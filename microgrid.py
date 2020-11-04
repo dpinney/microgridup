@@ -23,12 +23,11 @@ if not os.path.isfile(ONELINE_NAME):
 if not os.path.isdir(MAP_NAME):
 	geo.mapOmd(OMD_NAME, MAP_NAME, 'html', openBrowser=False, conversion=False, offline=True)
 
-# voltage plot
-# opendss.runDSS(f'./{DSS_NAME}')
-# opendss.voltagePlot(DSS_NAME, PU=True)
+# voltage and current plotting
+opendss.voltagePlot(DSS_NAME, PU=False)
+opendss.currentPlot(DSS_NAME)
 
 '''
-run powerflow?
 add (more) DG?
 get the loadshapes into opendss.
 translate coordinates to florida?

@@ -27,6 +27,18 @@ if not os.path.isdir(MAP_NAME):
 opendss.voltagePlot(DSS_NAME, PU=False)
 opendss.currentPlot(DSS_NAME)
 
+def the_whole_shebang(allInputData, modelDir, resilientDist=False):
+	if resilientDist:
+		allInputData['omd'] = resilientDist()
+		design_options = microgridDesign(candidate_gens_from_circuit)
+	else:
+		design_options = microgridDesign(set_of_loads_on_circuit)
+	for option in design_options:
+		derInterconnection(option) # Optional: weed out all the circuits in option that fail the screens.
+	for option in design_options:
+		microgridControl(option)
+	return allOutputData
+
 '''
 add (more) DG?
 get the loadshapes into opendss.

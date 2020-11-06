@@ -4,16 +4,17 @@ from omf import distNetViz
 from omf import geo
 import os
 
-DSS_NAME = 'ieee123_solarRamp.clean.dss'
-OMD_NAME = 'ieee123_solarRamp.clean.dss.omd'
-ONELINE_NAME = 'ieee123_solarRamp.oneline.html'
-MAP_NAME = 'ieee123_solarRamp_map'
+DSS_NAME = 'lehigh.dss'
+OMD_NAME = 'lehigh.dss.omd'
+ONELINE_NAME = 'lehigh.oneline.html'
+MAP_NAME = 'lehigh_map'
 
 # generate an OMD
 if not os.path.isfile(OMD_NAME):
 	tree = dssConvert.dssToTree(DSS_NAME)
 	evil_glm = dssConvert.evilDssTreeToGldTree(tree)
 	dssConvert.evilToOmd(evil_glm, OMD_NAME)
+	#todo: edit load coordinates.
 
 # draw the circuit
 if not os.path.isfile(ONELINE_NAME):

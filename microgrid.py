@@ -14,6 +14,7 @@ if not os.path.isfile(OMD_NAME):
 	tree = dssConvert.dssToTree(DSS_NAME)
 	evil_glm = dssConvert.evilDssTreeToGldTree(tree)
 	dssConvert.evilToOmd(evil_glm, OMD_NAME)
+	#todo: edit load coordinates.
 
 # draw the circuit
 if not os.path.isfile(ONELINE_NAME):
@@ -25,7 +26,7 @@ if not os.path.isdir(MAP_NAME):
 
 # voltage and current plotting
 opendss.voltagePlot(DSS_NAME, PU=False)
-# opendss.currentPlot(DSS_NAME)
+opendss.currentPlot(DSS_NAME)
 
 def the_whole_shebang(allInputData, modelDir, resilientDist=False):
 	if resilientDist:

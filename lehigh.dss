@@ -31,12 +31,16 @@ new object=linecode.mtx605 nphases=1 basefreq=60 rmatrix=[1.3292] xmatrix=[1.347
 new object=linecode.mtx606 nphases=3 units=mi rmatrix=[0.791721|0.318476,0.781649|0.28345,0.318476,0.791721] xmatrix=[0.438352|0.0276838,0.396697|-0.0184204,0.0276838,0.438352] cmatrix=[383.948|0,383.948|0,0,383.948]
 new object=linecode.mtx607 nphases=1 basefreq=60 rmatrix=[1.3425] xmatrix=[0.5124] cmatrix=[236] units=mi 
 
+!loadshape definitions
+new loadshape.634c_loadcurve npts=24 interval=1 useactual=no mult=[1.22,1.559,1.21,1.124,1.03,1.561,1.56,1.786,1.694,0.949,0.806,0.747,1.211,0.86,1.371,1.198,1.554,1.591,1.8,1.871,2.072,2.315,1.383,0.956]
+new object=loadshape.solarramp npts=300 interval=0.00027777778 mult=[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.98,0.97,0.96,0.95,0.94,0.93,0.92,0.91,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.87,0.89,0.92,0.93,0.94,0.95,0.96,0.975,0.98,0.99,0.995,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+
 !load definitions 
 new object=load.671 bus1=671.1.2.3 phases=3 conn=delta model=1 kv=4.16 kw=1155 kvar=660
 new object=load.634a bus1=634.1 phases=1 conn=wye model=1 kv=0.277 kw=160 kvar=110 
 new object=load.634b bus1=634.2 phases=1 conn=wye model=1 kv=0.277 kw=120 kvar=90 
 new object=load.634c bus1=634.3 phases=1 conn=wye model=1 kv=0.277 kw=120 kvar=90
-new object=load.645 bus1=645.2 phases=1 conn=wye model=1 kv=2.4 kw=170 kvar=125 !daily=634c_loadcurve
+new object=load.645 bus1=645.2 phases=1 conn=wye model=1 kv=2.4 kw=170 kvar=125 daily=634c_loadcurve
 new object=load.646 bus1=646.2.3 phases=1 conn=delta model=2 kv=4.16 kw=230 kvar=132 
 new object=load.692 bus1=692.3.1 phases=1 conn=delta model=5 kv=4.16 kw=170 kvar=151 
 new object=load.675a bus1=675.1 phases=1 conn=wye model=1 kv=2.4 kw=485 kvar=190 
@@ -48,10 +52,8 @@ new object=load.670a bus1=670.1 phases=1 conn=wye model=1 kv=2.4 kw=17 kvar=10
 new object=load.670b bus1=670.2 phases=1 conn=wye model=1 kv=2.4 kw=66 kvar=38 
 new object=load.670c bus1=670.3 phases=1 conn=wye model=1 kv=2.4 kw=117 kvar=68
 
-!loadshape definitions
-!new loadshape.634c_loadcurve npts=24 interval=1 useactual=no mult=[1.22,1.559,1.21,1.124,1.03,1.561,1.56,1.786,1.694,0.949,0.806,0.747,1.211,0.86,1.371,1.198,1.554,1.591,1.8,1.871,2.072,2.315,1.383,0.956]
-
 ! generator definitions
+new object=generator.solar_gen bus1=671.1.2.3 kv=4.16 kw=20 pf=1 duty=solarramp
 
 !capacitor definitions
 new object=capacitor.cap1 bus1=675 phases=3 kvar=600 kv=4.16 
@@ -75,6 +77,24 @@ new object=line.671692 phases=3 bus1=671.1.2.3 bus2=692.1.2.3 switch=y r1=1e-4 r
 
 ! bus coords
 makebuslist
+!rough lat/lon coords
+!setbusxy bus=sourcebus x=30.285013 y=-84.071493
+!setbusxy bus=650 x=30.285013 y=-84.071993
+!setbusxy bus=rg60 x=30.285013 y=-84.072493
+!setbusxy bus=646 x=30.283013 y=-84.072993
+!setbusxy bus=645 x=30.284013 y=-84.072993
+!setbusxy bus=632 x=30.285013 y=-84.072993
+!setbusxy bus=633 x=30.286513 y=-84.072993
+!setbusxy bus=634 x=30.287013 y=-84.072993
+!setbusxy bus=670 x=30.285013 y=-84.073493
+!setbusxy bus=611 x=30.283013 y=-84.074493
+!setbusxy bus=684 x=30.284013 y=-84.074493
+!setbusxy bus=671 x=30.285013 y=-84.074493
+!setbusxy bus=692 x=30.285513 y=-84.074493
+!setbusxy bus=675 x=30.287013 y=-84.074493
+!setbusxy bus=652 x=30.284013 y=-84.075493
+!setbusxy bus=680 x=30.285013 y=-84.075493
+!map feet coords
 setbusxy bus=sourcebus x=200 y=400
 setbusxy bus=650 x=200 y=350
 setbusxy bus=rg60 x=200 y=300

@@ -34,6 +34,7 @@ if not os.path.isdir(MAP_NAME):
 # dssConvert.treeToDss(tree, 'lehigh_shapes.dss'):
 
 # voltage and current plotting
+opendss.qstsPlot(DSS_NAME, 60, 10)
 opendss.voltagePlot(DSS_NAME, PU=False)
 opendss.currentPlot(DSS_NAME)
 
@@ -50,7 +51,6 @@ def the_whole_shebang(allInputData, modelDir, resilientDist=False):
 	return allOutputData
 
 '''
-timeseries powerflow...
 insert real loadshapes...
 get a battery loadshape (schedule)...
 translate coordinates to florida?

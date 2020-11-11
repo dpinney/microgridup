@@ -41,8 +41,6 @@ def the_whole_shebang(allInputData, modelDir, resilientDist=False):
 	return allOutputData
 
 '''
-add (more) DG?
-get the loadshapes into opendss.
 translate coordinates to florida?
 	Could just move the x,y coords
 	Could convert in geo.py

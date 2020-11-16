@@ -5,27 +5,52 @@ from omf import geo
 import os
 from pprint import pprint as pp
 
+# File paths.
 DSS_NAME = 'lehigh.dss'
 OMD_NAME = 'lehigh.dss.omd'
 ONELINE_NAME = 'lehigh.oneline.html'
 MAP_NAME = 'lehigh_map'
 
-# generate an OMD
+# Microgrid definitions.
+microgrids = {
+	'm1': {
+		'loads': ['634a','634b','634c'],
+		'switch': '632633',
+		'gen_bus': '634'
+	},
+	'm2': {
+		'loads': ['675a','675b','675c'],
+		'switch': '671692',
+		'gen_bus': '675'
+	},
+	'm3': {
+		'loads': ['611','652'],
+		'switch': '671684',
+		'gen_bus': '684'
+	},
+	'm4': {
+		'loads': ['645','646'],
+		'switch': '632645',
+		'gen_bus': '646'
+	}
+}
+
+# Generate an OMD.
 if not os.path.isfile(OMD_NAME):
 	tree = dssConvert.dssToTree(DSS_NAME)
 	evil_glm = dssConvert.evilDssTreeToGldTree(tree)
 	dssConvert.evilToOmd(evil_glm, OMD_NAME)
 	#todo: edit load coordinates.
 
-# draw the circuit
+# Draw the circuit.
 if not os.path.isfile(ONELINE_NAME):
 	distNetViz.viz(OMD_NAME, forceLayout=False, outputPath='.', outputName=ONELINE_NAME, open_file=False)
 
-# draw the map
+# Draw the map.
 if not os.path.isdir(MAP_NAME):
 	geo.mapOmd(OMD_NAME, MAP_NAME, 'html', openBrowser=False, conversion=False, offline=True)
 
-# insert loadshapes
+# Insert loadshapes.
 # tree = dssConvert.dssToTree(DSS_NAME)
 # for ob in tree:
 # 	if ob.get('object','') == 'loadshape.solarramp':
@@ -33,8 +58,8 @@ if not os.path.isdir(MAP_NAME):
 # pp([dict(x) for x in tree])
 # dssConvert.treeToDss(tree, 'lehigh_shapes.dss'):
 
-# voltage and current plotting
-opendss.qstsPlot(DSS_NAME, 60, 10)
+# Voltage and current plotting.
+# opendss.qstsPlot(DSS_NAME, 60, 10)
 opendss.voltagePlot(DSS_NAME, PU=False)
 opendss.currentPlot(DSS_NAME)
 

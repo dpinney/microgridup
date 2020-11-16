@@ -1,0 +1,146 @@
+[
+    {
+        "object": "circuit",
+        "name": "ieee13nodeckt",
+        "longitude": 178.09254310038767,
+        "latitude": 403.39944852373304
+    },
+    {
+        "object": "regcontrol",
+        "name": "reg1",
+        "longitude": 188.09331189000395,
+        "latitude": 325.50914058911974
+    },
+    {
+        "object": "regcontrol",
+        "name": "reg2",
+        "longitude": 13.786594091889095,
+        "latitude": 415.486322646821
+    },
+    {
+        "object": "regcontrol",
+        "name": "reg3",
+        "longitude": 23.60717954986832,
+        "latitude": 397.73372614412966
+    },
+    {
+        "object": "load",
+        "name": "671",
+        "longitude": 236.26062252055485,
+        "latitude": 130.68934004426114
+    },
+    {
+        "object": "load",
+        "name": "634a",
+        "longitude": 372.6156720299221,
+        "latitude": 228.13976900786923
+    },
+    {
+        "object": "load",
+        "name": "634b",
+        "longitude": 357.5070790176464,
+        "latitude": 276.10955182184466
+    },
+    {
+        "object": "load",
+        "name": "634c",
+        "longitude": 393.01227502291556,
+        "latitude": 288.95185156111677
+    },
+    {
+        "object": "load",
+        "name": "645",
+        "longitude": 111.23701534397314,
+        "latitude": 282.1529849923254
+    },
+    {
+        "object": "load",
+        "name": "646",
+        "longitude": -10.764875656574599,
+        "latitude": 281.3975593761412
+    },
+    {
+        "object": "load",
+        "name": "692",
+        "longitude": 271.3881012740959,
+        "latitude": 121.62419129282489
+    },
+    {
+        "object": "load",
+        "name": "675a",
+        "longitude": 355.6185054962763,
+        "latitude": 120.49104799265228
+    },
+    {
+        "object": "load",
+        "name": "675b",
+        "longitude": 394.90084879211486,
+        "latitude": 142.02078956553567
+    },
+    {
+        "object": "load",
+        "name": "675c",
+        "longitude": 369.2162386021601,
+        "latitude": 145.04250744035267
+    },
+    {
+        "object": "load",
+        "name": "611",
+        "longitude": 39.8489109345491,
+        "latitude": 135.59963680768033
+    },
+    {
+        "object": "load",
+        "name": "652",
+        "longitude": 66.6666683034924,
+        "latitude": 10.95374728050632
+    },
+    {
+        "object": "load",
+        "name": "670a",
+        "longitude": 225.68460741196182,
+        "latitude": 207.74317146279654
+    },
+    {
+        "object": "load",
+        "name": "670b",
+        "longitude": 230.21718531564457,
+        "latitude": 192.25686362521392
+    },
+    {
+        "object": "load",
+        "name": "670c",
+        "longitude": 225.68460498554063,
+        "latitude": 172.61568968775586
+    },
+    {
+        "object": "generator",
+        "name": "solar_gen",
+        "longitude": 187.15769280423748,
+        "latitude": 132.9556330305321
+    },
+    {
+        "object": "generator",
+        "name": "diesel",
+        "longitude": 170.53824049073418,
+        "latitude": 121.6241882713253
+    },
+    {
+        "object": "storage",
+        "name": "bat1",
+        "longitude": 164.87251935027706,
+        "latitude": 142.02078883789756
+    },
+    {
+        "object": "capacitor",
+        "name": "cap1",
+        "longitude": 338.9990586811242,
+        "latitude": 146.93108156688714
+    },
+    {
+        "object": "capacitor",
+        "name": "cap2",
+        "longitude": -9.631731180653919,
+        "latitude": 128.80076995215626
+    }
+]

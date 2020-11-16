@@ -38,11 +38,12 @@ microgrids = {
 # Generate an OMD.
 if not os.path.isfile(OMD_NAME):
 	tree = dssConvert.dssToTree(DSS_NAME)
+	print(tree)
 	evil_glm = dssConvert.evilDssTreeToGldTree(tree)
-	dssConvert.evilToOmd(evil_glm, OMD_NAME)
 	#todo: edit load coordinates.
+	dssConvert.evilToOmd(evil_glm, OMD_NAME)
 
-# Draw the circuit.
+# Draw the circuit online.
 if not os.path.isfile(ONELINE_NAME):
 	distNetViz.viz(OMD_NAME, forceLayout=False, outputPath='.', outputName=ONELINE_NAME, open_file=False)
 
@@ -60,8 +61,8 @@ if not os.path.isdir(MAP_NAME):
 
 # Voltage and current plotting.
 # opendss.qstsPlot(DSS_NAME, 60, 10)
-opendss.voltagePlot(DSS_NAME, PU=False)
-opendss.currentPlot(DSS_NAME)
+opendss.voltagePlot(DSS_NAME, PU=True)
+# opendss.currentPlot(DSS_NAME)
 
 def the_whole_shebang(allInputData, modelDir, resilientDist=False):
 	if resilientDist:

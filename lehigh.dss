@@ -119,3 +119,4 @@ setbusxy bus=680 x=200 y=0
 
 ! set voltages
 set voltagebases=[115,4.16,0.48]
+calcvoltagebases

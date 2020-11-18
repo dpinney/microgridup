@@ -4,6 +4,7 @@ from omf import distNetViz
 from omf import geo
 import os
 from pprint import pprint as pp
+import json
 
 # File paths.
 DSS_NAME = 'lehigh.dss'
@@ -38,9 +39,18 @@ microgrids = {
 # Generate an OMD.
 if not os.path.isfile(OMD_NAME):
 	tree = dssConvert.dssToTree(DSS_NAME)
-	print(tree)
 	evil_glm = dssConvert.evilDssTreeToGldTree(tree)
-	#todo: edit load coordinates.
+	add_coords = json.load(open('additional_coords.json'))
+	# Injecting additional coordinates.
+	for ob in evil_glm.values():
+		ob_name = ob.get('name','')
+		ob_type = ob.get('object','')
+		for ob2 in add_coords:
+			ob2_name = ob2.get('name','')
+			ob2_type = ob2.get('object','')
+			if ob_name == ob2_name and ob_type == ob2_type:
+				ob['latitude'] = ob2.get('latitude',0)
+				ob['longitude'] = ob2.get('longitude',0)
 	dssConvert.evilToOmd(evil_glm, OMD_NAME)
 
 # Draw the circuit online.

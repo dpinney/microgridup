@@ -30,7 +30,9 @@
             "phases": "3",
             "angle": "30",
             "mvasc3": "20000",
-            "mvasc1": "21000"
+            "mvasc1": "21000",
+            "latitude": 403.39944852373304,
+            "longitude": 178.09254310038767
         },
         "4": {
             "object": "transformer",
@@ -74,7 +76,9 @@
             "ptratio": "20",
             "ctprim": "700",
             "r": "3",
-            "x": "9"
+            "x": "9",
+            "latitude": 325.50914058911974,
+            "longitude": 188.09331189000395
         },
         "7": {
             "object": "transformer",
@@ -100,7 +104,9 @@
             "ptratio": "20",
             "ctprim": "700",
             "r": "3",
-            "x": "9"
+            "x": "9",
+            "latitude": 415.486322646821,
+            "longitude": 13.786594091889095
         },
         "9": {
             "object": "transformer",
@@ -126,7 +132,9 @@
             "ptratio": "20",
             "ctprim": "700",
             "r": "3",
-            "x": "9"
+            "x": "9",
+            "latitude": 397.73372614412966,
+            "longitude": 23.60717954986832
         },
         "11": {
             "object": "transformer",
@@ -224,6 +232,14 @@
             "mult": "[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]"
         },
         "21": {
+            "object": "loadshape",
+            "name": "634c_loadcurve",
+            "npts": "24",
+            "interval": "1",
+            "useactual": "no",
+            "mult": "[1.22,1.559,1.21,1.124,1.03,1.561,1.56,1.786,1.694,0.949,0.806,0.747,1.211,0.86,1.371,1.198,1.554,1.591,1.8,1.871,2.072,2.315,1.383,0.956]"
+        },
+        "22": {
             "object": "load",
             "name": "671",
             "parent": "671",
@@ -233,9 +249,11 @@
             "kv": "4.16",
             "kw": "1155",
             "kvar": "660",
-            "!CONNCODE": ".1.2.3"
+            "!CONNCODE": ".1.2.3",
+            "latitude": 130.68934004426114,
+            "longitude": 236.26062252055485
         },
-        "22": {
+        "23": {
             "object": "load",
             "name": "634a",
             "parent": "634",
@@ -245,9 +263,11 @@
             "kv": "0.277",
             "kw": "160",
             "kvar": "110",
-            "!CONNCODE": ".1"
+            "!CONNCODE": ".1",
+            "latitude": 228.13976900786923,
+            "longitude": 372.6156720299221
         },
-        "23": {
+        "24": {
             "object": "load",
             "name": "634b",
             "parent": "634",
@@ -257,9 +277,11 @@
             "kv": "0.277",
             "kw": "120",
             "kvar": "90",
-            "!CONNCODE": ".2"
+            "!CONNCODE": ".2",
+            "latitude": 276.10955182184466,
+            "longitude": 357.5070790176464
         },
-        "24": {
+        "25": {
             "object": "load",
             "name": "634c",
             "parent": "634",
@@ -269,9 +291,11 @@
             "kv": "0.277",
             "kw": "120",
             "kvar": "90",
-            "!CONNCODE": ".3"
+            "!CONNCODE": ".3",
+            "latitude": 288.95185156111677,
+            "longitude": 393.01227502291556
         },
-        "25": {
+        "26": {
             "object": "load",
             "name": "645",
             "parent": "645",
@@ -282,9 +306,11 @@
             "kw": "170",
             "kvar": "125",
             "daily": "634c_loadcurve",
-            "!CONNCODE": ".2"
+            "!CONNCODE": ".2",
+            "latitude": 282.1529849923254,
+            "longitude": 111.23701534397314
         },
-        "26": {
+        "27": {
             "object": "load",
             "name": "646",
             "parent": "646",
@@ -294,9 +320,11 @@
             "kv": "4.16",
             "kw": "230",
             "kvar": "132",
-            "!CONNCODE": ".2.3"
+            "!CONNCODE": ".2.3",
+            "latitude": 281.3975593761412,
+            "longitude": -10.764875656574599
         },
-        "27": {
+        "28": {
             "object": "load",
             "name": "692",
             "parent": "692",
@@ -306,9 +334,11 @@
             "kv": "4.16",
             "kw": "170",
             "kvar": "151",
-            "!CONNCODE": ".3.1"
+            "!CONNCODE": ".3.1",
+            "latitude": 121.62419129282489,
+            "longitude": 271.3881012740959
         },
-        "28": {
+        "29": {
             "object": "load",
             "name": "675a",
             "parent": "675",
@@ -318,9 +348,11 @@
             "kv": "2.4",
             "kw": "485",
             "kvar": "190",
-            "!CONNCODE": ".1"
+            "!CONNCODE": ".1",
+            "latitude": 120.49104799265228,
+            "longitude": 355.6185054962763
         },
-        "29": {
+        "30": {
             "object": "load",
             "name": "675b",
             "parent": "675",
@@ -330,9 +362,11 @@
             "kv": "2.4",
             "kw": "68",
             "kvar": "60",
-            "!CONNCODE": ".2"
+            "!CONNCODE": ".2",
+            "latitude": 142.02078956553567,
+            "longitude": 394.90084879211486
         },
-        "30": {
+        "31": {
             "object": "load",
             "name": "675c",
             "parent": "675",
@@ -342,9 +376,11 @@
             "kv": "2.4",
             "kw": "290",
             "kvar": "212",
-            "!CONNCODE": ".3"
+            "!CONNCODE": ".3",
+            "latitude": 145.04250744035267,
+            "longitude": 369.2162386021601
         },
-        "31": {
+        "32": {
             "object": "load",
             "name": "611",
             "parent": "611",
@@ -354,9 +390,11 @@
             "kv": "2.4",
             "kw": "170",
             "kvar": "80",
-            "!CONNCODE": ".3"
+            "!CONNCODE": ".3",
+            "latitude": 135.59963680768033,
+            "longitude": 39.8489109345491
         },
-        "32": {
+        "33": {
             "object": "load",
             "name": "652",
             "parent": "652",
@@ -366,9 +404,11 @@
             "kv": "2.4",
             "kw": "128",
             "kvar": "86",
-            "!CONNCODE": ".1"
+            "!CONNCODE": ".1",
+            "latitude": 10.95374728050632,
+            "longitude": 66.6666683034924
         },
-        "33": {
+        "34": {
             "object": "load",
             "name": "670a",
             "parent": "670",
@@ -378,9 +418,11 @@
             "kv": "2.4",
             "kw": "17",
             "kvar": "10",
-            "!CONNCODE": ".1"
+            "!CONNCODE": ".1",
+            "latitude": 207.74317146279654,
+            "longitude": 225.68460741196182
         },
-        "34": {
+        "35": {
             "object": "load",
             "name": "670b",
             "parent": "670",
@@ -390,9 +432,11 @@
             "kv": "2.4",
             "kw": "66",
             "kvar": "38",
-            "!CONNCODE": ".2"
+            "!CONNCODE": ".2",
+            "latitude": 192.25686362521392,
+            "longitude": 230.21718531564457
         },
-        "35": {
+        "36": {
             "object": "load",
             "name": "670c",
             "parent": "670",
@@ -402,9 +446,11 @@
             "kv": "2.4",
             "kw": "117",
             "kvar": "68",
-            "!CONNCODE": ".3"
+            "!CONNCODE": ".3",
+            "latitude": 172.61568968775586,
+            "longitude": 225.68460498554063
         },
-        "36": {
+        "37": {
             "object": "generator",
             "name": "solar_gen",
             "parent": "671",
@@ -412,9 +458,11 @@
             "kw": "20",
             "pf": "1",
             "duty": "solarramp",
-            "!CONNCODE": ".1.2.3"
+            "!CONNCODE": ".1.2.3",
+            "latitude": 132.9556330305321,
+            "longitude": 187.15769280423748
         },
-        "37": {
+        "38": {
             "object": "generator",
             "name": "diesel",
             "parent": "671",
@@ -427,9 +475,11 @@
             "h": "2",
             "conn": "delta",
             "duty": "dieselshape",
-            "!CONNCODE": ".1.2.3"
+            "!CONNCODE": ".1.2.3",
+            "latitude": 121.6241882713253,
+            "longitude": 170.53824049073418
         },
-        "38": {
+        "39": {
             "object": "storage",
             "name": "bat1",
             "parent": "671",
@@ -446,50 +496,32 @@
             "%idlingkw": "1",
             "%r": "0",
             "%x": "50",
-            "!CONNCODE": ".1.2.3"
+            "!CONNCODE": ".1.2.3",
+            "latitude": 142.02078883789756,
+            "longitude": 164.87251935027706
         },
-        "39": {
+        "40": {
             "object": "capacitor",
             "name": "cap1",
             "parent": "675",
             "phases": "3",
             "kvar": "600",
-            "kv": "4.16"
+            "kv": "4.16",
+            "latitude": 146.93108156688714,
+            "longitude": 338.9990586811242
         },
-        "40": {
+        "41": {
             "object": "capacitor",
             "name": "cap2",
             "parent": "611",
             "phases": "1",
             "kvar": "100",
             "kv": "2.4",
-            "!CONNCODE": ".3"
-        },
-        "41": {
-            "object": "line",
-            "name": "650632",
-            "from": "rg60",
-            "to": "632",
-            "!FROCODE": ".1.2.3",
-            "!TOCODE": ".1.2.3",
-            "phases": "3",
-            "linecode": "mtx601",
-            "length": "2000",
-            "units": "ft"
+            "!CONNCODE": ".3",
+            "latitude": 128.80076995215626,
+            "longitude": -9.631731180653919
         },
         "42": {
-            "object": "line",
-            "name": "632670",
-            "from": "632",
-            "to": "670",
-            "!FROCODE": ".1.2.3",
-            "!TOCODE": ".1.2.3",
-            "phases": "3",
-            "linecode": "mtx601",
-            "length": "667",
-            "units": "ft"
-        },
-        "43": {
             "object": "line",
             "name": "670671",
             "from": "670",
@@ -501,7 +533,7 @@
             "length": "1333",
             "units": "ft"
         },
-        "44": {
+        "43": {
             "object": "line",
             "name": "671680",
             "from": "671",
@@ -513,31 +545,7 @@
             "length": "1000",
             "units": "ft"
         },
-        "45": {
-            "object": "line",
-            "name": "632633",
-            "from": "632",
-            "to": "633",
-            "!FROCODE": ".1.2.3",
-            "!TOCODE": ".1.2.3",
-            "phases": "3",
-            "linecode": "mtx602",
-            "length": "500",
-            "units": "ft"
-        },
-        "46": {
-            "object": "line",
-            "name": "632645",
-            "from": "632",
-            "to": "645",
-            "!FROCODE": ".3.2",
-            "!TOCODE": ".3.2",
-            "phases": "2",
-            "linecode": "mtx603",
-            "length": "500",
-            "units": "ft"
-        },
-        "47": {
+        "44": {
             "object": "line",
             "name": "645646",
             "from": "645",
@@ -549,7 +557,7 @@
             "length": "300",
             "units": "ft"
         },
-        "48": {
+        "45": {
             "object": "line",
             "name": "692675",
             "from": "692",
@@ -561,19 +569,7 @@
             "length": "500",
             "units": "ft"
         },
-        "49": {
-            "object": "line",
-            "name": "671684",
-            "from": "671",
-            "to": "684",
-            "!FROCODE": ".1.3",
-            "!TOCODE": ".1.3",
-            "phases": "2",
-            "linecode": "mtx604",
-            "length": "300",
-            "units": "ft"
-        },
-        "50": {
+        "46": {
             "object": "line",
             "name": "684611",
             "from": "684",
@@ -585,7 +581,7 @@
             "length": "300",
             "units": "ft"
         },
-        "51": {
+        "47": {
             "object": "line",
             "name": "684652",
             "from": "684",
@@ -597,7 +593,7 @@
             "length": "800",
             "units": "ft"
         },
-        "52": {
+        "48": {
             "object": "line",
             "name": "671692",
             "from": "671",
@@ -613,110 +609,179 @@
             "c1": "0.000",
             "c0": "0.000"
         },
+        "49": {
+            "object": "line",
+            "name": "632633",
+            "from": "632",
+            "to": "633",
+            "!FROCODE": ".1.2.3",
+            "!TOCODE": ".1.2.3",
+            "phases": "3",
+            "switch": "y",
+            "linecode": "mtx602",
+            "length": "500",
+            "units": "ft"
+        },
+        "50": {
+            "object": "line",
+            "name": "671684",
+            "from": "671",
+            "to": "684",
+            "!FROCODE": ".1.3",
+            "!TOCODE": ".1.3",
+            "phases": "2",
+            "switch": "y",
+            "linecode": "mtx604",
+            "length": "300",
+            "units": "ft"
+        },
+        "51": {
+            "object": "line",
+            "name": "632645",
+            "from": "632",
+            "to": "645",
+            "!FROCODE": ".3.2",
+            "!TOCODE": ".3.2",
+            "phases": "2",
+            "switch": "y",
+            "linecode": "mtx603",
+            "length": "500",
+            "units": "ft"
+        },
+        "52": {
+            "object": "line",
+            "name": "632670",
+            "from": "632",
+            "to": "670",
+            "!FROCODE": ".1.2.3",
+            "!TOCODE": ".1.2.3",
+            "phases": "3",
+            "switch": "y",
+            "linecode": "mtx601",
+            "length": "667",
+            "units": "ft"
+        },
         "53": {
+            "object": "line",
+            "name": "650632",
+            "from": "rg60",
+            "to": "632",
+            "!FROCODE": ".1.2.3",
+            "!TOCODE": ".1.2.3",
+            "phases": "3",
+            "switch": "y",
+            "linecode": "mtx601",
+            "length": "2000",
+            "units": "ft"
+        },
+        "54": {
             "object": "!CMD",
             "name": "makebuslist"
         },
-        "54": {
+        "55": {
             "object": "bus",
             "name": "sourcebus",
             "latitude": "400",
             "longitude": "200"
         },
-        "55": {
+        "56": {
             "object": "bus",
             "name": "650",
             "latitude": "350",
             "longitude": "200"
         },
-        "56": {
+        "57": {
             "object": "bus",
             "name": "rg60",
             "latitude": "300",
             "longitude": "200"
         },
-        "57": {
+        "58": {
             "object": "bus",
             "name": "646",
             "latitude": "250",
             "longitude": "0"
         },
-        "58": {
+        "59": {
             "object": "bus",
             "name": "645",
             "latitude": "250",
             "longitude": "100"
         },
-        "59": {
+        "60": {
             "object": "bus",
             "name": "632",
             "latitude": "250",
             "longitude": "200"
         },
-        "60": {
+        "61": {
             "object": "bus",
             "name": "633",
             "latitude": "250",
             "longitude": "350"
         },
-        "61": {
+        "62": {
             "object": "bus",
             "name": "634",
             "latitude": "250",
             "longitude": "400"
         },
-        "62": {
+        "63": {
             "object": "bus",
             "name": "670",
             "latitude": "200",
             "longitude": "200"
         },
-        "63": {
+        "64": {
             "object": "bus",
             "name": "611",
             "latitude": "100",
             "longitude": "0"
         },
-        "64": {
+        "65": {
             "object": "bus",
             "name": "684",
             "latitude": "100",
             "longitude": "100"
         },
-        "65": {
+        "66": {
             "object": "bus",
             "name": "671",
             "latitude": "100",
             "longitude": "200"
         },
-        "66": {
+        "67": {
             "object": "bus",
             "name": "692",
             "latitude": "100",
             "longitude": "250"
         },
-        "67": {
+        "68": {
             "object": "bus",
             "name": "675",
             "latitude": "100",
             "longitude": "400"
         },
-        "68": {
+        "69": {
             "object": "bus",
             "name": "652",
             "latitude": "0",
             "longitude": "100"
         },
-        "69": {
+        "70": {
             "object": "bus",
             "name": "680",
             "latitude": "0",
             "longitude": "200"
         },
-        "70": {
+        "71": {
             "object": "!CMD",
             "name": "set",
             "voltagebases": "[115,4.16,0.48]"
+        },
+        "72": {
+            "object": "!CMD",
+            "name": "calcvoltagebases"
         }
     },
     "attachments": {},

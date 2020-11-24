@@ -70,8 +70,8 @@ if not os.path.isdir(MAP_NAME):
 # dssConvert.treeToDss(tree, 'lehigh_shapes.dss'):
 
 # Voltage and current plotting.
-# opendss.qstsPlot(DSS_NAME, 60, 10)
-opendss.voltagePlot(DSS_NAME, PU=True)
+opendss.qstsPlot(DSS_NAME, 60, 10)
+# opendss.voltagePlot(DSS_NAME, PU=True)
 # opendss.currentPlot(DSS_NAME)
 
 def the_whole_shebang(allInputData, modelDir, resilientDist=False):

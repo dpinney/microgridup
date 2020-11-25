@@ -72,7 +72,7 @@ if not os.path.isdir(MAP_NAME):
 # dssConvert.treeToDss(tree, 'lehigh_shapes.dss'):
 
 # Powerflow outputs.
-opendss.newQstsPlot(DSS_NAME, stepSizeInMinutes=60, numberOfSteps=24*10)
+opendss.newQstsPlot(DSS_NAME, stepSizeInMinutes=60, numberOfSteps=24*10, keepAllFiles=False)
 # opendss.qstsPlot(DSS_NAME, stepSizeInMinutes=60, numberOfSteps=100, getVolts=True, getLoads=True, getGens=True)
 # opendss.voltagePlot(DSS_NAME, PU=True)
 # opendss.currentPlot(DSS_NAME)
@@ -90,7 +90,7 @@ def make_chart(csvName, series_name, x, y):
 		)
 		data.append(trace)
 	layout = plotly.graph_objs.Layout(
-		title = f'{series_name} Output',
+		title = f'{csvName} Output',
 		xaxis = dict(title = x),
 		yaxis = dict(title = y)
 	)

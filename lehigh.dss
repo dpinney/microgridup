@@ -160,11 +160,11 @@ set voltagebases=[115,4.16,0.48]
 calcvoltagebases
 
 ! output monitors
-new object=monitor.m1 element=generator.solar_634 terminal=1 mode=1 ppolar=no 
-new object=monitor.m2 element=generator.solar_634 terminal=1 mode=0
+! new object=monitor.m1 element=generator.solar_634 terminal=1 mode=1 ppolar=no 
+!  new object=monitor.m2 element=generator.solar_634 terminal=1 mode=0
 
 ! annual test
-set mode=yearly stepsize=1.0h number=8760 controlmode=static
-solve
-export monitors monitorname=m1
-export monitors monitorname=m2
+! set mode=yearly stepsize=1.0h number=8760 controlmode=static
+! solve
+! export monitors monitorname=m1
+! export monitors monitorname=m2

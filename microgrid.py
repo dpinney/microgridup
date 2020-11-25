@@ -70,7 +70,7 @@ if not os.path.isdir(MAP_NAME):
 # dssConvert.treeToDss(tree, 'lehigh_shapes.dss'):
 
 # Voltage and current plotting.
-opendss.qstsPlot(DSS_NAME, 60, 10)
+opendss.qstsPlot(DSS_NAME, stepSizeInMinutes=60, numberOfSteps=100, getVolts=True, getLoads=True, getGens=True)
 # opendss.voltagePlot(DSS_NAME, PU=True)
 # opendss.currentPlot(DSS_NAME)
 

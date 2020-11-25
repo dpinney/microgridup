@@ -71,6 +71,8 @@ if not os.path.isdir(MAP_NAME):
 # pp([dict(x) for x in tree])
 # dssConvert.treeToDss(tree, 'lehigh_shapes.dss'):
 
+#TODO: generate the microgrid specs with REOpt here.
+
 # Powerflow outputs.
 opendss.newQstsPlot(DSS_NAME, stepSizeInMinutes=60, numberOfSteps=24*10, keepAllFiles=False)
 # opendss.qstsPlot(DSS_NAME, stepSizeInMinutes=60, numberOfSteps=100, getVolts=True, getLoads=True, getGens=True)
@@ -99,6 +101,7 @@ def make_chart(csvName, category_name, x, y):
 make_chart('timeseries_gen.csv', 'Name', 'hour', 'P1(kW)')
 make_chart('timeseries_load.csv', 'Name', 'hour', 'V1')
 make_chart('timeseries_source.csv', 'Name', 'hour', 'P1(kW)')
+make_chart('timeseries_control.csv', 'Name', 'hour', 'Tap(pu)')
 
 def the_whole_shebang(allInputData, modelDir, resilientDist=False):
 	if resilientDist:

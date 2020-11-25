@@ -2,7 +2,7 @@ clear
 set defaultbasefrequency=60
 
 ! around 3.5 mw of load
-new object=circuit.ieee13nodeckt basekv=115 pu=1.0001 phases=3 bus1=sourcebus angle=30 mvasc3=20000 mvasc1=21000 
+new object=circuit.lehigh basekv=115 pu=1.0001 phases=3 bus1=sourcebus angle=30 mvasc3=20000 mvasc1=21000 
 
 !sub transformer definition 
 new object=transformer.sub phases=3 windings=2 xhl=0.008 windings=2 buses=[sourcebus,650] conns=[delta,wye] kvs=[115,4.16] kvas=[5000,5000] %rs=[0.0005,0.0005]
@@ -77,24 +77,24 @@ new object=loadshape.battery_2017 npts=8760 interval=1 useactual=no mult=[0.7500
 !new object=storage.bat1 phases=3 bus1=671.1.2.3 kv=4.16 kwhstored=200 kwhrated=200 kva=100 kvar=100 %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
 
 ! microgrid m1 generator definitions
-new object=generator.solar_634 bus1=634.1.2.3 kv=4.16 kw=440 pf=1 duty=solar_2017
-new object=generator.diesel_634 bus1=634.1.2.3 kw=165 pf=1 kva=0 kv=4.16 xdp=0.27 xdpp=0.2 h=2 conn=delta duty=diesel_flat
-new object=storage.battery_634 phases=3 bus1=634.1.2.3 kv=4.16 kwhstored=307 kwhrated=307 kva=79 kvar=79 %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50 duty=battery_2017
+new object=generator.solar_634 bus1=634.1.2.3 kv=4.16 kw=440 pf=1 yearly=solar_2017
+new object=generator.diesel_634 bus1=634.1.2.3 kw=165 pf=1 kv=4.16 xdp=0.27 xdpp=0.2 h=2 conn=delta yearly=diesel_flat
+new object=storage.battery_634 phases=3 bus1=634.1.2.3 kv=4.16 kwhstored=307 kwhrated=307 kva=79 kvar=79 %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50 yearly=battery_2017
 
 ! microgrid m2 generator definitions
-new object=generator.solar_675 bus1=675.1.2.3 kv=4.16 kw=1234 pf=1 duty=solar_2017
-new object=generator.diesel_675 bus1=675.1.2.3 kw=265 pf=1 kva=0 kv=4.16 xdp=0.27 xdpp=0.2 h=2 conn=delta duty=diesel_flat
-new object=storage.battery_675 phases=3 bus1=675.1.2.3 kv=4.16 kwhstored=553 kwhrated=553 kva=198 kvar=198 %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50 duty=battery_2017
+new object=generator.solar_675 bus1=675.1.2.3 kv=4.16 kw=1234 pf=1 yearly=solar_2017
+new object=generator.diesel_675 bus1=675.1.2.3 kw=265 pf=1 kv=4.16 xdp=0.27 xdpp=0.2 h=2 conn=delta yearly=diesel_flat
+new object=storage.battery_675 phases=3 bus1=675.1.2.3 kv=4.16 kwhstored=553 kwhrated=553 kva=198 kvar=198 %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50 yearly=battery_2017
 
 ! microgrid m3 generator definitions
-new object=generator.solar_684 bus1=684 kv=4.16 kw=432 pf=1 duty=solar_2017
-new object=generator.diesel_684 bus1=684 kw=81 pf=1 kva=0 kv=4.16 xdp=0.27 xdpp=0.2 h=2 conn=delta duty=diesel_flat
-new object=storage.battery_684 phases=3 bus1=684 kv=4.16 kwhstored=225 kwhrated=225 kva=83 kvar=83 %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50 duty=battery_2017
+! new object=generator.solar_684 bus1=684 kv=4.16 kw=432 pf=1 yearly=solar_2017
+new object=generator.diesel_684 bus1=684 kw=81 pf=1 kv=4.16 xdp=0.27 xdpp=0.2 h=2 conn=delta yearly=diesel_flat
+new object=storage.battery_684 phases=3 bus1=684 kv=4.16 kwhstored=225 kwhrated=225 kva=83 kvar=83 %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50 yearly=battery_2017
 
 ! microgrid m4 generator definitions
-new object=generator.solar_646 bus1=646.2.3 kv=4.16 kw=590 pf=1 duty=solar_2017
-new object=generator.diesel_646 bus1=646.2.3 kw=145 pf=1 kva=0 kv=4.16 xdp=0.27 xdpp=0.2 h=2 conn=delta duty=diesel_flat
-new object=storage.battery_646 phases=3 bus1=646.2.3 kv=4.16 kwhstored=346 kwhrated=346 kva=98 kvar=98 %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50 duty=battery_2017
+new object=generator.solar_646 bus1=646.2.3 kv=4.16 kw=590 pf=1 yearly=solar_2017
+new object=generator.diesel_646 bus1=646.2.3 kw=145 pf=1 kv=4.16 xdp=0.27 xdpp=0.2 h=2 conn=delta yearly=diesel_flat
+new object=storage.battery_646 phases=3 bus1=646.2.3 kv=4.16 kwhstored=346 kwhrated=346 kva=98 kvar=98 %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50 yearly=battery_2017
 
 !capacitor definitions
 new object=capacitor.cap1 bus1=675 phases=3 kvar=600 kv=4.16 

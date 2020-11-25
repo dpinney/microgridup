@@ -5,6 +5,8 @@ from omf import geo
 import os
 from pprint import pprint as pp
 import json
+import pandas as pd
+import plotly
 
 # File paths.
 DSS_NAME = 'lehigh.dss'
@@ -69,10 +71,33 @@ if not os.path.isdir(MAP_NAME):
 # pp([dict(x) for x in tree])
 # dssConvert.treeToDss(tree, 'lehigh_shapes.dss'):
 
-# Voltage and current plotting.
-# opendss.qstsPlot(DSS_NAME, 60, 10)
-opendss.voltagePlot(DSS_NAME, PU=True)
+# Powerflow outputs.
+opendss.newQstsPlot(DSS_NAME, stepSizeInMinutes=60, numberOfSteps=24*10, keepAllFiles=False)
+# opendss.qstsPlot(DSS_NAME, stepSizeInMinutes=60, numberOfSteps=100, getVolts=True, getLoads=True, getGens=True)
+# opendss.voltagePlot(DSS_NAME, PU=True)
 # opendss.currentPlot(DSS_NAME)
+
+# Charting outputs.
+def make_chart(csvName, series_name, x, y):
+	gen_data = pd.read_csv(csvName)
+	data = []
+	for ob_name in set(gen_data[series_name]):
+		this_series = gen_data[gen_data[series_name] == ob_name]
+		trace = plotly.graph_objs.Scatter(
+			x = this_series[x],
+			y = this_series[y],
+			name = ob_name
+		)
+		data.append(trace)
+	layout = plotly.graph_objs.Layout(
+		title = f'{csvName} Output',
+		xaxis = dict(title = x),
+		yaxis = dict(title = y)
+	)
+	fig = plotly.graph_objs.Figure(data, layout)
+	plotly.offline.plot(fig, filename=f'{csvName}.plot.html')
+make_chart('timeseries_gen.csv', 'Name', 'hour', ' P1 (kW)')
+make_chart('timeseries_load.csv', 'Name', 'hour', ' V1')
 
 def the_whole_shebang(allInputData, modelDir, resilientDist=False):
 	if resilientDist:

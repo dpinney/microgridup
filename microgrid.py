@@ -2,6 +2,8 @@ from omf.solvers import opendss
 from omf.solvers.opendss import dssConvert
 from omf import distNetViz
 from omf import geo
+import omf.models
+import shutil
 import os
 from pprint import pprint as pp
 import json
@@ -71,7 +73,13 @@ if not os.path.isdir(MAP_NAME):
 # pp([dict(x) for x in tree])
 # dssConvert.treeToDss(tree, 'lehigh_shapes.dss'):
 
-#TODO: generate the microgrid specs with REOpt here.
+# Generate the microgrid specs with REOpt here and insert into OpenDSS.
+# reopt_folder = './lehigh_reopt'
+# shutil.rmtree(reopt_folder, ignore_errors=True)
+# omf.models.microgridDesign.new(reopt_folder)
+#TODO: insert modification of allInputData.json here.
+# omf.models.__neoMetaModel__.runForeground(reopt_folder)
+#TODO: insert reopt gen details into dss model.
 
 # Powerflow outputs.
 opendss.newQstsPlot(DSS_NAME, stepSizeInMinutes=60, numberOfSteps=24*10, keepAllFiles=False)

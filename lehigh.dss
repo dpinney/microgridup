@@ -3,6 +3,7 @@ set defaultbasefrequency=60
 
 ! around 3.5 mw of load
 new object=circuit.lehigh basekv=115 pu=1.0001 phases=3 bus1=sourcebus angle=30 mvasc3=20000 mvasc1=21000 
+edit object=vsource.source basekv=115 bus1=sourcebus pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001
 
 !sub transformer definition 
 new object=transformer.sub phases=3 windings=2 xhl=0.008 windings=2 buses=[sourcebus,650] conns=[delta,wye] kvs=[115,4.16] kvas=[5000,5000] %rs=[0.0005,0.0005]
@@ -158,3 +159,9 @@ setbusxy bus=680 x=200 y=0
 ! set voltages
 set voltagebases=[115,4.16,0.48]
 calcvoltagebases
+
+! swing stuff
+!new object=monitor.master element=vsource.source terminal=1 mode=1 ppolar=no
+!set mode=yearly stepsize=1h number=100
+!solve
+!export monitors monitorname=master

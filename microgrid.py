@@ -78,11 +78,11 @@ opendss.newQstsPlot(DSS_NAME, stepSizeInMinutes=60, numberOfSteps=24*10, keepAll
 # opendss.currentPlot(DSS_NAME)
 
 # Charting outputs.
-def make_chart(csvName, series_name, x, y):
+def make_chart(csvName, category_name, x, y):
 	gen_data = pd.read_csv(csvName)
 	data = []
-	for ob_name in set(gen_data[series_name]):
-		this_series = gen_data[gen_data[series_name] == ob_name]
+	for ob_name in set(gen_data[category_name]):
+		this_series = gen_data[gen_data[category_name] == ob_name]
 		trace = plotly.graph_objs.Scatter(
 			x = this_series[x],
 			y = this_series[y],
@@ -96,8 +96,9 @@ def make_chart(csvName, series_name, x, y):
 	)
 	fig = plotly.graph_objs.Figure(data, layout)
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html')
-make_chart('timeseries_gen.csv', 'Name', 'hour', ' P1 (kW)')
-make_chart('timeseries_load.csv', 'Name', 'hour', ' V1')
+make_chart('timeseries_gen.csv', 'Name', 'hour', 'P1(kW)')
+make_chart('timeseries_load.csv', 'Name', 'hour', 'V1')
+make_chart('timeseries_source.csv', 'Name', 'hour', 'P1(kW)')
 
 def the_whole_shebang(allInputData, modelDir, resilientDist=False):
 	if resilientDist:

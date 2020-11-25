@@ -72,7 +72,8 @@ if not os.path.isdir(MAP_NAME):
 # dssConvert.treeToDss(tree, 'lehigh_shapes.dss'):
 
 # Powerflow outputs.
-opendss.qstsPlot(DSS_NAME, stepSizeInMinutes=60, numberOfSteps=100, getVolts=True, getLoads=True, getGens=True)
+opendss.newQstsPlot(DSS_NAME, stepSizeInMinutes=60, numberOfSteps=24*10)
+# opendss.qstsPlot(DSS_NAME, stepSizeInMinutes=60, numberOfSteps=100, getVolts=True, getLoads=True, getGens=True)
 # opendss.voltagePlot(DSS_NAME, PU=True)
 # opendss.currentPlot(DSS_NAME)
 
@@ -95,9 +96,8 @@ def make_chart(csvName, series_name, x, y):
 	)
 	fig = plotly.graph_objs.Figure(data, layout)
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html')
-make_chart('timeseries_gen.csv', 'Generator', 'Hour', 'kWh')
-make_chart('timeseries_voltage.csv', 'Bus', 'Step', 'Magnitude1')
-make_chart('timeseries_load.csv', 'Load', 'Step', 'kW')
+make_chart('timeseries_gen.csv', 'Name', 'hour', ' P1 (kW)')
+make_chart('timeseries_load.csv', 'Name', 'hour', ' V1')
 
 def the_whole_shebang(allInputData, modelDir, resilientDist=False):
 	if resilientDist:

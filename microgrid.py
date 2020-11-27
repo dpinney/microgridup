@@ -21,22 +21,22 @@ GEN_NAME = 'lehigh_gen.csv'
 # Microgrid definitions.
 microgrids = {
 	'm1': {
-		'loads': ['634a','634b','634c'],
+		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
 		'switch': '632633',
 		'gen_bus': '634'
 	},
 	'm2': {
-		'loads': ['675a','675b','675c'],
+		'loads': ['675a_residential1','675b_residential1','675c_residential1'],
 		'switch': '671692',
 		'gen_bus': '675'
 	},
 	'm3': {
-		'loads': ['611','652'],
+		'loads': ['671_hospital','652_med_apartment'],
 		'switch': '671684',
 		'gen_bus': '684'
 	},
 	'm4': {
-		'loads': ['645','646'],
+		'loads': ['645_warehouse1','646_med_office'],
 		'switch': '632645',
 		'gen_bus': '646'
 	}
@@ -113,7 +113,6 @@ dssConvert.treeToDss(tree, FULL_NAME)
 # omf.models.microgridDesign.new(reopt_folder)
 #TODO: insert modification of allInputData.json here.
 # omf.models.__neoMetaModel__.runForeground(reopt_folder)
-
 #TODO: insert reopt gen details into dss model.
 
 # Powerflow outputs.
@@ -145,11 +144,3 @@ make_chart('timeseries_gen.csv', 'Name', 'hour', 'P1(kW)')
 make_chart('timeseries_load.csv', 'Name', 'hour', 'V1')
 make_chart('timeseries_source.csv', 'Name', 'hour', 'P1(kW)')
 make_chart('timeseries_control.csv', 'Name', 'hour', 'Tap(pu)')
-
-'''
-get a battery loadshape (schedule)...
-translate coordinates to florida?
-	Could just move the x,y coords
-	Could convert in geo.py
-	LatLongCoords might be helpful?
-'''

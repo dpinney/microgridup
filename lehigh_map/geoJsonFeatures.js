@@ -6,8 +6,34 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    0.0,
-                    0.0
+                    -84.07549294319917,
+                    30.28701311472824
+                ]
+            },
+            "properties": {
+                "name": "clear"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07538912849999,
+                    30.287096097200003
+                ]
+            },
+            "properties": {
+                "name": "set"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.0714957430315,
+                    30.28519165561138
                 ]
             },
             "properties": {
@@ -84,8 +110,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07133814,
-                    30.28315087
+                    -84.07214393351242,
+                    30.284867343887736
                 ]
             },
             "properties": {
@@ -97,8 +123,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07151566,
-                    30.28324907
+                    -84.07216665842793,
+                    30.284721904428515
                 ]
             },
             "properties": {
@@ -129,6 +155,227 @@ var geojson ={
             },
             "properties": {
                 "name": "634"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07549163713763,
+                    30.287054908697407
+                ]
+            },
+            "properties": {
+                "name": "mtx601"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.0754694340915,
+                    30.287011808666705
+                ]
+            },
+            "properties": {
+                "name": "mtx602"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.0754722257,
+                    30.2870545486
+                ]
+            },
+            "properties": {
+                "name": "mtx603"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.0754514514,
+                    30.2870545486
+                ]
+            },
+            "properties": {
+                "name": "mtx604"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.0754514514,
+                    30.287013
+                ]
+            },
+            "properties": {
+                "name": "mtx605"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.0754514514,
+                    30.287033774300003
+                ]
+            },
+            "properties": {
+                "name": "mtx606"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.075493,
+                    30.2870753229
+                ]
+            },
+            "properties": {
+                "name": "mtx607"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.0754722257,
+                    30.2870753229
+                ]
+            },
+            "properties": {
+                "name": "634a_loadcurve"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.0754514514,
+                    30.2870753229
+                ]
+            },
+            "properties": {
+                "name": "634b_loadcurve"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07543067709999,
+                    30.2870753229
+                ]
+            },
+            "properties": {
+                "name": "634c_loadcurve"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07543067709999,
+                    30.287013
+                ]
+            },
+            "properties": {
+                "name": "675a_loadcurve"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07543067709999,
+                    30.287033774300003
+                ]
+            },
+            "properties": {
+                "name": "675b_loadcurve"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07543067709999,
+                    30.2870545486
+                ]
+            },
+            "properties": {
+                "name": "675c_loadcurve"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.075493,
+                    30.287096097200003
+                ]
+            },
+            "properties": {
+                "name": "611_loadcurve"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.0754722257,
+                    30.287096097200003
+                ]
+            },
+            "properties": {
+                "name": "652_loadcurve"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.0754514514,
+                    30.287096097200003
+                ]
+            },
+            "properties": {
+                "name": "645_loadcurve"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07543067709999,
+                    30.287096097200003
+                ]
+            },
+            "properties": {
+                "name": "646_loadcurve"
             }
         },
         {
@@ -357,8 +604,47 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    0.0,
-                    0.0
+                    -84.07540990279999,
+                    30.287096097200003
+                ]
+            },
+            "properties": {
+                "name": "solar_2017"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07540990279999,
+                    30.287013
+                ]
+            },
+            "properties": {
+                "name": "diesel_flat"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07540990279999,
+                    30.287033774300003
+                ]
+            },
+            "properties": {
+                "name": "battery_2017"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07333386663574,
+                    30.2868800368923
                 ]
             },
             "properties": {
@@ -370,8 +656,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    0.0,
-                    0.0
+                    -84.0732638035943,
+                    30.287058628897878
                 ]
             },
             "properties": {
@@ -383,8 +669,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    0.0,
-                    0.0
+                    -84.07300141070675,
+                    30.287139682473864
                 ]
             },
             "properties": {
@@ -396,8 +682,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    0.0,
-                    0.0
+                    -84.07464720489402,
+                    30.286794862503807
                 ]
             },
             "properties": {
@@ -409,8 +695,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    0.0,
-                    0.0
+                    -84.07480106878714,
+                    30.28678936736514
                 ]
             },
             "properties": {
@@ -422,8 +708,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    0.0,
-                    0.0
+                    -84.07470490356025,
+                    30.286991313450322
                 ]
             },
             "properties": {
@@ -435,8 +721,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    0.0,
-                    0.0
+                    -84.07470765137073,
+                    30.2842464918561
                 ]
             },
             "properties": {
@@ -461,8 +747,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    0.0,
-                    0.0
+                    -84.07437107388526,
+                    30.284257481900674
                 ]
             },
             "properties": {
@@ -474,8 +760,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    0.0,
-                    0.0
+                    -84.07321579742339,
+                    30.28293621000399
                 ]
             },
             "properties": {
@@ -487,8 +773,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    0.0,
-                    0.0
+                    -84.07337135463115,
+                    30.28320411425379
                 ]
             },
             "properties": {
@@ -500,8 +786,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    0.0,
-                    0.0
+                    -84.0728475468446,
+                    30.28312136196552
                 ]
             },
             "properties": {
@@ -563,11 +849,37 @@ var geojson ={
         {
             "type": "Feature",
             "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07538912849999,
+                    30.2870753229
+                ]
+            },
+            "properties": {
+                "name": "makebuslist"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07547534477486,
+                    30.28703654018579
+                ]
+            },
+            "properties": {
+                "name": "calcvoltagebases"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
                 "type": "LineString",
                 "coordinates": [
                     [
-                        0.0,
-                        0.0
+                        -84.0714957430315,
+                        30.28519165561138
                     ],
                     [
                         -84.071493,
@@ -740,8 +1052,8 @@ var geojson ={
                         30.287013
                     ],
                     [
-                        0.0,
-                        0.0
+                        -84.07333386663574,
+                        30.2868800368923
                     ]
                 ]
             },
@@ -757,8 +1069,8 @@ var geojson ={
                         30.287013
                     ],
                     [
-                        0.0,
-                        0.0
+                        -84.0732638035943,
+                        30.287058628897878
                     ]
                 ]
             },
@@ -774,8 +1086,8 @@ var geojson ={
                         30.287013
                     ],
                     [
-                        0.0,
-                        0.0
+                        -84.07300141070675,
+                        30.287139682473864
                     ]
                 ]
             },
@@ -944,8 +1256,8 @@ var geojson ={
                         30.283013
                     ],
                     [
-                        0.0,
-                        0.0
+                        -84.07321579742339,
+                        30.28293621000399
                     ]
                 ]
             },
@@ -961,8 +1273,8 @@ var geojson ={
                         30.283013
                     ],
                     [
-                        0.0,
-                        0.0
+                        -84.07337135463115,
+                        30.28320411425379
                     ]
                 ]
             },
@@ -978,8 +1290,8 @@ var geojson ={
                         30.283013
                     ],
                     [
-                        0.0,
-                        0.0
+                        -84.0728475468446,
+                        30.28312136196552
                     ]
                 ]
             },
@@ -1080,8 +1392,8 @@ var geojson ={
                         30.287013
                     ],
                     [
-                        0.0,
-                        0.0
+                        -84.07464720489402,
+                        30.286794862503807
                     ]
                 ]
             },
@@ -1097,8 +1409,8 @@ var geojson ={
                         30.287013
                     ],
                     [
-                        0.0,
-                        0.0
+                        -84.07480106878714,
+                        30.28678936736514
                     ]
                 ]
             },
@@ -1114,8 +1426,8 @@ var geojson ={
                         30.287013
                     ],
                     [
-                        0.0,
-                        0.0
+                        -84.07470490356025,
+                        30.286991313450322
                     ]
                 ]
             },
@@ -1297,8 +1609,8 @@ var geojson ={
                 "type": "LineString",
                 "coordinates": [
                     [
-                        0.0,
-                        0.0
+                        -84.07470765137073,
+                        30.2842464918561
                     ],
                     [
                         -84.074493,
@@ -1318,8 +1630,8 @@ var geojson ={
                         30.284013
                     ],
                     [
-                        0.0,
-                        0.0
+                        -84.07437107388526,
+                        30.284257481900674
                     ]
                 ]
             },

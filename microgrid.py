@@ -106,10 +106,10 @@ def make_chart(csvName, category_name, x, y):
 	)
 	fig = plotly.graph_objs.Figure(data, layout)
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html')
-make_chart('timeseries_gen.csv', 'Name', 'hour', 'P1(kW)')
-make_chart('timeseries_load.csv', 'Name', 'hour', 'V1')
-make_chart('timeseries_source.csv', 'Name', 'hour', 'P1(kW)')
-make_chart('timeseries_control.csv', 'Name', 'hour', 'Tap(pu)')
+# make_chart('timeseries_gen.csv', 'Name', 'hour', 'P1(kW)')
+# make_chart('timeseries_load.csv', 'Name', 'hour', 'V1')
+# make_chart('timeseries_source.csv', 'Name', 'hour', 'P1(kW)')
+# make_chart('timeseries_control.csv', 'Name', 'hour', 'Tap(pu)')
 
 '''
 get a battery loadshape (schedule)...

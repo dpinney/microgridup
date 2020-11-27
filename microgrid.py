@@ -9,14 +9,15 @@ import json
 import pandas as pd
 import plotly
 
-# File paths.
+# Input paths.
 BASE_NAME = 'lehigh_base.dss'
+LOAD_NAME = 'lehigh_load.csv'
+GEN_NAME = 'lehigh_gen.csv'
+# Output paths.
 FULL_NAME = 'lehigh_full.dss'
 OMD_NAME = 'lehigh.dss.omd'
 ONELINE_NAME = 'lehigh.oneline.html'
 MAP_NAME = 'lehigh_map'
-LOAD_NAME = 'lehigh_load.csv'
-GEN_NAME = 'lehigh_gen.csv'
 
 # Microgrid definitions.
 microgrids = {
@@ -111,9 +112,10 @@ dssConvert.treeToDss(tree, FULL_NAME)
 # reopt_folder = './lehigh_reopt'
 # shutil.rmtree(reopt_folder, ignore_errors=True)
 # omf.models.microgridDesign.new(reopt_folder)
-#TODO: insert modification of allInputData.json here.
+# allInputData = json.load(opend(reopt_folder + '/allInputData.json'))
+# #TODO: modify inputs.
 # omf.models.__neoMetaModel__.runForeground(reopt_folder)
-#TODO: insert reopt gen details into dss model.
+# #TODO: insert reopt gen details into dss model.
 
 # Powerflow outputs.
 opendss.newQstsPlot(FULL_NAME, stepSizeInMinutes=60, numberOfSteps=24*10, keepAllFiles=False)

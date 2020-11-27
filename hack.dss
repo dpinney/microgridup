@@ -43,3 +43,18 @@ Export monitors m2
 !Plot monitor object= m2 channels=(1 ) base=[7200] 
 !Export monitors m2 
 !Plot monitor object= m2 channels=(9 )
+
+! swing stuff
+!new object=monitor.master element=vsource.source terminal=1 mode=1 ppolar=no
+!set mode=yearly stepsize=1h number=1
+!solve
+!solve
+!solve
+!export monitors monitorname=master
+!solve
+!solve
+!solve
+!solve
+!solve
+!solve
+!export monitors monitorname=master

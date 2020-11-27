@@ -2,7 +2,6 @@ from omf.solvers import opendss
 from omf.solvers.opendss import dssConvert
 from omf import distNetViz
 from omf import geo
-import omf.models
 import shutil
 import os
 from pprint import pprint as pp
@@ -11,10 +10,13 @@ import pandas as pd
 import plotly
 
 # File paths.
-DSS_NAME = 'lehigh.dss'
+BASE_NAME = 'lehigh_base.dss'
+FULL_NAME = 'lehigh_full.dss'
 OMD_NAME = 'lehigh.dss.omd'
 ONELINE_NAME = 'lehigh.oneline.html'
 MAP_NAME = 'lehigh_map'
+LOAD_NAME = 'lehigh_load.csv'
+GEN_NAME = 'lehigh_gen.csv'
 
 # Microgrid definitions.
 microgrids = {
@@ -42,7 +44,7 @@ microgrids = {
 
 # Generate an OMD.
 if not os.path.isfile(OMD_NAME):
-	tree = dssConvert.dssToTree(DSS_NAME)
+	tree = dssConvert.dssToTree(BASE_NAME)
 	evil_glm = dssConvert.evilDssTreeToGldTree(tree)
 	add_coords = json.load(open('additional_coords.json'))
 	# Injecting additional coordinates.
@@ -65,27 +67,60 @@ if not os.path.isfile(ONELINE_NAME):
 if not os.path.isdir(MAP_NAME):
 	geo.mapOmd(OMD_NAME, MAP_NAME, 'html', openBrowser=False, conversion=False, offline=True)
 
-# Insert loadshapes.
-# tree = dssConvert.dssToTree(DSS_NAME)
-# for ob in tree:
-# 	if ob.get('object','') == 'loadshape.solarramp':
-# 		ob['mult'] = '[1,2,3]'
-# pp([dict(x) for x in tree])
-# dssConvert.treeToDss(tree, 'lehigh_shapes.dss'):
+# Insert loadshapes and generator duties.
+tree = dssConvert.dssToTree(BASE_NAME)
+load_df = pd.read_csv(LOAD_NAME)
+gen_df = pd.read_csv(GEN_NAME)
+insert_list = {}
+for i, ob in enumerate(tree):
+	ob_string = ob.get('object','')
+	if ob_string.startswith('load.'):
+		ob_name = ob_string[5:]
+		shape_data = load_df[ob_name]
+		shape_name = ob_name + '_shape'
+		ob['yearly'] = shape_name
+		insert_list[i] = {
+			'!CMD': 'new',
+			'object': f'loadshape.{shape_name}',
+			'npts': f'{len(shape_data)}',
+			'interval': '1',
+			'useactual': 'yes', #todo: move back to [0,1] shapes?
+			'mult': f'{list(shape_data)}'.replace(' ','')
+		}
+	elif ob_string.startswith('generator.') or ob_string.startswith('battery.'):
+		ob_name = ob_string[10:]
+		shape_data = gen_df[ob_name]
+		shape_name = ob_name + '_shape'
+		ob['yearly'] = shape_name
+		insert_list[i] = {
+			'!CMD': 'new',
+			'object': f'loadshape.{shape_name}',
+			'npts': f'{len(shape_data)}',
+			'interval': '1',
+			'useactual': 'no',
+			'mult': f'{list(shape_data)}'.replace(' ','')
+		}
+# do insertions at proper places
+min_pos = min(insert_list.keys())
+for key in insert_list:
+	tree.insert(min_pos, insert_list[key])
+dssConvert.treeToDss(tree, FULL_NAME)
 
 # Generate the microgrid specs with REOpt here and insert into OpenDSS.
+# import omf.models
 # reopt_folder = './lehigh_reopt'
 # shutil.rmtree(reopt_folder, ignore_errors=True)
 # omf.models.microgridDesign.new(reopt_folder)
 #TODO: insert modification of allInputData.json here.
 # omf.models.__neoMetaModel__.runForeground(reopt_folder)
+
 #TODO: insert reopt gen details into dss model.
 
 # Powerflow outputs.
-opendss.newQstsPlot(DSS_NAME, stepSizeInMinutes=60, numberOfSteps=24*10, keepAllFiles=False)
-# opendss.qstsPlot(DSS_NAME, stepSizeInMinutes=60, numberOfSteps=100, getVolts=True, getLoads=True, getGens=True)
-# opendss.voltagePlot(DSS_NAME, PU=True)
-# opendss.currentPlot(DSS_NAME)
+opendss.newQstsPlot(FULL_NAME, stepSizeInMinutes=60, numberOfSteps=24*10, keepAllFiles=False)
+# opendss.qstsPlot(FULL_NAME, stepSizeInMinutes=60, numberOfSteps=100, getVolts=True, getLoads=True, getGens=True)
+# opendss.voltagePlot(FULL_NAME, PU=True)
+# opendss.currentPlot(FULL_NAME)
 
 # Charting outputs.
 def make_chart(csvName, category_name, x, y):
@@ -106,10 +141,10 @@ def make_chart(csvName, category_name, x, y):
 	)
 	fig = plotly.graph_objs.Figure(data, layout)
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html')
-# make_chart('timeseries_gen.csv', 'Name', 'hour', 'P1(kW)')
-# make_chart('timeseries_load.csv', 'Name', 'hour', 'V1')
-# make_chart('timeseries_source.csv', 'Name', 'hour', 'P1(kW)')
-# make_chart('timeseries_control.csv', 'Name', 'hour', 'Tap(pu)')
+make_chart('timeseries_gen.csv', 'Name', 'hour', 'P1(kW)')
+make_chart('timeseries_load.csv', 'Name', 'hour', 'V1')
+make_chart('timeseries_source.csv', 'Name', 'hour', 'P1(kW)')
+make_chart('timeseries_control.csv', 'Name', 'hour', 'Tap(pu)')
 
 '''
 get a battery loadshape (schedule)...

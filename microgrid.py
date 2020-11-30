@@ -107,19 +107,20 @@ for key in insert_list:
 	tree.insert(min_pos, insert_list[key])
 dssConvert.treeToDss(tree, FULL_NAME)
 
-# Generate the microgrid specs with REOpt here and insert into OpenDSS.
-# import omf.models
-# reopt_folder = './lehigh_reopt'
-# shutil.rmtree(reopt_folder, ignore_errors=True)
-# omf.models.microgridDesign.new(reopt_folder)
-# allInputData = json.load(opend(reopt_folder + '/allInputData.json'))
-# #TODO: modify inputs.
-# omf.models.__neoMetaModel__.runForeground(reopt_folder)
-# #TODO: insert reopt gen details into dss model.
+#Generate the microgrid specs with REOpt here and insert into OpenDSS.
+reopt_folder = './lehigh_reopt'
+if not os.path.isdir(reopt_folder):
+	import omf.models
+	shutil.rmtree(reopt_folder, ignore_errors=True)
+	omf.models.microgridDesign.new(reopt_folder)
+	allInputData = json.load(open(reopt_folder + '/allInputData.json'))
+	#TODO: modify inputs.
+	omf.models.__neoMetaModel__.runForeground(reopt_folder)
+	omf.models.__neoMetaModel__.renderTemplateToFile(reopt_folder)
+	#TODO: insert reopt gen details into dss model.
 
 # Powerflow outputs.
-opendss.newQstsPlot(FULL_NAME, stepSizeInMinutes=60, numberOfSteps=24*10, keepAllFiles=False)
-# opendss.qstsPlot(FULL_NAME, stepSizeInMinutes=60, numberOfSteps=100, getVolts=True, getLoads=True, getGens=True)
+opendss.newQstsPlot(FULL_NAME, stepSizeInMinutes=60, numberOfSteps=24*10, keepAllFiles=False, actions={24*5:'open object=line.671692 term=1'})
 # opendss.voltagePlot(FULL_NAME, PU=True)
 # opendss.currentPlot(FULL_NAME)
 

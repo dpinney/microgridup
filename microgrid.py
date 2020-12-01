@@ -101,26 +101,41 @@ for i, ob in enumerate(tree):
 			'useactual': 'no',
 			'mult': f'{list(shape_data)}'.replace(' ','')
 		}
-# do insertions at proper places
+# Do load insertions at proper places
 min_pos = min(insert_list.keys())
 for key in insert_list:
 	tree.insert(min_pos, insert_list[key])
 dssConvert.treeToDss(tree, FULL_NAME)
 
-#Generate the microgrid specs with REOpt here and insert into OpenDSS.
+# Generate the microgrid specs with REOpt here and insert into OpenDSS.
 reopt_folder = './lehigh_reopt'
 if not os.path.isdir(reopt_folder):
 	import omf.models
 	shutil.rmtree(reopt_folder, ignore_errors=True)
 	omf.models.microgridDesign.new(reopt_folder)
+	# Get the microgrid total loads
+	mg_load_df = pd.DataFrame()
+	for key in microgrids:
+		loads = microgrids[key]['loads']
+		mg_load_df[key] = [0 for x in range(8760)]
+		for load_name in loads:
+			mg_load_df[key] = mg_load_df[key] + load_df[load_name]
+	mg_load_df.to_csv(reopt_folder + '/loadShape.csv', header=False, index=False)
+	# Modify inputs.
 	allInputData = json.load(open(reopt_folder + '/allInputData.json'))
-	#TODO: modify inputs.
+	allInputData['loadShape'] = open(reopt_folder + '/loadShape.csv').read()
+	allInputData['fileName'] = 'loadShape.csv'
+	allInputData['latitude'] = '30.285013'
+	allInputData['longitude'] = '-84.071493'
+	allInputData['year'] = '2017'
+	with open(reopt_folder + '/allInputData.json','w') as outfile:
+		json.dump(allInputData, outfile, indent=4)
 	omf.models.__neoMetaModel__.runForeground(reopt_folder)
 	omf.models.__neoMetaModel__.renderTemplateToFile(reopt_folder)
-	#TODO: insert reopt gen details into dss model.
+#TODO: insert reopt gen details into dss model.
 
 # Powerflow outputs.
-opendss.newQstsPlot(FULL_NAME, stepSizeInMinutes=60, numberOfSteps=24*10, keepAllFiles=False, actions={24*5:'open object=line.671692 term=1'})
+# opendss.newQstsPlot(FULL_NAME, stepSizeInMinutes=60, numberOfSteps=24*10, keepAllFiles=False, actions={24*5:'open object=line.671692 term=1'})
 # opendss.voltagePlot(FULL_NAME, PU=True)
 # opendss.currentPlot(FULL_NAME)
 
@@ -143,7 +158,7 @@ def make_chart(csvName, category_name, x, y):
 	)
 	fig = plotly.graph_objs.Figure(data, layout)
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html')
-make_chart('timeseries_gen.csv', 'Name', 'hour', 'P1(kW)')
-make_chart('timeseries_load.csv', 'Name', 'hour', 'V1')
-make_chart('timeseries_source.csv', 'Name', 'hour', 'P1(kW)')
-make_chart('timeseries_control.csv', 'Name', 'hour', 'Tap(pu)')
+# make_chart('timeseries_gen.csv', 'Name', 'hour', 'P1(kW)')
+# make_chart('timeseries_load.csv', 'Name', 'hour', 'V1')
+# make_chart('timeseries_source.csv', 'Name', 'hour', 'P1(kW)')
+# make_chart('timeseries_control.csv', 'Name', 'hour', 'Tap(pu)')

@@ -34,6 +34,16 @@ microgrids = {
 		'gen_bus': '646'
 	}
 }
+# Second input set.
+BASE_NAME = 'lehigh_base.dss'
+LOAD_NAME = 'lehigh_load.csv'
+microgrids = {
+	'm1': {
+		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_residential1','675b_residential1','675c_residential1','671_hospital','652_med_apartment','645_warehouse1','646_med_office'],
+		'switch': '650632',
+		'gen_bus': '670'
+	}
+}
 # Output paths.
 GEN_NAME = 'lehigh_gen.csv'
 FULL_NAME = 'lehigh_full.dss'
@@ -165,7 +175,16 @@ for ob in gen_obs:
 dssConvert.treeToDss(tree, FULL_NAME)
 
 # Powerflow outputs.
-opendss.newQstsPlot(FULL_NAME, stepSizeInMinutes=60, numberOfSteps=24*10, keepAllFiles=False, actions={24*5:'open object=line.671692 term=1'})
+opendss.newQstsPlot(FULL_NAME,
+	stepSizeInMinutes=60, 
+	numberOfSteps=24*10,
+	keepAllFiles=False,
+	actions={
+		24*5:'open object=line.671692 term=1',
+		24*8:'new object=fault.f1 bus1=670.1.2.3 phases=3 r=0 ontime=0.0'
+
+	}
+)
 # opendss.voltagePlot(FULL_NAME, PU=True)
 # opendss.currentPlot(FULL_NAME)
 

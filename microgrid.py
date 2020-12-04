@@ -189,25 +189,26 @@ opendss.newQstsPlot(FULL_NAME,
 # opendss.currentPlot(FULL_NAME)
 
 # Charting outputs.
-def make_chart(csvName, category_name, x, y):
+def make_chart(csvName, category_name, x, y_list):
 	gen_data = pd.read_csv(csvName)
 	data = []
 	for ob_name in set(gen_data[category_name]):
-		this_series = gen_data[gen_data[category_name] == ob_name]
-		trace = plotly.graph_objs.Scatter(
-			x = this_series[x],
-			y = this_series[y],
-			name = ob_name
-		)
-		data.append(trace)
+		for y_name in y_list:
+			this_series = gen_data[gen_data[category_name] == ob_name]
+			trace = plotly.graph_objs.Scatter(
+				x = this_series[x],
+				y = this_series[y_name],
+				name = ob_name + '_' + y_name
+			)
+			data.append(trace)
 	layout = plotly.graph_objs.Layout(
 		title = f'{csvName} Output',
 		xaxis = dict(title = x),
-		yaxis = dict(title = y)
+		yaxis = dict(title = str(y_list))
 	)
 	fig = plotly.graph_objs.Figure(data, layout)
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html')
-make_chart('timeseries_gen.csv', 'Name', 'hour', 'P1(kW)')
-make_chart('timeseries_load.csv', 'Name', 'hour', 'V1')
-make_chart('timeseries_source.csv', 'Name', 'hour', 'P1(kW)')
-make_chart('timeseries_control.csv', 'Name', 'hour', 'Tap(pu)')
+make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
+make_chart('timeseries_load.csv', 'Name', 'hour', ['V1','V2','V3'])
+make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
+make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'])

@@ -99,7 +99,8 @@ if not os.path.isdir(reopt_folder):
 	allInputData['fileName'] = 'loadShape.csv'
 	allInputData['latitude'] = '30.285013'
 	allInputData['longitude'] = '-84.071493'
-	#TODO: add in additional required inputs for MGD.
+	allInputData['outage_start_hour'] = '1000'
+	allInputData['outage_duration'] = '48'
 	allInputData['year'] = '2017'
 	with open(reopt_folder + '/allInputData.json','w') as outfile:
 		json.dump(allInputData, outfile, indent=4)

@@ -10,41 +10,41 @@ import pandas as pd
 import plotly
 
 # #Input data.
-# BASE_NAME = 'lehigh_base.dss'
-# LOAD_NAME = 'lehigh_load.csv'
-# microgrids = {
-# 	'm1': {
-# 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
-# 		'switch': '632633',
-# 		'gen_bus': '634'
-# 	},
-# 	'm2': {
-# 		'loads': ['675a_residential1','675b_residential1','675c_residential1'],
-# 		'switch': '671692',
-# 		'gen_bus': '675'
-# 	},
-# 	'm3': {
-# 		'loads': ['671_hospital','652_med_apartment'],
-# 		'switch': '671684',
-# 		'gen_bus': '684'
-# 	},
-# 	'm4': {
-# 		'loads': ['645_warehouse1','646_med_office'],
-# 		'switch': '632645',
-# 		'gen_bus': '646'
-# 	}
-# }
-
-# #Second input set.
 BASE_NAME = 'lehigh_base.dss'
 LOAD_NAME = 'lehigh_load.csv'
 microgrids = {
 	'm1': {
-		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_residential1','675b_residential1','675c_residential1','671_hospital','652_med_apartment','645_warehouse1','646_med_office'],
-		'switch': '650632',
-		'gen_bus': '670'
+		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
+		'switch': '632633',
+		'gen_bus': '634'
+	},
+	'm2': {
+		'loads': ['675a_residential1','675b_residential1','675c_residential1'],
+		'switch': '671692',
+		'gen_bus': '675'
+	},
+	'm3': {
+		'loads': ['671_hospital','652_med_apartment'],
+		'switch': '671684',
+		'gen_bus': '684'
+	},
+	'm4': {
+		'loads': ['645_warehouse1','646_med_office'],
+		'switch': '632645',
+		'gen_bus': '646'
 	}
 }
+
+# #Second input set.
+# BASE_NAME = 'lehigh_base.dss'
+# LOAD_NAME = 'lehigh_load.csv'
+# microgrids = {
+# 	'm1': {
+# 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_residential1','675b_residential1','675c_residential1','671_hospital','652_med_apartment','645_warehouse1','646_med_office'],
+# 		'switch': '650632',
+# 		'gen_bus': '670'
+# 	}
+# }
 
 # Output paths.
 GEN_NAME = 'lehigh_gen.csv'

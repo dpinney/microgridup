@@ -9,32 +9,33 @@ import json
 import pandas as pd
 import plotly
 
-# Input data.
-BASE_NAME = 'lehigh_base.dss'
-LOAD_NAME = 'lehigh_load.csv'
-microgrids = {
-	'm1': {
-		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
-		'switch': '632633',
-		'gen_bus': '634'
-	},
-	'm2': {
-		'loads': ['675a_residential1','675b_residential1','675c_residential1'],
-		'switch': '671692',
-		'gen_bus': '675'
-	},
-	'm3': {
-		'loads': ['671_hospital','652_med_apartment'],
-		'switch': '671684',
-		'gen_bus': '684'
-	},
-	'm4': {
-		'loads': ['645_warehouse1','646_med_office'],
-		'switch': '632645',
-		'gen_bus': '646'
-	}
-}
-# Second input set.
+# #Input data.
+# BASE_NAME = 'lehigh_base.dss'
+# LOAD_NAME = 'lehigh_load.csv'
+# microgrids = {
+# 	'm1': {
+# 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
+# 		'switch': '632633',
+# 		'gen_bus': '634'
+# 	},
+# 	'm2': {
+# 		'loads': ['675a_residential1','675b_residential1','675c_residential1'],
+# 		'switch': '671692',
+# 		'gen_bus': '675'
+# 	},
+# 	'm3': {
+# 		'loads': ['671_hospital','652_med_apartment'],
+# 		'switch': '671684',
+# 		'gen_bus': '684'
+# 	},
+# 	'm4': {
+# 		'loads': ['645_warehouse1','646_med_office'],
+# 		'switch': '632645',
+# 		'gen_bus': '646'
+# 	}
+# }
+
+# #Second input set.
 BASE_NAME = 'lehigh_base.dss'
 LOAD_NAME = 'lehigh_load.csv'
 microgrids = {
@@ -44,6 +45,7 @@ microgrids = {
 		'gen_bus': '670'
 	}
 }
+
 # Output paths.
 GEN_NAME = 'lehigh_gen.csv'
 FULL_NAME = 'lehigh_full.dss'
@@ -78,6 +80,7 @@ if not os.path.isdir(MAP_NAME):
 
 # Generate the microgrid specs with REOpt here and insert into OpenDSS.
 reopt_folder = './lehigh_reopt'
+load_df = pd.read_csv(LOAD_NAME)
 if not os.path.isdir(reopt_folder):
 	import omf.models
 	shutil.rmtree(reopt_folder, ignore_errors=True)
@@ -96,6 +99,7 @@ if not os.path.isdir(reopt_folder):
 	allInputData['fileName'] = 'loadShape.csv'
 	allInputData['latitude'] = '30.285013'
 	allInputData['longitude'] = '-84.071493'
+	#TODO: add in additional required inputs for MGD.
 	allInputData['year'] = '2017'
 	with open(reopt_folder + '/allInputData.json','w') as outfile:
 		json.dump(allInputData, outfile, indent=4)
@@ -104,6 +108,7 @@ if not os.path.isdir(reopt_folder):
 
 # Get generator objects and shapes from REOpt.
 reopt_out = json.load(open(reopt_folder + '/allOutputData.json'))
+tree = dssConvert.dssToTree(BASE_NAME)
 gen_df_builder = pd.DataFrame()
 gen_obs = []
 for i, mg_ob in enumerate(microgrids.values()):
@@ -115,28 +120,76 @@ for i, mg_ob in enumerate(microgrids.values()):
 	battery_cap = reopt_out.get(f'capacityBattery{mg_num}', 0.0)
 	battery_pow = reopt_out.get(f'powerBattery{mg_num}', 0.0)
 	if solar_size > 0:
-		gen_obs.append(f'new object=generator.solar_{gen_bus_name} bus1={gen_bus_name}.1.2.3 kv=4.16 kw={solar_size} pf=1')
+		gen_obs.append({
+			'!CMD': 'new',
+			'object':f'generator.solar_{gen_bus_name}',
+			'bus1':f'{gen_bus_name}.1.2.3',
+			'phases':'3', #todo: what about multiple smaller phases?
+			'kv':'4.16', #todo: fix, make non-generic
+			'kw':f'{solar_size}',
+			'pf':'1'
+		})
 		gen_df_builder[f'solar_{gen_bus_name}'] = reopt_out.get(f'powerPV{mg_num}')
 	if wind_size > 0:
-		gen_obs.append(f'new object=generator.wind_{gen_bus_name} bus1={gen_bus_name}.1.2.3 kv=4.16 kw={wind_size} pf=1')
+		gen_obs.append({
+			'!CMD': 'new',
+			'object':f'generator.wind_{gen_bus_name}',
+			'bus1':f'{gen_bus_name}.1.2.3',
+			'phases':'3', #todo: what about multiple smaller phases?
+			'kv':'4.16', #todo: fix, make non-generic
+			'kw':f'{wind_size}',
+			'pf':'1'
+		})
 		gen_df_builder[f'wind_{gen_bus_name}'] = reopt_out.get(f'windData{mg_num}')
 	if diesel_size > 0:
-		gen_obs.append(f'new object=generator.diesel_{gen_bus_name} bus1={gen_bus_name}.1.2.3 kw={diesel_size} pf=1 kv=4.16 xdp=0.27 xdpp=0.2 h=2 conn=delta')
-		gen_df_builder[f'diesel_{gen_bus_name}'] = reopt_out.get(f'powerDiesel{mg_num}') #TODO: fix, it's not in the model outputs.
+		gen_obs.append({
+			'!CMD': 'new',
+			'object':f'generator.diesel_{gen_bus_name}',
+			'bus1':f'{gen_bus_name}.1.2.3',
+			'kv':'4.16', #todo: fix, make non-generic
+			'kw':f'{diesel_size}',
+			'phases':'3', #todo: what about multiple smaller phases?
+			'pf':'1',
+			'xdp':'0.27',
+			'xdpp':'0.2',
+			'h':'2',
+			'conn':'delta'
+		})
+		gen_df_builder[f'diesel_{gen_bus_name}'] = reopt_out.get(f'powerDiesel{mg_num}')
 	if battery_cap > 0:
-		gen_obs.append(f'new object=storage.battery_{gen_bus_name} phases=3 bus1={gen_bus_name}.1.2.3 kv=4.16 kwhstored={battery_cap} kwhrated={battery_cap} kva={battery_pow} kvar={battery_pow} %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50')
+		gen_obs.append({
+			'!CMD': 'new',
+			'object':f'storage.battery_{gen_bus_name}',
+			'bus1':f'{gen_bus_name}.1.2.3',
+			'kv':'4.16', #todo: fix, make non-generic
+			'kw':f'{diesel_size}',
+			'phases':'3',
+			'kwhstored':f'{battery_cap}',
+			'kwhrated':f'{battery_cap}',
+			'kva':f'{battery_pow}',
+			'kvar':f'{battery_pow}',
+			'%charge':'100',
+			'%discharge':'100',
+			'%effcharge':'100',
+			'%effdischarge':'100',
+			'%idlingkw':'1',
+			'%r':'0',
+			'%x':'50'
+		})
 		gen_df_builder[f'battery_{gen_bus_name}'] = reopt_out.get(f'powerBatteryToLoad{mg_num}') #TODO: does this capture all battery behavior?
 for col in gen_df_builder.columns:
 	gen_df_builder[col] = gen_df_builder[col] / gen_df_builder[col].max()
-print('Generation obs to add', gen_obs)
-print('Generation shapes', gen_df_builder)
-# gen_df_builder.to_csv(GEN_NAME, index=False) #TODO: re-enable once microgridDesign is fixed.
+gen_df_builder.to_csv(GEN_NAME, index=False) #TODO: re-enable once microgridDesign is fixed.
+bus_list_pos = -1
+for i, ob in enumerate(tree):
+	if ob.get('!CMD','') == 'makebuslist':
+		bus_list_pos = i
+for ob in gen_obs:
+	tree.insert(bus_list_pos, ob)
 
 # Gather loadshapes and generator duties.
-tree = dssConvert.dssToTree(BASE_NAME)
-load_df = pd.read_csv(LOAD_NAME)
 gen_df = pd.read_csv(GEN_NAME)
-insert_list = {}
+shape_insert_list = {}
 for i, ob in enumerate(tree):
 	ob_string = ob.get('object','')
 	if ob_string.startswith('load.'):
@@ -144,7 +197,7 @@ for i, ob in enumerate(tree):
 		shape_data = load_df[ob_name]
 		shape_name = ob_name + '_shape'
 		ob['yearly'] = shape_name
-		insert_list[i] = {
+		shape_insert_list[i] = {
 			'!CMD': 'new',
 			'object': f'loadshape.{shape_name}',
 			'npts': f'{len(shape_data)}',
@@ -157,7 +210,7 @@ for i, ob in enumerate(tree):
 		shape_data = gen_df[ob_name]
 		shape_name = ob_name + '_shape'
 		ob['yearly'] = shape_name
-		insert_list[i] = {
+		shape_insert_list[i] = {
 			'!CMD': 'new',
 			'object': f'loadshape.{shape_name}',
 			'npts': f'{len(shape_data)}',
@@ -167,11 +220,11 @@ for i, ob in enumerate(tree):
 		}
 
 # Do shape insertions at proper places
-min_pos = min(insert_list.keys())
-for key in insert_list:
-	tree.insert(min_pos, insert_list[key])
-for ob in gen_obs:
-	pass #TODO: insert objects.
+for key in shape_insert_list:
+	min_pos = min(shape_insert_list.keys())
+	tree.insert(min_pos, shape_insert_list[key])
+
+# Write new DSS file.
 dssConvert.treeToDss(tree, FULL_NAME)
 
 # Powerflow outputs.
@@ -182,7 +235,6 @@ opendss.newQstsPlot(FULL_NAME,
 	actions={
 		24*5:'open object=line.671692 term=1',
 		24*8:'new object=fault.f1 bus1=670.1.2.3 phases=3 r=0 ontime=0.0'
-
 	}
 )
 # opendss.voltagePlot(FULL_NAME, PU=True)

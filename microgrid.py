@@ -19,7 +19,7 @@ microgrids = {
 		'gen_bus': '634'
 	},
 	'm2': {
-		'loads': ['675a_residential1','675b_residential1','675c_residential1'],
+		'loads': ['675a_hospital','675b_residential1','675c_residential1'],
 		'switch': '671692',
 		'gen_bus': '675'
 	},
@@ -40,7 +40,7 @@ microgrids = {
 # LOAD_NAME = 'lehigh_load.csv'
 # microgrids = {
 # 	'm1': {
-# 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_residential1','675b_residential1','675c_residential1','611_hotel','652_med_apartment','645_warehouse1','646_med_office'],
+# 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_hospital','675b_residential1','675c_residential1','611_hotel','652_med_apartment','645_warehouse1','646_med_office'],
 # 		'switch': '650632',
 # 		'gen_bus': '670'
 # 	}
@@ -99,8 +99,8 @@ if not os.path.isdir(reopt_folder):
 	allInputData['fileName'] = 'loadShape.csv'
 	allInputData['latitude'] = '30.285013'
 	allInputData['longitude'] = '-84.071493'
-	allInputData['outage_start_hour'] = '196'
-	allInputData['outage_duration'] = '48'
+	allInputData['outage_start_hour'] = '240'
+	allInputData['outage_duration'] = '168'
 	allInputData['year'] = '2017'
 	with open(reopt_folder + '/allInputData.json','w') as outfile:
 		json.dump(allInputData, outfile, indent=4)
@@ -120,6 +120,25 @@ for i, mg_ob in enumerate(microgrids.values()):
 	diesel_size = reopt_out.get(f'sizeDiesel{mg_num}', 0.0) #TODO: fix, it's not in the model outputs.
 	battery_cap = reopt_out.get(f'capacityBattery{mg_num}', 0.0)
 	battery_pow = reopt_out.get(f'powerBattery{mg_num}', 0.0)
+	npv = reopt_out.get(f'savings{mg_num}', 0.0)
+	cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0)
+	cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0)
+	ave_outage = reopt_out.get(f'avgOutage{mg_num}', 0.0)
+
+	# print for testing
+	print("Microgrid: m", mg_num)
+	print("Diesel:", diesel_size, 'kW')
+	print("Wind:", wind_size)
+	print("Solar:", solar_size, 'kW')
+	print("Battery Power:", battery_pow, "kW")
+	print("Battery Capacity:", battery_cap, "kWh")
+	print("NPV: $", npv)
+	print("CapEx: $", cap_ex)
+	print("CapEx after incentives: $", cap_ex_after_incentives)
+	print("Average Outage", ave_outage, 'hours')
+
+	print(("Microgrid",))
+
 	if solar_size > 0:
 		gen_obs.append({
 			'!CMD': 'new',
@@ -234,8 +253,8 @@ opendss.newQstsPlot(FULL_NAME,
 	numberOfSteps=24*20,
 	keepAllFiles=False,
 	actions={
-		24*5:'open object=line.671692 term=1',
-		24*8:'new object=fault.f1 bus1=670.1.2.3 phases=3 r=0 ontime=0.0'
+		#24*5:'open object=line.671692 term=1',
+		#24*8:'new object=fault.f1 bus1=670.1.2.3 phases=3 r=0 ontime=0.0'
 	}
 )
 # opendss.voltagePlot(FULL_NAME, PU=True)

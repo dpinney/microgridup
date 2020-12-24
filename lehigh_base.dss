@@ -40,7 +40,7 @@ new object=load.634c_supermarket bus1=634.3 phases=1 conn=wye model=1 kv=0.277 k
 new object=load.645_warehouse1 bus1=645.2 phases=1 conn=wye model=1 kv=2.4 kw=170 kvar=125
 new object=load.646_med_office bus1=646.2.3 phases=1 conn=delta model=2 kv=4.16 kw=230 kvar=132
 new object=load.692_warehouse2 bus1=692.3.1 phases=1 conn=delta model=5 kv=4.16 kw=170 kvar=151 
-new object=load.675a_residential1 bus1=675.1 phases=1 conn=wye model=1 kv=2.4 kw=485 kvar=190
+new object=load.675a_hospital bus1=675.1 phases=1 conn=wye model=1 kv=2.4 kw=485 kvar=190
 new object=load.675b_residential1 bus1=675.2 phases=1 conn=wye model=1 kv=2.4 kw=68 kvar=60
 new object=load.675c_residential1 bus1=675.3 phases=1 conn=wye model=1 kv=2.4 kw=290 kvar=212
 new object=load.611_hotel bus1=611.3 phases=1 conn=wye model=5 kv=2.4 kw=170 kvar=80

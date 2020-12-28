@@ -136,9 +136,7 @@ for i, mg_ob in enumerate(microgrids.values()):
 	print("CapEx: $", cap_ex)
 	print("CapEx after incentives: $", cap_ex_after_incentives)
 	print("Average Outage", ave_outage, 'hours')
-
-	print(("Microgrid",))
-
+	
 	if solar_size > 0:
 		gen_obs.append({
 			'!CMD': 'new',

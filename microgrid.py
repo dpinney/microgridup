@@ -25,7 +25,7 @@ import csv
 # 		'gen_bus': '675'
 # 	},
 # 	'm3': {
-# 		'loads': ['611_hotel','652_med_apartment'],
+# 		'loads': ['671_hospital','652_med_apartment'],
 # 		'switch': '671684',
 # 		'gen_bus': '684'
 # 	},
@@ -41,7 +41,7 @@ BASE_NAME = 'lehigh_base.dss'
 LOAD_NAME = 'lehigh_load.csv'
 microgrids = {
 	'm1': {
-		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_hospital','675b_residential1','675c_residential1','611_hotel','652_med_apartment','645_warehouse1','646_med_office'],
+		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_hospital','675b_residential1','675c_residential1','671_hospital','652_med_apartment','645_warehouse1','646_med_office'],
 		'switch': '650632',
 		'gen_bus': '670'
 	}

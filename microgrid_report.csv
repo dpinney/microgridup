@@ -1,2 +1,2 @@
 Microgrid Name,Diesel (kW),Solar (kW),Battery Power (kW),Battery Capacity (kWh),Wind (kW),NPV ($),CapEx ($),CapEx after Incentives,Average Outage Survived (h)
-1,569.9,1417.1,229.5,557.6,0,-194186.0,2979310.31,1858890.19,44.6
+1,1146.9,2779.5,383.6,1042.1,0,-607045.0,5780600.35,3601633.74,43.0

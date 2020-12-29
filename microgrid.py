@@ -8,6 +8,7 @@ from pprint import pprint as pp
 import json
 import pandas as pd
 import plotly
+import csv
 
 #Input data.
 BASE_NAME = 'lehigh_base.dss'
@@ -126,17 +127,17 @@ for i, mg_ob in enumerate(microgrids.values()):
 	ave_outage = reopt_out.get(f'avgOutage{mg_num}', 0.0)
 
 	# print for testing
-	print("Microgrid: m", mg_num)
-	print("Diesel:", diesel_size, 'kW')
-	print("Wind:", wind_size)
-	print("Solar:", solar_size, 'kW')
-	print("Battery Power:", battery_pow, "kW")
-	print("Battery Capacity:", battery_cap, "kWh")
-	print("NPV: $", npv)
-	print("CapEx: $", cap_ex)
-	print("CapEx after incentives: $", cap_ex_after_incentives)
-	print("Average Outage", ave_outage, 'hours')
-	
+	# print("Microgrid: m", mg_num)
+	# print("Diesel:", diesel_size, 'kW')
+	# print("Solar:", solar_size, 'kW')
+	# print("Battery Power:", battery_pow, "kW")
+	# print("Battery Capacity:", battery_cap, "kWh")
+	# print("Wind:", wind_size, 'kW')
+	# print("NPV: $", npv)
+	# print("CapEx: $", cap_ex)
+	# print("CapEx after incentives: $", cap_ex_after_incentives)
+	# print("Average Outage", ave_outage, 'hours')
+
 	if solar_size > 0:
 		gen_obs.append({
 			'!CMD': 'new',
@@ -257,6 +258,31 @@ opendss.newQstsPlot(FULL_NAME,
 )
 # opendss.voltagePlot(FULL_NAME, PU=True)
 # opendss.currentPlot(FULL_NAME)
+
+# Generate a report on each microgrid
+def microgrid_report(csvName):
+    reopt_out = json.load(open(reopt_folder + '/allOutputData.json'))
+
+    with open(csvName, 'w', newline='') as outcsv:
+        writer = csv.writer(outcsv)
+        writer.writerow(["Microgrid Name", "Diesel (kW)","Solar (kW)", "Battery Power (kW)", "Battery Capacity (kWh)", "Wind (kW)", "NPV ($)", "CapEx ($)", "CapEx after Incentives", "Average Outage Survived (h)"])
+
+        for i, mg_ob in enumerate(microgrids.values()):
+            mg_num = i + 1
+            gen_bus_name = mg_ob['gen_bus']
+            solar_size = reopt_out.get(f'sizePV{mg_num}', 0.0)
+            diesel_size = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
+            battery_cap = reopt_out.get(f'capacityBattery{mg_num}', 0.0)
+            battery_pow = reopt_out.get(f'powerBattery{mg_num}', 0.0)
+            wind_size = reopt_out.get(f'sizeWind{mg_num}', 0.0)
+            npv = reopt_out.get(f'savings{mg_num}', 0.0)
+            cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0)
+            cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0)
+            ave_outage = reopt_out.get(f'avgOutage{mg_num}', 0.0)
+            row =[mg_num, round(diesel_size,1), round(solar_size,1), round(battery_pow,1), round(battery_cap,1), round(wind_size,1), round(npv,2), round(cap_ex,2), round(cap_ex_after_incentives,2), round(ave_outage,1)]
+            writer.writerow(row)
+
+microgrid_report('microgrid_report.csv')
 
 # Charting outputs.
 def make_chart(csvName, category_name, x, y_list):

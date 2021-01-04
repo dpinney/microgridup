@@ -306,6 +306,6 @@ def make_chart(csvName, category_name, x, y_list):
 	fig = plotly.graph_objs.Figure(data, layout)
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html')
 make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
-make_chart('timeseries_load.csv', 'Name', 'hour', ['V1','V2','V3'])
+make_chart('timeseries_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'])
 make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
 make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'])

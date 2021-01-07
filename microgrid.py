@@ -9,6 +9,7 @@ import json
 import pandas as pd
 import plotly
 import csv
+import jinja2 as j2
 
 #Input data.
 # BASE_NAME = 'lehigh_base.dss'
@@ -304,8 +305,22 @@ def make_chart(csvName, category_name, x, y_list):
 		yaxis = dict(title = str(y_list))
 	)
 	fig = plotly.graph_objs.Figure(data, layout)
-	plotly.offline.plot(fig, filename=f'{csvName}.plot.html')
+	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
 make_chart('timeseries_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'])
 make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
 make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'])
+
+# Create giant consolidated report.
+template = j2.Template(open('output_template.html').read())
+out = template.render(
+	x='David',
+	y='Matt',
+	summary=open('microgrid_report.csv').read(),
+	inputs={'circ':BASE_NAME,'loads':LOAD_NAME,'mg':microgrids}
+)
+#TODO: have an option where we make the template <iframe srcdoc="{{X}}"> to embed the html and create a single file.
+BIG_OUT_NAME = 'output_full_analysis_lehigh.html'
+with open(BIG_OUT_NAME,'w') as outFile:
+	outFile.write(out)
+os.system(f'open {BIG_OUT_NAME}')

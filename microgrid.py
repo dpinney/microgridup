@@ -7,6 +7,7 @@ import os
 from pprint import pprint as pp
 import json
 import pandas as pd
+import numpy as np
 import plotly
 import csv
 
@@ -266,7 +267,7 @@ def microgrid_report(csvName):
 
     with open(csvName, 'w', newline='') as outcsv:
         writer = csv.writer(outcsv)
-        writer.writerow(["Microgrid Name", "Generation Bus", "Minimum Load (kWh)", "Average Load (kWh)", "Maximum Load (kWh)", "Recommended Diesel (kW)", "Recommended Solar (kW)", "Recommended Battery Power (kW)", "Recommended Battery Capacity (kWh)", "Recommended Wind (kW)", "NPV ($)", "CapEx ($)", "CapEx after Incentives ($)", "Average Outage Survived (h)"])
+        writer.writerow(["Microgrid Name", "Generation Bus", "Minimum Load (kWh)", "Average Load (kWh)", "Average Daytime Load (kWh)", "Maximum Load (kWh)", "Recommended Diesel (kW)", "Recommended Solar (kW)", "Recommended Battery Power (kW)", "Recommended Battery Capacity (kWh)", "Recommended Wind (kW)", "NPV ($)", "CapEx ($)", "CapEx after Incentives ($)", "Average Outage Survived (h)"])
 
         for i, mg_ob in enumerate(microgrids.values()):
             mg_num = i + 1
@@ -274,6 +275,10 @@ def microgrid_report(csvName):
             load = reopt_out.get(f'load{mg_num}', 0.0)
             min_load = min(load)
             ave_load = sum(load)/len(load)
+            np_load = np.array_split(load, 365)
+            np_load = np.array(np_load) #an array of 365 arrays of 24 hours each
+            daytime_kwh = np_load[:,9:17] #365 8-hour daytime arrays
+            avg_daytime_load = np.average(np.average(daytime_kwh, axis=1))
             max_load = max(load)
             diesel_size = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
             solar_size = reopt_out.get(f'sizePV{mg_num}', 0.0)
@@ -284,7 +289,7 @@ def microgrid_report(csvName):
             cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0)
             cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0)
             ave_outage = reopt_out.get(f'avgOutage{mg_num}', 0.0)
-            row =[mg_num, gen_bus_name, round(min_load,0), round(ave_load,0), round(max_load,0), round(diesel_size,1), round(solar_size,1), round(battery_pow,1), round(battery_cap,1), round(wind_size,1), int(round(npv)), int(round(cap_ex)), int(round(cap_ex_after_incentives)), round(ave_outage,1)]
+            row =[mg_num, gen_bus_name, round(min_load,0), round(ave_load,0), round(avg_daytime_load,1), round(max_load,0), round(diesel_size,1), round(solar_size,1), round(battery_pow,1), round(battery_cap,1), round(wind_size,1), int(round(npv)), int(round(cap_ex)), int(round(cap_ex_after_incentives)), round(ave_outage,1)]
             writer.writerow(row)
 
 microgrid_report('microgrid_report.csv')

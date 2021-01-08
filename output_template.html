@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>This report was made by {{x}} and {{y}}.</title>
+	<style type="text/css">iframe {width:100%;height:600px}</style>
+</head>
+<body>
+	<pre>INPUTS {{inputs}}</pre>
+	<pre>{{summary}}</pre>
+	<iframe src="lehigh_map/geoJsonMap_offline.html"></iframe>
+	<iframe src="lehigh.oneline.html"></iframe>
+	<iframe src="timeseries_gen.csv.plot.html"></iframe>
+	<iframe src="timeseries_load.csv.plot.html"></iframe>
+	<iframe src="timeseries_source.csv.plot.html"></iframe>
+	<iframe src="timeseries_control.csv.plot.html"></iframe>
+	<iframe src="lehigh_reopt/inlineTemplate.html"></iframe>
+	<iframe srcdoc="<pre>Control Sim Goes Here</pre>"></iframe>
+</body>
+</html>

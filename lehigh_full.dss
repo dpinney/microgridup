@@ -5,11 +5,11 @@ edit object=vsource.source basekv=115 bus1=sourcebus.1.2.3 pu=1.00 r1=0 x1=0.000
 new object=vsource.secondsource basekv=4.16 bus1=680.1.2.3 pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001
 new object=transformer.sub phases=3 windings=2 xhl=0.008 buses=[sourcebus.1.2.3,650.1.2.3] conns=[delta,wye] kvs=[115,4.16] kvas=[5000,5000] %rs=[0.0005,0.0005]
 new object=transformer.reg1 phases=1 bank=reg1 xhl=0.01 kvas=[1666,1666] buses=[650.1,rg60.1] kvs=[2.4,2.4] %loadloss=0.01
-new object=regcontrol.reg1 transformer=reg1 winding=2 vreg=122 band=2 ptratio=20 ctprim=700 r=3 x=9
+new object=regcontrol.reg1 transformer=reg1 winding=2 vreg=121 band=2 ptratio=20 ctprim=700 r=3 x=9
 new object=transformer.reg2 phases=1 bank=reg1 xhl=0.01 kvas=[1666,1666] buses=[650.2,rg60.2] kvs=[2.4,2.4] %loadloss=0.01
-new object=regcontrol.reg2 transformer=reg2 winding=2 vreg=122 band=2 ptratio=20 ctprim=700 r=3 x=9
+new object=regcontrol.reg2 transformer=reg2 winding=2 vreg=121 band=2 ptratio=20 ctprim=700 r=3 x=9
 new object=transformer.reg3 phases=1 bank=reg1 xhl=0.01 kvas=[1666,1666] buses=[650.3,rg60.3] kvs=[2.4,2.4] %loadloss=0.01
-new object=regcontrol.reg3 transformer=reg3 winding=2 vreg=122 band=2 ptratio=20 ctprim=700 r=3 x=9
+new object=regcontrol.reg3 transformer=reg3 winding=2 vreg=121 band=2 ptratio=20 ctprim=700 r=3 x=9
 new object=transformer.xfm1 phases=3 windings=2 xhl=2 buses=[633.1.2.3,634.1.2.3] conns=[wye,wye] kvs=[4.16,0.480] kvas=[500,500] %rs=[0.55,0.55] xht=1 xlt=1
 new object=linecode.mtx601 nphases=3 basefreq=60 rmatrix=[0.3465|0.1560,0.3375|0.1580,0.1535,0.3414] xmatrix=[1.0179|0.5017,1.0478|0.4236,0.3849,1.0348] units=mi
 new object=linecode.mtx602 nphases=3 basefreq=60 rmatrix=[0.7526|0.1580,0.7475|0.1560,0.1535,0.7436] xmatrix=[1.1814|0.4236,1.1983|0.5017,0.3849,1.2112] units=mi

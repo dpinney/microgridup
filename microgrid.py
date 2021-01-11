@@ -113,7 +113,6 @@ if not os.path.isdir(reopt_folder):
 
 # Get generator objects and shapes from REOpt.
 reopt_out = json.load(open(reopt_folder + '/allOutputData.json'))
-tree = dssConvert.dssToTree(BASE_NAME)
 gen_df_builder = pd.DataFrame()
 gen_obs = []
 for i, mg_ob in enumerate(microgrids.values()):
@@ -199,9 +198,13 @@ for i, mg_ob in enumerate(microgrids.values()):
 			'%x':'50'
 		})
 		gen_df_builder[f'battery_{gen_bus_name}'] = reopt_out.get(f'powerBatteryToLoad{mg_num}') #TODO: does this capture all battery behavior?
+
+# insert generation objects and shapes into dss
+tree = dssConvert.dssToTree(BASE_NAME)
 for col in gen_df_builder.columns:
+	# zero-one scale the generator shapes.
 	gen_df_builder[col] = gen_df_builder[col] / gen_df_builder[col].max()
-gen_df_builder.to_csv(GEN_NAME, index=False) #TODO: re-enable once microgridDesign is fixed.
+gen_df_builder.to_csv(GEN_NAME, index=False)
 bus_list_pos = -1
 for i, ob in enumerate(tree):
 	if ob.get('!CMD','') == 'makebuslist':

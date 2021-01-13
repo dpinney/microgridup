@@ -255,10 +255,10 @@ opendss.newQstsPlot(FULL_NAME,
 # opendss.currentPlot(FULL_NAME)
 
 # Generate a report on each microgrid
-def microgrid_report(csvName):
-    reopt_out = json.load(open(reopt_folder + '/allOutputData.json'))
+def microgrid_report(inputName, outputCsvName):
+    reopt_out = json.load(open(reopt_folder + inputName))
 
-    with open(csvName, 'w', newline='') as outcsv:
+    with open(outputCsvName, 'w', newline='') as outcsv:
         writer = csv.writer(outcsv)
         writer.writerow(["Microgrid Name", "Generation Bus", "Minimum Load (kWh)", "Average Load (kWh)", "Average Daytime Load (kWh)", "Maximum Load (kWh)", "Recommended Diesel (kW)", "Recommended Solar (kW)", "Recommended Battery Power (kW)", "Recommended Battery Capacity (kWh)", "Recommended Wind (kW)", "NPV ($)", "CapEx ($)", "CapEx after Incentives ($)", "Average Outage Survived (h)"])
 
@@ -285,7 +285,7 @@ def microgrid_report(csvName):
             row =[mg_num, gen_bus_name, round(min_load,0), round(ave_load,0), round(avg_daytime_load,1), round(max_load,0), round(diesel_size,1), round(solar_size,1), round(battery_pow,1), round(battery_cap,1), round(wind_size,1), int(round(npv)), int(round(cap_ex)), int(round(cap_ex_after_incentives)), round(ave_outage,1)]
             writer.writerow(row)
 
-microgrid_report('microgrid_report.csv')
+microgrid_report('/allOutputData.json','microgrid_report.csv')
 
 # Charting outputs.
 def make_chart(csvName, category_name, x, y_list):

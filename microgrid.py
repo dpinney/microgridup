@@ -13,41 +13,41 @@ import csv
 import jinja2 as j2
 
 #Input data.
-# BASE_NAME = 'lehigh_base.dss'
-# LOAD_NAME = 'lehigh_load.csv'
-# microgrids = {
-# 	'm1': {
-# 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
-# 		'switch': '632633',
-# 		'gen_bus': '634'
-# 	},
-# 	'm2': {
-# 		'loads': ['675a_hospital','675b_residential1','675c_residential1'],
-# 		'switch': '671692',
-# 		'gen_bus': '675'
-# 	},
-# 	'm3': {
-# 		'loads': ['671_hospital','652_med_apartment'],
-# 		'switch': '671684',
-# 		'gen_bus': '684'
-# 	},
-# 	'm4': {
-# 		'loads': ['645_warehouse1','646_med_office'],
-# 		'switch': '632645',
-# 		'gen_bus': '646'
-# 	}
-# }
-
-#Second input set.
 BASE_NAME = 'lehigh_base.dss'
 LOAD_NAME = 'lehigh_load.csv'
 microgrids = {
 	'm1': {
-		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_hospital','675b_residential1','675c_residential1','671_hospital','652_med_apartment','645_warehouse1','646_med_office'],
-		'switch': '650632',
-		'gen_bus': '670'
+		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
+		'switch': '632633',
+		'gen_bus': '634'
+	},
+	'm2': {
+		'loads': ['675a_hospital','675b_residential1','675c_residential1'],
+		'switch': '671692',
+		'gen_bus': '675'
+	},
+	'm3': {
+		'loads': ['671_hospital','652_med_apartment'],
+		'switch': '671684',
+		'gen_bus': '684'
+	},
+	'm4': {
+		'loads': ['645_warehouse1','646_med_office'],
+		'switch': '632645',
+		'gen_bus': '646'
 	}
 }
+
+#Second input set.
+# BASE_NAME = 'lehigh_base.dss'
+# LOAD_NAME = 'lehigh_load.csv'
+# microgrids = {
+# 	'm1': {
+# 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_hospital','675b_residential1','675c_residential1','671_hospital','652_med_apartment','645_warehouse1','646_med_office'],
+# 		'switch': '650632',
+# 		'gen_bus': '670'
+# 	}
+# }
 
 # Output paths.
 GEN_NAME = 'lehigh_gen.csv'
@@ -120,7 +120,7 @@ for i, mg_ob in enumerate(microgrids.values()):
 	gen_bus_name = mg_ob['gen_bus']
 	solar_size = reopt_out.get(f'sizePV{mg_num}', 0.0)
 	wind_size = reopt_out.get(f'sizeWind{mg_num}', 0.0)
-	diesel_size = reopt_out.get(f'sizeDiesel{mg_num}', 0.0) #TODO: fix, it's not in the model outputs.
+	diesel_size = reopt_out.get(f'sizeDiesel{mg_num}', 0.0) 
 	battery_cap = reopt_out.get(f'capacityBattery{mg_num}', 0.0)
 	battery_pow = reopt_out.get(f'powerBattery{mg_num}', 0.0)
 	npv = reopt_out.get(f'savings{mg_num}', 0.0)
@@ -128,17 +128,6 @@ for i, mg_ob in enumerate(microgrids.values()):
 	cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0)
 	ave_outage = reopt_out.get(f'avgOutage{mg_num}', 0.0)
 
-	# print for testing
-	# print("Microgrid: m", mg_num)
-	# print("Diesel:", diesel_size, 'kW')
-	# print("Solar:", solar_size, 'kW')
-	# print("Battery Power:", battery_pow, "kW")
-	# print("Battery Capacity:", battery_cap, "kWh")
-	# print("Wind:", wind_size, 'kW')
-	# print("NPV: $", npv)
-	# print("CapEx: $", cap_ex)
-	# print("CapEx after incentives: $", cap_ex_after_incentives)
-	# print("Average Outage", ave_outage, 'hours')
 
 	if solar_size > 0:
 		gen_obs.append({

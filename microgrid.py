@@ -13,41 +13,41 @@ import csv
 import jinja2 as j2
 
 #Input data.
-BASE_NAME = 'lehigh_base.dss'
-LOAD_NAME = 'lehigh_load.csv'
-microgrids = {
-	'm1': {
-		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
-		'switch': '632633',
-		'gen_bus': '634'
-	},
-	'm2': {
-		'loads': ['675a_hospital','675b_residential1','675c_residential1'],
-		'switch': '671692',
-		'gen_bus': '675'
-	},
-	'm3': {
-		'loads': ['671_hospital','652_med_apartment'],
-		'switch': '671684',
-		'gen_bus': '684'
-	},
-	'm4': {
-		'loads': ['645_warehouse1','646_med_office'],
-		'switch': '632645',
-		'gen_bus': '646'
-	}
-}
-
-#Second input set.
 # BASE_NAME = 'lehigh_base.dss'
 # LOAD_NAME = 'lehigh_load.csv'
 # microgrids = {
 # 	'm1': {
-# 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_hospital','675b_residential1','675c_residential1','671_hospital','652_med_apartment','645_warehouse1','646_med_office'],
-# 		'switch': '650632',
-# 		'gen_bus': '670'
+# 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
+# 		'switch': '632633',
+# 		'gen_bus': '634'
+# 	},
+# 	'm2': {
+# 		'loads': ['675a_hospital','675b_residential1','675c_residential1'],
+# 		'switch': '671692',
+# 		'gen_bus': '675'
+# 	},
+# 	'm3': {
+# 		'loads': ['671_hospital','652_med_apartment'],
+# 		'switch': '671684',
+# 		'gen_bus': '684'
+# 	},
+# 	'm4': {
+# 		'loads': ['645_warehouse1','646_med_office'],
+# 		'switch': '632645',
+# 		'gen_bus': '646'
 # 	}
 # }
+
+#Second input set.
+BASE_NAME = 'lehigh_base.dss'
+LOAD_NAME = 'lehigh_load.csv'
+microgrids = {
+	'm1': {
+		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_hospital','675b_residential1','675c_residential1','671_hospital','652_med_apartment','645_warehouse1','646_med_office'],
+		'switch': '650632',
+		'gen_bus': '670'
+	}
+}
 
 # Output paths.
 GEN_NAME = 'lehigh_gen.csv'
@@ -100,12 +100,23 @@ if not os.path.isdir(reopt_folder):
 	allInputData = json.load(open(reopt_folder + '/allInputData.json'))
 	allInputData['loadShape'] = open(reopt_folder + '/loadShape.csv').read()
 	allInputData['fileName'] = 'loadShape.csv'
-	allInputData['latitude'] = '30.285013'
-	allInputData['longitude'] = '-84.071493'
 	allInputData['outage_start_hour'] = '240'
 	allInputData['outageDuration'] = '168'
 	allInputData['fuelAvailable'] = '10000'
 	allInputData['year'] = '2017'
+	# Pulling coordinates from BASE_NAME.dss into REopt allInputData.json:
+	tree = dssConvert.dssToTree(BASE_NAME)
+	evil_glm = dssConvert.evilDssTreeToGldTree(tree)
+	for ob in evil_glm.values():
+		ob_name = ob.get('name','')
+		ob_type = ob.get('object','')
+		if ob_type == "bus" and ob_name == "sourcebus":
+			ob_lat = ob.get('latitude','')
+			ob_long = ob.get('longitude','')
+			#print('lat:', float(ob_lat), 'long:', float(ob_long))
+			allInputData['latitude'] = float(ob_lat)
+			allInputData['longitude'] = float(ob_long)
+	# run REopt via microgridDesign
 	with open(reopt_folder + '/allInputData.json','w') as outfile:
 		json.dump(allInputData, outfile, indent=4)
 	omf.models.__neoMetaModel__.runForeground(reopt_folder)
@@ -208,7 +219,7 @@ for i, ob in enumerate(tree):
 	ob_string = ob.get('object','')
 	if ob_string.startswith('load.'):
 		ob_name = ob_string[5:]
-		shape_data = load_df[ob_name]
+		shape_data = load_df[ob_name] #load_df built in line 86 using load_df = pd.read_csv(LOAD_NAME)
 		shape_name = ob_name + '_shape'
 		ob['yearly'] = shape_name
 		shape_insert_list[i] = {

@@ -81,7 +81,7 @@ if not os.path.isfile(ONELINE_NAME):
 if not os.path.isdir(MAP_NAME):
 	geo.mapOmd(OMD_NAME, MAP_NAME, 'html', openBrowser=False, conversion=False, offline=True)
 
-# Generate the microgrid specs with REOpt here and insert into OpenDSS.
+# Generate the microgrid specs with REOpt.
 reopt_folder = './lehigh_reopt'
 load_df = pd.read_csv(LOAD_NAME)
 if not os.path.isdir(reopt_folder):
@@ -199,7 +199,7 @@ for i, mg_ob in enumerate(microgrids.values()):
 		})
 		gen_df_builder[f'battery_{gen_bus_name}'] = reopt_out.get(f'powerBatteryToLoad{mg_num}') #TODO: does this capture all battery behavior?
 
-# insert generation objects and shapes into dss
+# insert generation objects into dss
 tree = dssConvert.dssToTree(BASE_NAME)
 for col in gen_df_builder.columns:
 	# zero-one scale the generator shapes.

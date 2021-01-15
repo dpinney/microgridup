@@ -100,6 +100,7 @@ if not os.path.isdir(reopt_folder):
 	allInputData = json.load(open(reopt_folder + '/allInputData.json'))
 	allInputData['loadShape'] = open(reopt_folder + '/loadShape.csv').read()
 	allInputData['fileName'] = 'loadShape.csv'
+	#allInputData['solarMax'] = '1000' #need to edit this so that it does not trip line 207 into having unsupported 'str' type
 	allInputData['outage_start_hour'] = '240'
 	allInputData['outageDuration'] = '168'
 	allInputData['fuelAvailable'] = '10000'

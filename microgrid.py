@@ -100,12 +100,24 @@ if not os.path.isdir(reopt_folder):
 	allInputData = json.load(open(reopt_folder + '/allInputData.json'))
 	allInputData['loadShape'] = open(reopt_folder + '/loadShape.csv').read()
 	allInputData['fileName'] = 'loadShape.csv'
-	allInputData['latitude'] = '30.285013'
-	allInputData['longitude'] = '-84.071493'
+	#allInputData['solarMax'] = '1000' #need to edit this so that it does not trip line 207 into having unsupported 'str' type
 	allInputData['outage_start_hour'] = '240'
 	allInputData['outageDuration'] = '168'
 	allInputData['fuelAvailable'] = '10000'
 	allInputData['year'] = '2017'
+	# Pulling coordinates from BASE_NAME.dss into REopt allInputData.json:
+	tree = dssConvert.dssToTree(BASE_NAME)
+	evil_glm = dssConvert.evilDssTreeToGldTree(tree)
+	for ob in evil_glm.values():
+		ob_name = ob.get('name','')
+		ob_type = ob.get('object','')
+		if ob_type == "bus" and ob_name == "sourcebus":
+			ob_lat = ob.get('latitude','')
+			ob_long = ob.get('longitude','')
+			#print('lat:', float(ob_lat), 'long:', float(ob_long))
+			allInputData['latitude'] = float(ob_lat)
+			allInputData['longitude'] = float(ob_long)
+	# run REopt via microgridDesign
 	with open(reopt_folder + '/allInputData.json','w') as outfile:
 		json.dump(allInputData, outfile, indent=4)
 	omf.models.__neoMetaModel__.runForeground(reopt_folder)
@@ -120,7 +132,7 @@ for i, mg_ob in enumerate(microgrids.values()):
 	gen_bus_name = mg_ob['gen_bus']
 	solar_size = reopt_out.get(f'sizePV{mg_num}', 0.0)
 	wind_size = reopt_out.get(f'sizeWind{mg_num}', 0.0)
-	diesel_size = reopt_out.get(f'sizeDiesel{mg_num}', 0.0) #TODO: fix, it's not in the model outputs.
+	diesel_size = reopt_out.get(f'sizeDiesel{mg_num}', 0.0) 
 	battery_cap = reopt_out.get(f'capacityBattery{mg_num}', 0.0)
 	battery_pow = reopt_out.get(f'powerBattery{mg_num}', 0.0)
 	npv = reopt_out.get(f'savings{mg_num}', 0.0)
@@ -128,17 +140,6 @@ for i, mg_ob in enumerate(microgrids.values()):
 	cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0)
 	ave_outage = reopt_out.get(f'avgOutage{mg_num}', 0.0)
 
-	# print for testing
-	# print("Microgrid: m", mg_num)
-	# print("Diesel:", diesel_size, 'kW')
-	# print("Solar:", solar_size, 'kW')
-	# print("Battery Power:", battery_pow, "kW")
-	# print("Battery Capacity:", battery_cap, "kWh")
-	# print("Wind:", wind_size, 'kW')
-	# print("NPV: $", npv)
-	# print("CapEx: $", cap_ex)
-	# print("CapEx after incentives: $", cap_ex_after_incentives)
-	# print("Average Outage", ave_outage, 'hours')
 
 	if solar_size > 0:
 		gen_obs.append({
@@ -219,7 +220,7 @@ for i, ob in enumerate(tree):
 	ob_string = ob.get('object','')
 	if ob_string.startswith('load.'):
 		ob_name = ob_string[5:]
-		shape_data = load_df[ob_name]
+		shape_data = load_df[ob_name] #load_df built in line 86 using load_df = pd.read_csv(LOAD_NAME)
 		shape_name = ob_name + '_shape'
 		ob['yearly'] = shape_name
 		shape_insert_list[i] = {
@@ -266,10 +267,10 @@ opendss.newQstsPlot(FULL_NAME,
 # opendss.currentPlot(FULL_NAME)
 
 # Generate a report on each microgrid
-def microgrid_report(csvName):
-    reopt_out = json.load(open(reopt_folder + '/allOutputData.json'))
+def microgrid_report(inputName, outputCsvName):
+    reopt_out = json.load(open(reopt_folder + inputName))
 
-    with open(csvName, 'w', newline='') as outcsv:
+    with open(outputCsvName, 'w', newline='') as outcsv:
         writer = csv.writer(outcsv)
         writer.writerow(["Microgrid Name", "Generation Bus", "Minimum Load (kWh)", "Average Load (kWh)", "Average Daytime Load (kWh)", "Maximum Load (kWh)", "Recommended Diesel (kW)", "Recommended Solar (kW)", "Recommended Battery Power (kW)", "Recommended Battery Capacity (kWh)", "Recommended Wind (kW)", "NPV ($)", "CapEx ($)", "CapEx after Incentives ($)", "Average Outage Survived (h)"])
 
@@ -296,7 +297,7 @@ def microgrid_report(csvName):
             row =[mg_num, gen_bus_name, round(min_load,0), round(ave_load,0), round(avg_daytime_load,1), round(max_load,0), round(diesel_size,1), round(solar_size,1), round(battery_pow,1), round(battery_cap,1), round(wind_size,1), int(round(npv)), int(round(cap_ex)), int(round(cap_ex_after_incentives)), round(ave_outage,1)]
             writer.writerow(row)
 
-microgrid_report('microgrid_report.csv')
+microgrid_report('/allOutputData.json','microgrid_report.csv')
 
 # Charting outputs.
 def make_chart(csvName, category_name, x, y_list):

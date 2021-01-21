@@ -43,9 +43,30 @@ import jinja2 as j2
 BASE_NAME = 'lehigh_base.dss'
 LOAD_NAME = 'lehigh_load.csv'
 REOPT_INPUTS = {
-	'outage_start_hour':'100',
-	'outageDuration':'120',
-	'solarMax':'1000'
+	"solar" : "on",
+	"wind" : "off",
+	"battery" : "on",
+	"year" : '2017',
+	"energyCost" : "0.1",
+	"demandCost" : '20',
+	"solarCost" : "1600",
+	"windCost" : "4989",
+	"batteryPowerCost" : "840",
+	"batteryCapacityCost" : "420",
+	"solarMin": 0,
+	"windMin": 0,
+	"batteryPowerMin": 0,
+	"batteryCapacityMin": 0,
+	"solarMax": "1000000000",
+	"windMax": "1000000000",
+	"batteryPowerMax": "1000000",
+	"batteryCapacityMax": "1000000",
+	"criticalLoadFactor": ".99",
+	"outage_start_hour": "100",
+	"outageDuration": "120",
+	"fuelAvailable": "10000",
+	"genSize": "0",
+	"minGenLoading": "0.3"
 }
 #TODO: year, generation types in the mix, rate structure, and max_solar
 microgrids = {
@@ -107,9 +128,7 @@ if not os.path.isdir(reopt_folder):
 	allInputData = json.load(open(reopt_folder + '/allInputData.json'))
 	allInputData['loadShape'] = open(reopt_folder + '/loadShape.csv').read()
 	allInputData['fileName'] = 'loadShape.csv'
-	allInputData['fuelAvailable'] = '10000'
-	allInputData['year'] = '2017'
-	# User inputs.
+	# User inputs to REopt using keys from microgridDesign.
 	for key in REOPT_INPUTS:
 		allInputData[key] = REOPT_INPUTS[key]
 	# Pulling coordinates from BASE_NAME.dss into REopt allInputData.json:
@@ -337,7 +356,7 @@ out = template.render(
 	x='David',
 	y='Matt',
 	summary=open('microgrid_report.csv').read(),
-	inputs={'circ':BASE_NAME,'loads':LOAD_NAME,'mg':microgrids}
+	inputs={'circuit':BASE_NAME,'loads':LOAD_NAME,'REopt inputs':REOPT_INPUTS,'microgrids':microgrids}
 )
 #TODO: have an option where we make the template <iframe srcdoc="{{X}}"> to embed the html and create a single file.
 BIG_OUT_NAME = 'output_full_analysis_lehigh.html'

@@ -57,15 +57,16 @@ REOPT_INPUTS = {
 	"windMin": 0,
 	"batteryPowerMin": 0,
 	"batteryCapacityMin": 0,
-	"solarMax": "1000000000",
-	"windMax": "1000000000",
+	"solarMax": "100000",
+	"windMax": "100000",
 	"batteryPowerMax": "1000000",
 	"batteryCapacityMax": "1000000",
+	"solarExisting": 0,
 	"criticalLoadFactor": ".99",
 	"outage_start_hour": "100",
 	"outageDuration": "120",
 	"fuelAvailable": "10000",
-	"genSize": "0",
+	"genExisting": 0,
 	"minGenLoading": "0.3"
 }
 #TODO: year, generation types in the mix, rate structure, and max_solar

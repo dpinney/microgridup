@@ -15,6 +15,7 @@ import jinja2 as j2
 #Input data.
 # BASE_NAME = 'lehigh_base.dss'
 # LOAD_NAME = 'lehigh_load.csv'
+# REOPT_INPUTS = {}
 # microgrids = {
 # 	'm1': {
 # 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
@@ -41,6 +42,12 @@ import jinja2 as j2
 #Second input set.
 BASE_NAME = 'lehigh_base.dss'
 LOAD_NAME = 'lehigh_load.csv'
+REOPT_INPUTS = {
+	'outage_start_hour':'100',
+	'outageDuration':'120',
+	'solarMax':'1000'
+}
+#TODO: year, generation types in the mix, rate structure, and max_solar
 microgrids = {
 	'm1': {
 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_hospital','675b_residential1','675c_residential1','671_hospital','652_med_apartment','645_warehouse1','646_med_office'],
@@ -96,15 +103,15 @@ if not os.path.isdir(reopt_folder):
 		for load_name in loads:
 			mg_load_df[key] = mg_load_df[key] + load_df[load_name]
 	mg_load_df.to_csv(reopt_folder + '/loadShape.csv', header=False, index=False)
-	# Modify inputs.
+	# Default inputs.
 	allInputData = json.load(open(reopt_folder + '/allInputData.json'))
 	allInputData['loadShape'] = open(reopt_folder + '/loadShape.csv').read()
 	allInputData['fileName'] = 'loadShape.csv'
-	#allInputData['solarMax'] = '1000' #need to edit this so that it does not trip line 207 into having unsupported 'str' type
-	allInputData['outage_start_hour'] = '240'
-	allInputData['outageDuration'] = '168'
 	allInputData['fuelAvailable'] = '10000'
 	allInputData['year'] = '2017'
+	# User inputs.
+	for key in REOPT_INPUTS:
+		allInputData[key] = REOPT_INPUTS[key]
 	# Pulling coordinates from BASE_NAME.dss into REopt allInputData.json:
 	tree = dssConvert.dssToTree(BASE_NAME)
 	evil_glm = dssConvert.evilDssTreeToGldTree(tree)

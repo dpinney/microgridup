@@ -1,961 +1,961 @@
 hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Q3(kvar),Name,P4(kW),Q4(kvar)
-1,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-2,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-3,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-4,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-5,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-6,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-7,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-8,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-9,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-10,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-11,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-12,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-13,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-14,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-15,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-16,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-17,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-18,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-19,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-20,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-21,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-22,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-23,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-24,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-25,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-26,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-27,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-28,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-29,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-30,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-31,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-32,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-33,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-34,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-35,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-36,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-37,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-38,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-39,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-40,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-41,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-42,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-43,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-44,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-45,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-46,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-47,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-48,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-49,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-50,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-51,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-52,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-53,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-54,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-55,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-56,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-57,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-58,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-59,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-60,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-61,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-62,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-63,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-64,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-65,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-66,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-67,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-68,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-69,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-70,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-71,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-72,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-73,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-74,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-75,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-76,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-77,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-78,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-79,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-80,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-81,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-82,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-83,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-84,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-85,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-86,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-87,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-88,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-89,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-90,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-91,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-92,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-93,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-94,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-95,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-96,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-97,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-98,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-99,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-100,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-101,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-102,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-103,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-104,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-105,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-106,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-107,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-108,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-109,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-110,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-111,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-112,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-113,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-114,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-115,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-116,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-117,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-118,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-119,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-120,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-121,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-122,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-123,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-124,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-125,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-126,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-127,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-128,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-129,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-130,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-131,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-132,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-133,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-134,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-135,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-136,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-137,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-138,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-139,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-140,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-141,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-142,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-143,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-144,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-145,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-146,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-147,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-148,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-149,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-150,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-151,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-152,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-153,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-154,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-155,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-156,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-157,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-158,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-159,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-160,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-161,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-162,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-163,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-164,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-165,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-166,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-167,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-168,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-169,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-170,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-171,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-172,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-173,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-174,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-175,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-176,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-177,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-178,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-179,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-180,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-181,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-182,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-183,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-184,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-185,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-186,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-187,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-188,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-189,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-190,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-191,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-192,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-193,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-194,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-195,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-196,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-197,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-198,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-199,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-200,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-201,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-202,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-203,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-204,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-205,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-206,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-207,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-208,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-209,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-210,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-211,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-212,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-213,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-214,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-215,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-216,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-217,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-218,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-219,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-220,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-221,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-222,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-223,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-224,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-225,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-226,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-227,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-228,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-229,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-230,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-231,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-232,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-233,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-234,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-235,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-236,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-237,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-238,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-239,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-240,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-241,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-242,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-243,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-244,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-245,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-246,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-247,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-248,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-249,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-250,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-251,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-252,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-253,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-254,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-255,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-256,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-257,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-258,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-259,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-260,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-261,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-262,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-263,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-264,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-265,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-266,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-267,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-268,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-269,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-270,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-271,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-272,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-273,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-274,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-275,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-276,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-277,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-278,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-279,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-280,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-281,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-282,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-283,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-284,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-285,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-286,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-287,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-288,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-289,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-290,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-291,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-292,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-293,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-294,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-295,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-296,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-297,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-298,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-299,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-300,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-301,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-302,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-303,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-304,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-305,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-306,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-307,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-308,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-309,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-310,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-311,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-312,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-313,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-314,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-315,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-316,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-317,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-318,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-319,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-320,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-321,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-322,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-323,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-324,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-325,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-326,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-327,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-328,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-329,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-330,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-331,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-332,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-333,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-334,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-335,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-336,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-337,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-338,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-339,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-340,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-341,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-342,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-343,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-344,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-345,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-346,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-347,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-348,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-349,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-350,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-351,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-352,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-353,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-354,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-355,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-356,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-357,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-358,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-359,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-360,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-361,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-362,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-363,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-364,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-365,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-366,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-367,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-368,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-369,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-370,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-371,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-372,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-373,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-374,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-375,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-376,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-377,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-378,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-379,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-380,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-381,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-382,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-383,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-384,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-385,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-386,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-387,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-388,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-389,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-390,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-391,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-392,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-393,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-394,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-395,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-396,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-397,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-398,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-399,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-400,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-401,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-402,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-403,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-404,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-405,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-406,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-407,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-408,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-409,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-410,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-411,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-412,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-413,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-414,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-415,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-416,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-417,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-418,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-419,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-420,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-421,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-422,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-423,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-424,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-425,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-426,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-427,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-428,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-429,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-430,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-431,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-432,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-433,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-434,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-435,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-436,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-437,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-438,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-439,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-440,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-441,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-442,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-443,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-444,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-445,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-446,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-447,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-448,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-449,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-450,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-451,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-452,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-453,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-454,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-455,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-456,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-457,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-458,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-459,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-460,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-461,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-462,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-463,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-464,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-465,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-466,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-467,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-468,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-469,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-470,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-471,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-472,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-473,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-474,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-475,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-476,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-477,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-478,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-479,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-480,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-diesel_670,,
-1,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-2,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-3,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-4,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-5,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-6,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-7,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-8,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-9,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-10,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-11,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-12,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-13,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-14,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-15,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-16,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-17,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-18,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-19,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-20,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-21,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-22,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-23,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-24,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-25,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-26,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-27,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-28,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-29,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-30,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-31,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-32,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-33,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-34,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-35,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-36,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-37,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-38,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-39,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-40,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-41,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-42,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-43,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-44,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-45,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-46,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-47,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-48,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-49,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-50,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-51,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-52,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-53,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-54,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-55,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-56,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-57,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-58,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-59,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-60,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-61,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-62,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-63,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-64,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-65,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-66,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-67,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-68,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-69,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-70,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-71,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-72,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-73,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-74,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-75,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-76,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-77,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-78,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-79,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-80,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-81,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-82,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-83,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-84,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-85,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-86,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-87,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-88,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-89,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-90,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-91,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-92,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-93,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-94,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-95,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-96,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-97,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-98,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-99,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-100,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-101,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-102,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-103,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-104,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-105,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-106,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-107,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-108,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-109,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-110,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-111,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-112,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-113,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-114,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-115,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-116,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-117,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-118,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-119,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-120,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-121,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-122,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-123,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-124,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-125,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-126,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-127,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-128,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-129,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-130,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-131,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-132,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-133,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-134,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-135,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-136,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-137,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-138,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-139,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-140,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-141,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-142,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-143,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-144,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-145,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-146,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-147,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-148,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-149,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-150,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-151,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-152,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-153,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-154,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-155,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-156,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-157,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-158,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-159,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-160,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-161,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-162,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-163,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-164,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-165,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-166,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-167,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-168,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-169,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-170,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-171,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-172,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-173,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-174,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-175,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-176,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-177,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-178,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-179,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-180,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-181,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-182,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-183,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-184,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-185,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-186,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-187,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-188,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-189,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-190,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-191,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-192,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-193,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-194,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-195,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-196,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-197,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-198,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-199,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-200,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-201,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-202,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-203,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-204,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-205,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-206,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-207,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-208,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-209,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-210,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-211,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-212,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-213,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-214,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-215,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-216,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-217,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-218,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-219,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-220,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-221,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-222,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-223,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-224,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-225,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-226,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-227,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-228,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-229,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-230,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-231,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-232,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-233,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-234,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-235,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-236,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-237,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-238,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-239,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-240,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-241,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-242,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-243,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-244,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-245,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-246,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-247,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-248,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-249,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-250,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-251,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-252,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-253,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-254,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-255,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-256,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-257,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-258,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-259,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-260,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-261,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-262,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-263,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-264,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-265,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-266,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-267,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-268,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-269,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-270,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-271,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-272,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-273,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-274,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-275,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-276,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-277,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-278,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-279,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-280,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-281,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-282,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-283,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-284,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-285,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-286,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-287,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-288,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-289,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-290,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-291,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-292,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-293,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-294,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-295,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-296,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-297,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-298,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-299,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-300,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-301,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-302,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-303,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-304,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-305,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-306,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-307,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-308,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-309,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-310,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-311,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-312,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-313,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-314,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-315,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-316,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-317,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-318,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-319,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-320,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-321,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-322,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-323,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-324,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-325,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-326,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-327,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-328,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-329,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-330,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-331,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-332,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-333,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-334,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-335,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-336,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-337,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-338,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-339,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-340,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-341,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-342,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-343,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-344,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-345,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-346,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-347,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-348,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-349,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-350,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-351,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-352,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-353,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-354,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-355,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-356,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-357,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-358,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-359,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-360,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-361,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-362,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-363,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-364,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-365,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-366,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-367,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-368,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-369,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-370,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-371,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-372,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-373,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-374,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-375,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-376,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-377,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-378,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-379,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-380,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-381,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-382,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-383,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-384,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-385,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-386,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-387,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-388,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-389,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-390,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-391,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-392,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-393,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-394,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-395,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-396,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-397,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-398,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-399,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-400,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-401,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-402,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-403,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-404,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-405,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-406,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-407,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-408,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-409,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-410,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-411,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-412,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-413,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-414,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-415,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-416,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-417,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-418,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-419,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-420,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-421,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-422,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-423,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-424,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-425,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-426,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-427,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-428,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-429,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-430,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-431,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-432,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-433,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-434,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-435,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-436,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-437,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-438,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-439,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-440,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-441,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-442,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-443,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-444,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-445,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-446,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-447,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-448,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-449,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-450,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-451,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-452,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-453,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-454,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-455,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-456,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-457,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-458,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-459,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-460,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-461,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-462,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-463,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-464,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-465,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-466,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-467,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-468,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-469,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-470,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-471,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-472,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-473,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-474,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-475,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-476,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-477,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-478,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-479,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
-480,0.0, Nan, Nan, Nan, Nan, Nan, Nan,mongenerator-solar_670, Nan, Nan
+1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+3,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+4,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+5,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+6,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+7,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+8,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+9,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+10,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+11,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+12,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+13,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+14,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+15,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+16,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+17,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+18,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+19,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+20,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+21,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+22,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+23,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+24,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+25,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+26,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+27,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+28,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+29,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+30,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+31,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+32,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+33,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+34,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+35,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+36,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+37,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+38,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+39,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+40,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+41,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+42,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+43,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+44,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+45,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+46,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+47,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+48,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+49,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+50,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+51,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+52,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+53,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+54,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+55,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+56,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+57,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+58,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+59,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+60,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+61,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+62,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+63,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+64,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+65,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+66,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+67,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+68,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+69,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+70,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+71,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+72,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+73,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+74,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+75,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+76,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+77,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+78,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+79,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+80,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+81,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+82,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+83,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+84,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+85,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+86,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+87,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+88,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+89,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+90,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+91,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+92,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+93,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+94,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+95,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+96,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+97,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+98,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+99,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+100,0.0,-252.664,0.427784,-253.205,-0.0316799,-253.646,-0.42096,mongenerator-diesel_670,,
+101,0.0,-286.978,0.623191,-287.698,-0.0782609,-288.153,-0.545432,mongenerator-diesel_670,,
+102,0.0,-297.813,0.628648,-298.528,-0.137549,-298.932,-0.491094,mongenerator-diesel_670,,
+103,0.0,-409.184,1.03395,-410.478,-0.219555,-410.609,-0.815105,mongenerator-diesel_670,,
+104,0.0,-450.123,1.29762,-451.752,-0.224379,-451.879,-1.07366,mongenerator-diesel_670,,
+105,0.0,-454.97,1.09818,-456.672,0.22991,-456.88,-1.33138,mongenerator-diesel_670,,
+106,0.0,-427.226,1.02187,-428.761,0.261529,-429.155,-1.28379,mongenerator-diesel_670,,
+107,0.0,-394.522,0.955605,-395.894,0.230387,-396.267,-1.18854,mongenerator-diesel_670,,
+108,0.0,-363.546,0.922116,-364.837,0.266878,-365.258,-1.18931,mongenerator-diesel_670,,
+109,0.0,-337.619,0.82717,-338.752,0.1929,-339.068,-1.02076,mongenerator-diesel_670,,
+110,0.0,-359.744,0.838573,-360.946,0.241855,-361.317,-1.08023,mongenerator-diesel_670,,
+111,0.0,-382.951,0.878846,-384.228,0.235,-384.603,-1.11297,mongenerator-diesel_670,,
+112,0.0,-419.823,0.943473,-421.25,0.261358,-421.639,-1.2032,mongenerator-diesel_670,,
+113,0.0,-481.847,0.920025,-483.382,0.224095,-483.678,-1.14163,mongenerator-diesel_670,,
+114,0.0,-484.484,1.27549,-486.306,-0.298737,-485.811,-0.967997,mongenerator-diesel_670,,
+115,0.0,-435.717,0.786265,-436.791,-0.362566,-436.565,-0.425305,mongenerator-diesel_670,,
+116,0.0,-427.89,0.755425,-428.932,-0.357046,-428.705,-0.39862,mongenerator-diesel_670,,
+117,0.0,-374.21,0.436623,-374.864,-0.331666,-374.752,-0.104582,mongenerator-diesel_670,,
+118,0.0,-336.05,0.304898,-336.559,-0.278053,-336.475,-0.0293436,mongenerator-diesel_670,,
+119,0.0,-260.075,0.272661,-260.4,-0.222525,-260.66,-0.0512522,mongenerator-diesel_670,,
+120,0.0,-256.024,0.345021,-256.452,-0.101328,-256.83,-0.243442,mongenerator-diesel_670,,
+121,0.0,-241.361,0.329923,-241.787,-0.0480485,-242.185,-0.282318,mongenerator-diesel_670,,
+122,0.0,-238.137,0.325088,-238.559,-0.0405407,-238.957,-0.284782,mongenerator-diesel_670,,
+123,0.0,-237.188,0.32783,-237.615,-0.0297641,-238.022,-0.298141,mongenerator-diesel_670,,
+124,0.0,-236.668,0.333417,-237.103,-0.0225609,-237.515,-0.3109,mongenerator-diesel_670,,
+125,0.0,-279.834,0.551033,-280.484,-0.0717897,-280.931,-0.479349,mongenerator-diesel_670,,
+126,0.0,-288.493,0.536469,-289.119,-0.128423,-289.515,-0.40797,mongenerator-diesel_670,,
+127,0.0,-398.777,0.917736,-399.933,-0.225835,-400.095,-0.692116,mongenerator-diesel_670,,
+128,0.0,-439.971,1.14553,-441.411,-0.260837,-441.551,-0.885488,mongenerator-diesel_670,,
+129,0.0,-484.485,0.928363,-485.97,0.093096,-486.062,-1.02852,mongenerator-diesel_670,,
+130,0.0,-441.435,0.841665,-442.817,0.214184,-443.13,-1.05375,mongenerator-diesel_670,,
+131,0.0,-398.676,0.757218,-399.857,0.187787,-400.159,-0.947906,mongenerator-diesel_670,,
+132,0.0,-426.633,0.782512,-427.896,0.190228,-428.154,-0.971838,mongenerator-diesel_670,,
+133,0.0,-400.771,0.716758,-401.888,0.108839,-402.046,-0.826361,mongenerator-diesel_670,,
+134,0.0,-412.263,0.698536,-413.413,0.174252,-413.636,-0.873342,mongenerator-diesel_670,,
+135,0.0,-406.978,0.70555,-408.116,0.165918,-408.361,-0.871506,mongenerator-diesel_670,,
+136,0.0,-439.856,0.768917,-441.14,0.195415,-441.398,-0.962737,mongenerator-diesel_670,,
+137,0.0,-484.456,0.842684,-485.962,0.206343,-486.167,-1.04525,mongenerator-diesel_670,,
+138,0.0,-484.514,1.2834,-486.342,-0.364444,-485.741,-0.910445,mongenerator-diesel_670,,
+139,0.0,-447.73,0.764741,-448.755,-0.467065,-448.44,-0.300165,mongenerator-diesel_670,,
+140,0.0,-437.699,0.724591,-438.671,-0.475082,-438.354,-0.250061,mongenerator-diesel_670,,
+141,0.0,-385.228,0.402703,-385.81,-0.446637,-385.614,0.0443934,mongenerator-diesel_670,,
+142,0.0,-332.734,0.313475,-333.227,-0.29897,-333.166,-0.0170805,mongenerator-diesel_670,,
+143,0.0,-252.911,0.289986,-253.268,-0.170681,-253.561,-0.120397,mongenerator-diesel_670,,
+144,0.0,-250.101,0.361615,-250.559,-0.0548822,-250.967,-0.30652,mongenerator-diesel_670,,
+145,0.0,-236.053,0.342572,-236.487,-0.035283,-236.905,-0.307787,mongenerator-diesel_670,,
+146,0.0,-234.82,0.34431,-235.254,-0.0357147,-235.669,-0.308827,mongenerator-diesel_670,,
+147,0.0,-235.004,0.354267,-235.453,-0.0183381,-235.885,-0.336061,mongenerator-diesel_670,,
+148,0.0,-234.65,0.354017,-235.099,-0.015776,-235.533,-0.338251,mongenerator-diesel_670,,
+149,0.0,-246.301,0.39602,-246.789,-0.0352101,-247.229,-0.360807,mongenerator-diesel_670,,
+150,0.0,-251.4,0.383039,-251.863,-0.0708087,-252.283,-0.31219,mongenerator-diesel_670,,
+151,0.0,-309.144,0.412683,-309.775,-0.0692184,-309.949,-0.343971,mongenerator-diesel_670,,
+152,0.0,-332.185,0.702262,-333.043,-0.203041,-333.156,-0.499757,mongenerator-diesel_670,,
+153,0.0,-308.554,0.645546,-309.361,-0.174311,-309.368,-0.471115,mongenerator-diesel_670,,
+154,0.0,-346.895,0.863633,-347.991,-0.0692536,-348.173,-0.793171,mongenerator-diesel_670,,
+155,0.0,-253.73,0.714522,-254.535,-0.0117522,-254.795,-0.705271,mongenerator-diesel_670,,
+156,0.0,-243.338,0.695186,-244.103,-0.0136999,-244.358,-0.681602,mongenerator-diesel_670,,
+157,0.0,-307.539,0.944922,-308.392,-0.147969,-308.656,-0.803201,mongenerator-diesel_670,,
+158,0.0,-249.827,0.735841,-250.607,-0.0905599,-250.759,-0.639897,mongenerator-diesel_670,,
+159,0.0,-261.705,0.819254,-262.521,-0.157691,-262.762,-0.660563,mongenerator-diesel_670,,
+160,0.0,-303.811,0.80584,-304.668,-0.18667,-304.905,-0.616411,mongenerator-diesel_670,,
+161,0.0,-338.386,0.925099,-339.348,-0.317932,-339.457,-0.606258,mongenerator-diesel_670,,
+162,0.0,-368.075,0.876473,-369.04,-0.331776,-369.174,-0.542535,mongenerator-diesel_670,,
+163,0.0,-351.793,0.68324,-352.485,-0.418487,-352.786,-0.264264,mongenerator-diesel_670,,
+164,0.0,-337.213,0.606019,-337.817,-0.434349,-338.073,-0.173115,mongenerator-diesel_670,,
+165,0.0,-300.167,0.373989,-300.553,-0.362035,-300.801,-0.0114573,mongenerator-diesel_670,,
+166,0.0,-278.249,0.325976,-278.591,-0.328035,-278.825,0.000505767,mongenerator-diesel_670,,
+167,0.0,-249.69,0.284525,-250.019,-0.204836,-250.309,-0.0808136,mongenerator-diesel_670,,
+168,0.0,-247.955,0.354088,-248.392,-0.0767606,-248.796,-0.27713,mongenerator-diesel_670,,
+169,0.0,-230.626,0.31299,-231.031,-0.0295549,-231.444,-0.283852,mongenerator-diesel_670,,
+170,0.0,-227.429,0.306417,-227.827,-0.0269611,-228.235,-0.279668,mongenerator-diesel_670,,
+171,0.0,-226.599,0.311439,-227.006,-0.00877461,-227.43,-0.302773,mongenerator-diesel_670,,
+172,0.0,-226.528,0.312507,-226.937,-0.0070561,-227.363,-0.305453,mongenerator-diesel_670,,
+173,0.0,-239.256,0.35743,-239.706,-0.0273617,-240.139,-0.330064,mongenerator-diesel_670,,
+174,0.0,-245.192,0.3487,-245.622,-0.0631488,-246.037,-0.285523,mongenerator-diesel_670,,
+175,0.0,-284.186,0.488765,-284.733,-0.178941,-285.117,-0.309117,mongenerator-diesel_670,,
+176,0.0,-271.9,0.586375,-272.467,-0.292542,-272.731,-0.294471,mongenerator-diesel_670,,
+177,0.0,-262.572,0.613848,-263.117,-0.397273,-263.22,-0.21739,mongenerator-diesel_670,,
+178,0.0,-216.619,0.464962,-216.987,-0.361727,-217.036,-0.105312,mongenerator-diesel_670,,
+179,0.0,-307.884,0.674147,-308.522,-0.427909,-308.575,-0.242212,mongenerator-diesel_670,,
+180,0.0,-306.052,0.701683,-306.698,-0.427777,-306.793,-0.273577,mongenerator-diesel_670,,
+181,0.0,-275.656,0.642087,-276.231,-0.369245,-276.324,-0.273596,mongenerator-diesel_670,,
+182,0.0,-265.063,0.609512,-265.575,-0.393693,-265.667,-0.216158,mongenerator-diesel_670,,
+183,0.0,-287.401,0.613417,-287.926,-0.451156,-287.951,-0.161871,mongenerator-diesel_670,,
+184,0.0,-310.502,0.66841,-311.077,-0.505207,-311.115,-0.162234,mongenerator-diesel_670,,
+185,0.0,-330.36,0.647672,-330.938,-0.534414,-330.94,-0.112274,mongenerator-diesel_670,,
+186,0.0,-333.756,0.533653,-334.24,-0.53016,-334.302,-0.0029879,mongenerator-diesel_670,,
+187,0.0,-323.296,0.389803,-323.66,-0.473496,-323.862,0.0848734,mongenerator-diesel_670,,
+188,0.0,-309.278,0.378266,-309.65,-0.413316,-309.874,0.0346699,mongenerator-diesel_670,,
+189,0.0,-292.639,0.325767,-292.97,-0.371139,-293.195,0.0451378,mongenerator-diesel_670,,
+190,0.0,-277.538,0.322467,-277.883,-0.30844,-278.133,-0.0147182,mongenerator-diesel_670,,
+191,0.0,-243.948,0.265243,-244.26,-0.189457,-244.554,-0.0773326,mongenerator-diesel_670,,
+192,0.0,-242.204,0.33169,-242.62,-0.0658017,-243.023,-0.265771,mongenerator-diesel_670,,
+193,0.0,-233.58,0.322924,-234.003,-0.0220169,-234.411,-0.301657,mongenerator-diesel_670,,
+194,0.0,-230.114,0.309369,-230.525,-0.0116757,-230.94,-0.29803,mongenerator-diesel_670,,
+195,0.0,-229.746,0.308036,-230.158,-0.00278614,-230.582,-0.305419,mongenerator-diesel_670,,
+196,0.0,-230.465,0.308339,-230.878,-0.00264534,-231.305,-0.305773,mongenerator-diesel_670,,
+197,0.0,-267.57,0.484246,-268.152,-0.0557832,-268.603,-0.429052,mongenerator-diesel_670,,
+198,0.0,-274.62,0.463214,-275.173,-0.102215,-275.581,-0.3609,mongenerator-diesel_670,,
+199,0.0,-391.207,0.764215,-392.307,-0.109873,-392.344,-0.656731,mongenerator-diesel_670,,
+200,0.0,-424.452,1.03229,-425.831,-0.144959,-425.953,-0.887281,mongenerator-diesel_670,,
+201,0.0,-446.596,0.97418,-448.099,0.265012,-448.461,-1.24278,mongenerator-diesel_670,,
+202,0.0,-397.659,0.887637,-399.045,0.351031,-399.597,-1.23605,mongenerator-diesel_670,,
+203,0.0,-449.602,0.9906,-451.228,0.427629,-451.819,-1.41617,mongenerator-diesel_670,,
+204,0.0,-412.12,0.887988,-413.517,0.334373,-414.006,-1.22425,mongenerator-diesel_670,,
+205,0.0,-432.171,0.852492,-433.547,0.229582,-433.847,-1.08165,mongenerator-diesel_670,,
+206,0.0,-484.362,0.865814,-485.967,0.297076,-486.25,-1.1588,mongenerator-diesel_670,,
+207,0.0,-484.412,0.842491,-485.946,0.2366,-486.198,-1.08024,mongenerator-diesel_670,,
+208,0.0,-484.338,0.909768,-485.962,0.270329,-486.268,-1.17893,mongenerator-diesel_670,,
+209,0.0,-484.345,0.861355,-486.011,0.247688,-486.227,-1.10535,mongenerator-diesel_670,,
+210,0.0,-484.443,1.35446,-486.28,-0.335834,-485.839,-1.01858,mongenerator-diesel_670,,
+211,0.0,-434.071,0.842899,-435.186,-0.359097,-435.009,-0.484755,mongenerator-diesel_670,,
+212,0.0,-427.335,0.855544,-428.466,-0.340428,-428.301,-0.515524,mongenerator-diesel_670,,
+213,0.0,-375.994,0.55172,-376.758,-0.314678,-376.701,-0.236805,mongenerator-diesel_670,,
+214,0.0,-342.58,0.427767,-343.211,-0.267832,-343.166,-0.162383,mongenerator-diesel_670,,
+215,0.0,-271.245,0.371984,-271.675,-0.21627,-271.959,-0.156757,mongenerator-diesel_670,,
+216,0.0,-268.775,0.445649,-269.309,-0.0978842,-269.713,-0.347423,mongenerator-diesel_670,,
+217,0.0,-253.336,0.406695,-253.841,-0.0522389,-254.257,-0.354836,mongenerator-diesel_670,,
+218,0.0,-247.246,0.384565,-247.73,-0.0419162,-248.143,-0.342838,mongenerator-diesel_670,,
+219,0.0,-244.207,0.377598,-244.687,-0.0264604,-245.11,-0.351163,mongenerator-diesel_670,,
+220,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+221,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+222,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+223,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+224,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+225,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+226,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+227,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+228,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+229,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+230,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+231,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+232,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+233,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+234,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+235,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+236,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+237,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+238,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+239,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+240,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+241,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+242,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+243,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+244,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+245,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+246,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+247,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+248,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+249,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+250,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+251,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+252,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+253,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+254,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+255,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+256,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+257,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+258,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+259,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+260,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+261,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+262,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+263,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+264,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+265,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+266,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+267,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+268,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+269,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+270,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+271,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+272,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+273,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+274,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+275,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+276,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+277,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+278,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+279,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+280,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+281,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+282,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+283,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+284,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+285,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+286,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+287,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+288,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+289,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+290,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+291,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+292,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+293,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+294,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+295,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+296,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+297,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+298,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+299,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+300,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+301,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+302,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+303,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+304,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+305,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+306,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+307,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+308,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+309,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+310,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+311,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+312,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+313,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+314,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+315,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+316,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+317,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+318,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+319,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+320,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+321,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+322,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+323,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+324,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+325,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+326,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+327,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+328,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+329,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+330,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+331,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+332,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+333,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+334,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+335,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+336,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+337,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+338,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+339,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+340,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+341,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+342,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+343,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+344,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+345,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+346,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+347,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+348,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+349,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+350,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+351,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+352,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+353,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+354,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+355,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+356,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+357,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+358,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+359,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+360,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+361,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+362,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+363,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+364,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+365,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+366,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+367,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+368,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+369,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+370,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+371,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+372,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+373,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+374,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+375,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+376,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+377,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+378,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+379,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+380,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+381,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+382,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+383,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+384,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+385,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+386,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+387,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+388,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+389,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+390,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+391,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+392,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+393,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+394,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+395,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+396,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+397,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+398,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+399,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+400,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+401,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+402,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+403,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+404,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+405,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+406,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+407,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+408,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+409,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+410,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+411,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+412,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+413,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+414,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+415,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+416,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+417,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+418,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+419,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+420,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+421,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+422,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+423,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+424,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+425,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+426,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+427,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+428,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+429,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+430,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+431,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+432,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+433,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+434,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+435,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+436,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+437,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+438,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+439,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+440,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+441,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+442,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+443,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+444,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+445,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+446,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+447,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+448,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+449,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+450,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+451,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+452,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+453,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+454,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+455,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+456,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+457,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+458,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+459,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+460,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+461,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+462,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+463,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+464,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+465,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+466,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+467,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+468,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+469,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+470,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+471,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+472,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+473,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+474,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+475,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+476,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+477,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+478,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+479,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+480,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-diesel_670,,
+1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+3,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+4,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+5,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+6,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+7,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+8,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+9,0.0,-5.42815,3.02397e-05,-5.42818,4.66212e-06,-5.42817,3.3494e-06,mongenerator-solar_670,0.0,0.0
+10,0.0,-16.4583,-5.21411e-05,-16.4583,-5.15239e-05,-16.4583,-7.12998e-05,mongenerator-solar_670,0.0,0.0
+11,0.0,-23.2325,0.000134092,-23.2327,0.000113937,-23.2327,-0.000158339,mongenerator-solar_670,0.0,0.0
+12,0.0,-71.3911,-0.000258325,-71.391,-0.000259344,-71.3911,-0.000521978,mongenerator-solar_670,0.0,0.0
+13,0.0,-16.371,0.000156086,-16.3711,0.000170109,-16.3712,0.000111313,mongenerator-solar_670,0.0,0.0
+14,0.0,-38.2577,-0.000131755,-38.2576,-0.000114219,-38.2576,-0.000117527,mongenerator-solar_670,0.0,0.0
+15,0.0,-57.2347,-0.000163176,-57.2346,-0.000187505,-57.2346,-0.00014533,mongenerator-solar_670,0.0,0.0
+16,0.0,-61.6208,-6.04513e-05,-61.6207,-6.2004e-05,-61.6207,3.88805e-06,mongenerator-solar_670,0.0,0.0
+17,0.0,-30.7887,5.13649e-05,-30.7887,0.000114234,-30.7887,0.000252752,mongenerator-solar_670,0.0,0.0
+18,0.0,-2.04122,-5.71489e-06,-2.04121,5.04939e-06,-2.0412,2.37114e-05,mongenerator-solar_670,0.0,0.0
+19,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+20,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+21,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+22,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+23,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+24,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+25,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+26,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+27,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+28,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+29,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+30,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+31,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+32,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+33,0.0,-14.2431,0.000115304,-14.2431,0.000156013,-14.2434,-0.000106632,mongenerator-solar_670,0.0,0.0
+34,0.0,-36.1732,0.000199782,-36.1736,0.000281316,-36.1736,-0.00023584,mongenerator-solar_670,0.0,0.0
+35,0.0,-50.6339,9.60653e-05,-50.6342,-8.90723e-05,-50.634,-0.000257232,mongenerator-solar_670,0.0,0.0
+36,0.0,-1.99739,1.94302e-05,-1.9974,1.93038e-05,-1.99742,7.0308e-06,mongenerator-solar_670,0.0,0.0
+37,0.0,-108.695,-0.00142553,-108.695,-0.00186003,-108.693,-0.000917947,mongenerator-solar_670,0.0,0.0
+38,0.0,-38.8651,0.000391672,-38.8651,0.000419878,-38.8654,0.000170783,mongenerator-solar_670,0.0,0.0
+39,0.0,-141.133,-0.00133161,-141.133,-0.0018804,-141.131,-0.00137055,mongenerator-solar_670,0.0,0.0
+40,0.0,-97.0558,0.000382041,-97.0557,0.000497498,-97.0562,0.000456138,mongenerator-solar_670,0.0,0.0
+41,0.0,-51.2416,0.000141687,-51.2414,0.000278846,-51.2417,0.000398373,mongenerator-solar_670,0.0,0.0
+42,0.0,-4.38612,1.24242e-05,-4.38615,-1.94372e-05,-4.38609,5.48349e-05,mongenerator-solar_670,0.0,0.0
+43,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+44,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+45,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+46,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+47,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+48,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+49,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+50,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+51,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+52,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+53,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+54,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+55,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+56,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+57,0.0,-41.7746,0.00018015,-41.7747,0.000331485,-41.7752,-0.000405797,mongenerator-solar_670,0.0,0.0
+58,0.0,-97.4023,9.85825e-05,-97.4031,0.000223484,-97.4028,-0.000817413,mongenerator-solar_670,0.0,0.0
+59,0.0,-129.408,-0.000168241,-129.408,-0.000590436,-129.407,-0.000790495,mongenerator-solar_670,0.0,0.0
+60,0.0,-54.8457,0.000489907,-54.8456,0.000667499,-54.8463,0.000374322,mongenerator-solar_670,0.0,0.0
+61,0.0,-97.5342,-0.000864813,-97.5338,-0.000919877,-97.5333,-0.000163022,mongenerator-solar_670,0.0,0.0
+62,0.0,-97.2728,0.00018204,-97.2729,0.000239559,-97.2731,-5.34096e-06,mongenerator-solar_670,0.0,0.0
+63,0.0,-79.4685,0.000132697,-79.4685,0.000139298,-79.4686,0.000161742,mongenerator-solar_670,0.0,0.0
+64,0.0,-69.003,3.78989e-05,-69.0029,7.10924e-05,-69.003,0.000134178,mongenerator-solar_670,0.0,0.0
+65,0.0,-36.2167,0.000107491,-36.2167,0.000146377,-36.2167,0.000195156,mongenerator-solar_670,0.0,0.0
+66,0.0,-2.86617,7.04653e-06,-2.8662,-1.74079e-05,-2.86616,2.47547e-05,mongenerator-solar_670,0.0,0.0
+67,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+68,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+69,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+70,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+71,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+72,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+73,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+74,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+75,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+76,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+77,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+78,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+79,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+80,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+81,0.0,-63.5741,0.00011613,-63.5741,0.000405518,-63.5751,-0.000701545,mongenerator-solar_670,0.0,0.0
+82,0.0,-145.647,-0.000144846,-145.649,-9.42518e-05,-145.647,-0.00146032,mongenerator-solar_670,0.0,0.0
+83,0.0,-206.791,-0.000390698,-206.792,-0.00173602,-206.788,-0.00188256,mongenerator-solar_670,0.0,0.0
+84,0.0,-244.961,0.000186578,-244.962,-0.000126584,-244.961,-0.00110345,mongenerator-solar_670,0.0,0.0
+85,0.0,-259.511,-0.000708652,-259.51,-0.00144328,-259.509,-0.00027066,mongenerator-solar_670,0.0,0.0
+86,0.0,-252.649,0.000641586,-252.649,0.00103289,-252.65,0.000189345,mongenerator-solar_670,0.0,0.0
+87,0.0,-222.252,0.000892921,-222.252,0.000915651,-222.253,0.000581719,mongenerator-solar_670,0.0,0.0
+88,0.0,-170.358,0.000890865,-170.358,0.0011689,-170.359,0.000844187,mongenerator-solar_670,0.0,0.0
+89,0.0,-92.8431,0.000576566,-92.8428,0.000908677,-92.8438,0.000946907,mongenerator-solar_670,0.0,0.0
+90,0.0,-18.2384,0.000124316,-18.2386,-1.15205e-05,-18.2384,0.000254049,mongenerator-solar_670,0.0,0.0
+91,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+92,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+93,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+94,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+95,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+96,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+97,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+98,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+99,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+100,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+101,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+102,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+103,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+104,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+105,0.0,-69.1315,-0.000188375,-69.1311,0.000463521,-69.1325,-0.000769681,mongenerator-solar_670,0.0,0.0
+106,0.0,-154.243,-0.000413586,-154.244,0.000903015,-154.244,-0.000626793,mongenerator-solar_670,0.0,0.0
+107,0.0,-217.038,-0.000622436,-217.038,-0.000276446,-217.037,-0.000500835,mongenerator-solar_670,0.0,0.0
+108,0.0,-255.079,0.000216813,-255.08,0.000307555,-255.079,-0.000745225,mongenerator-solar_670,0.0,0.0
+109,0.0,-268.978,-0.000612385,-268.977,-0.000555339,-268.978,0.000619081,mongenerator-solar_670,0.0,0.0
+110,0.0,-259.466,-0.000204177,-259.466,0.000471787,-259.467,-0.000121076,mongenerator-solar_670,0.0,0.0
+111,0.0,-226.899,0.000133002,-226.899,-1.9279e-05,-226.899,0.000405761,mongenerator-solar_670,0.0,0.0
+112,0.0,-172.965,0.000297228,-172.965,7.71309e-05,-172.965,0.000297167,mongenerator-solar_670,0.0,0.0
+113,0.0,-93.7133,-8.41558e-05,-93.7128,4.8964e-06,-93.7131,0.000561761,mongenerator-solar_670,0.0,0.0
+114,0.0,-17.8049,0.000172583,-17.8051,-8.16706e-05,-17.8049,0.000230389,mongenerator-solar_670,0.0,0.0
+115,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+116,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+117,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+118,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+119,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+120,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+121,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+122,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+123,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+124,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+125,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+126,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+127,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+128,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+129,0.0,-54.6275,-0.000496494,-54.6269,0.000167886,-54.6281,-0.000464782,mongenerator-solar_670,0.0,0.0
+130,0.0,-129.362,0.000142963,-129.363,0.00102122,-129.363,-0.000546407,mongenerator-solar_670,0.0,0.0
+131,0.0,-202.794,-0.000762888,-202.794,-0.000274633,-202.794,-0.000436003,mongenerator-solar_670,0.0,0.0
+132,0.0,-181.735,-2.83065e-05,-181.735,0.000329141,-181.736,8.43476e-05,mongenerator-solar_670,0.0,0.0
+133,0.0,-205.446,-0.000436566,-205.446,-0.000314556,-205.446,0.000358764,mongenerator-solar_670,0.0,0.0
+134,0.0,-211.915,-0.000205613,-211.915,0.000299719,-211.915,-0.000377234,mongenerator-solar_670,0.0,0.0
+135,0.0,-212.741,8.79705e-05,-212.741,-0.000167674,-212.741,5.95155e-05,mongenerator-solar_670,0.0,0.0
+136,0.0,-161.414,0.000398994,-161.414,2.90583e-05,-161.414,0.000156643,mongenerator-solar_670,0.0,0.0
+137,0.0,-87.3733,0.000397822,-87.3734,4.59443e-05,-87.3735,0.000237375,mongenerator-solar_670,0.0,0.0
+138,0.0,-16.3282,0.000165049,-16.3284,-8.18836e-05,-16.3281,0.00020364,mongenerator-solar_670,0.0,0.0
+139,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+140,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+141,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+142,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+143,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+144,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+145,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+146,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+147,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+148,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+149,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+150,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+151,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+152,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+153,0.0,-55.4536,-4.31779e-05,-55.4537,0.00016622,-55.4539,-0.0001012,mongenerator-solar_670,0.0,0.0
+154,0.0,-55.0624,0.000407299,-55.063,0.000282882,-55.063,-0.000495959,mongenerator-solar_670,0.0,0.0
+155,0.0,-196.756,-0.00019774,-196.757,-5.04638e-05,-196.755,-0.00168627,mongenerator-solar_670,0.0,0.0
+156,0.0,-225.68,-0.000109525,-225.68,0.000334831,-225.681,-0.00033047,mongenerator-solar_670,0.0,0.0
+157,0.0,-202.098,-0.00177843,-202.096,-0.00176754,-202.096,-0.000559545,mongenerator-solar_670,0.0,0.0
+158,0.0,-193.508,0.00165911,-193.509,0.001278,-193.51,0.00122967,mongenerator-solar_670,0.0,0.0
+159,0.0,-163.107,0.000475431,-163.107,-0.000185093,-163.106,0.000331322,mongenerator-solar_670,0.0,0.0
+160,0.0,-83.378,-9.06077e-05,-83.3777,0.00020657,-83.378,0.000638155,mongenerator-solar_670,0.0,0.0
+161,0.0,-44.0335,2.95323e-05,-44.0335,-7.56443e-05,-44.0334,0.000164061,mongenerator-solar_670,0.0,0.0
+162,0.0,-4.68989,-8.75165e-07,-4.68988,1.12258e-05,-4.68988,1.71003e-05,mongenerator-solar_670,0.0,0.0
+163,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+164,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+165,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+166,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+167,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+168,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+169,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+170,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+171,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+172,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+173,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+174,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+175,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+176,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+177,0.0,-56.4524,-5.16618e-05,-56.4524,-0.000126038,-56.4523,2.83313e-06,mongenerator-solar_670,0.0,0.0
+178,0.0,-131.622,-0.000860964,-131.621,-0.000447299,-131.622,4.64259e-05,mongenerator-solar_670,0.0,0.0
+179,0.0,-34.7402,0.00023412,-34.7404,0.00022052,-34.7405,-3.95856e-07,mongenerator-solar_670,0.0,0.0
+180,0.0,-45.7701,4.43762e-05,-45.7702,8.58623e-05,-45.7703,-8.0701e-05,mongenerator-solar_670,0.0,0.0
+181,0.0,-102.439,-0.000161065,-102.439,0.000162257,-102.44,-0.000280701,mongenerator-solar_670,0.0,0.0
+182,0.0,-118.681,-0.000157503,-118.681,-0.00010312,-118.681,0.000108881,mongenerator-solar_670,0.0,0.0
+183,0.0,-97.23,-9.19657e-05,-97.2299,-6.33997e-05,-97.2299,0.00028656,mongenerator-solar_670,0.0,0.0
+184,0.0,-63.0105,0.000103754,-63.0105,2.32766e-05,-63.0105,6.97032e-05,mongenerator-solar_670,0.0,0.0
+185,0.0,-33.4375,-9.07332e-06,-33.4375,1.17178e-05,-33.4374,9.66421e-05,mongenerator-solar_670,0.0,0.0
+186,0.0,-3.86494,-5.28471e-06,-3.86492,-1.44281e-06,-3.86491,1.25239e-05,mongenerator-solar_670,0.0,0.0
+187,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+188,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+189,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+190,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+191,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+192,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+193,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+194,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+195,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+196,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+197,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+198,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+199,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+200,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+201,0.0,-58.0143,-0.000135631,-58.0142,0.000409441,-58.015,-0.000735706,mongenerator-solar_670,0.0,0.0
+202,0.0,-133.184,0.000366507,-133.184,0.00103761,-133.185,-0.000523649,mongenerator-solar_670,0.0,0.0
+203,0.0,-71.3916,0.000186082,-71.3916,9.32866e-05,-71.3919,4.72083e-05,mongenerator-solar_670,0.0,0.0
+204,0.0,-151.856,-0.00069281,-151.856,0.000200821,-151.856,-0.000201368,mongenerator-solar_670,0.0,0.0
+205,0.0,-118.944,-0.000258709,-118.943,-0.000246442,-118.943,0.000620144,mongenerator-solar_670,0.0,0.0
+206,0.0,-55.5414,0.000210175,-55.5413,0.000136958,-55.5416,0.000121356,mongenerator-solar_670,0.0,0.0
+207,0.0,-71.2172,-0.000174944,-71.2172,-3.4622e-05,-71.2171,3.97878e-05,mongenerator-solar_670,0.0,0.0
+208,0.0,-59.5796,0.000180168,-59.5798,2.77896e-05,-59.5798,-6.43572e-05,mongenerator-solar_670,0.0,0.0
+209,0.0,-30.8758,0.000110008,-30.8758,7.47799e-06,-30.8758,0.000117474,mongenerator-solar_670,0.0,0.0
+210,0.0,-14.5908,8.14838e-06,-14.5909,-0.000111652,-14.5907,0.00010485,mongenerator-solar_670,0.0,0.0
+211,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+212,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+213,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+214,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+215,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+216,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+217,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+218,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+219,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+220,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+221,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+222,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+223,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+224,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+225,0.0,-26.8801,9.23947e-05,-26.8798,0.000222796,-26.8806,-0.000118107,mongenerator-solar_670,0.0,0.0
+226,0.0,-66.4402,0.000133881,-66.4407,0.000472607,-66.4411,-0.00030359,mongenerator-solar_670,0.0,0.0
+227,0.0,-107.043,-0.00026468,-107.044,-0.000364768,-107.044,-0.000266875,mongenerator-solar_670,0.0,0.0
+228,0.0,-183.471,-0.00098912,-183.472,-0.0011398,-183.471,-0.000960617,mongenerator-solar_670,0.0,0.0
+229,0.0,-106.479,0.000639108,-106.479,0.000537704,-106.479,0.000602711,mongenerator-solar_670,0.0,0.0
+230,0.0,-139.048,-0.000170599,-139.048,-7.46373e-05,-139.048,-0.000489278,mongenerator-solar_670,0.0,0.0
+231,0.0,-141.219,-5.19349e-05,-141.219,-0.000131307,-141.219,1.56236e-05,mongenerator-solar_670,0.0,0.0
+232,0.0,-113.948,0.000320535,-113.948,0.000240351,-113.948,0.000170022,mongenerator-solar_670,0.0,0.0
+233,0.0,-63.5745,0.000289197,-63.5743,0.000348668,-63.5745,0.000396392,mongenerator-solar_670,0.0,0.0
+234,0.0,-11.1605,4.5317e-05,-11.1606,-5.01248e-05,-11.1604,0.00013381,mongenerator-solar_670,0.0,0.0
+235,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+236,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+237,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+238,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+239,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+240,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+241,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+242,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+243,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+244,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+245,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+246,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+247,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+248,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+249,0.0,-70.0009,5.09286e-05,-70.0007,0.000420336,-70.002,-0.000775516,mongenerator-solar_670,0.0,0.0
+250,0.0,-154.94,3.69429e-05,-154.941,-7.14254e-05,-154.94,-0.00162477,mongenerator-solar_670,0.0,0.0
+251,0.0,-216.865,-3.06846e-05,-216.867,-0.00167852,-216.863,-0.00204182,mongenerator-solar_670,0.0,0.0
+252,0.0,-254.167,-0.000481457,-254.167,-0.000386043,-254.167,-0.000629202,mongenerator-solar_670,0.0,0.0
+253,0.0,-267.892,-0.0016394,-267.89,-0.00110344,-267.892,0.000921231,mongenerator-solar_670,0.0,0.0
+254,0.0,-259.51,-0.000213788,-259.509,0.00157929,-259.513,0.00124488,mongenerator-solar_670,0.0,0.0
+255,0.0,-229.2,0.000204425,-229.199,0.00100543,-229.201,0.00122582,mongenerator-solar_670,0.0,0.0
+256,0.0,-178.435,0.000748123,-178.435,0.00106461,-178.436,0.000779412,mongenerator-solar_670,0.0,0.0
+257,0.0,-105.914,0.000754831,-105.914,0.00079289,-105.914,0.000672777,mongenerator-solar_670,0.0,0.0
+258,0.0,-26.0986,0.000232146,-26.099,-3.7334e-05,-26.0985,0.000270751,mongenerator-solar_670,0.0,0.0
+259,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+260,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+261,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+262,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+263,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+264,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+265,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+266,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+267,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+268,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+269,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+270,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+271,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+272,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+273,0.0,-64.66,2.30261e-05,-64.6596,0.000301191,-64.661,-0.00074229,mongenerator-solar_670,0.0,0.0
+274,0.0,-146.864,-0.000333404,-146.865,-0.000195893,-146.864,-0.00134782,mongenerator-solar_670,0.0,0.0
+275,0.0,-206.096,-0.000728031,-206.097,-0.00173071,-206.094,-0.00160088,mongenerator-solar_670,0.0,0.0
+276,0.0,-249.911,-0.000354342,-249.912,-0.000762676,-249.91,-0.00096125,mongenerator-solar_670,0.0,0.0
+277,0.0,-265.2,-0.00100071,-265.199,-0.00212039,-265.197,-0.000108483,mongenerator-solar_670,0.0,0.0
+278,0.0,-259.293,0.000575542,-259.294,0.000781502,-259.294,0.000178629,mongenerator-solar_670,0.0,0.0
+279,0.0,-229.765,0.000523983,-229.765,0.000712884,-229.765,0.000683071,mongenerator-solar_670,0.0,0.0
+280,0.0,-173.962,0.000795557,-173.962,0.00120807,-173.964,0.000974498,mongenerator-solar_670,0.0,0.0
+281,0.0,-103.439,0.00057374,-103.439,0.000903871,-103.44,0.00100166,mongenerator-solar_670,0.0,0.0
+282,0.0,-25.7078,0.000180561,-25.708,-2.82597e-05,-25.7077,0.000370688,mongenerator-solar_670,0.0,0.0
+283,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+284,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+285,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+286,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+287,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+288,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+289,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+290,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+291,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+292,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+293,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+294,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+295,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+296,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+297,0.0,-63.2701,9.84596e-05,-63.2701,0.000346935,-63.271,-0.000723353,mongenerator-solar_670,0.0,0.0
+298,0.0,-145.213,-0.000106412,-145.215,-0.000201563,-145.213,-0.00156172,mongenerator-solar_670,0.0,0.0
+299,0.0,-204.489,-0.000469572,-204.49,-0.00165539,-204.487,-0.001876,mongenerator-solar_670,0.0,0.0
+300,0.0,-188.639,0.000931498,-188.64,0.00125356,-188.641,2.39143e-05,mongenerator-solar_670,0.0,0.0
+301,0.0,-209.398,-0.000923514,-209.397,-0.00138324,-209.396,-0.000401426,mongenerator-solar_670,0.0,0.0
+302,0.0,-190.42,0.000654219,-190.42,0.00102259,-190.421,0.000273957,mongenerator-solar_670,0.0,0.0
+303,0.0,-171.834,0.00036852,-171.834,0.000456434,-171.835,0.000281578,mongenerator-solar_670,0.0,0.0
+304,0.0,-137.094,0.000451874,-137.094,0.000657549,-137.095,0.000476576,mongenerator-solar_670,0.0,0.0
+305,0.0,-81.3357,0.000339073,-81.3354,0.000565647,-81.3361,0.000674718,mongenerator-solar_670,0.0,0.0
+306,0.0,-19.6714,8.82605e-05,-19.6715,-6.89682e-05,-19.6713,0.000254535,mongenerator-solar_670,0.0,0.0
+307,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+308,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+309,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+310,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+311,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+312,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+313,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+314,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+315,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+316,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+317,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+318,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+319,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+320,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+321,0.0,-26.3591,6.18449e-06,-26.3591,7.44764e-05,-26.3592,-1.93937e-05,mongenerator-solar_670,0.0,0.0
+322,0.0,-62.4449,0.000526197,-62.4456,0.000344158,-62.4457,-0.000379341,mongenerator-solar_670,0.0,0.0
+323,0.0,-113.166,-2.79923e-05,-113.166,2.41506e-05,-113.167,-0.000745994,mongenerator-solar_670,0.0,0.0
+324,0.0,-144.258,-0.000181982,-144.259,-1.54609e-05,-144.259,-0.000183809,mongenerator-solar_670,0.0,0.0
+325,0.0,-165.278,-0.000622692,-165.277,-0.0011193,-165.277,8.57327e-05,mongenerator-solar_670,0.0,0.0
+326,0.0,-151.685,0.000420887,-151.685,0.000312784,-151.685,0.000174078,mongenerator-solar_670,0.0,0.0
+327,0.0,-89.7167,0.00080596,-89.7173,0.000578123,-89.7169,0.000490691,mongenerator-solar_670,0.0,0.0
+328,0.0,-73.042,-0.000334089,-73.0416,8.60663e-06,-73.0417,0.000179171,mongenerator-solar_670,0.0,0.0
+329,0.0,-41.2109,0.000149944,-41.2109,3.26305e-05,-41.2108,0.000152699,mongenerator-solar_670,0.0,0.0
+330,0.0,-6.73106,1.01407e-05,-6.73104,3.7545e-05,-6.73103,3.88302e-05,mongenerator-solar_670,0.0,0.0
+331,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+332,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+333,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+334,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+335,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+336,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+337,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+338,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+339,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+340,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+341,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+342,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+343,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+344,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+345,0.0,-13.8962,6.40052e-05,-13.8963,1.29665e-05,-13.8962,8.0828e-05,mongenerator-solar_670,0.0,0.0
+346,0.0,-37.3024,-0.000177138,-37.3022,-0.000129246,-37.3022,0.000107604,mongenerator-solar_670,0.0,0.0
+347,0.0,-173.265,-0.0018026,-173.264,-0.00171561,-173.265,-0.00295307,mongenerator-solar_670,0.0,0.0
+348,0.0,-215.996,-0.000201085,-215.996,-0.000719301,-215.996,-0.00105338,mongenerator-solar_670,0.0,0.0
+349,0.0,-249.477,9.18619e-05,-249.477,0.00021729,-249.478,-0.000887156,mongenerator-solar_670,0.0,0.0
+350,0.0,-247.482,0.000399531,-247.482,4.4629e-05,-247.482,0.000234096,mongenerator-solar_670,0.0,0.0
+351,0.0,-221.079,0.000582645,-221.08,0.00086087,-221.08,0.000892732,mongenerator-solar_670,0.0,0.0
+352,0.0,-172.616,0.00105984,-172.617,0.00089576,-172.617,0.00109735,mongenerator-solar_670,0.0,0.0
+353,0.0,-100.617,0.000750884,-100.617,0.000849891,-100.616,0.00108306,mongenerator-solar_670,0.0,0.0
+354,0.0,-25.4472,0.000101242,-25.4471,0.000128021,-25.4469,0.000241513,mongenerator-solar_670,0.0,0.0
+355,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+356,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+357,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+358,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+359,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+360,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+361,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+362,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+363,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+364,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+365,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+366,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+367,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+368,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+369,0.0,-57.5386,-3.77281e-05,-57.5386,-0.000277315,-57.5386,-0.000146096,mongenerator-solar_670,0.0,0.0
+370,0.0,-133.707,-0.00155021,-133.706,-0.00123688,-133.706,-0.000691878,mongenerator-solar_670,0.0,0.0
+371,0.0,-188.595,-6.72632e-05,-188.595,7.05358e-05,-188.596,-0.00115564,mongenerator-solar_670,0.0,0.0
+372,0.0,-159.501,0.00114368,-159.502,0.00114616,-159.502,0.000979685,mongenerator-solar_670,0.0,0.0
+373,0.0,-187.466,-0.000177229,-187.467,0.00020393,-187.467,-0.000244363,mongenerator-solar_670,0.0,0.0
+374,0.0,-244.092,-0.00155046,-244.091,-0.00162192,-244.092,-0.00132409,mongenerator-solar_670,0.0,0.0
+375,0.0,-147.517,0.00176444,-147.518,0.00167325,-147.517,0.00152973,mongenerator-solar_670,0.0,0.0
+376,0.0,-67.3962,0.000694698,-67.3965,0.000600662,-67.3961,0.00061663,mongenerator-solar_670,0.0,0.0
+377,0.0,-37.7368,5.8354e-05,-37.7368,0.000111089,-37.7367,0.000208658,mongenerator-solar_670,0.0,0.0
+378,0.0,-6.81776,-3.01667e-05,-6.81771,1.6645e-06,-6.81768,2.85563e-05,mongenerator-solar_670,0.0,0.0
+379,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+380,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+381,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+382,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+383,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+384,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+385,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+386,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+387,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+388,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+389,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+390,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+391,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+392,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+393,0.0,-59.4922,2.03889e-06,-59.4919,0.000360835,-59.4931,-0.00046772,mongenerator-solar_670,0.0,0.0
+394,0.0,-143.085,-0.000637077,-143.086,6.86971e-05,-143.086,-0.000962006,mongenerator-solar_670,0.0,0.0
+395,0.0,-208.875,-0.00128377,-208.875,-0.00145638,-208.874,-0.00108741,mongenerator-solar_670,0.0,0.0
+396,0.0,-254.557,-0.00127359,-254.557,-0.000345327,-254.559,-0.0002554,mongenerator-solar_670,0.0,0.0
+397,0.0,-264.244,-0.00119101,-264.243,-0.00108394,-264.244,0.000349092,mongenerator-solar_670,0.0,0.0
+398,0.0,-257.469,0.00033775,-257.469,0.00118859,-257.47,0.000145913,mongenerator-solar_670,0.0,0.0
+399,0.0,-228.636,0.000631762,-228.636,0.000433827,-228.635,0.00036376,mongenerator-solar_670,0.0,0.0
+400,0.0,-179.912,0.00103906,-179.912,0.00084589,-179.912,0.000284171,mongenerator-solar_670,0.0,0.0
+401,0.0,-105.349,0.000745431,-105.349,0.000840761,-105.35,0.000838759,mongenerator-solar_670,0.0,0.0
+402,0.0,-27.4448,0.000231952,-27.4452,-5.82861e-05,-27.4447,0.000330927,mongenerator-solar_670,0.0,0.0
+403,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+404,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+405,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+406,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+407,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+408,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+409,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+410,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+411,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+412,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+413,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+414,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+415,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+416,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+417,0.0,-64.9635,2.95676e-05,-64.9632,0.000462756,-64.9647,-0.000581982,mongenerator-solar_670,0.0,0.0
+418,0.0,-146.342,-0.000545714,-146.343,0.000277962,-146.343,-0.000820812,mongenerator-solar_670,0.0,0.0
+419,0.0,-211.741,-0.00110481,-211.742,-0.00150257,-211.74,-0.00115207,mongenerator-solar_670,0.0,0.0
+420,0.0,-250.78,-0.000839191,-250.781,-0.000534284,-250.781,-0.00062617,mongenerator-solar_670,0.0,0.0
+421,0.0,-266.415,-0.00116974,-266.414,-0.00147342,-266.414,-6.60385e-05,mongenerator-solar_670,0.0,0.0
+422,0.0,-259.727,0.000139564,-259.727,0.00117518,-259.729,0.000551132,mongenerator-solar_670,0.0,0.0
+423,0.0,-233.108,0.000676091,-233.108,0.000489212,-233.108,0.000263224,mongenerator-solar_670,0.0,0.0
+424,0.0,-182.517,0.000787081,-182.517,0.000986294,-182.518,0.000692257,mongenerator-solar_670,0.0,0.0
+425,0.0,-107.217,0.000808835,-107.216,0.000907827,-107.217,0.000905145,mongenerator-solar_670,0.0,0.0
+426,0.0,-28.3132,0.000209546,-28.3135,-6.70547e-05,-28.313,0.000362133,mongenerator-solar_670,0.0,0.0
+427,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+428,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+429,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+430,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+431,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+432,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+433,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+434,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+435,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+436,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+437,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+438,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+439,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+440,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+441,0.0,-68.5242,-4.70502e-06,-68.5239,0.000420489,-68.5254,-0.000725396,mongenerator-solar_670,0.0,0.0
+442,0.0,-153.637,-0.000706083,-153.638,9.66563e-05,-153.638,-0.000926862,mongenerator-solar_670,0.0,0.0
+443,0.0,-215.476,-0.00131837,-215.476,-0.0014171,-215.475,-0.000943686,mongenerator-solar_670,0.0,0.0
+444,0.0,-252.3,-0.00124087,-252.299,-0.000198895,-252.301,0.000212526,mongenerator-solar_670,0.0,0.0
+445,0.0,-276.402,-0.00139093,-276.402,-0.00142949,-276.402,0.000198722,mongenerator-solar_670,0.0,0.0
+446,0.0,-269.324,0.000317008,-269.324,0.00120274,-269.325,0.000153039,mongenerator-solar_670,0.0,0.0
+447,0.0,-239.362,0.000901962,-239.362,0.000500826,-239.362,0.000204105,mongenerator-solar_670,0.0,0.0
+448,0.0,-183.082,0.00114565,-183.082,0.00101972,-183.082,0.000553628,mongenerator-solar_670,0.0,0.0
+449,0.0,-112.645,0.000752724,-112.645,0.000847747,-112.645,0.000807224,mongenerator-solar_670,0.0,0.0
+450,0.0,-30.8751,0.000244818,-30.8755,-6.52906e-05,-30.8749,0.000401624,mongenerator-solar_670,0.0,0.0
+451,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+452,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+453,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+454,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+455,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+456,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+457,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+458,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+459,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+460,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+461,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+462,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+463,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+464,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+465,0.0,-67.2651,4.18384e-06,-67.2648,0.000382486,-67.2663,-0.000526376,mongenerator-solar_670,0.0,0.0
+466,0.0,-150.033,-0.000773663,-150.034,0.000296325,-150.034,-0.000548363,mongenerator-solar_670,0.0,0.0
+467,0.0,-209.787,-0.00116044,-209.787,-0.00116632,-209.787,-0.000719693,mongenerator-solar_670,0.0,0.0
+468,0.0,-245.656,-0.00030997,-245.657,-0.000376284,-245.656,-0.000819728,mongenerator-solar_670,0.0,0.0
+469,0.0,-259.076,-0.000705276,-259.075,-0.00102442,-259.075,1.56678e-05,mongenerator-solar_670,0.0,0.0
+470,0.0,-251.302,0.000486181,-251.302,0.00121994,-251.304,5.77726e-05,mongenerator-solar_670,0.0,0.0
+471,0.0,-224.033,0.000610107,-224.033,0.000388703,-224.032,0.000161935,mongenerator-solar_670,0.0,0.0
+472,0.0,-176.655,0.000697804,-176.655,0.000829028,-176.655,0.000576844,mongenerator-solar_670,0.0,0.0
+473,0.0,-107.043,0.000646686,-107.043,0.000781623,-107.043,0.000877399,mongenerator-solar_670,0.0,0.0
+474,0.0,-28.7911,0.00023468,-28.7914,-8.99634e-05,-28.7909,0.000345976,mongenerator-solar_670,0.0,0.0
+475,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+476,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+477,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+478,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+479,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0
+480,0.0,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_670,0.0,0.0

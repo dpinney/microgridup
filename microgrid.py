@@ -47,7 +47,7 @@ REOPT_INPUTS = {
 	"wind" : "off",
 	"battery" : "on",
 	"year" : '2017',
-	"energyCost" : "0.1",
+	"energyCost" : "0.12",
 	"demandCost" : '20',
 	"solarCost" : "1600",
 	"windCost" : "4989",
@@ -63,13 +63,12 @@ REOPT_INPUTS = {
 	"batteryCapacityMax": "1000000",
 	"solarExisting": 0,
 	"criticalLoadFactor": ".99",
-	"outage_start_hour": "100",
+	"outage_start_hour": "200",
 	"outageDuration": "120",
 	"fuelAvailable": "10000",
 	"genExisting": 0,
 	"minGenLoading": "0.3"
 }
-#TODO: year, generation types in the mix, rate structure, and max_solar
 microgrids = {
 	'm1': {
 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_hospital','675b_residential1','675c_residential1','671_hospital','652_med_apartment','645_warehouse1','646_med_office'],
@@ -299,7 +298,7 @@ def microgrid_report(inputName, outputCsvName):
 
     with open(outputCsvName, 'w', newline='') as outcsv:
         writer = csv.writer(outcsv)
-        writer.writerow(["Microgrid Name", "Generation Bus", "Minimum Load (kWh)", "Average Load (kWh)", "Average Daytime Load (kWh)", "Maximum Load (kWh)", "Recommended Diesel (kW)", "Recommended Solar (kW)", "Recommended Battery Power (kW)", "Recommended Battery Capacity (kWh)", "Recommended Wind (kW)", "NPV ($)", "CapEx ($)", "CapEx after Incentives ($)", "Average Outage Survived (h)"])
+        writer.writerow(["Microgrid Name", "Generation Bus", "Minimum Load (kWh)", "Average Load (kWh)", "Average Daytime Load (kWh)", "Maximum Load (kWh)", "Recommended Diesel (kW)", "Diesel Fuel Used During Outage (gal)", "Recommended Solar (kW)", "Recommended Battery Power (kW)", "Recommended Battery Capacity (kWh)", "Recommended Wind (kW)", "NPV ($)", "CapEx ($)", "CapEx after Incentives ($)", "Average Outage Survived (h)"])
 
         for i, mg_ob in enumerate(microgrids.values()):
             mg_num = i + 1
@@ -313,6 +312,7 @@ def microgrid_report(inputName, outputCsvName):
             avg_daytime_load = np.average(np.average(daytime_kwh, axis=1))
             max_load = max(load)
             diesel_size = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
+            diesel_used_gal =reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0)
             solar_size = reopt_out.get(f'sizePV{mg_num}', 0.0)
             battery_cap = reopt_out.get(f'capacityBattery{mg_num}', 0.0)
             battery_pow = reopt_out.get(f'powerBattery{mg_num}', 0.0)

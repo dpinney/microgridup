@@ -66,7 +66,7 @@ REOPT_INPUTS = {
 	"criticalLoadFactor": ".99",
 	"outage_start_hour": "200",
 	"outageDuration": "120",
-	"fuelAvailable": "10000",
+	"fuelAvailable": "50000",
 	"genExisting": 50,
 	"minGenLoading": "0.3"
 }
@@ -151,9 +151,10 @@ if not os.path.isdir(reopt_folder):
 			allInputData['longitude'] = float(ob_long)
 	
 	# pull out kw of all solar and diesel generators in the microgrid
-	# solar_gen = []
-	# diesel_gen = []
-	# for ob in evil_glm.values():
+	# requires pre-selection of all objects in a given microgrid
+	# solar_gen = [] # will need one list per microgrid if running a single pass of REopt (named solar_gen_{mg_num} for example)
+	# diesel_gen = [] # will need one list per microgrid if running a single pass of REopt (named diesel_gen_{mg_num} for example)
+	# for ob in evil_glm.values(): # run this loop once for every object in base.dss to hunt down any potential generators
 	# 	ob_name = ob.get('name','')
 	# 	ob_type = ob.get('object','')
 	# 	for key in microgrids:
@@ -184,10 +185,6 @@ for i, mg_ob in enumerate(microgrids.values()):
 	diesel_size = reopt_out.get(f'sizeDiesel{mg_num}', 0.0) 
 	battery_cap = reopt_out.get(f'capacityBattery{mg_num}', 0.0)
 	battery_pow = reopt_out.get(f'powerBattery{mg_num}', 0.0)
-	#npv = reopt_out.get(f'savings{mg_num}', 0.0)
-	#cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0)
-	#cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0)
-	#ave_outage = reopt_out.get(f'avgOutage{mg_num}', 0.0)
 
 	if solar_size > 0:
 		gen_obs.append({
@@ -232,7 +229,7 @@ for i, mg_ob in enumerate(microgrids.values()):
 			'object':f'storage.battery_{gen_bus_name}',
 			'bus1':f'{gen_bus_name}.1.2.3',
 			'kv':'4.16', #todo: fix, make non-generic
-			'kw':f'{diesel_size}',
+			'kw':f'{battery_pow}',
 			'phases':'3',
 			'kwhstored':f'{battery_cap}',
 			'kwhrated':f'{battery_cap}',

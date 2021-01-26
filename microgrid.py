@@ -11,6 +11,7 @@ import numpy as np
 import plotly
 import csv
 import jinja2 as j2
+import re
 
 #Input data.
 # BASE_NAME = 'lehigh_base.dss'
@@ -43,11 +44,32 @@ import jinja2 as j2
 BASE_NAME = 'lehigh_base.dss'
 LOAD_NAME = 'lehigh_load.csv'
 REOPT_INPUTS = {
-	'outage_start_hour':'100',
-	'outageDuration':'120',
-	'solarMax':'1000'
+	"solar" : "on",
+	"wind" : "off",
+	"battery" : "on",
+	"year" : '2017',
+	"energyCost" : "0.12",
+	"demandCost" : '20',
+	"solarCost" : "1600",
+	"windCost" : "4989",
+	"batteryPowerCost" : "840",
+	"batteryCapacityCost" : "420",
+	"solarMin": 0,
+	"windMin": 0,
+	"batteryPowerMin": 0,
+	"batteryCapacityMin": 0,
+	"solarMax": "100000",
+	"windMax": "100000",
+	"batteryPowerMax": "1000000",
+	"batteryCapacityMax": "1000000",
+	"solarExisting": 100,
+	"criticalLoadFactor": ".99",
+	"outage_start_hour": "200",
+	"outageDuration": "120",
+	"fuelAvailable": "50000",
+	"genExisting": 50,
+	"minGenLoading": "0.3"
 }
-#TODO: year, generation types in the mix, rate structure, and max_solar
 microgrids = {
 	'm1': {
 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_hospital','675b_residential1','675c_residential1','671_hospital','652_med_apartment','645_warehouse1','646_med_office'],
@@ -80,7 +102,7 @@ if not os.path.isfile(OMD_NAME):
 				ob['longitude'] = ob2.get('longitude',0)
 	dssConvert.evilToOmd(evil_glm, OMD_NAME)
 
-# Draw the circuit online.
+# Draw the circuit oneline.
 if not os.path.isfile(ONELINE_NAME):
 	distNetViz.viz(OMD_NAME, forceLayout=False, outputPath='.', outputName=ONELINE_NAME, open_file=False)
 
@@ -95,6 +117,7 @@ if not os.path.isdir(reopt_folder):
 	import omf.models
 	shutil.rmtree(reopt_folder, ignore_errors=True)
 	omf.models.microgridDesign.new(reopt_folder)
+	
 	# Get the microgrid total loads
 	mg_load_df = pd.DataFrame()
 	for key in microgrids:
@@ -103,27 +126,47 @@ if not os.path.isdir(reopt_folder):
 		for load_name in loads:
 			mg_load_df[key] = mg_load_df[key] + load_df[load_name]
 	mg_load_df.to_csv(reopt_folder + '/loadShape.csv', header=False, index=False)
+	
 	# Default inputs.
 	allInputData = json.load(open(reopt_folder + '/allInputData.json'))
 	allInputData['loadShape'] = open(reopt_folder + '/loadShape.csv').read()
 	allInputData['fileName'] = 'loadShape.csv'
-	allInputData['fuelAvailable'] = '10000'
-	allInputData['year'] = '2017'
-	# User inputs.
+	# Pulling user defined inputs from REOPT_INPUTS.
 	for key in REOPT_INPUTS:
 		allInputData[key] = REOPT_INPUTS[key]
-	# Pulling coordinates from BASE_NAME.dss into REopt allInputData.json:
+	
+	# Pulling coordinates and existing generation from BASE_NAME.dss into REopt allInputData.json:
 	tree = dssConvert.dssToTree(BASE_NAME)
 	evil_glm = dssConvert.evilDssTreeToGldTree(tree)
+
 	for ob in evil_glm.values():
 		ob_name = ob.get('name','')
 		ob_type = ob.get('object','')
+		# pull out long and lat; When running one microgrid per REopt run, ob_name should be updated to the gen_bus from microgrids
 		if ob_type == "bus" and ob_name == "sourcebus":
 			ob_lat = ob.get('latitude','')
 			ob_long = ob.get('longitude','')
 			#print('lat:', float(ob_lat), 'long:', float(ob_long))
 			allInputData['latitude'] = float(ob_lat)
 			allInputData['longitude'] = float(ob_long)
+	
+	# pull out kw of all solar and diesel generators in the microgrid
+	# requires pre-selection of all objects in a given microgrid
+	# solar_gen = [] # will need one list per microgrid if running a single pass of REopt (named solar_gen_{mg_num} for example)
+	# diesel_gen = [] # will need one list per microgrid if running a single pass of REopt (named diesel_gen_{mg_num} for example)
+	# for ob in evil_glm.values(): # run this loop once for every object in base.dss to hunt down any potential generators
+	# 	ob_name = ob.get('name','')
+	# 	ob_type = ob.get('object','')
+	# 	for key in microgrids:
+	# 		for all_potential_objects in microgrids[key]: # how do we list all potential objects in a specific microgrids[key] in which a potential generator is attached? 
+	# 			if ob_name in all_potential_objects:
+	# 				if ob_type == "generator" and re.search('solar.+', ob_name):
+	# 					solar_gen.append(ob.get('kw'))
+	# 				elif ob_type == "generator" and re.search('solar.+', ob_name):
+	# 					solar_gen.append(ob.get('kw'))
+	# allInputData['solarExisting'] = float(sum(solar_gen))
+	# allInputData['genExisting'] = float(sum(diesel_gen))
+
 	# run REopt via microgridDesign
 	with open(reopt_folder + '/allInputData.json','w') as outfile:
 		json.dump(allInputData, outfile, indent=4)
@@ -137,16 +180,11 @@ gen_obs = []
 for i, mg_ob in enumerate(microgrids.values()):
 	mg_num = i + 1
 	gen_bus_name = mg_ob['gen_bus']
-	solar_size = reopt_out.get(f'sizePV{mg_num}', 0.0)
-	wind_size = reopt_out.get(f'sizeWind{mg_num}', 0.0)
+	solar_size = reopt_out.get(f'sizePV{mg_num}', 0.0) # for PV and Diesel, can we just subtract the existing generation variable in the allOutputData.json?
+	wind_size = reopt_out.get(f'sizeWind{mg_num}', 0.0) # Worth overwriting the existing wind and battery generation, as total output 
 	diesel_size = reopt_out.get(f'sizeDiesel{mg_num}', 0.0) 
 	battery_cap = reopt_out.get(f'capacityBattery{mg_num}', 0.0)
 	battery_pow = reopt_out.get(f'powerBattery{mg_num}', 0.0)
-	npv = reopt_out.get(f'savings{mg_num}', 0.0)
-	cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0)
-	cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0)
-	ave_outage = reopt_out.get(f'avgOutage{mg_num}', 0.0)
-
 
 	if solar_size > 0:
 		gen_obs.append({
@@ -191,7 +229,7 @@ for i, mg_ob in enumerate(microgrids.values()):
 			'object':f'storage.battery_{gen_bus_name}',
 			'bus1':f'{gen_bus_name}.1.2.3',
 			'kv':'4.16', #todo: fix, make non-generic
-			'kw':f'{diesel_size}',
+			'kw':f'{battery_pow}',
 			'phases':'3',
 			'kwhstored':f'{battery_cap}',
 			'kwhrated':f'{battery_cap}',
@@ -279,7 +317,7 @@ def microgrid_report(inputName, outputCsvName):
 
     with open(outputCsvName, 'w', newline='') as outcsv:
         writer = csv.writer(outcsv)
-        writer.writerow(["Microgrid Name", "Generation Bus", "Minimum Load (kWh)", "Average Load (kWh)", "Average Daytime Load (kWh)", "Maximum Load (kWh)", "Recommended Diesel (kW)", "Recommended Solar (kW)", "Recommended Battery Power (kW)", "Recommended Battery Capacity (kWh)", "Recommended Wind (kW)", "NPV ($)", "CapEx ($)", "CapEx after Incentives ($)", "Average Outage Survived (h)"])
+        writer.writerow(["Microgrid Name", "Generation Bus", "Minimum Load (kWh)", "Average Load (kWh)", "Average Daytime Load (kWh)", "Maximum Load (kWh)", "Recommended Diesel (kW)", "Diesel Fuel Used During Outage (gal)", "Recommended Solar (kW)", "Recommended Battery Power (kW)", "Recommended Battery Capacity (kWh)", "Recommended Wind (kW)", "NPV ($)", "CapEx ($)", "CapEx after Incentives ($)", "Average Outage Survived (h)"])
 
         for i, mg_ob in enumerate(microgrids.values()):
             mg_num = i + 1
@@ -293,6 +331,7 @@ def microgrid_report(inputName, outputCsvName):
             avg_daytime_load = np.average(np.average(daytime_kwh, axis=1))
             max_load = max(load)
             diesel_size = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
+            diesel_used_gal =reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0)
             solar_size = reopt_out.get(f'sizePV{mg_num}', 0.0)
             battery_cap = reopt_out.get(f'capacityBattery{mg_num}', 0.0)
             battery_pow = reopt_out.get(f'powerBattery{mg_num}', 0.0)
@@ -337,7 +376,7 @@ out = template.render(
 	x='David',
 	y='Matt',
 	summary=open('microgrid_report.csv').read(),
-	inputs={'circ':BASE_NAME,'loads':LOAD_NAME,'mg':microgrids}
+	inputs={'circuit':BASE_NAME,'loads':LOAD_NAME,'REopt inputs':REOPT_INPUTS,'microgrids':microgrids}
 )
 #TODO: have an option where we make the template <iframe srcdoc="{{X}}"> to embed the html and create a single file.
 BIG_OUT_NAME = 'output_full_analysis_lehigh.html'

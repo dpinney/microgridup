@@ -370,6 +370,10 @@ make_chart('timeseries_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'])
 make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
 make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'])
 
+#TODO: enable this when we're good with control.
+#import opendss_playground
+#opendss_playground.play('lehigh.dss.omd', 'lehigh_full.dss', None, microgrids, '670671', False)
+
 # Create giant consolidated report.
 template = j2.Template(open('output_template.html').read())
 out = template.render(

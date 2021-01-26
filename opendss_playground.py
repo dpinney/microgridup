@@ -323,17 +323,18 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss):
 		max_pos+=1
 		key+=1
 	# print(treeDSS)
-
+	filePrefix = 'timezcontrol'
 	opendss.newQstsPlot(FULL_NAME,
 		stepSizeInMinutes=60, 
 		numberOfSteps=24*20,
 		keepAllFiles=False,
-		actions=actions
+		actions=actions,
+		filePrefix=filePrefix
 	)
 	# Report on actions.
 	pp(actions)
 	# Served versus unserved loads.
-	voltage_data = pd.read_csv('timeseries_load.csv')
+	voltage_data = pd.read_csv(f'{filePrefix}_load.csv')
 	voltage_data = voltage_data.filter(['Name','V1(PU)','V2(PU)','V3(PU)'])
 	voltage_data = voltage_data.set_index('Name').fillna(-1).sum(level='Name')
 	print('KEY: negative=no load on that phase, positive=powered, 0=unpowered')
@@ -357,11 +358,10 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss):
 		)
 		fig = py.graph_objs.Figure(data, layout)
 		py.offline.plot(fig, filename=f'{csvName}.plot.html')
-	
-	# make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
-	make_chart('timeseries_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'])
-	make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
-	make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'])
+	# make_chart(f'{filePrefix}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
+	make_chart(f'{filePrefix}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'])
+	make_chart(f'{filePrefix}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
+	make_chart(f'{filePrefix}_control.csv', 'Name', 'hour', ['Tap(pu)'])
 
 microgrids = {
 	'm1': {

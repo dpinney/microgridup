@@ -14,7 +14,7 @@ import jinja2 as j2
 import re
 
 #Input data.
-# BASE_NAME = 'lehigh_base.dss'
+# BASE_NAME = 'lehigh_base_phased.dss'
 # LOAD_NAME = 'lehigh_load.csv'
 # REOPT_INPUTS = {}
 # microgrids = {
@@ -41,7 +41,7 @@ import re
 # }
 
 #Second input set.
-BASE_NAME = 'lehigh_base.dss'
+BASE_NAME = 'lehigh_base_phased.dss'
 LOAD_NAME = 'lehigh_load.csv'
 REOPT_INPUTS = {
 	"solar" : "on",

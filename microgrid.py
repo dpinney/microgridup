@@ -298,8 +298,23 @@ for i, ob in enumerate(tree):
 			'useactual': 'yes', #todo: move back to [0,1] shapes?
 			'mult': f'{list(shape_data)}'.replace(' ','')
 		}
-	elif ob_string.startswith('generator.') or ob_string.startswith('battery.'):
-		ob_name = ob_string[10:] #To Do: check if this grabs the full name of the battery gen objects; if not, add an elif statement or start after the '.' using regex
+	elif ob_string.startswith('generator.'):
+		ob_name = ob_string[10:]
+		print('ob_name:', ob_name)
+		shape_data = gen_df[ob_name]
+		shape_name = ob_name + '_shape'
+		print('shape_name:', shape_name)
+		ob['yearly'] = shape_name
+		shape_insert_list[i] = {
+			'!CMD': 'new',
+			'object': f'loadshape.{shape_name}',
+			'npts': f'{len(shape_data)}',
+			'interval': '1',
+			'useactual': 'no',
+			'mult': f'{list(shape_data)}'.replace(' ','')
+		}
+	elif ob_string.startswith('storage.'):
+		ob_name = ob_string[8:]
 		print('ob_name:', ob_name)
 		shape_data = gen_df[ob_name]
 		shape_name = ob_name + '_shape'

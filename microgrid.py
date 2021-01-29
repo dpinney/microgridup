@@ -70,13 +70,13 @@ REOPT_INPUTS = {
 	"genExisting": 0,
 	"minGenLoading": "0.3"
 }
-# gen_objects include all generator objects in the microgrid, preselected from base.dss
+# gen_obs_existing include all generator objects already in the microgrid, preselected from base.dss
 microgrids = {
 	'm1': {
 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_hospital','675b_residential1','675c_residential1','671_hospital','652_med_apartment','645_warehouse1','646_med_office'],
 		'switch': '650632',
 		'gen_bus': '670',
-		'gen_objects': ['solar_634', 'diesel_634']
+		'gen_obs_existing': ['solar_634', 'diesel_634']
 	}
 }
 
@@ -156,24 +156,29 @@ if not os.path.isdir(reopt_folder):
 			allInputData['longitude'] = float(ob_long)
 	
 	# Pull out and add up kw of all solar and diesel generators in the microgrid
-	# requires pre-selection of all objects in a given microgrid in microgrids[key]['gen_objects']
-	solar_gen = [] # TODO: Refactor will need one list per microgrid if running a single pass of REopt (named solar_gen_{mg_num} for example)
-	diesel_gen = [] # TODO: Refactor will need one list per microgrid if running a single pass of REopt (named diesel_gen_{mg_num} for example)
+	# requires pre-selection of all objects in a given microgrid in microgrids[key]['gen_obs_existing']
+	solar_gen_exist = [] # TODO: Refactor will need one list per microgrid if running a single pass of REopt (named solar_gen_exist_{mg_num} for example)
+	diesel_gen_exist = [] # TODO: Refactor will need one list per microgrid if running a single pass of REopt (named diesel_gen_exist_{mg_num} for example)
+	# battery_kw_exist = []
+	# battery_kwh_exist = []
 	for key in microgrids:
-		gen_obs = microgrids[key]['gen_objects'] 
+		gen_obs = microgrids[key]['gen_obs_existing'] 
 		for gen_ob in gen_obs: # gen_ob is a name of an object from base.dss
-			for ob in evil_glm.values(): # TODO: Change the syntax to match to the "tree" structure; See shpae insertions at line 270 for an example
+			for ob in evil_glm.values(): # TODO: Change the syntax to match to the "tree" structure; See shape insertions at line 270 for an example
 				ob_name = ob.get('name','')
 				#print(ob_name)
 				ob_type = ob.get('object','')
 				if ob_name == gen_ob and ob_type == "generator" and re.search('solar.+', ob_name):
-						solar_gen.append(float(ob.get('kw')))
+					solar_gen_exist.append(float(ob.get('kw')))
 				elif ob_name == gen_ob and ob_type == "generator" and re.search('diesel.+', ob_name):
-						diesel_gen.append(float(ob.get('kw')))
+					diesel_gen_exist.append(float(ob.get('kw')))
+				# elif ob_name == gen_ob and ob_type == "storage" and re.search('battery.+', ob_name):
+				# 	battery_kw_exist.append(float(ob.get('kva')))
+				# 	battery_kwh_exist.append(float(ob.get('kwhrated')))		
 	#print("solar_gen:", solar_gen)
 	#print("diesel_gen:", diesel_gen)
-	allInputData['solarExisting'] = str(sum(solar_gen))
-	allInputData['genExisting'] = str(sum(diesel_gen))
+	allInputData['solarExisting'] = str(sum(solar_gen_exist))
+	allInputData['genExisting'] = str(sum(diesel_gen_exist))
 
 	# run REopt via microgridDesign
 	with open(reopt_folder + '/allInputData.json','w') as outfile:
@@ -188,17 +193,30 @@ gen_obs = []
 for i, mg_ob in enumerate(microgrids.values()):
 	mg_num = i + 1
 	gen_bus_name = mg_ob['gen_bus']
+	gen_obs_existing = mg_ob['gen_obs_existing']
+	# calculate size of new generators at gen_bus based on REopt and existing gen from BASE_NAME for each microgrid
 	solar_size_total = reopt_out.get(f'sizePV{mg_num}', 0.0)
 	solar_size_existing = reopt_out.get(f'sizePVExisting{mg_num}', 0.0)
 	solar_size_new = solar_size_total - solar_size_existing
-	wind_size = reopt_out.get(f'sizeWind{mg_num}', 0.0) # TO DO: Update size of wind based on existing generation
+	wind_size = reopt_out.get(f'sizeWind{mg_num}', 0.0) # TO DO: Update size of wind based on existing generation once we find a way to get a loadshape for that wind if REopt recommends no wind
 	diesel_size_total = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
 	diesel_size_existing = reopt_out.get(f'sizeDieselExisting{mg_num}', 0.0)
 	diesel_size_new = diesel_size_total - diesel_size_existing
-	battery_cap = reopt_out.get(f'capacityBattery{mg_num}', 0.0) # TO DO: Update size of battery based on existing generation
-	battery_pow = reopt_out.get(f'powerBattery{mg_num}', 0.0) # TO DO: Update power of battery based on existing generation
+	battery_cap_total = reopt_out.get(f'capacityBattery{mg_num}', 0.0) 
+	# battery_cap_existing = sum(battery_kwh_exist) #TO Do: for refactor, need to rebuild the list of existing batteries here (see battery_kwh_exist)
+	# if battery_cap_total - battery_cap_existing > 0:
+	# 	battery_cap_new = battery_cap_total - battery_cap_existing 
+	# else:
+	# 	battery_cap_new = 0 #TO DO: update logic here to make run more robust to oversized existing battery generation
+	battery_pow_total = reopt_out.get(f'powerBattery{mg_num}', 0.0) 
+	# battery_pow_existing = sum(battery_kw_exist)# TO Do: for refactor, need to rebuild the list of existing batteries here
+	# if battery_pow_total - battery_pow_existing > 0:
+	# 	battery_pow_new = battery_pow_total - battery_pow_existing 
+	# else:
+	# 	battery_pow_new = 0 #TO DO: update logic here to make run more robust to oversized existing battery generation
 
 	if solar_size_total > 0:
+		# Build new solar gen objects and loadshapes as recommended by REopt
 		gen_obs.append({
 			'!CMD': 'new',
 			'object':f'generator.solar_{gen_bus_name}',
@@ -209,8 +227,15 @@ for i, mg_ob in enumerate(microgrids.values()):
 			'pf':'1'
 		})
 		gen_df_builder[f'solar_{gen_bus_name}'] = reopt_out.get(f'powerPV{mg_num}')
-		# 0-1 scale the power output loadshape to the total generation kw of that type of generator
+		# 0-1 scale the power output loadshape to the total generation kw of that type of generator using pandas
 		gen_df_builder[f'solar_{gen_bus_name}'] = gen_df_builder[f'solar_{gen_bus_name}']/solar_size_total
+		solar_gen_loadshape_0_1 = gen_df_builder[f'solar_{gen_bus_name}'] # To DO: convert the reopt_out.get(f'powerPV{mg_num}') to a pd.df() type array and pass that around as a variable within the loop
+
+		# build loadshapes for existing generation from BASE_NAME, inputting the same 0-1 solar generation loadshape (solar_gen_loadshape_0_1)
+		for gen_ob_existing in gen_obs_existing:
+			if gen_ob_existing.startswith('solar_'):
+				gen_df_builder[f'{gen_ob_existing}'] = solar_gen_loadshape_0_1
+
 	if wind_size > 0:
 		gen_obs.append({
 			'!CMD': 'new',
@@ -223,7 +248,14 @@ for i, mg_ob in enumerate(microgrids.values()):
 		})
 		gen_df_builder[f'wind_{gen_bus_name}'] = reopt_out.get(f'powerWind{mg_num}')
 		# 0-1 scale the power output loadshape to the total generation kw of that type of generator
-		gen_df_builder[f'wind_{gen_bus_name}'] = gen_df_builder[f'wind_{gen_bus_name}']/wind_size # TODO: 0-1 scale this to wind_size_total
+		gen_df_builder[f'wind_{gen_bus_name}'] = gen_df_builder[f'wind_{gen_bus_name}']/wind_size # TODO: 0-1 scale this to wind_size_total once 
+		wind_gen_loadshape_0_1 = gen_df_builder[f'wind_{gen_bus_name}']
+
+		# build loadshapes for existing generation from BASE_NAME
+		for gen_ob_existing in gen_obs_existing:
+			if gen_ob_existing.startswith('wind_'):
+				gen_df_builder[f'{gen_ob_existing}'] = wind_gen_loadshape_0_1
+
 	if diesel_size_total > 0:
 		gen_obs.append({
 			'!CMD': 'new',
@@ -241,18 +273,25 @@ for i, mg_ob in enumerate(microgrids.values()):
 		gen_df_builder[f'diesel_{gen_bus_name}'] = reopt_out.get(f'powerDiesel{mg_num}')
 		# 0-1 scale the power output loadshape to the total generation kw of that type of generator
 		gen_df_builder[f'diesel_{gen_bus_name}'] = gen_df_builder[f'diesel_{gen_bus_name}']/diesel_size_total
-	if battery_cap > 0:
+		diesel_gen_loadshape_0_1 = gen_df_builder[f'diesel_{gen_bus_name}']
+
+		# build loadshapes for existing generation from BASE_NAME, inputting the same 0-1 diesel generation loadshape (diesel_gen_loadshape_0_1)
+		for gen_ob_existing in gen_obs_existing:
+			if gen_ob_existing.startswith('diesel_'):
+				gen_df_builder[f'{gen_ob_existing}'] = diesel_gen_loadshape_0_1
+
+	if battery_cap_total > 0: #ToDo: trigger on battery_cap_new
 		gen_obs.append({
 			'!CMD': 'new',
 			'object':f'storage.battery_{gen_bus_name}',
 			'bus1':f'{gen_bus_name}.1.2.3',
 			'kv':'4.16', #todo: fix, make non-generic
-			'kw':f'{battery_pow}',
+			'kw':f'{battery_pow_total}', #To Do: Is kw necessary to define in how we use batteries in OpenDSS? kw is not defined for existing batteries in BASE_NAME
 			'phases':'3',
-			'kwhstored':f'{battery_cap}',
-			'kwhrated':f'{battery_cap}',
-			'kva':f'{battery_pow}',
-			'kvar':f'{battery_pow}',
+			'kwhstored':f'{battery_cap_total}',
+			'kwhrated':f'{battery_cap_total}',
+			'kva':f'{battery_pow_total}',
+			'kvar':f'{battery_pow_total}',
 			'%charge':'100',
 			'%discharge':'100',
 			'%effcharge':'100',
@@ -263,20 +302,23 @@ for i, mg_ob in enumerate(microgrids.values()):
 		})
 		gen_df_builder[f'battery_{gen_bus_name}'] = reopt_out.get(f'powerBatteryToLoad{mg_num}')
 		# 0-1 scale the power output loadshape to the total generation kw of that type of generator in pandas
-		gen_df_builder[f'battery_{gen_bus_name}'] = gen_df_builder[f'battery_{gen_bus_name}']/battery_pow
+		gen_df_builder[f'battery_{gen_bus_name}'] = gen_df_builder[f'battery_{gen_bus_name}']/battery_pow_total
+		battery_gen_loadshape_0_1 = gen_df_builder[f'battery_{gen_bus_name}']
+
+		# build loadshapes for existing generation from BASE_NAME
+		for gen_ob_existing in gen_obs_existing:
+			if gen_ob_existing.startswith('battery_'):
+				gen_df_builder[f'{gen_ob_existing}'] = battery_gen_loadshape_0_1
 		#print(gen_obs)
 
 # insert generation objects into dss
 tree = dssConvert.dssToTree(BASE_NAME)
-# for col in gen_df_builder.columns:
-# 	# zero-one scale the generator shapes. Already done in reference to the total reference size in loop above
-# 	gen_df_builder[col] = gen_df_builder[col] / gen_df_builder[col].max() #TO DO: the 0-1 should be relative to the specified total kw of the generator
 gen_df_builder.to_csv(GEN_NAME, index=False)
 bus_list_pos = -1
 for i, ob in enumerate(tree):
 	if ob.get('!CMD','') == 'makebuslist':
 		bus_list_pos = i
-print("gen_obs after all new gen is built:", gen_obs)
+#print("gen_obs after all new gen is built:", gen_obs)
 for ob in gen_obs:
 	tree.insert(bus_list_pos, ob)
 
@@ -300,10 +342,10 @@ for i, ob in enumerate(tree):
 		}
 	elif ob_string.startswith('generator.'):
 		ob_name = ob_string[10:]
-		print('ob_name:', ob_name)
+		#print('ob_name:', ob_name)
 		shape_data = gen_df[ob_name]
 		shape_name = ob_name + '_shape'
-		print('shape_name:', shape_name)
+		#print('shape_name:', shape_name)
 		ob['yearly'] = shape_name
 		shape_insert_list[i] = {
 			'!CMD': 'new',
@@ -315,10 +357,10 @@ for i, ob in enumerate(tree):
 		}
 	elif ob_string.startswith('storage.'):
 		ob_name = ob_string[8:]
-		print('ob_name:', ob_name)
+		#print('ob_name:', ob_name)
 		shape_data = gen_df[ob_name]
 		shape_name = ob_name + '_shape'
-		print('shape_name:', shape_name)
+		#print('shape_name:', shape_name)
 		ob['yearly'] = shape_name
 		shape_insert_list[i] = {
 			'!CMD': 'new',

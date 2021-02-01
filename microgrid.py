@@ -68,7 +68,9 @@ REOPT_INPUTS = {
 	"outageDuration": "120",
 	"fuelAvailable": "50000",
 	"genExisting": 0,
-	"minGenLoading": "0.3"
+	"minGenLoading": "0.3",
+	"batteryKwExisting": 0,
+	"batteryKwhExisting": 0
 }
 # gen_obs_existing include all generator objects already in the microgrid, preselected from base.dss
 microgrids = {
@@ -76,7 +78,7 @@ microgrids = {
 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_hospital','675b_residential1','675c_residential1','671_hospital','652_med_apartment','645_warehouse1','646_med_office'],
 		'switch': '650632',
 		'gen_bus': '670',
-		'gen_obs_existing': ['solar_634', 'diesel_634']
+		'gen_obs_existing': ['solar_634', 'diesel_634', 'battery_634', 'solar_684', 'diesel_684', 'battery_684']
 	}
 }
 
@@ -159,8 +161,8 @@ if not os.path.isdir(reopt_folder):
 	# requires pre-selection of all objects in a given microgrid in microgrids[key]['gen_obs_existing']
 	solar_gen_exist = [] # TODO: Refactor will need one list per microgrid if running a single pass of REopt (named solar_gen_exist_{mg_num} for example)
 	diesel_gen_exist = [] # TODO: Refactor will need one list per microgrid if running a single pass of REopt (named diesel_gen_exist_{mg_num} for example)
-	# battery_kw_exist = []
-	# battery_kwh_exist = []
+	battery_kw_exist = []
+	battery_kwh_exist = []
 	for key in microgrids:
 		gen_obs = microgrids[key]['gen_obs_existing'] 
 		for gen_ob in gen_obs: # gen_ob is a name of an object from base.dss
@@ -172,13 +174,13 @@ if not os.path.isdir(reopt_folder):
 					solar_gen_exist.append(float(ob.get('kw')))
 				elif ob_name == gen_ob and ob_type == "generator" and re.search('diesel.+', ob_name):
 					diesel_gen_exist.append(float(ob.get('kw')))
-				# elif ob_name == gen_ob and ob_type == "storage" and re.search('battery.+', ob_name):
-				# 	battery_kw_exist.append(float(ob.get('kva')))
-				# 	battery_kwh_exist.append(float(ob.get('kwhrated')))		
-	#print("solar_gen:", solar_gen)
-	#print("diesel_gen:", diesel_gen)
+				elif ob_name == gen_ob and ob_type == "storage" and re.search('battery.+', ob_name):
+					battery_kw_exist.append(float(ob.get('kva')))
+					battery_kwh_exist.append(float(ob.get('kwhrated')))
 	allInputData['solarExisting'] = str(sum(solar_gen_exist))
 	allInputData['genExisting'] = str(sum(diesel_gen_exist))
+	allInputData['batteryKwExisting'] = str(sum(battery_kw_exist))
+	allInputData['batteryKwhExisting'] = str(sum(battery_kwh_exist))
 
 	# run REopt via microgridDesign
 	with open(reopt_folder + '/allInputData.json','w') as outfile:
@@ -203,17 +205,17 @@ for i, mg_ob in enumerate(microgrids.values()):
 	diesel_size_existing = reopt_out.get(f'sizeDieselExisting{mg_num}', 0.0)
 	diesel_size_new = diesel_size_total - diesel_size_existing
 	battery_cap_total = reopt_out.get(f'capacityBattery{mg_num}', 0.0) 
-	# battery_cap_existing = sum(battery_kwh_exist) #TO Do: for refactor, need to rebuild the list of existing batteries here (see battery_kwh_exist)
-	# if battery_cap_total - battery_cap_existing > 0:
-	# 	battery_cap_new = battery_cap_total - battery_cap_existing 
-	# else:
-	# 	battery_cap_new = 0 #TO DO: update logic here to make run more robust to oversized existing battery generation
+	battery_cap_existing = reopt_out.get(f'batteryKwhExisting{mg_num}', 0.0)
+	if battery_cap_total - battery_cap_existing > 0:
+		battery_cap_new = battery_cap_total - battery_cap_existing 
+	else:
+		battery_cap_new = 0 #TO DO: update logic here to make run more robust to oversized existing battery generation
 	battery_pow_total = reopt_out.get(f'powerBattery{mg_num}', 0.0) 
-	# battery_pow_existing = sum(battery_kw_exist)# TO Do: for refactor, need to rebuild the list of existing batteries here
-	# if battery_pow_total - battery_pow_existing > 0:
-	# 	battery_pow_new = battery_pow_total - battery_pow_existing 
-	# else:
-	# 	battery_pow_new = 0 #TO DO: update logic here to make run more robust to oversized existing battery generation
+	battery_pow_existing = reopt_out.get(f'batteryKwExisting{mg_num}', 0.0)
+	if battery_pow_total - battery_pow_existing > 0:
+		battery_pow_new = battery_pow_total - battery_pow_existing 
+	else:
+		battery_pow_new = 0 #TO DO: update logic here to make run more robust to oversized existing battery generation
 
 	if solar_size_total > 0:
 		# Build new solar gen objects and loadshapes as recommended by REopt

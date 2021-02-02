@@ -266,7 +266,7 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss):
 				gen_name = 'isource.isource_newdiesel' + str(buses[0]) + '_' + str(phase) + '_shape'
 				gen_insert_list[j] = {
 						'!CMD': 'new',
-						'object': f'"{gen_name}"',
+						'object': f'{gen_name}',
 						'bus1': str(buses[0]) + '.' + str(phase),
 						'phases': '1',
 						'angle': str(angle),
@@ -277,7 +277,7 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss):
 			gen_name = 'isource.isource_solar' + str(buses[0]) + '_' + str(phase) + '_shape'
 			gen_insert_list[j] = {
 					'!CMD': 'new',
-					'object': f'"{gen_name}"',
+					'object': f'{gen_name}',
 					'bus1': str(buses[0]) + '.' + str(phase),
 					'phases': '1',
 					'angle': str(angle),
@@ -358,7 +358,7 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss):
 		)
 		fig = py.graph_objs.Figure(data, layout)
 		py.offline.plot(fig, filename=f'{csvName}.plot.html')
-	# make_chart(f'{filePrefix}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
+	make_chart(f'{filePrefix}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
 	make_chart(f'{filePrefix}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'])
 	make_chart(f'{filePrefix}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
 	make_chart(f'{filePrefix}_control.csv', 'Name', 'hour', ['Tap(pu)'])

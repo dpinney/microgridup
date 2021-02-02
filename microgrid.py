@@ -369,7 +369,6 @@ dssConvert.treeToDss(tree, FULL_NAME)
 # Generate an OMD.
 tree = dssConvert.dssToTree(FULL_NAME)
 evil_glm = dssConvert.evilDssTreeToGldTree(tree)
-add_coords = json.load(open('additional_coords.json'))
 # Injecting additional coordinates.
 RADIUS = 0.0002 #TODO: derive sensible RADIUS from lat/lon numbers.
 tree = dssConvert.dssToTree(FULL_NAME)

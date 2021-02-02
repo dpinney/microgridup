@@ -12,6 +12,8 @@ import plotly
 import csv
 import jinja2 as j2
 import re
+import math
+import random
 
 #Input data.
 # BASE_NAME = 'lehigh_base_phased.dss'
@@ -89,30 +91,13 @@ OMD_NAME = 'lehigh.dss.omd'
 ONELINE_NAME = 'lehigh.oneline.html'
 MAP_NAME = 'lehigh_map'
 
-# Generate an OMD.
-if not os.path.isfile(OMD_NAME):
-	tree = dssConvert.dssToTree(BASE_NAME)
-	evil_glm = dssConvert.evilDssTreeToGldTree(tree)
-	add_coords = json.load(open('additional_coords.json'))
-	# Injecting additional coordinates.
-	for ob in evil_glm.values():
-		ob_name = ob.get('name','')
-		ob_type = ob.get('object','')
-		for ob2 in add_coords:
-			ob2_name = ob2.get('name','')
-			ob2_type = ob2.get('object','')
-			if ob_name == ob2_name and ob_type == ob2_type:
-				ob['latitude'] = ob2.get('latitude',0)
-				ob['longitude'] = ob2.get('longitude',0)
-	dssConvert.evilToOmd(evil_glm, OMD_NAME)
-
-# Draw the circuit oneline.
-if not os.path.isfile(ONELINE_NAME):
-	distNetViz.viz(OMD_NAME, forceLayout=False, outputPath='.', outputName=ONELINE_NAME, open_file=False)
-
-# Draw the map.
-if not os.path.isdir(MAP_NAME):
-	geo.mapOmd(OMD_NAME, MAP_NAME, 'html', openBrowser=False, conversion=False, offline=True)
+def _name_to_key(glm):
+	''' Make fast lookup map by name in a glm. '''
+	mapping = {}
+	for key, val in glm.items():
+		if 'name' in val:
+			mapping[val['name']] = key
+	return mapping
 
 # Generate the microgrid specs with REOpt.
 reopt_folder = './lehigh_reopt'
@@ -380,6 +365,38 @@ for key in shape_insert_list:
 
 # Write new DSS file.
 dssConvert.treeToDss(tree, FULL_NAME)
+
+# Generate an OMD.
+tree = dssConvert.dssToTree(FULL_NAME)
+evil_glm = dssConvert.evilDssTreeToGldTree(tree)
+add_coords = json.load(open('additional_coords.json'))
+# Injecting additional coordinates.
+RADIUS = 0.0002 #TODO: derive sensible RADIUS from lat/lon numbers.
+tree = dssConvert.dssToTree(FULL_NAME)
+evil_glm = dssConvert.evilDssTreeToGldTree(tree)
+name_map = _name_to_key(evil_glm)
+for ob in evil_glm.values():
+	ob_name = ob.get('name','')
+	ob_type = ob.get('object','')
+	if 'parent' in ob:
+		parent_loc = name_map[ob['parent']]
+		parent_ob = evil_glm[parent_loc]
+		parent_lat = parent_ob.get('latitude', None)
+		parent_lon = parent_ob.get('longitude', None)
+		# place randomly on circle around parent.
+		angle = random.random()*3.14159265*2;
+		x = math.cos(angle)*RADIUS;
+		y = math.sin(angle)*RADIUS;
+		ob['latitude'] = str(float(parent_lat) + x)
+		ob['longitude'] = str(float(parent_lon) + y)
+		# print(ob)
+dssConvert.evilToOmd(evil_glm, OMD_NAME)
+
+# Draw the circuit oneline.
+distNetViz.viz(OMD_NAME, forceLayout=False, outputPath='.', outputName=ONELINE_NAME, open_file=False)
+
+# Draw the map.
+geo.mapOmd(OMD_NAME, MAP_NAME, 'html', openBrowser=False, conversion=False, offline=True)
 
 # Powerflow outputs.
 opendss.newQstsPlot(FULL_NAME,

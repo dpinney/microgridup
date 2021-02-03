@@ -273,7 +273,7 @@ for i, mg_ob in enumerate(microgrids.values()):
 			'object':f'storage.battery_{gen_bus_name}',
 			'bus1':f'{gen_bus_name}.1.2.3',
 			'kv':'4.16', #todo: fix, make non-generic
-			'kw':f'{battery_pow_total}', #To Do: Is kw necessary to define in how we use batteries in OpenDSS? kw is not defined for existing batteries in BASE_NAME
+			'kw':f'{battery_pow_total}',
 			'phases':'3',
 			'dispmode':'follow',
 			'kwhstored':f'{battery_cap_total}',

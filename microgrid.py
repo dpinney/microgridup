@@ -275,21 +275,22 @@ for i, mg_ob in enumerate(microgrids.values()):
 			'kv':'4.16', #todo: fix, make non-generic
 			'kw':f'{battery_pow_total}', #To Do: Is kw necessary to define in how we use batteries in OpenDSS? kw is not defined for existing batteries in BASE_NAME
 			'phases':'3',
+			'dispmode':'follow',
 			'kwhstored':f'{battery_cap_total}',
 			'kwhrated':f'{battery_cap_total}',
-			'kva':f'{battery_pow_total}',
-			'kvar':f'{battery_pow_total}',
+			# 'kva':f'{battery_pow_total}',
+			# 'kvar':f'{battery_pow_total}',
 			'%charge':'100',
 			'%discharge':'100',
 			'%effcharge':'100',
 			'%effdischarge':'100',
-			'%idlingkw':'1',
+			'%idlingkw':'0',
 			'%r':'0',
 			'%x':'50'
 		})
 		gen_df_builder[f'battery_{gen_bus_name}'] = reopt_out.get(f'powerBatteryToLoad{mg_num}')
 		# 0-1 scale the power output loadshape to the total generation kw of that type of generator in pandas
-		gen_df_builder[f'battery_{gen_bus_name}'] = gen_df_builder[f'battery_{gen_bus_name}']/battery_pow_total
+		gen_df_builder[f'battery_{gen_bus_name}'] = -1.0 * gen_df_builder[f'battery_{gen_bus_name}']/battery_pow_total
 		battery_gen_loadshape_0_1 = gen_df_builder[f'battery_{gen_bus_name}']
 
 		# build loadshapes for existing generation from BASE_NAME

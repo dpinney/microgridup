@@ -290,7 +290,7 @@ for i, mg_ob in enumerate(microgrids.values()):
 		})
 		gen_df_builder[f'battery_{gen_bus_name}'] = reopt_out.get(f'powerBatteryToLoad{mg_num}')
 		# 0-1 scale the power output loadshape to the total generation kw of that type of generator in pandas
-		gen_df_builder[f'battery_{gen_bus_name}'] = -1.0 * gen_df_builder[f'battery_{gen_bus_name}']/battery_pow_total
+		gen_df_builder[f'battery_{gen_bus_name}'] = gen_df_builder[f'battery_{gen_bus_name}']/battery_pow_total
 		battery_gen_loadshape_0_1 = gen_df_builder[f'battery_{gen_bus_name}']
 
 		# build loadshapes for existing generation from BASE_NAME

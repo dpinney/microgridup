@@ -72,7 +72,8 @@ REOPT_INPUTS = {
 	"genExisting": 0,
 	"minGenLoading": "0.3",
 	"batteryKwExisting": 0,
-	"batteryKwhExisting": 0
+	"batteryKwhExisting": 0,
+	"windExisting": 0
 }
 # gen_obs_existing include all generator objects already in the microgrid, preselected from base.dss
 microgrids = {
@@ -80,7 +81,7 @@ microgrids = {
 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_hospital','675b_residential1','675c_residential1','671_hospital','652_med_apartment','645_warehouse1','646_med_office'],
 		'switch': '650632',
 		'gen_bus': '670',
-		'gen_obs_existing': ['solar_634', 'diesel_634', 'battery_634', 'solar_684', 'diesel_684', 'battery_684']
+		'gen_obs_existing': [] #['wind_634_existing', 'solar_634_existing', 'diesel_634_existing', 'battery_634_existing', 'solar_684_existing', 'diesel_684_existing', 'battery_684_existing']
 	}
 }
 
@@ -144,10 +145,11 @@ if not os.path.isdir(reopt_folder):
 	
 	# Pull out and add up kw of all solar and diesel generators in the microgrid
 	# requires pre-selection of all objects in a given microgrid in microgrids[key]['gen_obs_existing']
-	solar_gen_exist = [] # TODO: Refactor will need one list per microgrid if running a single pass of REopt (named solar_gen_exist_{mg_num} for example)
-	diesel_gen_exist = [] # TODO: Refactor will need one list per microgrid if running a single pass of REopt (named diesel_gen_exist_{mg_num} for example)
+	solar_kw_exist = [] # TODO: Refactor will need one list per microgrid if running a single pass of REopt (named solar_gen_exist_{mg_num} for example)
+	diesel_kw_exist = [] # TODO: Refactor will need one list per microgrid if running a single pass of REopt (named diesel_gen_exist_{mg_num} for example)
 	battery_kw_exist = []
 	battery_kwh_exist = []
+	wind_kw_exist = []
 	for key in microgrids:
 		gen_obs = microgrids[key]['gen_obs_existing'] 
 		for gen_ob in gen_obs: # gen_ob is a name of an object from base.dss
@@ -156,16 +158,21 @@ if not os.path.isdir(reopt_folder):
 				#print(ob_name)
 				ob_type = ob.get('object','')
 				if ob_name == gen_ob and ob_type == "generator" and re.search('solar.+', ob_name):
-					solar_gen_exist.append(float(ob.get('kw')))
+					solar_kw_exist.append(float(ob.get('kw')))
+				elif ob_name == gen_ob and ob_type == "generator" and re.search('wind.+', ob_name):
+					wind_kw_exist.append(float(ob.get('kw')))
 				elif ob_name == gen_ob and ob_type == "generator" and re.search('diesel.+', ob_name):
-					diesel_gen_exist.append(float(ob.get('kw')))
+					diesel_kw_exist.append(float(ob.get('kw')))
 				elif ob_name == gen_ob and ob_type == "storage" and re.search('battery.+', ob_name):
 					battery_kw_exist.append(float(ob.get('kva')))
 					battery_kwh_exist.append(float(ob.get('kwhrated')))
-	allInputData['solarExisting'] = str(sum(solar_gen_exist))
-	allInputData['genExisting'] = str(sum(diesel_gen_exist))
+	allInputData['solarExisting'] = str(sum(solar_kw_exist))
+	allInputData['genExisting'] = str(sum(diesel_kw_exist))
 	allInputData['batteryKwExisting'] = str(sum(battery_kw_exist))
 	allInputData['batteryKwhExisting'] = str(sum(battery_kwh_exist))
+	if sum(wind_kw_exist) > 0:
+		allInputData['windExisting'] = str(sum(wind_kw_exist))
+		allInputData['windMin'] = str(sum(wind_kw_exist)) # To Do: update logic if windMin, windExisting and other generation variables are enabled to be set by the user as inputs
 
 	# run REopt via microgridDesign
 	with open(reopt_folder + '/allInputData.json','w') as outfile:
@@ -185,7 +192,12 @@ for i, mg_ob in enumerate(microgrids.values()):
 	solar_size_total = reopt_out.get(f'sizePV{mg_num}', 0.0)
 	solar_size_existing = reopt_out.get(f'sizePVExisting{mg_num}', 0.0)
 	solar_size_new = solar_size_total - solar_size_existing
-	wind_size = reopt_out.get(f'sizeWind{mg_num}', 0.0) # TO DO: Update size of wind based on existing generation once we find a way to get a loadshape for that wind if REopt recommends no wind
+	wind_size_total = reopt_out.get(f'sizeWind{mg_num}', 0.0) # TO DO: Update size of wind based on existing generation once we find a way to get a loadshape for that wind if REopt recommends no wind
+	wind_size_existing = reopt_out.get(f'windExisting{mg_num}', 0.0)
+	if wind_size_total - wind_size_existing > 0:
+		wind_size_new = wind_size_total - wind_size_existing 
+	else:
+		wind_size_new = 0 #TO DO: update logic here to make run more robust to oversized existing wind gen	
 	diesel_size_total = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
 	diesel_size_existing = reopt_out.get(f'sizeDieselExisting{mg_num}', 0.0)
 	diesel_size_new = diesel_size_total - diesel_size_existing
@@ -223,25 +235,29 @@ for i, mg_ob in enumerate(microgrids.values()):
 			if gen_ob_existing.startswith('solar_'):
 				gen_df_builder[f'{gen_ob_existing}'] = solar_gen_loadshape_0_1
 
-	if wind_size > 0:
+	# insert loadshapes for new Wind
+	# TO Do: fully test out the logic here for different scenarios and then update battery logic
+	if wind_size_new > 0:
 		gen_obs.append({
 			'!CMD': 'new',
 			'object':f'generator.wind_{gen_bus_name}',
 			'bus1':f'{gen_bus_name}.1.2.3',
 			'phases':'3', #todo: what about multiple smaller phases?
 			'kv':'4.16', #todo: fix, make non-generic
-			'kw':f'{wind_size}',
+			'kw':f'{wind_size_new}',
 			'pf':'1'
 		})
 		gen_df_builder[f'wind_{gen_bus_name}'] = reopt_out.get(f'powerWind{mg_num}')
 		# 0-1 scale the power output loadshape to the total generation kw of that type of generator
-		gen_df_builder[f'wind_{gen_bus_name}'] = gen_df_builder[f'wind_{gen_bus_name}']/wind_size # TODO: 0-1 scale this to wind_size_total once 
-		wind_gen_loadshape_0_1 = gen_df_builder[f'wind_{gen_bus_name}']
+		gen_df_builder[f'wind_{gen_bus_name}'] = gen_df_builder[f'wind_{gen_bus_name}']/wind_size_total
+		#wind_gen_loadshape_0_1 = gen_df_builder[f'wind_{gen_bus_name}']
 
-		# build loadshapes for existing generation from BASE_NAME
+	# build loadshapes for existing Wind generation from BASE_NAME
+	if wind_size_existing > 0:	
 		for gen_ob_existing in gen_obs_existing:
 			if gen_ob_existing.startswith('wind_'):
-				gen_df_builder[f'{gen_ob_existing}'] = wind_gen_loadshape_0_1
+				gen_df_builder[f'{gen_ob_existing}'] = reopt_out.get(f'powerWind{mg_num}')
+				gen_df_builder[f'{gen_ob_existing}'] = gen_df_builder[f'{gen_ob_existing}']/wind_size_total
 
 	if diesel_size_total > 0:
 		gen_obs.append({
@@ -268,6 +284,8 @@ for i, mg_ob in enumerate(microgrids.values()):
 				gen_df_builder[f'{gen_ob_existing}'] = diesel_gen_loadshape_0_1
 
 	if battery_cap_total > 0: #ToDo: trigger on battery_cap_new
+		
+		# only trigger a new generator object if 
 		gen_obs.append({
 			'!CMD': 'new',
 			'object':f'storage.battery_{gen_bus_name}',

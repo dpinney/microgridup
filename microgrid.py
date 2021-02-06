@@ -81,7 +81,7 @@ microgrids = {
 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_hospital','675b_residential1','675c_residential1','671_hospital','652_med_apartment','645_warehouse1','646_med_office'],
 		'switch': '650632',
 		'gen_bus': '670',
-		'gen_obs_existing': ['wind_634_existing', 'solar_634_existing', 'diesel_634_existing', 'battery_634_existing']#, 'solar_684_existing', 'wind_684_existing', 'diesel_684_existing', 'battery_684_existing']
+		'gen_obs_existing': []#['wind_634_existing', 'solar_634_existing', 'diesel_634_existing', 'battery_634_existing']#, 'solar_684_existing', 'wind_684_existing', 'diesel_684_existing', 'battery_684_existing']
 	}
 }
 
@@ -166,13 +166,16 @@ if not os.path.isdir(reopt_folder):
 				elif ob_name == gen_ob and ob_type == "storage" and re.search('battery.+', ob_name):
 					battery_kw_exist.append(float(ob.get('kwrated')))
 					battery_kwh_exist.append(float(ob.get('kwhrated')))
-	allInputData['solarExisting'] = str(sum(solar_kw_exist))
 	allInputData['genExisting'] = str(sum(diesel_kw_exist))
+	if sum(solar_kw_exist) > 0:
+		allInputData['solarExisting'] = str(sum(solar_kw_exist))
+		allInputData['solar'] = 'on'
 	if sum(battery_kwh_exist) > 0:
 		allInputData['batteryKwExisting'] = str(sum(battery_kw_exist))
 		allInputData['batteryPowerMin'] = str(sum(battery_kw_exist))
 		allInputData['batteryKwhExisting'] = str(sum(battery_kwh_exist))
 		allInputData['batteryCapacityMin'] = str(sum(battery_kwh_exist))
+		allInputData['battery'] = 'on'
 	if sum(wind_kw_exist) > 0:
 		allInputData['windExisting'] = str(sum(wind_kw_exist))
 		allInputData['windMin'] = str(sum(wind_kw_exist))
@@ -234,8 +237,6 @@ for i, mg_ob in enumerate(microgrids.values()):
 		})
 		# 0-1 scale the power output loadshape to the total generation kw of that type of generator using pandas
 		gen_df_builder[f'solar_{gen_bus_name}'] = pd.Series(reopt_out.get(f'powerPV{mg_num}'))/solar_size_total
-		#gen_df_builder[f'solar_{gen_bus_name}'] = gen_df_builder[f'solar_{gen_bus_name}']/solar_size_total
-		#solar_gen_loadshape_0_1 = gen_df_builder[f'solar_{gen_bus_name}'] # To DO: convert the reopt_out.get(f'powerPV{mg_num}') to a pd.df() type array and pass that around as a variable within the loop
 
 	# build loadshapes for existing generation from BASE_NAME, inputting the 0-1 solar generation loadshape 
 	if solar_size_existing > 0:

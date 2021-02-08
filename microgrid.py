@@ -18,27 +18,60 @@ import random
 #Input data.
 # BASE_NAME = 'lehigh_base_phased.dss'
 # LOAD_NAME = 'lehigh_load.csv'
-# REOPT_INPUTS = {}
+# REOPT_INPUTS = {
+# 	"solar" : "on",
+# 	"wind" : "off",
+# 	"battery" : "on",
+# 	"year" : '2017',
+# 	"energyCost" : "0.12",
+# 	"demandCost" : '20',
+# 	"solarCost" : "1600",
+# 	"windCost" : "4989",
+# 	"batteryPowerCost" : "840",
+# 	"batteryCapacityCost" : "420",
+# 	"solarMin": 0,
+# 	"windMin": 0,
+# 	"batteryPowerMin": 0,
+# 	"batteryCapacityMin": 0,
+# 	"solarMax": "100000",
+# 	"windMax": "100000",
+# 	"batteryPowerMax": "1000000",
+# 	"batteryCapacityMax": "1000000",
+# 	"solarExisting": 0,
+# 	"criticalLoadFactor": "1",
+# 	"outage_start_hour": "200",
+# 	"outageDuration": "120",
+# 	"fuelAvailable": "50000",
+# 	"genExisting": 0,
+# 	"minGenLoading": "0.3",
+# 	"batteryKwExisting": 0,
+# 	"batteryKwhExisting": 0,
+# 	"windExisting": 0
+# }
 # microgrids = {
 # 	'm1': {
 # 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
 # 		'switch': '632633',
-# 		'gen_bus': '634'
+# 		'gen_bus': '634',
+# 		'gen_obs_existing': ['solar_634_existing', 'wind_634_existing', 'diesel_634_existing', 'battery_634_existing']
 # 	},
 # 	'm2': {
 # 		'loads': ['675a_hospital','675b_residential1','675c_residential1'],
 # 		'switch': '671692',
-# 		'gen_bus': '675'
+# 		'gen_bus': '675',
+# 		'gen_obs_existing': ['solar_675_existing', 'diesel_675_existing', 'battery_675_existing']
 # 	},
 # 	'm3': {
 # 		'loads': ['671_hospital','652_med_apartment'],
 # 		'switch': '671684',
-# 		'gen_bus': '684'
+# 		'gen_bus': '684',
+# 		'gen_obs_existing': ['solar_684_existing', 'wind_684_existing', 'diesel_684_existing', 'battery_684_existing']
 # 	},
 # 	'm4': {
 # 		'loads': ['645_warehouse1','646_med_office'],
 # 		'switch': '632645',
-# 		'gen_bus': '646'
+# 		'gen_bus': '646',
+# 		'gen_obs_existing': ['solar_646_existing', 'diesel_646_existing', 'battery_646_existing']
 # 	}
 # }
 
@@ -81,7 +114,7 @@ microgrids = {
 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_hospital','675b_residential1','675c_residential1','671_hospital','652_med_apartment','645_warehouse1','646_med_office'],
 		'switch': '650632',
 		'gen_bus': '670',
-		'gen_obs_existing': ['solar_634_existing']#['wind_634_existing', 'solar_634_existing', 'diesel_634_existing', 'battery_634_existing']#, 'solar_684_existing', 'wind_684_existing', 'diesel_684_existing', 'battery_684_existing']
+		'gen_obs_existing': ['solar_634_existing', 'wind_634_existing', 'diesel_634_existing', 'battery_634_existing', 'solar_675_existing', 'diesel_675_existing', 'battery_675_existing', 'solar_684_existing', 'wind_684_existing', 'diesel_684_existing', 'battery_684_existing', 'solar_646_existing', 'diesel_646_existing', 'battery_646_existing']
 	}
 }
 

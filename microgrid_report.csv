@@ -1,2 +1,2 @@
 Microgrid Name,Generation Bus,Minimum Load (kWh),Average Load (kWh),Average Daytime Load (kWh),Maximum Load (kWh),Recommended Diesel (kW),Diesel Fuel Used During Outage (gal),Recommended Solar (kW),Recommended Battery Power (kW),Recommended Battery Capacity (kWh),Recommended Wind (kW),NPV ($),CapEx ($),CapEx after Incentives ($),Average Outage Survived (h)
-1,670,676.0,1271.0,1645.3,2262.0,1109.5,3798.4,474.5,1512.4,0,576324,6961954,4301436,69.7
+1,670,676.0,1271.0,1645.3,2262.0,1102.0,3686.1,522.2,1527.9,350.0,-320940,4633663,2925811,103.2

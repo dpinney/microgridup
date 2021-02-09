@@ -471,7 +471,7 @@ geo.mapOmd(OMD_NAME, MAP_NAME, 'html', openBrowser=False, conversion=False, offl
 # Powerflow outputs.
 opendss.newQstsPlot(FULL_NAME,
 	stepSizeInMinutes=60, 
-	numberOfSteps=24*20,
+	numberOfSteps=24*365,
 	keepAllFiles=False,
 	actions={
 		#24*5:'open object=line.671692 term=1',

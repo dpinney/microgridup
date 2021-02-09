@@ -33,13 +33,13 @@ new object=linecode.mtx606 nphases=3 units=mi rmatrix=[0.791721|0.318476,0.78164
 new object=linecode.mtx607 nphases=1 basefreq=60 rmatrix=[1.3425] xmatrix=[0.5124] cmatrix=[236] units=mi 
 
 !load definitions
-new object=load.671_hospital bus1=671.1.2.3 phases=3 conn=delta model=1 kv=4.16 kw=1155 kvar=660
+new object=load.671_hospital bus1=671.1.2.3 phases=3 conn=delta model=1 kv=2.4 kw=1155 kvar=660
 new object=load.634a_supermarket bus1=634.1 phases=1 conn=wye model=1 kv=0.277 kw=160 kvar=110
 new object=load.634b_supermarket bus1=634.1 phases=1 conn=wye model=1 kv=0.277 kw=120 kvar=90
 new object=load.634c_supermarket bus1=634.1 phases=1 conn=wye model=1 kv=0.277 kw=120 kvar=90
 new object=load.645_warehouse1 bus1=645.2 phases=1 conn=wye model=1 kv=2.4 kw=170 kvar=125
-new object=load.646_med_office bus1=646.2 phases=1 conn=delta model=2 kv=4.16 kw=230 kvar=132
-new object=load.692_warehouse2 bus1=692.1.2.3 phases=3 conn=delta model=5 kv=4.16 kw=170 kvar=151 
+new object=load.646_med_office bus1=646.2 phases=1 conn=delta model=2 kv=2.4 kw=230 kvar=132
+new object=load.692_warehouse2 bus1=692.1.2.3 phases=3 conn=delta model=5 kv=2.4 kw=170 kvar=151 
 new object=load.675a_hospital bus1=675.1.2.3 phases=3 conn=wye model=1 kv=2.4 kw=485 kvar=190
 new object=load.675b_residential1 bus1=675.1.2.3 phases=3 conn=wye model=1 kv=2.4 kw=68 kvar=60
 new object=load.675c_residential1 bus1=675.1.2.3 phases=3 conn=wye model=1 kv=2.4 kw=290 kvar=212
@@ -72,8 +72,8 @@ new object=generator.diesel_646_existing bus1=646.2 kw=145 pf=1 kv=4.16 xdp=0.27
 new object=storage.battery_646_existing phases=1 bus1=646.2 kv=4.16 kwrated=98 kwhstored=346 kwhrated=346 dispmode=follow %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
 
 !capacitor definitions
-! new object=capacitor.cap1 bus1=675 phases=3 kvar=600 kv=4.16 
-! new object=capacitor.cap2 bus1=611.3 phases=1 kvar=100 kv=2.4 
+new object=capacitor.cap1 bus1=675 phases=3 kvar=600 kv=4.16 
+new object=capacitor.cap2 bus1=611.3 phases=1 kvar=100 kv=2.4 
 
 !line definitions 
 new object=line.670671 phases=3 bus1=670.1.2.3 bus2=671.1.2.3 linecode=mtx601 length=1333 units=ft 

@@ -40,7 +40,7 @@ import random
 # 	"solarExisting": 0,
 # 	"criticalLoadFactor": "1",
 # 	"outage_start_hour": "200",
-# 	"outageDuration": "120",
+# 	"outageDuration": "96",
 # 	"fuelAvailable": "50000",
 # 	"genExisting": 0,
 # 	"minGenLoading": "0.3",
@@ -49,30 +49,30 @@ import random
 # 	"windExisting": 0
 # }
 # microgrids = {
-# 	'm1': {
-# 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
-# 		'switch': '632633',
-# 		'gen_bus': '634',
-# 		'gen_obs_existing': ['solar_634_existing', 'wind_634_existing', 'diesel_634_existing', 'battery_634_existing']
-# 	},
-# 	'm2': {
-# 		'loads': ['675a_hospital','675b_residential1','675c_residential1'],
-# 		'switch': '671692',
-# 		'gen_bus': '675',
-# 		'gen_obs_existing': ['solar_675_existing', 'diesel_675_existing', 'battery_675_existing']
-# 	},
-# 	'm3': {
-# 		'loads': ['671_hospital','652_med_apartment'],
-# 		'switch': '671684',
-# 		'gen_bus': '684',
-# 		'gen_obs_existing': ['solar_684_existing', 'wind_684_existing', 'diesel_684_existing', 'battery_684_existing']
-# 	},
-# 	'm4': {
-# 		'loads': ['645_warehouse1','646_med_office'],
-# 		'switch': '632645',
-# 		'gen_bus': '646',
-# 		'gen_obs_existing': ['solar_646_existing', 'diesel_646_existing', 'battery_646_existing']
-# 	}
+	# 'm1': {
+	# 	'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
+	# 	'switch': '632633',
+	# 	'gen_bus': '634',
+	# 	'gen_obs_existing': ['solar_634_existing', 'wind_634_existing', 'diesel_634_existing', 'battery_634_existing']
+	# },
+	# 'm2': {
+	# 	'loads': ['675a_hospital','675b_residential1','675c_residential1'],
+	# 	'switch': '671692',
+	# 	'gen_bus': '675',
+	# 	'gen_obs_existing': ['solar_675_existing', 'diesel_675_existing', 'battery_675_existing']
+	# },
+	# 'm3': {
+	# 	'loads': ['671_hospital','652_med_apartment'],
+	# 	'switch': '671684',
+	# 	'gen_bus': '684',
+	# 	'gen_obs_existing': ['solar_684_existing', 'wind_684_existing', 'diesel_684_existing', 'battery_684_existing']
+	# },
+	# 'm4': {
+	# 	'loads': ['645_warehouse1','646_med_office'],
+	# 	'switch': '632645',
+	# 	'gen_bus': '646',
+	# 	'gen_obs_existing': ['solar_646_existing', 'diesel_646_existing', 'battery_646_existing']
+	# }
 # }
 
 #Second input set.
@@ -100,7 +100,7 @@ REOPT_INPUTS = {
 	"solarExisting": 0,
 	"criticalLoadFactor": "1",
 	"outage_start_hour": "200",
-	"outageDuration": "120",
+	"outageDuration": "96",
 	"fuelAvailable": "50000",
 	"genExisting": 0,
 	"minGenLoading": "0.3",
@@ -487,7 +487,12 @@ def microgrid_report(inputName, outputCsvName):
 
     with open(outputCsvName, 'w', newline='') as outcsv:
         writer = csv.writer(outcsv)
-        writer.writerow(["Microgrid Name", "Generation Bus", "Minimum Load (kWh)", "Average Load (kWh)", "Average Daytime Load (kWh)", "Maximum Load (kWh)", "Recommended Diesel (kW)", "Diesel Fuel Used During Outage (gal)", "Recommended Solar (kW)", "Recommended Battery Power (kW)", "Recommended Battery Capacity (kWh)", "Recommended Wind (kW)", "NPV ($)", "CapEx ($)", "CapEx after Incentives ($)", "Average Outage Survived (h)"])
+        writer.writerow(["Microgrid Name", "Generation Bus", "Minimum Load (kWh)", "Average Load (kWh)",
+			        		"Average Daytime Load (kWh)", "Maximum Load (kWh)", "Existing Diesel (kW)", "Recommended New Diesel (kW)",
+			        		"Diesel Fuel Used During Outage (gal)", "Existing Solar (kW)", "Recommended New Solar (kW)", 
+			        		"Existing Battery Power (kW)", "Recommended New Battery Power (kW)", "Existing Battery Capacity (kWh)", 
+			        		"Recommended New Battery Capacity (kWh)", "Existing Wind (kW)", "Recommended New Wind (kW)", 
+			        		"NPV ($)", "CapEx ($)", "CapEx after Incentives ($)", "Average Outage Survived (h)"])
 
         for i, mg_ob in enumerate(microgrids.values()):
             mg_num = i + 1
@@ -496,24 +501,69 @@ def microgrid_report(inputName, outputCsvName):
             min_load = min(load)
             ave_load = sum(load)/len(load)
             np_load = np.array_split(load, 365)
-            np_load = np.array(np_load) #an array of 365 arrays of 24 hours each
+            np_load = np.array(np_load) #a flattened array of 365 arrays of 24 hours each
             daytime_kwh = np_load[:,9:17] #365 8-hour daytime arrays
             avg_daytime_load = np.average(np.average(daytime_kwh, axis=1))
             max_load = max(load)
-            diesel_size = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
             diesel_used_gal =reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0)
-            solar_size = reopt_out.get(f'sizePV{mg_num}', 0.0)
-            battery_cap = reopt_out.get(f'capacityBattery{mg_num}', 0.0)
-            battery_pow = reopt_out.get(f'powerBattery{mg_num}', 0.0)
-            wind_size = reopt_out.get(f'sizeWind{mg_num}', 0.0)
-            npv = reopt_out.get(f'savings{mg_num}', 0.0)
-            cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0)
-            cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0)
+            # diesel_size = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
+            # solar_size = reopt_out.get(f'sizePV{mg_num}', 0.0)
+            # battery_cap = reopt_out.get(f'capacityBattery{mg_num}', 0.0)
+            # battery_pow = reopt_out.get(f'powerBattery{mg_num}', 0.0)
+            # wind_size = reopt_out.get(f'sizeWind{mg_num}', 0.0)
+
+            #TO DO: FIX THE TABBING ERROR IN THIS CODE SO IT PULLS THE VARIABELS FROM THIS LOOP INTO THE SUMMARY REPORT
+         #    solar_size_total = reopt_out.get(f'sizePV{mg_num}', 0.0)
+         #    solar_size_existing = reopt_out.get(f'sizePVExisting{mg_num}', 0.0)
+         #    solar_size_new = solar_size_total - solar_size_existing
+         #    wind_size_total = reopt_out.get(f'sizeWind{mg_num}', 0.0)# TO DO: Update size of wind based on existing generation once we find a way to get a loadshape for that wind if REopt recommends no wind
+         #    wind_size_existing = reopt_out.get(f'windExisting{mg_num}', 0.0)
+         #    if wind_size_total - wind_size_existing > 0:
+         #    	wind_size_new = wind_size_total - wind_size_existing
+         #    else:
+         #    	wind_size_new = 0# TO DO: update logic here to make run more robust to oversized existing wind gen
+         #    diesel_size_total = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
+         #    diesel_size_existing = reopt_out.get(f'sizeDieselExisting{mg_num}', 0.0)
+         #    diesel_size_new = diesel_size_total - diesel_size_existing
+         #    battery_cap_total = reopt_out.get(f'capacityBattery{mg_num}', 0.0)
+         #    battery_cap_existing = reopt_out.get(f'batteryKwhExisting{mg_num}', 0.0)
+         #    if battery_cap_total - battery_cap_existing > 0:
+         #    	battery_cap_new = battery_cap_total - battery_cap_existing
+         #    else:
+         #    	battery_cap_new = 0
+
+        	# battery_pow_total = reopt_out.get(f'powerBattery{mg_num}', 0.0)
+        	# battery_pow_existing = reopt_out.get(f'batteryKwExisting{mg_num}', 0.0)
+        	# if battery_pow_total - battery_pow_existing > 0:
+        	# 	battery_pow_new = battery_pow_total - battery_pow_existing
+        	# else:
+        	# 	battery_pow_new = 0
+
+            npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
+            cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
+            cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
+            # economic outcomes with the capital costs of existing wind and batteries deducted:
+            npv_existing_gen_adj = npv \
+            						+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
+            						+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
+            						+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
+            cap_ex_existing_gen_adj = cap_ex \
+            						+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
+            						+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
+            						+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
+            cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives \
+            						+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
+            						+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
+            						+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
             ave_outage = reopt_out.get(f'avgOutage{mg_num}', 0.0)
-            row =[mg_num, gen_bus_name, round(min_load,0), round(ave_load,0), round(avg_daytime_load,1), round(max_load,0), round(diesel_size,1), round(solar_size,1), round(battery_pow,1), round(battery_cap,1), round(wind_size,1), int(round(npv)), int(round(cap_ex)), int(round(cap_ex_after_incentives)), round(ave_outage,1)]
+            row =[mg_num, gen_bus_name, round(min_load,0), round(ave_load,0), round(avg_daytime_load,1), round(max_load,0),
+            round(diesel_size_existing,1), round(diesel_size_new,1), round(diesel_used_gal, 0), round(solar_size_existing,1), 
+            round(solar_size_new,1), round(battery_pow_existing,1), round(battery_pow_new,1), round(battery_cap_existing,1), 
+            round(battery_cap_new,1), round(wind_size_existing,1), round(wind_size_new,1), int(round(npv_existing_gen_adj)),
+            int(round(cap_ex_existing_gen_adj)), int(round(cap_ex_after_incentives_existing_gen_adj)), round(ave_outage,1)]
             writer.writerow(row)
 
-microgrid_report('/allOutputData.json','microgrid_report.csv')
+microgrid_report('/allOutputData.json','microgrid_report.csv') #TO DO: output as json or dict and convert report to list info in columns to reduce clutter in html output
 
 # Charting outputs.
 def make_chart(csvName, category_name, x, y_list):
@@ -545,13 +595,17 @@ make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'])
 #opendss_playground.play('lehigh.dss.omd', 'lehigh_full.dss', None, microgrids, '670671', False)
 
 # Create giant consolidated report.
+summary_rdr= csv.reader( open('microgrid_report.csv', "r" ) )
+summary_data = [row for row in summary_rdr]
 template = j2.Template(open('output_template.html').read())
 out = template.render(
 	x='David',
 	y='Matt',
-	summary=open('microgrid_report.csv').read(),
+	#summary=open('microgrid_report.csv').read(),
+	summary=summary_data,
 	inputs={'circuit':BASE_NAME,'loads':LOAD_NAME,'REopt inputs':REOPT_INPUTS,'microgrids':microgrids}
 )
+
 #TODO: have an option where we make the template <iframe srcdoc="{{X}}"> to embed the html and create a single file.
 BIG_OUT_NAME = 'output_full_analysis_lehigh.html'
 with open(BIG_OUT_NAME,'w') as outFile:

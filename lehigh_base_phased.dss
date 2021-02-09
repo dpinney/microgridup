@@ -72,8 +72,8 @@ new object=generator.diesel_646_existing bus1=646.2 kw=145 pf=1 kv=4.16 xdp=0.27
 new object=storage.battery_646_existing phases=1 bus1=646.2 kv=4.16 kwrated=98 kwhstored=346 kwhrated=346 dispmode=follow %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
 
 !capacitor definitions
-new object=capacitor.cap1 bus1=675 phases=3 kvar=600 kv=4.16 
-new object=capacitor.cap2 bus1=611.3 phases=1 kvar=100 kv=2.4 
+! new object=capacitor.cap1 bus1=675 phases=3 kvar=600 kv=4.16 
+! new object=capacitor.cap2 bus1=611.3 phases=1 kvar=100 kv=2.4 
 
 !line definitions 
 new object=line.670671 phases=3 bus1=670.1.2.3 bus2=671.1.2.3 linecode=mtx601 length=1333 units=ft 

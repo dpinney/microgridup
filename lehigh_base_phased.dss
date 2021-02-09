@@ -51,25 +51,25 @@ new object=load.670c_residential2 bus1=670.3 phases=1 conn=wye model=1 kv=2.4 kw
 
 ! microgrid m1 generator definitions
 new object=generator.solar_634_existing bus1=634.1.2.3 kv=0.277 kw=440 pf=1
-new object=generator.wind_634_existing bus1=634.1.2.3 kv=0.277 kw=300 pf=1
-new object=generator.diesel_634_existing bus1=634.1.2.3 kw=165 pf=1 kv=0.277 xdp=0.27 xdpp=0.2 h=2 conn=delta
-new object=storage.battery_634_existing phases=3 bus1=634.1.2.3 kv=0.277 kwrated=79 kwhstored=307 kwhrated=307 dispmode=follow %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
+! new object=generator.wind_634_existing bus1=634.1.2.3 kv=0.277 kw=300 pf=1
+! new object=generator.diesel_634_existing bus1=634.1.2.3 kw=165 pf=1 kv=0.277 xdp=0.27 xdpp=0.2 h=2 conn=delta
+! new object=storage.battery_634_existing phases=3 bus1=634.1.2.3 kv=0.277 kwrated=79 kwhstored=307 kwhrated=307 dispmode=follow %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
 
 ! microgrid m2 generator definitions
-new object=generator.solar_675_existing bus1=675.1.2.3 kv=2.4 kw=1234 pf=1
-new object=generator.diesel_675_existing bus1=675.1.2.3 kw=265 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 conn=delta
-new object=storage.battery_675_existing phases=3 bus1=675.1.2.3 kv=2.4 kwrated=198 kwhstored=553 kwhrated=553 dispmode=follow %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
+! new object=generator.solar_675_existing bus1=675.1.2.3 kv=2.4 kw=1234 pf=1
+! new object=generator.diesel_675_existing bus1=675.1.2.3 kw=265 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 conn=delta
+! new object=storage.battery_675_existing phases=3 bus1=675.1.2.3 kv=2.4 kwrated=198 kwhstored=553 kwhrated=553 dispmode=follow %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
 
 ! microgrid m3 generator definitions
-new object=generator.solar_684_existing bus1=684.3 kv=2.4 kw=432 pf=1
-new object=generator.wind_684_existing bus1=684.3 kv=2.4 kw=50 pf=1
-new object=generator.diesel_684_existing bus1=684.3 kw=81 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 conn=delta
-new object=storage.battery_684_existing phases=3 bus1=684.1.2.3 kv=2.4 kwrated=20 kwhstored=100 kwhrated=100 dispmode=follow %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
+! new object=generator.solar_684_existing bus1=684.3 kv=2.4 kw=432 pf=1
+! new object=generator.wind_684_existing bus1=684.3 kv=2.4 kw=50 pf=1
+! new object=generator.diesel_684_existing bus1=684.3 kw=81 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 conn=delta
+! new object=storage.battery_684_existing phases=3 bus1=684.1.2.3 kv=2.4 kwrated=20 kwhstored=100 kwhrated=100 dispmode=follow %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
 
 ! microgrid m4 generator definitions
-new object=generator.solar_646_existing bus1=646.2 kv=4.16 kw=590 pf=1
+! new object=generator.solar_646_existing bus1=646.2 kv=4.16 kw=590 pf=1
 new object=generator.diesel_646_existing bus1=646.2 kw=145 pf=1 kv=4.16 xdp=0.27 xdpp=0.2 h=2 conn=delta
-new object=storage.battery_646_existing phases=1 bus1=646.2 kv=4.16 kwrated=98 kwhstored=346 kwhrated=346 dispmode=follow %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
+! new object=storage.battery_646_existing phases=1 bus1=646.2 kv=4.16 kwrated=98 kwhstored=346 kwhrated=346 dispmode=follow %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
 
 !capacitor definitions
 new object=capacitor.cap1 bus1=675 phases=3 kvar=600 kv=4.16 

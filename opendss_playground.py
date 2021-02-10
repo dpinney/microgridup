@@ -12,7 +12,6 @@ import matplotlib.pyplot as plt
 import plotly as py
 import plotly.graph_objs as go
 from plotly.tools import make_subplots
-from pprint import pprint as pp
 
 # OMF imports
 import omf
@@ -29,7 +28,7 @@ from omf.solvers import opendss
 # modelName, template = __neoMetaModel__.metadata(__file__)
 # hidden = True
 
-def play(pathToOmd, pathToDss, workDir, microgrids, faultedLine, radial):
+def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine, radial, lengthOfOutage, switchingTime):
 	# 1) isolate the fault (using step one of flisr model)
 	if not workDir:
 		workDir = tempfile.mkdtemp()
@@ -54,41 +53,63 @@ def play(pathToOmd, pathToDss, workDir, microgrids, faultedLine, radial):
 	buses = []
 	for key in microgrids.keys():
 		buses.append(microgrids[key].get('gen_bus', ''))
-
 	tree, bestReclosers, badBuses = flisr.cutoffFault(tree, faultedNode, bestReclosers, workDir, radial, buses)
-
+	print(bestReclosers)
 	# 2) get a list of loads associated with each microgrid component
 	# and create a loadshape containing all said loads
-	playOneStep(tree, bestReclosers, badBuses, pathToDss)
-
-	# read in the set of tie lines in the system as a dataframe
+	if switchingTime <= lengthOfOutage:
+		totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, 0, None, None, None)
+		tree = solveSystem(busShapes, microgrids, tree, pathToDss, badBuses, bestReclosers)
+	# # read in the set of tie lines in the system as a dataframe
 	# tieLines = pd.read_csv(pathToTieLines)
 
-	# start the restoration piece of the algorithm
+	# #start the restoration piece of the algorithm
 	# index = 0
 	# terminate = False
 	# goTo4 = False
 	# goTo3 = False
 	# goTo2 = True
-	# while terminate == False:
+	# while (terminate == False) and ((timePassed+switchingTime) < lengthOfOutage):
 	# 	# Step 2
 	# 	if goTo2 == True:
 	# 		goTo2 = False
 	# 		goTo3 = True
-	# 		unpowered, powered, potentiallyViable = listPotentiallyViable(tree, tieLines, workDir)
+	# 		unpowered, powered, potentiallyViable = flisr.listPotentiallyViable(tree, tieLines, workDir)
+	# 		print(potentiallyViable)
 	# 	# Step 3
 	# 	if goTo3 == True:
 	# 		goTo3 = False
 	# 		goTo4 = True
-	# 		openSwitch = chooseOpenSwitch(potentiallyViable)
+	# 		openSwitch = flisr.chooseOpenSwitch(potentiallyViable)
 	# 	# Step 4
 	# 	if goTo4 == True:
 	# 		goTo4 = False
-	# 		tree, potentiallyViable, tieLines, bestTies, bestReclosers, goTo2, goTo3, terminate, index = addTieLines(tree, faultedNode, potentiallyViable, unpowered, powered, openSwitch, tieLines, bestTies, bestReclosers, workDir, goTo2, goTo3, terminate, index, radial)
+	# 		tree, potentiallyViable, tieLines, bestTies, bestReclosers, goTo2, goTo3, terminate, index = flisr.addTieLines(tree, faultedNode, potentiallyViable, unpowered, powered, openSwitch, tieLines, bestTies, bestReclosers, workDir, goTo2, goTo3, terminate, index, radial)
 	# 		if goTo2 == True:
-	# 			playOneStep(tree, bestReclosers, badBuses, pathToDss)
+	# 			totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad)
 
-def playOneStep(tree, bestReclosers, badBuses, pathToDss):
+	# when the outage is over, switch back to the main sourcebus
+	buses = []
+	sortvals = {}
+	for key in microgrids:
+		sortvals[key] = microgrids[key].get('max_potential','')
+	sortvals = sorted(sortvals.items(), key=lambda x: x[1], reverse=True)
+
+	for key in sortvals:
+		buses.append(microgrids[key[0]].get('gen_bus', ''))
+	buses = [x for x in buses if x not in badBuses]
+
+	listOfZeroes = [0] * (totalTime-lengthOfOutage)
+
+	while len(buses) > 0:
+		phase = 0
+		while phase < 3:
+			del(busShapes[buses[0]][phase][lengthOfOutage:])
+			busShapes[buses[0]][phase] = busShapes[buses[0]][phase] + listOfZeroes 
+			phase+=1
+		del(buses[0])
+
+def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad):
 	buses = []
 	sortvals = {}
 	for key in microgrids:
@@ -102,9 +123,8 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss):
 	subtrees = {}
 	busShapes = {}
 	leftOverBusShapes = {}
-	shape_insert_list = {}
-	gen_insert_list = {}
 	leftOverLoad = {}
+	totalTime = 0
 	i = 0
 	j = 0
 	# for each power source
@@ -171,76 +191,123 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss):
 									leftOverShapes[shape].append(float(entry)-float(maximum))
 									leftOverHere[shape].append(True)
 				alreadySeen = True
+				subtrees[bus] = subtree
+				subtrees.pop(key)
+		
 		if 'sourcebus' in subtree:
 			del(buses[0])
 			continue
-		for node in subtree:
-			for key in tree.keys():
-				obtype = tree[key].get('object','')
-				if obtype == 'load' or obtype == 'triplex_load':
-					if tree[key].get('parent','').startswith(str(node)):
-						loadshapeName = tree[key].get('yearly', '')
-						for key1 in tree.keys():
-							if tree[key1].get('name','') == loadshapeName:
-								loadshape = eval(tree[key1].get('mult',''))
-								if '.1' in tree[key].get('!CONNCODE',''):
-									if '.1' in loadShapes:
-										loadShapes['.1'] = [a + b for a, b in zip(loadShapes.get('.1',''), loadshape)]
-									else: loadShapes['.1'] = loadshape
-								if '.2' in tree[key].get('!CONNCODE',''):
-									if '.2' in loadShapes:
-										loadShapes['.2'] = [a + b for a, b in zip(loadShapes.get('.2',''), loadshape)]
-									else: loadShapes['.2'] = loadshape
-								if '.3' in tree[key].get('!CONNCODE',''):
-									if '.3' in loadShapes:
-										loadShapes['.3'] = [a + b for a, b in zip(loadShapes.get('.3',''), loadshape)]
-									else: loadShapes['.3'] = loadshape
-
-# 3) obtain the diesel loadshape by subtracting off solar from load
-		dieselShapes = {}
-		leftOverShapes = {}
-		dieselShapesNew = {}
-		leftOverHere = {}
-		maximum = 1.0
-		for key in tree.keys():
-			if tree[key].get('object','').startswith('generator'):
-				if tree[key].get('name','').startswith('solar') and tree[key].get('parent','') == bus:
-					solarshapeName = tree[key].get('yearly','')
-					for key1 in tree.keys():
-						if tree[key1].get('name','') == solarshapeName:
-							solarshape = eval(tree[key1].get('mult',''))
-							if alreadySeen == False:
-								for entry in microgrids:
-									if buses[0] == microgrids[entry].get('gen_bus', ''):
-										maximum = microgrids[entry].get('max_potential', '')
+		if alreadySeen == False:
+			for node in subtree:
+				for key in tree.keys():
+					obtype = tree[key].get('object','')
+					if obtype == 'load' or obtype == 'triplex_load':
+						if tree[key].get('parent','').startswith(str(node)):
+							loadshapeName = tree[key].get('yearly', '')
+							for key1 in tree.keys():
+								if tree[key1].get('name','') == loadshapeName:
+									loadshape = eval(tree[key1].get('mult',''))
+									if '.1' in tree[key].get('!CONNCODE',''):
 										if '.1' in loadShapes:
-											dieselShapes['.1'] = [a - b for a, b in zip(loadShapes.get('.1',''), solarshape)]
+											loadShapes['.1'] = [a + b for a, b in zip(loadShapes.get('.1',''), loadshape)]
+										else: loadShapes['.1'] = loadshape
+									if '.2' in tree[key].get('!CONNCODE',''):
 										if '.2' in loadShapes:
-											dieselShapes['.2'] = [a - b for a, b in zip(loadShapes.get('.2',''), solarshape)]
+											loadShapes['.2'] = [a + b for a, b in zip(loadShapes.get('.2',''), loadshape)]
+										else: loadShapes['.2'] = loadshape
+									if '.3' in tree[key].get('!CONNCODE',''):
 										if '.3' in loadShapes:
-											dieselShapes['.3'] = [a - b for a, b in zip(loadShapes.get('.3',''), solarshape)]
-								for shape in dieselShapes:
-									if not shape in dieselShapesNew.keys():
-										dieselShapesNew[shape] = []
-									if not shape in leftOverShapes.keys():
-										leftOverShapes[shape] = []
-									if not shape in leftOverHere.keys():
-										leftOverHere[shape] = []
-									for entry in dieselShapes[shape]:
-										if (float(maximum) - float(entry)) >= 0:
-											dieselShapesNew[shape].append(float(entry))
-											leftOverShapes[shape].append(0.0)
-											leftOverHere[shape].append(False)
-										else:
-											dieselShapesNew[shape].append(float(maximum))
-											leftOverShapes[shape].append(float(entry)-float(maximum))
-											leftOverHere[shape].append(True)
-		busShapes[buses[0]] = [dieselShapesNew.get('.1',''), dieselShapesNew.get('.2',''), dieselShapesNew.get('.3','')]
-		leftOverBusShapes[buses[0]] = [leftOverShapes.get('.1',''), leftOverShapes.get('.2',''), leftOverShapes.get('.3','')]
-		leftOverLoad[buses[0]] = [leftOverHere.get('.1',''), leftOverHere.get('.2',''), leftOverHere.get('.3','')]
+												loadShapes['.3'] = [a + b for a, b in zip(loadShapes.get('.3',''), loadshape)]
+										else: loadShapes['.3'] = loadshape
+	
+# 3) obtain the diesel loadshape by subtracting off solar from load
+			dieselShapes = {}
+			leftOverShapes = {}
+			dieselShapesNew = {}
+			leftOverHere = {}
+			maximum = 1.0
+			for key in tree.keys():
+				if tree[key].get('object','').startswith('generator'):
+					if tree[key].get('name','').startswith('solar') and tree[key].get('parent','') == bus:
+						solarshapeName = tree[key].get('yearly','')
+						if alreadySeen == False:
+							for key1 in tree.keys():
+								if tree[key1].get('name','') == solarshapeName:
+									solarshape = eval(tree[key1].get('mult',''))
+									for entry in microgrids:
+										if buses[0] == microgrids[entry].get('gen_bus', ''):
+											maximum = microgrids[entry].get('max_potential', '')
+											if '.1' in loadShapes:
+												dieselShapes['.1'] = [a - b for a, b in zip(loadShapes.get('.1',''), solarshape)]
+											if '.2' in loadShapes:
+												dieselShapes['.2'] = [a - b for a, b in zip(loadShapes.get('.2',''), solarshape)]
+											if '.3' in loadShapes:
+												dieselShapes['.3'] = [a - b for a, b in zip(loadShapes.get('.3',''), solarshape)]
+									for shape in dieselShapes:
+										if not shape in dieselShapesNew.keys():
+											dieselShapesNew[shape] = []
+										if not shape in leftOverShapes.keys():
+											leftOverShapes[shape] = []
+										if not shape in leftOverHere.keys():
+											leftOverHere[shape] = []
+										for entry in dieselShapes[shape]:
+											if (float(maximum) - float(entry)) >= 0:
+												dieselShapesNew[shape].append(float(entry))
+												leftOverShapes[shape].append(0.0)
+												leftOverHere[shape].append(False)
+											else:
+												dieselShapesNew[shape].append(float(maximum))
+												leftOverShapes[shape].append(float(entry)-float(maximum))
+												leftOverHere[shape].append(True)
+		if timePassed == 0:
+			busShapes[buses[0]] = [dieselShapesNew.get('.1',''), dieselShapesNew.get('.2',''), dieselShapesNew.get('.3','')]
+			leftOverBusShapes[buses[0]] = [leftOverShapes.get('.1',''), leftOverShapes.get('.2',''), leftOverShapes.get('.3','')]
+			leftOverLoad[buses[0]] = [leftOverHere.get('.1',''), leftOverHere.get('.2',''), leftOverHere.get('.3','')]
+		else:
+			phase = 0
+			while phase < 3:
+				del(busShapes[buses[0]][phase][timePassed:])
+				del(leftOverBusShapes[buses[0]][phase][timePassed:])
+				del(leftOverLoad[buses[0]][phase][timePassed:])
+				del(dieselShapesNew.get('.' + str(phase + 1),'')[:timePassed])
+				del(leftOverShapes.get('.' + str(phase + 1),'')[:timePassed])
+				del(leftOverHere.get('.' + str(phase + 1),'')[:timePassed])
+				busShapes[buses[0]][phase] = busShapes[buses[0]][phase] + dieselShapesNew.get('.' + str(phase + 1),'')
+				leftOverBusShapes[buses[0]][phase] = leftOverBusShapes[buses[0]][phase] + leftOverShapes.get('.' + str(phase + 1),'')
+				leftOverLoad[buses[0]][phase] = leftOverLoad[buses[0]][phase] + leftOverHere.get('.' + str(phase + 1),'')
+				phase+=1
 		subtrees[bus] = subtree
+		if len(busShapes[buses[0]][0]) > totalTime:
+			totalTime = len(busShapes[buses[0]][0])
+		del(buses[0])
+	timePassed = timePassed + switchingTime
+
+	return totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad
+
+def solveSystem(busShapes, microgrids, tree, pathToDss, badBuses, bestReclosers):
 	# 4) add diesel generation to the opendss formatted system and solve
-		phase=1
+	buses = []
+	sortvals = {}
+	for key in microgrids:
+		sortvals[key] = microgrids[key].get('max_potential','')
+	sortvals = sorted(sortvals.items(), key=lambda x: x[1], reverse=True)
+
+	for key in sortvals:
+		buses.append(microgrids[key[0]].get('gen_bus', ''))
+	buses = [x for x in buses if x not in badBuses]
+	i = 0
+	j = 0
+	shape_insert_list = {}
+	gen_insert_list = {}
+
+	while len(buses) > 0:
+		adjacList, reclosers, vertices = flisr.adjacencyList(tree)
+		bus = buses[0]
+		subtree = flisr.getMaxSubtree(adjacList, bus)
+		if 'sourcebus' in subtree:
+			del(buses[0])
+			continue
+		phase = 1
 		while phase < 4:
 			if phase == 1:
 				angle = '240.000000'
@@ -251,29 +318,28 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss):
 			else:
 				angle = '0.000000'
 				amps = '169.120000'
-			if alreadySeen == False:
-				shape_name = 'newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape'
-				shape_data = dieselShapes.get('.' + str(phase),'')
-				shape_insert_list[i] = {
-						'!CMD': 'new',
-						'object': f'loadshape.{shape_name}',
-						'npts': f'{len(shape_data)}',
-						'interval': '1',
-						'useactual': 'no',
-						'mult': str(list(shape_data)).replace(' ','')
-					}
-				i+=1
-				gen_name = 'isource.isource_newdiesel' + str(buses[0]) + '_' + str(phase) + '_shape'
-				gen_insert_list[j] = {
-						'!CMD': 'new',
-						'object': f'{gen_name}',
-						'bus1': str(buses[0]) + '.' + str(phase),
-						'phases': '1',
-						'angle': str(angle),
-						'amps': str(amps),
-						'daily': 'newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape'
-					}
-				j+=1
+			shape_name = 'newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape'
+			shape_data = busShapes[bus][phase - 1]
+			shape_insert_list[i] = {
+					'!CMD': 'new',
+					'object': f'loadshape.{shape_name}',
+					'npts': f'{len(shape_data)}',
+					'interval': '1',
+					'useactual': 'no',
+					'mult': str(list(shape_data)).replace(' ','')
+				}
+			i+=1
+			gen_name = 'isource.isource_newdiesel' + str(buses[0]) + '_' + str(phase) + '_shape'
+			gen_insert_list[j] = {
+					'!CMD': 'new',
+					'object': f'{gen_name}',
+					'bus1': str(buses[0]) + '.' + str(phase),
+					'phases': '1',
+					'angle': str(angle),
+					'amps': str(amps),
+					'daily': 'newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape'
+				}
+			j+=1
 			gen_name = 'isource.isource_solar' + str(buses[0]) + '_' + str(phase) + '_shape'
 			gen_insert_list[j] = {
 					'!CMD': 'new',
@@ -297,7 +363,7 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss):
 			treeDSS.remove(thing)
 	for key in shape_insert_list:
 		convertedKey = collections.OrderedDict(shape_insert_list[key])
-		min_pos = min(shape_insert_list.keys())
+		min_pos = min(shape_insert_list.keys()) + 1
 		treeDSS.insert(min_pos, convertedKey)
 	max_pos = 100000000
 	for key in gen_insert_list:
@@ -315,7 +381,7 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss):
 
 	actions = {}
 	key = 0
-	max_pos = 1000000000
+	max_pos = 10*24
 	while key < len(bestReclosers):
 		recloserName = bestReclosers[key].get('name','')
 		open_line = 'open object=line.' + f'{recloserName}' + ' term=1'
@@ -323,22 +389,14 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss):
 		max_pos+=1
 		key+=1
 	# print(treeDSS)
-	filePrefix = 'timezcontrol'
+
 	opendss.newQstsPlot(FULL_NAME,
 		stepSizeInMinutes=60, 
 		numberOfSteps=24*20,
 		keepAllFiles=False,
-		actions=actions,
-		filePrefix=filePrefix
+		actions=actions
 	)
-	# Report on actions.
-	pp(actions)
-	# Served versus unserved loads.
-	voltage_data = pd.read_csv(f'{filePrefix}_load.csv')
-	voltage_data = voltage_data.filter(['Name','V1(PU)','V2(PU)','V3(PU)'])
-	voltage_data = voltage_data.set_index('Name').fillna(-1).sum(level='Name')
-	print('KEY: negative=no load on that phase, positive=powered, 0=unpowered')
-	print(voltage_data)
+
 	def make_chart(csvName, category_name, x, y_list):
 		gen_data = pd.read_csv(csvName)
 		data = []
@@ -358,36 +416,39 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss):
 		)
 		fig = py.graph_objs.Figure(data, layout)
 		py.offline.plot(fig, filename=f'{csvName}.plot.html')
-	make_chart(f'{filePrefix}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
-	make_chart(f'{filePrefix}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'])
-	make_chart(f'{filePrefix}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
-	make_chart(f'{filePrefix}_control.csv', 'Name', 'hour', ['Tap(pu)'])
+	
+	# make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
+	make_chart('timeseries_load.csv', 'Name', 'hour', ['V1','V2','V3'])
+	make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
+	make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'])
+
+	return(tree)
 
 microgrids = {
 	'm1': {
 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
 		'switch': '632633',
 		'gen_bus': '634',
-		'max_potential': '0.7'
+		'max_potential': '700'
 	},
 	'm2': {
 		'loads': ['675a_residential1','675b_residential1','675c_residential1'],
 		'switch': '671692',
 		'gen_bus': '675',
-		'max_potential': '0.65'
+		'max_potential': '900'
 	},
 	'm3': {
 		'loads': ['671_hospital','652_med_apartment'],
 		'switch': '671684',
 		'gen_bus': '684',
-		'max_potential': '0.9'
+		'max_potential': '650'
 	},
 	'm4': {
 		'loads': ['645_warehouse1','646_med_office'],
 		'switch': '632645',
 		'gen_bus': '646',
-		'max_potential': '0.8'
+		'max_potential': '800'
 	}
 }
 
-play('lehigh.dss.omd', 'lehigh_full.dss', None, microgrids, '670671', False)
+play('C:/Users/granb/microgridup-main/lehigh.dss.omd', 'C:/Users/granb/microgridup-main/lehigh_base_phased.dss', 'C:/Users/granb/omf/omf/scratch/RONM/tiedata.csv', None, microgrids, '670671', False, 400, 40)

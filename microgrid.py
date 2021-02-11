@@ -575,7 +575,8 @@ def make_chart(csvName, category_name, x, y_list):
 			trace = plotly.graph_objs.Scatter(
 				x = this_series[x],
 				y = this_series[y_name],
-				name = ob_name + '_' + y_name
+				name = ob_name + '_' + y_name,
+				hoverlabel = dict(namelength = -1)
 			)
 			data.append(trace)
 	layout = plotly.graph_objs.Layout(

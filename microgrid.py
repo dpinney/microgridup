@@ -89,6 +89,7 @@ REOPT_INPUTS = {
 	"windCost" : "4989",
 	"batteryPowerCost" : "840",
 	"batteryCapacityCost" : "420",
+	"dieselGenCost": "500",
 	"solarMin": 0,
 	"windMin": 0,
 	"batteryPowerMin": 0,
@@ -573,8 +574,8 @@ def make_chart(csvName, category_name, x, y_list, year):
 		for y_name in y_list:
 			this_series = gen_data[gen_data[category_name] == ob_name]
 			trace = plotly.graph_objs.Scatter(
-				x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly if needed
-				y = round(this_series[y_name],4),
+				x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
+				y = round(this_series[y_name],3),
 				name = ob_name + '_' + y_name,
 				hoverlabel = dict(namelength = -1)
 			)
@@ -586,7 +587,8 @@ def make_chart(csvName, category_name, x, y_list, year):
 	)
 	fig = plotly.graph_objs.Figure(data, layout)
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
-make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], "2017") #TODO: pass year through microgridDesign to allOutputData.json after refactor and pull the year from there
+	
+make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year']) #TODO: pull year using reopt_out.get(f'year{mg_num}', 0.0) from allOutputData.json after refactor
 make_chart('timeseries_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'])
 make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'])
 make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'])

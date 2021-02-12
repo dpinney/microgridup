@@ -15,7 +15,7 @@ import re
 import math
 import random
 
-#Input data.
+# Input data.
 # BASE_NAME = 'lehigh_base_phased.dss'
 # LOAD_NAME = 'lehigh_load.csv'
 # REOPT_INPUTS = {
@@ -46,7 +46,10 @@ import random
 # 	"minGenLoading": "0.3",
 # 	"batteryKwExisting": 0,
 # 	"batteryKwhExisting": 0,
-# 	"windExisting": 0
+# 	"windExisting": 0,
+# 	"value_of_lost_load": "100",
+# 	"solarCanCurtail": True,
+# 	"solarCanExport": True
 # }
 # microgrids = {
 	# 'm1': {
@@ -107,7 +110,10 @@ REOPT_INPUTS = {
 	"minGenLoading": "0.3",
 	"batteryKwExisting": 0,
 	"batteryKwhExisting": 0,
-	"windExisting": 0
+	"windExisting": 0,
+	"value_of_lost_load": "100",
+	"solarCanCurtail": True,
+	"solarCanExport": True
 }
 # gen_obs_existing include all generator objects already in the microgrid, preselected from base.dss
 microgrids = {
@@ -587,7 +593,7 @@ def make_chart(csvName, category_name, x, y_list, year):
 	)
 	fig = plotly.graph_objs.Figure(data, layout)
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
-	
+
 make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year']) #TODO: pull year using reopt_out.get(f'year{mg_num}', 0.0) from allOutputData.json after refactor
 make_chart('timeseries_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'])
 make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'])

@@ -566,15 +566,15 @@ def microgrid_report(inputName, outputCsvName):
 microgrid_report('/allOutputData.json','microgrid_report.csv') #TO DO: output as json or dict and convert report to list info in columns to reduce clutter in html output
 
 # Charting outputs.
-def make_chart(csvName, category_name, x, y_list):
+def make_chart(csvName, category_name, x, y_list, year):
 	gen_data = pd.read_csv(csvName)
-	data = []
+	data = [] 
 	for ob_name in set(gen_data[category_name]):
 		for y_name in y_list:
 			this_series = gen_data[gen_data[category_name] == ob_name]
 			trace = plotly.graph_objs.Scatter(
-				x = this_series[x],
-				y = this_series[y_name],
+				x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly if needed
+				y = round(this_series[y_name],4),
 				name = ob_name + '_' + y_name,
 				hoverlabel = dict(namelength = -1)
 			)
@@ -586,10 +586,10 @@ def make_chart(csvName, category_name, x, y_list):
 	)
 	fig = plotly.graph_objs.Figure(data, layout)
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
-make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
-make_chart('timeseries_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'])
-make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
-make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'])
+make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], "2017") #TODO: pass year through microgridDesign to allOutputData.json after refactor and pull the year from there
+make_chart('timeseries_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'])
+make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'])
+make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'])
 
 #TODO: enable this when we're good with control.
 #import opendss_playground

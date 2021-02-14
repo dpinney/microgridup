@@ -6,37 +6,15 @@
 </head>
 <body>
 	<pre>INPUTS {{inputs}}</pre>
-<!--	<pre>{{summary}}</pre>
-	<pre>Overview of microgrids</pre>
-	<table style="width:100%">
-	{% for row in summary %}
-	<tr>
-	    <td>{{ row.0 }}</td><td>{{ row.1 }}</td><td>{{ row.2 }}</td><td>{{ row.3 }}</td><td>{{ row.4 }}</td><td>{{ row.5 }}</td><td>{{ row.6 }}</td><td>{{ row.7 }}</td><td>{{ row.8 }}</td><td>{{ row.9 }}</td><td>{{ row.10 }}</td><td>{{ row.11 }}</td><td>{{ row.12 }}</td><td>{{ row.13 }}</td><td>{{ row.14 }}</td><td>{{ row.15 }}</td><td>{{ row.16 }}</td><td>{{ row.17 }}</td><td>{{ row.18 }}</td><td>{{ row.19 }}</td><td>{{ row.20 }}</td>
-	</tr>
-	{% endfor %}
+	<!-- formatted below for a dict of lists -->
+	<pre>Overview of Microgrids</pre>
+	<table>
+	 	{% for k,v in summary.items() %}
+		    <tr>
+		      <td>{{ k,v }}</td>
+		    </tr>
+  		{% endfor %}
 	</table>
-
-	--><pre>Overview of Microgrids</pre>
-	<table style="width:100%">
-		<!-- table header -->
-	{% if summary %}
-	<tr>
-		{% for key in summary[0] %}
-		<th> {{ key }} </th>
- 		{% endfor %}
-	</tr>
-	{% endif %}
-
-	<!-- table rows -->
-	{% for dict_item in summary %}
-	<tr>
- 		{% for value in dict_item.values() %}
- 		<td> {{ value }} </td>
- 		{% endfor %}
-	</tr>
-	{% endfor %}
-	</table>
-
 	<iframe src="lehigh_map/geoJsonMap_offline.html"></iframe>
 	<iframe src="lehigh.oneline.html"></iframe>
 	<iframe src="timeseries_gen.csv.plot.html"></iframe>

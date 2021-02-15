@@ -441,6 +441,7 @@ def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, b
 		filePrefix=FPREFIX
 	)
 
+	# TODO: only have one make_chart function.
 	def make_chart(csvName, category_name, x, y_list):
 		gen_data = pd.read_csv(csvName)
 		data = []
@@ -459,9 +460,9 @@ def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, b
 			yaxis = dict(title = str(y_list))
 		)
 		fig = py.graph_objs.Figure(data, layout)
-		py.offline.plot(fig, filename=f'{csvName}.plot.html')
+		py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 	
-	# make_chart('timezcontrol_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
+	# make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
 	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1','V2','V3'])
 	make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
 	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'])

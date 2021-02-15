@@ -432,11 +432,13 @@ def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, b
 		key+=1
 	# print(treeDSS)
 
+	FPREFIX = 'timezcontrol'
 	opendss.newQstsPlot(FULL_NAME,
 		stepSizeInMinutes=60, 
 		numberOfSteps=180,
 		keepAllFiles=False,
-		actions=actions
+		actions=actions,
+		filePrefix=FPREFIX
 	)
 
 	def make_chart(csvName, category_name, x, y_list):
@@ -459,11 +461,10 @@ def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, b
 		fig = py.graph_objs.Figure(data, layout)
 		py.offline.plot(fig, filename=f'{csvName}.plot.html')
 	
-	# make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
-	make_chart('timeseries_load.csv', 'Name', 'hour', ['V1','V2','V3'])
-	make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
-	make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'])
-
+	# make_chart('timezcontrol_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
+	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1','V2','V3'])
+	make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
+	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'])
 	return(tree)
 
 microgrids = {
@@ -493,4 +494,4 @@ microgrids = {
 	}
 }
 
-play('C:/Users/granb/microgridup-main/lehigh.dss.omd', 'C:/Users/granb/microgridup-main/lehigh_base_phased_playground.dss', 'C:/Users/granb/omf/omf/scratch/RONM/tiedata.csv', None, microgrids, '670671', False, 120, 30)
+play('./lehigh.dss.omd', './lehigh_base_phased_playground.dss', './tiedata.csv', None, microgrids, '670671', False, 120, 30)

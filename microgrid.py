@@ -516,9 +516,9 @@ make_chart('timeseries_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], 
 make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'])
 make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'])
 
-#TODO: enable this when we're good with control.
-#import opendss_playground
-#opendss_playground.play('lehigh.dss.omd', 'lehigh_full.dss', None, microgrids, '670671', False)
+# Perform control sim.
+import opendss_playground
+opendss_playground.play('./lehigh.dss.omd', './lehigh_base_phased_playground.dss', './tiedata.csv', None, opendss_playground.microgrids, '670671', False, 120, 30) #TODO: unify the microgrids data structure.
 
 # Generate a report on each microgrid
 def microgrid_report_csv(inputName, outputCsvName):

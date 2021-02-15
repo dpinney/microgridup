@@ -49,6 +49,7 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 	# initialize the list of ties closed and reclosers opened
 	bestTies = []
 	bestReclosers = []
+	actionsDict = {}
 
 	buses = []
 	for key in microgrids.keys():
@@ -58,36 +59,57 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 	# 2) get a list of loads associated with each microgrid component
 	# and create a loadshape containing all said loads
 	if switchingTime <= lengthOfOutage:
-		totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, 0, None, None, None)
-		tree = solveSystem(busShapes, microgrids, tree, pathToDss, badBuses, bestReclosers)
-	# # read in the set of tie lines in the system as a dataframe
-	# tieLines = pd.read_csv(pathToTieLines)
+		totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, 0, None, None, None, 0)
+		key = 0
+		while key < len(bestReclosers):
+			recloserName = bestReclosers[key].get('name','')
+			print(recloserName)
+			lineAction = 'open'
+			actionsDict[recloserName] = {'timePassed':timePassed, 'lineAction':lineAction}
+			timePassed+=1
+			key+=1
 
-	# #start the restoration piece of the algorithm
-	# index = 0
-	# terminate = False
-	# goTo4 = False
-	# goTo3 = False
-	# goTo2 = True
-	# while (terminate == False) and ((timePassed+switchingTime) < lengthOfOutage):
-	# 	# Step 2
-	# 	if goTo2 == True:
-	# 		goTo2 = False
-	# 		goTo3 = True
-	# 		unpowered, powered, potentiallyViable = flisr.listPotentiallyViable(tree, tieLines, workDir)
-	# 		print(potentiallyViable)
-	# 	# Step 3
-	# 	if goTo3 == True:
-	# 		goTo3 = False
-	# 		goTo4 = True
-	# 		openSwitch = flisr.chooseOpenSwitch(potentiallyViable)
-	# 	# Step 4
-	# 	if goTo4 == True:
-	# 		goTo4 = False
-	# 		tree, potentiallyViable, tieLines, bestTies, bestReclosers, goTo2, goTo3, terminate, index = flisr.addTieLines(tree, faultedNode, potentiallyViable, unpowered, powered, openSwitch, tieLines, bestTies, bestReclosers, workDir, goTo2, goTo3, terminate, index, radial)
-	# 		if goTo2 == True:
-	# 			totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad)
+	# read in the set of tie lines in the system as a dataframe
+	tieLines = pd.read_csv(pathToTieLines)
 
+	#start the restoration piece of the algorithm
+	index = 0
+	terminate = False
+	goTo4 = False
+	goTo3 = False
+	goTo2 = True
+	while (terminate == False) and ((timePassed+switchingTime) < lengthOfOutage):
+		# Step 2
+		if goTo2 == True:
+			goTo2 = False
+			goTo3 = True
+			unpowered, powered, potentiallyViable = flisr.listPotentiallyViable(tree, tieLines, workDir)
+			print(potentiallyViable)
+		# Step 3
+		if goTo3 == True:
+			goTo3 = False
+			goTo4 = True
+			openSwitch = flisr.chooseOpenSwitch(potentiallyViable)
+		# Step 4
+		if goTo4 == True:
+			goTo4 = False
+			tree, potentiallyViable, tieLines, bestTies, bestReclosers, goTo2, goTo3, terminate, index = flisr.addTieLines(tree, faultedNode, potentiallyViable, unpowered, powered, openSwitch, tieLines, bestTies, bestReclosers, workDir, goTo2, goTo3, terminate, index, radial)
+			if goTo2 == True:
+				totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad, totalTime)
+				key = 0
+				while key < len(bestReclosers):
+					recloserName = bestReclosers[key].get('name','')
+					if recloserName not in actionsDict.keys():
+						lineAction = 'open'
+						actionsDict[recloserName] = {'timePassed':timePassed, 'lineAction':lineAction}
+					key+=1
+				key = 0
+				while key < len(bestTies):
+					tieName = bestTies[key].get('name','')
+					if tieName not in actionsDict.keys():
+						lineAction = 'close'
+						actionsDict[tieName] = {'timePassed':timePassed, 'lineAction':lineAction}
+					key+=1
 	# when the outage is over, switch back to the main sourcebus
 	buses = []
 	sortvals = {}
@@ -104,12 +126,16 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 	while len(buses) > 0:
 		phase = 0
 		while phase < 3:
-			del(busShapes[buses[0]][phase][lengthOfOutage:])
-			busShapes[buses[0]][phase] = busShapes[buses[0]][phase] + listOfZeroes 
+			if buses[0] in busShapes.keys():
+				if busShapes[buses[0]][phase]:
+					busShapes[buses[0]][phase] = busShapes[buses[0]][phase][0 : lengthOfOutage]
+					busShapes[buses[0]][phase] = busShapes[buses[0]][phase] + listOfZeroes
 			phase+=1
 		del(buses[0])
 
-def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad):
+	tree = solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, bestReclosers, bestTies, lengthOfOutage)
+
+def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad, totalTime):
 	buses = []
 	sortvals = {}
 	for key in microgrids:
@@ -266,25 +292,28 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 		else:
 			phase = 0
 			while phase < 3:
-				del(busShapes[buses[0]][phase][timePassed:])
-				del(leftOverBusShapes[buses[0]][phase][timePassed:])
-				del(leftOverLoad[buses[0]][phase][timePassed:])
-				del(dieselShapesNew.get('.' + str(phase + 1),'')[:timePassed])
-				del(leftOverShapes.get('.' + str(phase + 1),'')[:timePassed])
-				del(leftOverHere.get('.' + str(phase + 1),'')[:timePassed])
-				busShapes[buses[0]][phase] = busShapes[buses[0]][phase] + dieselShapesNew.get('.' + str(phase + 1),'')
-				leftOverBusShapes[buses[0]][phase] = leftOverBusShapes[buses[0]][phase] + leftOverShapes.get('.' + str(phase + 1),'')
-				leftOverLoad[buses[0]][phase] = leftOverLoad[buses[0]][phase] + leftOverHere.get('.' + str(phase + 1),'')
+				if buses[0] in busShapes.keys():
+					if busShapes[buses[0]][phase]:
+						busShapes[buses[0]][phase] = busShapes[buses[0]][phase][0 : timePassed]
+						leftOverBusShapes[buses[0]][phase] = leftOverBusShapes[buses[0]][phase][0 : timePassed]
+						leftOverLoad[buses[0]][phase] = leftOverLoad[buses[0]][phase][0 : timePassed]
+						dieselShapesNew['.' + str(phase + 1)] = dieselShapesNew.get('.' + str(phase + 1),'')[timePassed : totalTime]
+						leftOverShapes['.' + str(phase + 1)] = leftOverShapes.get('.' + str(phase + 1),'')[timePassed : totalTime]
+						leftOverHere['.' + str(phase + 1)] = leftOverHere.get('.' + str(phase + 1),'')[timePassed : totalTime]
+						busShapes[buses[0]][phase] = busShapes[buses[0]][phase] + dieselShapesNew.get('.' + str(phase + 1),'')
+						leftOverBusShapes[buses[0]][phase] = leftOverBusShapes[buses[0]][phase] + leftOverShapes.get('.' + str(phase + 1),'')
+						leftOverLoad[buses[0]][phase] = leftOverLoad[buses[0]][phase] + leftOverHere.get('.' + str(phase + 1),'')
 				phase+=1
 		subtrees[bus] = subtree
-		if len(busShapes[buses[0]][0]) > totalTime:
-			totalTime = len(busShapes[buses[0]][0])
+		if buses[0] in busShapes.keys():
+			if len(busShapes[buses[0]][0]) > totalTime:
+				totalTime = len(busShapes[buses[0]][0])
 		del(buses[0])
 	timePassed = timePassed + switchingTime
 
 	return totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad
 
-def solveSystem(busShapes, microgrids, tree, pathToDss, badBuses, bestReclosers):
+def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, bestReclosers, bestTies, lengthOfOutage):
 	# 4) add diesel generation to the opendss formatted system and solve
 	buses = []
 	sortvals = {}
@@ -309,48 +338,50 @@ def solveSystem(busShapes, microgrids, tree, pathToDss, badBuses, bestReclosers)
 			continue
 		phase = 1
 		while phase < 4:
-			if phase == 1:
-				angle = '240.000000'
-				amps = '219.969000'
-			elif phase == 2:
-				angle = '120.000000'
-				amps = '65.000000'
-			else:
-				angle = '0.000000'
-				amps = '169.120000'
-			shape_name = 'newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape'
-			shape_data = busShapes[bus][phase - 1]
-			shape_insert_list[i] = {
-					'!CMD': 'new',
-					'object': f'loadshape.{shape_name}',
-					'npts': f'{len(shape_data)}',
-					'interval': '1',
-					'useactual': 'no',
-					'mult': str(list(shape_data)).replace(' ','')
-				}
-			i+=1
-			gen_name = 'isource.isource_newdiesel' + str(buses[0]) + '_' + str(phase) + '_shape'
-			gen_insert_list[j] = {
-					'!CMD': 'new',
-					'object': f'{gen_name}',
-					'bus1': str(buses[0]) + '.' + str(phase),
-					'phases': '1',
-					'angle': str(angle),
-					'amps': str(amps),
-					'daily': 'newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape'
-				}
-			j+=1
-			gen_name = 'isource.isource_solar' + str(buses[0]) + '_' + str(phase) + '_shape'
-			gen_insert_list[j] = {
-					'!CMD': 'new',
-					'object': f'{gen_name}',
-					'bus1': str(buses[0]) + '.' + str(phase),
-					'phases': '1',
-					'angle': str(angle),
-					'amps': str(amps),
-					'daily': 'solar_' + str(buses[0]) + '_shape'
-				}
-			j+=1
+			if buses[0] in busShapes.keys():
+				if busShapes[buses[0]][phase-1]:
+					if phase == 1:
+						angle = '240.000000'
+						amps = '219.969000'
+					elif phase == 2:
+						angle = '120.000000'
+						amps = '65.000000'
+					else:
+						angle = '0.000000'
+						amps = '169.120000'
+					shape_name = 'newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape'
+					shape_data = busShapes[bus][phase - 1]
+					shape_insert_list[i] = {
+							'!CMD': 'new',
+							'object': f'loadshape.{shape_name}',
+							'npts': f'{len(shape_data)}',
+							'interval': '1',
+							'useactual': 'no',
+							'mult': str(list(shape_data)).replace(' ','')
+						}
+					i+=1
+					gen_name = 'isource.isource_newdiesel' + str(buses[0]) + '_' + str(phase) + '_shape'
+					gen_insert_list[j] = {
+							'!CMD': 'new',
+							'object': f'{gen_name}',
+							'bus1': str(buses[0]) + '.' + str(phase),
+							'phases': '1',
+							'angle': str(angle),
+							'amps': str(amps),
+							'daily': 'newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape'
+						}
+					j+=1
+					gen_name = 'isource.isource_solar' + str(buses[0]) + '_' + str(phase) + '_shape'
+					gen_insert_list[j] = {
+							'!CMD': 'new',
+							'object': f'{gen_name}',
+							'bus1': str(buses[0]) + '.' + str(phase),
+							'phases': '1',
+							'angle': str(angle),
+							'amps': str(amps),
+							'daily': 'solar_' + str(buses[0]) + '_shape'
+						}
+					j+=1
 			phase += 1
 		del (buses[0])
 
@@ -380,19 +411,30 @@ def solveSystem(busShapes, microgrids, tree, pathToDss, badBuses, bestReclosers)
 	# print(treeDSS)
 
 	actions = {}
+	for key in actionsDict:
+		line = str(actionsDict[key].get('lineAction','')) + ' object=line.' + str(key) + ' term=1'
+		actions[int(actionsDict[key].get('timePassed',''))] = line
+	
 	key = 0
-	max_pos = 10*24
+	max_pos = lengthOfOutage
 	while key < len(bestReclosers):
 		recloserName = bestReclosers[key].get('name','')
-		open_line = 'open object=line.' + f'{recloserName}' + ' term=1'
-		actions[max_pos] = open_line
+		line = 'close object=line.' + f'{recloserName}' + ' term=1'
+		actions[max_pos] = line
+		max_pos+=1
+		key+=1
+	key = 0
+	while key < len(bestTies):
+		tieName = bestTies[key].get('name','')
+		line = 'open object=line.' + f'{tieName}' + ' term=1'
+		actions[max_pos] = line
 		max_pos+=1
 		key+=1
 	# print(treeDSS)
 
 	opendss.newQstsPlot(FULL_NAME,
 		stepSizeInMinutes=60, 
-		numberOfSteps=24*20,
+		numberOfSteps=180,
 		keepAllFiles=False,
 		actions=actions
 	)
@@ -411,7 +453,7 @@ def solveSystem(busShapes, microgrids, tree, pathToDss, badBuses, bestReclosers)
 				data.append(trace)
 		layout = py.graph_objs.Layout(
 			title = f'{csvName} Output',
-			xaxis = dict(title = x),
+			xaxis = dict(title = 'hour'),
 			yaxis = dict(title = str(y_list))
 		)
 		fig = py.graph_objs.Figure(data, layout)
@@ -451,4 +493,4 @@ microgrids = {
 	}
 }
 
-play('C:/Users/granb/microgridup-main/lehigh.dss.omd', 'C:/Users/granb/microgridup-main/lehigh_base_phased.dss', 'C:/Users/granb/omf/omf/scratch/RONM/tiedata.csv', None, microgrids, '670671', False, 400, 40)
+play('C:/Users/granb/microgridup-main/lehigh.dss.omd', 'C:/Users/granb/microgridup-main/lehigh_base_phased_playground.dss', 'C:/Users/granb/omf/omf/scratch/RONM/tiedata.csv', None, microgrids, '670671', False, 120, 30)

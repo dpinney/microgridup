@@ -33,26 +33,26 @@ new object=linecode.mtx606 nphases=3 units=mi rmatrix=[0.791721|0.318476,0.78164
 new object=linecode.mtx607 nphases=1 basefreq=60 rmatrix=[1.3425] xmatrix=[0.5124] cmatrix=[236] units=mi 
 
 !load definitions
-new object=load.671_hospital bus1=671.1.2.3 phases=3 conn=delta model=1 kv=2.4 kw=1155 kvar=660
-new object=load.634a_supermarket bus1=634.1 phases=1 conn=wye model=1 kv=0.277 kw=160 kvar=110
-new object=load.634b_supermarket bus1=634.1 phases=1 conn=wye model=1 kv=0.277 kw=120 kvar=90
-new object=load.634c_supermarket bus1=634.1 phases=1 conn=wye model=1 kv=0.277 kw=120 kvar=90
-new object=load.645_warehouse1 bus1=645.2 phases=1 conn=wye model=1 kv=2.4 kw=170 kvar=125
-new object=load.646_med_office bus1=646.2 phases=1 conn=delta model=2 kv=2.4 kw=230 kvar=132
+new object=load.671_command_center bus1=671.1.2.3 phases=3 conn=delta model=1 kv=2.4 kw=1155 kvar=660
+new object=load.634a_data_center bus1=634.1 phases=1 conn=wye model=1 kv=0.277 kw=160 kvar=110
+new object=load.634b_radar bus1=634.1 phases=1 conn=wye model=1 kv=0.277 kw=120 kvar=90
+new object=load.634c_atc_tower bus1=634.1 phases=1 conn=wye model=1 kv=0.277 kw=120 kvar=90
+new object=load.645_hangar bus1=645.2 phases=1 conn=wye model=1 kv=2.4 kw=170 kvar=125
+new object=load.646_office bus1=646.2 phases=1 conn=delta model=2 kv=2.4 kw=230 kvar=132
 new object=load.692_warehouse2 bus1=692.1.2.3 phases=3 conn=delta model=5 kv=2.4 kw=170 kvar=151 
 new object=load.675a_hospital bus1=675.1.2.3 phases=3 conn=wye model=1 kv=2.4 kw=485 kvar=190
 new object=load.675b_residential1 bus1=675.1.2.3 phases=3 conn=wye model=1 kv=2.4 kw=68 kvar=60
 new object=load.675c_residential1 bus1=675.1.2.3 phases=3 conn=wye model=1 kv=2.4 kw=290 kvar=212
-new object=load.611_hotel bus1=611.3 phases=1 conn=wye model=5 kv=2.4 kw=170 kvar=80
-new object=load.652_med_apartment bus1=652.3 phases=1 conn=wye model=2 kv=2.4 kw=128 kvar=86
+new object=load.611_runway bus1=611.3 phases=1 conn=wye model=5 kv=2.4 kw=170 kvar=80
+new object=load.652_residential bus1=652.3 phases=1 conn=wye model=2 kv=2.4 kw=128 kvar=86
 new object=load.670a_residential2 bus1=670.1 phases=1 conn=wye model=1 kv=2.4 kw=17 kvar=10
 new object=load.670b_residential2 bus1=670.2 phases=1 conn=wye model=1 kv=2.4 kw=66 kvar=38
 new object=load.670c_residential2 bus1=670.3 phases=1 conn=wye model=1 kv=2.4 kw=117 kvar=68
 
 ! microgrid m1 generator definitions
-new object=generator.solar_634_existing bus1=634.1.2.3 kv=0.277 kw=440 pf=1
-! new object=generator.wind_634_existing bus1=634.1.2.3 kv=0.277 kw=300 pf=1
-! new object=generator.diesel_634_existing bus1=634.1.2.3 kw=165 pf=1 kv=0.277 xdp=0.27 xdpp=0.2 h=2 conn=delta
+new object=generator.solar_634_existing bus1=634.1 kv=0.277 kw=440 pf=1
+! new object=generator.wind_634_existing bus1=634.1 kv=0.277 kw=300 pf=1
+! new object=generator.diesel_634_existing bus1=634.1 kw=165 pf=1 kv=0.277 xdp=0.27 xdpp=0.2 h=2 conn=delta
 ! new object=storage.battery_634_existing phases=3 bus1=634.1.2.3 kv=0.277 kwrated=79 kwhstored=307 kwhrated=307 dispmode=follow %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
 
 ! microgrid m2 generator definitions

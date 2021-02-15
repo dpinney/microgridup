@@ -29,6 +29,7 @@ import random
 # 	"windCost" : "4989",
 # 	"batteryPowerCost" : "840",
 # 	"batteryCapacityCost" : "420",
+# 	"dieselGenCost": "500",
 # 	"solarMin": 0,
 # 	"windMin": 0,
 # 	"batteryPowerMin": 0,
@@ -40,7 +41,7 @@ import random
 # 	"solarExisting": 0,
 # 	"criticalLoadFactor": "1",
 # 	"outage_start_hour": "200",
-# 	"outageDuration": "96",
+# 	"outageDuration": "48",
 # 	"fuelAvailable": "50000",
 # 	"genExisting": 0,
 # 	"minGenLoading": "0.3",
@@ -53,28 +54,28 @@ import random
 # }
 # microgrids = {
 	# 'm1': {
-	# 	'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
+	# 	'loads': ['634a_data_center','634b_radar','634c_atc_tower'],
 	# 	'switch': '632633',
 	# 	'gen_bus': '634',
-	# 	'gen_obs_existing': ['solar_634_existing', 'wind_634_existing', 'diesel_634_existing', 'battery_634_existing']
+	# 	'gen_obs_existing': ['solar_634_existing']
 	# },
 	# 'm2': {
 	# 	'loads': ['675a_hospital','675b_residential1','675c_residential1'],
 	# 	'switch': '671692',
 	# 	'gen_bus': '675',
-	# 	'gen_obs_existing': ['solar_675_existing', 'diesel_675_existing', 'battery_675_existing']
+	# 	'gen_obs_existing': []
 	# },
 	# 'm3': {
-	# 	'loads': ['671_hospital','652_med_apartment'],
+	# 	'loads': ['671_command_center','652_residential'],
 	# 	'switch': '671684',
 	# 	'gen_bus': '684',
-	# 	'gen_obs_existing': ['solar_684_existing', 'wind_684_existing', 'diesel_684_existing', 'battery_684_existing']
+	# 	'gen_obs_existing': ['diesel_684_existing']
 	# },
 	# 'm4': {
-	# 	'loads': ['645_warehouse1','646_med_office'],
+	# 	'loads': ['645_hangar','646_office'],
 	# 	'switch': '632645',
 	# 	'gen_bus': '646',
-	# 	'gen_obs_existing': ['solar_646_existing', 'diesel_646_existing', 'battery_646_existing']
+	# 	'gen_obs_existing': []
 	# }
 # }
 
@@ -104,7 +105,7 @@ REOPT_INPUTS = {
 	"solarExisting": 0,
 	"criticalLoadFactor": "1",
 	"outage_start_hour": "200",
-	"outageDuration": "96",
+	"outageDuration": "48",
 	"fuelAvailable": "50000",
 	"genExisting": 0,
 	"minGenLoading": "0.3",
@@ -118,7 +119,7 @@ REOPT_INPUTS = {
 # gen_obs_existing include all generator objects already in the microgrid, preselected from base.dss
 microgrids = {
 	'm1': {
-		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket','675a_hospital','675b_residential1','675c_residential1','671_hospital','652_med_apartment','645_warehouse1','646_med_office'],
+		'loads': ['634a_data_center','634b_radar','634c_atc_tower','675a_hospital','675b_residential1','675c_residential1','671_command_center','652_residential','645_hangar','646_office'],
 		'switch': '650632',
 		'gen_bus': '670',
 		'gen_obs_existing': ['solar_634_existing', 'diesel_684_existing']
@@ -530,7 +531,8 @@ def microgrid_report_csv(inputName, outputCsvName):
 							"Diesel Fuel Used During Outage (gal)", "Existing Solar (kW)", "Recommended New Solar (kW)", 
 							"Existing Battery Power (kW)", "Recommended New Battery Power (kW)", "Existing Battery Capacity (kWh)", 
 							"Recommended New Battery Capacity (kWh)", "Existing Wind (kW)", "Recommended New Wind (kW)", 
-							"NPV ($)", "CapEx ($)", "CapEx after Incentives ($)", "Average Outage Survived (h)"])
+							"Total Generation on Grid (kW)", "NPV ($)", "CapEx ($)", "CapEx after Incentives ($)", 
+							"Average Outage Survived (h)"])
 
 		for i, mg_ob in enumerate(microgrids.values()):
 			mg_num = i + 1
@@ -544,11 +546,6 @@ def microgrid_report_csv(inputName, outputCsvName):
 			avg_daytime_load = np.average(np.average(daytime_kwh, axis=1))
 			max_load = max(load)
 			diesel_used_gal =reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0)
-			# diesel_size = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
-			# solar_size = reopt_out.get(f'sizePV{mg_num}', 0.0)
-			# battery_cap = reopt_out.get(f'capacityBattery{mg_num}', 0.0)
-			# battery_pow = reopt_out.get(f'powerBattery{mg_num}', 0.0)
-			# wind_size = reopt_out.get(f'sizeWind{mg_num}', 0.0)
 
 			#TO DO: FIX THE TABBING ERROR IN THIS CODE SO IT PULLS THE VARIABELS FROM THIS LOOP INTO THE SUMMARY REPORT
 			solar_size_total = reopt_out.get(f'sizePV{mg_num}', 0.0)
@@ -577,6 +574,8 @@ def microgrid_report_csv(inputName, outputCsvName):
 			else:
 				battery_pow_new = 0
 
+			total_gen = diesel_size_total + solar_size_total + battery_pow_total + wind_size_total
+
 			npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
 			cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
 			cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
@@ -594,11 +593,14 @@ def microgrid_report_csv(inputName, outputCsvName):
 									+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
 									+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
 			ave_outage = reopt_out.get(f'avgOutage{mg_num}', 0.0)
+			
 			row =[mg_num, gen_bus_name, round(min_load,0), round(ave_load,0), round(avg_daytime_load,1), round(max_load,0),
 			round(diesel_size_existing,1), round(diesel_size_new,1), round(diesel_used_gal, 0), round(solar_size_existing,1), 
 			round(solar_size_new,1), round(battery_pow_existing,1), round(battery_pow_new,1), round(battery_cap_existing,1), 
-			round(battery_cap_new,1), round(wind_size_existing,1), round(wind_size_new,1), int(round(npv_existing_gen_adj)),
-			int(round(cap_ex_existing_gen_adj)), int(round(cap_ex_after_incentives_existing_gen_adj)), round(ave_outage,1)]
+			round(battery_cap_new,1), round(wind_size_existing,1), round(wind_size_new,1), round(total_gen,1),
+			int(round(npv_existing_gen_adj)), int(round(cap_ex_existing_gen_adj)), int(round(cap_ex_after_incentives_existing_gen_adj)), 
+			round(ave_outage,1)]
+			
 			writer.writerow(row)
 
 microgrid_report_csv('/allOutputData.json','microgrid_report.csv') #TO DO: output as json or dict and convert report to list info in columns to reduce clutter in html output
@@ -658,6 +660,8 @@ def microgrid_report_list_of_dicts(inputName):
 		else:
 			mg_dict["Recommended New Wind (kW)"] = 0.0
 
+		total_gen = diesel_size_total + solar_size_total + battery_pow_total + wind_size_total
+		mg_dict["Total Generation on Grid (kW)"] = round(total_gen,0)
 
 		npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
 		cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives

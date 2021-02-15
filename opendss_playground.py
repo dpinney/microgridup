@@ -495,4 +495,5 @@ microgrids = {
 	}
 }
 
-play('./lehigh.dss.omd', './lehigh_base_phased_playground.dss', './tiedata.csv', None, microgrids, '670671', False, 120, 30)
+if __name__ == '__main__':
+	play('./lehigh.dss.omd', './lehigh_base_phased_playground.dss', './tiedata.csv', None, microgrids, '670671', False, 120, 30)

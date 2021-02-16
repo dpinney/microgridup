@@ -2,18 +2,21 @@
 <html>
 <head>
 	<title>This report was made by {{x}} and {{y}}.</title>
-	<style type="text/css">iframe {width:100%;height:600px}</style>
+	<style type="text/css">iframe {width:95%;height:600px}</style>
 </head>
 <body>
 	<pre>INPUTS {{inputs}}</pre>
 	<!-- formatted below for a dict of lists -->
 	<pre>Overview of Microgrids</pre>
-	<table>
-	 	{% for k,v in summary.items() %}
-		    <tr>
-		      <td>{{ k,v }}</td>
-		    </tr>
-  		{% endfor %}
+	<table style="">
+		{% for k,v in summary.items() %}
+			<tr>
+				<td>{{ k }}</td>
+				{% for v_i in v %}
+				<td style="text-align:right">{{ v_i }}</td>
+				{% endfor %}
+			</tr>
+		{% endfor %}
 	</table>
 	<iframe src="lehigh_map/geoJsonMap_offline.html"></iframe>
 	<iframe src="lehigh.oneline.html"></iframe>

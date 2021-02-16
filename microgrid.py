@@ -53,30 +53,30 @@ import random
 # 	"solarCanExport": True
 # }
 # microgrids = {
-	# 'm1': {
-	# 	'loads': ['634a_data_center','634b_radar','634c_atc_tower'],
-	# 	'switch': '632633',
-	# 	'gen_bus': '634',
-	# 	'gen_obs_existing': ['solar_634_existing']
-	# },
-	# 'm2': {
-	# 	'loads': ['675a_hospital','675b_residential1','675c_residential1'],
-	# 	'switch': '671692',
-	# 	'gen_bus': '675',
-	# 	'gen_obs_existing': []
-	# },
-	# 'm3': {
-	# 	'loads': ['671_command_center','652_residential'],
-	# 	'switch': '671684',
-	# 	'gen_bus': '684',
-	# 	'gen_obs_existing': ['diesel_684_existing']
-	# },
-	# 'm4': {
-	# 	'loads': ['645_hangar','646_office'],
-	# 	'switch': '632645',
-	# 	'gen_bus': '646',
-	# 	'gen_obs_existing': []
-	# }
+# 	'm1': {
+# 		'loads': ['634a_data_center','634b_radar','634c_atc_tower'],
+# 		'switch': '632633',
+# 		'gen_bus': '634',
+# 		'gen_obs_existing': ['solar_634_existing']
+# 	},
+# 	'm2': {
+# 		'loads': ['675a_hospital','675b_residential1','675c_residential1'],
+# 		'switch': '671692',
+# 		'gen_bus': '675',
+# 		'gen_obs_existing': []
+# 	},
+# 	'm3': {
+# 		'loads': ['671_command_center','652_residential'],
+# 		'switch': '671684',
+# 		'gen_bus': '684',
+# 		'gen_obs_existing': ['diesel_684_existing']
+# 	},
+# 	'm4': {
+# 		'loads': ['645_hangar','646_office'],
+# 		'switch': '632645',
+# 		'gen_bus': '646',
+# 		'gen_obs_existing': []
+# 	}
 # }
 
 #Second input set.
@@ -498,7 +498,7 @@ def make_chart(csvName, category_name, x, y_list, year):
 			this_series = gen_data[gen_data[category_name] == ob_name]
 			trace = plotly.graph_objs.Scatter(
 				x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
-				y = round(this_series[y_name],3),
+				y = this_series[y_name], # rounding to 3 decimals here would be ideal, but it doing so does not accept Inf values 
 				name = ob_name + '_' + y_name,
 				hoverlabel = dict(namelength = -1)
 			)

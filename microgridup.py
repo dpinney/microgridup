@@ -521,7 +521,7 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid):
 	#print(list_of_mg_dict)
 	return(list_of_mg_dict)
 
-def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, GEN_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER):
+def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, GEN_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER, BIG_OUT_NAME):
 	reopt_gen_mg_specs(LOAD_NAME, REOPT_FOLDER)
 	gen_obs = get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs)
@@ -566,7 +566,6 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, GEN_NAME, FULL_NAME, OMD
 		inputs={'circuit':BASE_NAME,'loads':LOAD_NAME,'REopt inputs':REOPT_INPUTS,'microgrids':{'m1':microgrid}}
 	)
 	#TODO: have an option where we make the template <iframe srcdoc="{{X}}"> to embed the html and create a single file.
-	BIG_OUT_NAME = 'output_full_analysis_lehigh.html'
 	with open(BIG_OUT_NAME,'w') as outFile:
 		outFile.write(out)
 	os.system(f'open {BIG_OUT_NAME}')
@@ -687,6 +686,7 @@ if __name__ == '__main__':
 	ONELINE_NAME = 'lehigh.oneline.html'
 	MAP_NAME = 'lehigh_map'
 	REOPT_FOLDER = 'lehigh_reopt'
+	BIG_OUT_NAME = 'output_full_analysis_lehigh.html'
 
 	# 2nd run inputs.
 	microgrid2 = {
@@ -697,5 +697,6 @@ if __name__ == '__main__':
 	}
 	FULL_NAME2 = 'lehigh_fuller.dss'
 	REOPT_FOLDER2 = 'lehigh_reopt_2'
-	main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, GEN_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER)
-	main(FULL_NAME, LOAD_NAME, REOPT_INPUTS, microgrid2, GEN_NAME, FULL_NAME2, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER2)
+	BIGGER_OUT_NAME = 'output_full_analysis_lehigh2.html'
+	main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, GEN_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER, BIG_OUT_NAME)
+	main(FULL_NAME, LOAD_NAME, REOPT_INPUTS, microgrid2, GEN_NAME, FULL_NAME2, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER2, BIGGER_OUT_NAME)

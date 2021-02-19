@@ -498,20 +498,23 @@ def make_chart(csvName, category_name, x, y_list, year):
 			this_series = gen_data[gen_data[category_name] == ob_name]
 			trace = plotly.graph_objs.Scatter(
 				x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
-				y = this_series[y_name], # rounding to 3 decimals here would be ideal, but it doing so does not accept Inf values 
+				y = this_series[y_name], # ToDo: rounding to 3 decimals here would be ideal, but it doing so does not accept Inf values 
 				name = ob_name + '_' + y_name,
 				hoverlabel = dict(namelength = -1)
 			)
 			data.append(trace)
 	layout = plotly.graph_objs.Layout(
 		title = f'{csvName} Output',
-		xaxis = dict(title = x),
+		# xaxis = dict(title = x),
+		xaxis = dict(title="Time"),
 		yaxis = dict(title = str(y_list))
 	)
 	fig = plotly.graph_objs.Figure(data, layout)
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
+
 make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year']) #TODO: pull year using reopt_out.get(f'year{mg_num}', 0.0) from allOutputData.json after refactor
+# for timeseries_load, output ANSI Range A service bands (2,520V - 2,340V for 2.4kV and 291V - 263V for 0.277kV)
 make_chart('timeseries_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'])
 make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'])
 make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'])
@@ -605,8 +608,10 @@ def microgrid_report_csv(inputName, outputCsvName):
 
 microgrid_report_csv('/allOutputData.json','microgrid_report.csv') #TO DO: output as json or dict and convert report to list info in columns to reduce clutter in html output
 
+# for use in output_template.html reporting
+#summary_rdr= csv.reader( open('microgrid_report.csv', "r" ) )
+#summary_data = [row for row in summary_rdr]
 
-#https://stackoverflow.com/questions/42847877/jinja2-list-of-dictionaries-into-html-table
 def microgrid_report_list_of_dicts(inputName):
 	reopt_out = json.load(open(reopt_folder + inputName))
 	list_of_mg_dict = []
@@ -690,39 +695,16 @@ def microgrid_report_list_of_dicts(inputName):
 	return(list_of_mg_dict)
 
 
-# Create giant consolidated report.
-#summary_rdr= csv.reader( open('microgrid_report.csv', "r" ) )
-#summary_data = [row for row in summary_rdr]
-
 mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json')
-
-# mg_dict_of_lists_full = {}
-
-# mg_num = 0
-# for mg in mg_list_of_dicts_full:
-# 	mg_num += 1
-# 	value_list = []
-# 	for key in mg.keys():
-# 		value_list.append(mg[key])
-# 	else:
-# 		mg_dict_of_lists_full[mg_num] = value_list
-
+# convert to dict of lists for columnar output in output_template.html
 mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
 
-#print(mg_dict_of_lists_full)
-
-
-
-#print(mg_dict_full)
-# for key in mg_dict_full[0]:
-# 	print(key)
-
+# Create giant consolidated report.
 template = j2.Template(open('output_template.html').read())
 out = template.render(
 	x='David',
 	y='Matt',
 	summary=mg_dict_of_lists_full,
-	#summary=summary_data, # enable for using csv formatted print
 	inputs={'circuit':BASE_NAME,'loads':LOAD_NAME,'REopt inputs':REOPT_INPUTS,'microgrids':microgrids}
 )
 

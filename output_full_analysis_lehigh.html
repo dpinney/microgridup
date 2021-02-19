@@ -5,165 +5,165 @@
 	<style type="text/css">iframe {width:95%;height:600px}</style>
 </head>
 <body>
-	<pre>INPUTS {'circuit': 'lehigh_base_phased.dss', 'loads': 'lehigh_load.csv', 'REopt inputs': {'solar': 'on', 'wind': 'off', 'battery': 'on', 'year': '2017', 'energyCost': '0.12', 'demandCost': '20', 'solarCost': '1600', 'windCost': '4989', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'dieselGenCost': '500', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '100000', 'windMax': '100000', 'batteryPowerMax': '1000000', 'batteryCapacityMax': '1000000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outage_start_hour': '200', 'outageDuration': '48', 'fuelAvailable': '50000', 'genExisting': 0, 'minGenLoading': '0.3', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True}, 'microgrids': {'m1': {'loads': ['634a_data_center', '634b_radar', '634c_atc_tower', '675a_hospital', '675b_residential1', '675c_residential1', '671_command_center', '652_residential', '645_hangar', '646_office'], 'switch': '650632', 'gen_bus': '670', 'gen_obs_existing': ['solar_634_existing', 'diesel_684_existing']}}}</pre>
+	<pre>INPUTS {'circuit': 'lehigh_full.dss', 'loads': 'lehigh_load.csv', 'REopt inputs': {'solar': 'on', 'wind': 'off', 'battery': 'on', 'year': '2017', 'energyCost': '0.12', 'demandCost': '20', 'solarCost': '1600', 'windCost': '4989', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'dieselGenCost': '500', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '100000', 'windMax': '100000', 'batteryPowerMax': '1000000', 'batteryCapacityMax': '1000000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outage_start_hour': '200', 'outageDuration': '48', 'fuelAvailable': '50000', 'genExisting': 0, 'minGenLoading': '0.3', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True}, 'microgrids': {'m1': {'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'switch': '632633', 'gen_bus': '634', 'gen_obs_existing': ['solar_634_existing']}}}</pre>
 	<!-- formatted below for a dict of lists -->
 	<pre>Overview of Microgrids</pre>
 	<table style="">
-	 	
-		    <tr>
-		    	<td>Microgrid Name</td>
-	 			
-	 			<td style="text-align:right">1</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Generation Bus</td>
-	 			
-	 			<td style="text-align:right">670</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Minimum Load (kWh)</td>
-	 			
-	 			<td style="text-align:right">676.0</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Average Load (kWh)</td>
-	 			
-	 			<td style="text-align:right">1271.0</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Average Daytime Load (kWh)</td>
-	 			
-	 			<td style="text-align:right">1645.0</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Maximum Load (kWh)</td>
-	 			
-	 			<td style="text-align:right">2262.0</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Existing Diesel (kW)</td>
-	 			
-	 			<td style="text-align:right">81.0</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Recommended New Diesel (kW)</td>
-	 			
-	 			<td style="text-align:right">1029.0</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Diesel Fuel Used During Outage (gal)</td>
-	 			
-	 			<td style="text-align:right">5840.0</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Existing Solar (kW)</td>
-	 			
-	 			<td style="text-align:right">440.0</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Recommended New Solar (kW)</td>
-	 			
-	 			<td style="text-align:right">3345.0</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Existing Battery Power (kW)</td>
-	 			
-	 			<td style="text-align:right">0.0</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Recommended New Battery Power (kW)</td>
-	 			
-	 			<td style="text-align:right">475.0</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Existing Battery Capacity (kWh)</td>
-	 			
-	 			<td style="text-align:right">0.0</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Recommended New Battery Capacity (kWh)</td>
-	 			
-	 			<td style="text-align:right">1517.0</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Existing Wind (kW)</td>
-	 			
-	 			<td style="text-align:right">0.0</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Recommended New Wind (kW)</td>
-	 			
-	 			<td style="text-align:right">0.0</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Total Generation on Grid (kW)</td>
-	 			
-	 			<td style="text-align:right">5370.0</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Net Present Value ($)</td>
-	 			
-	 			<td style="text-align:right">671,056</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>CapEx ($)</td>
-	 			
-	 			<td style="text-align:right">6,902,595</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>CapEx after Incentives ($)</td>
-	 			
-	 			<td style="text-align:right">4,251,118</td>
-	 			
-		    </tr>
-  		
-		    <tr>
-		    	<td>Average Outage Survived (h)</td>
-	 			
-	 			<td style="text-align:right">70.0</td>
-	 			
-		    </tr>
-  		
+		
+			<tr>
+				<td>Microgrid Name</td>
+				
+				<td style="text-align:right">1</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Generation Bus</td>
+				
+				<td style="text-align:right">634</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Minimum Load (kWh)</td>
+				
+				<td style="text-align:right">676.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Average Load (kWh)</td>
+				
+				<td style="text-align:right">1271.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Average Daytime Load (kWh)</td>
+				
+				<td style="text-align:right">1645.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Maximum Load (kWh)</td>
+				
+				<td style="text-align:right">2262.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Existing Diesel (kW)</td>
+				
+				<td style="text-align:right">81.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Recommended New Diesel (kW)</td>
+				
+				<td style="text-align:right">5.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Diesel Fuel Used During Outage (gal)</td>
+				
+				<td style="text-align:right">268.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Existing Solar (kW)</td>
+				
+				<td style="text-align:right">440.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Recommended New Solar (kW)</td>
+				
+				<td style="text-align:right">11025.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Existing Battery Power (kW)</td>
+				
+				<td style="text-align:right">0.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Recommended New Battery Power (kW)</td>
+				
+				<td style="text-align:right">2354.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Existing Battery Capacity (kWh)</td>
+				
+				<td style="text-align:right">0.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Recommended New Battery Capacity (kWh)</td>
+				
+				<td style="text-align:right">25434.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Existing Wind (kW)</td>
+				
+				<td style="text-align:right">0.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Recommended New Wind (kW)</td>
+				
+				<td style="text-align:right">0.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Total Generation on Grid (kW)</td>
+				
+				<td style="text-align:right">13906.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Net Present Value ($)</td>
+				
+				<td style="text-align:right">-8,480,173</td>
+				
+			</tr>
+		
+			<tr>
+				<td>CapEx ($)</td>
+				
+				<td style="text-align:right">30,302,790</td>
+				
+			</tr>
+		
+			<tr>
+				<td>CapEx after Incentives ($)</td>
+				
+				<td style="text-align:right">19,344,013</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Average Outage Survived (h)</td>
+				
+				<td style="text-align:right">349.0</td>
+				
+			</tr>
+		
 	</table>
 	<iframe src="lehigh_map/geoJsonMap_offline.html"></iframe>
 	<iframe src="lehigh.oneline.html"></iframe>

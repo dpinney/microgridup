@@ -63,8 +63,8 @@ def reopt_gen_mg_specs(LOAD_NAME, REOPT_FOLDER):
 				allInputData['longitude'] = float(ob_long)
 		# Pull out and add up kw of all solar and diesel generators in the microgrid
 		# requires pre-selection of all objects in a given microgrid in microgrids[key]['gen_obs_existing']
-		solar_kw_exist = [] # TODO: Refactor will need one list per microgrid if running a single pass of REopt (named solar_gen_exist_{mg_num} for example)
-		diesel_kw_exist = [] # TODO: Refactor will need one list per microgrid if running a single pass of REopt (named diesel_gen_exist_{mg_num} for example)
+		solar_kw_exist = []
+		diesel_kw_exist = []
 		battery_kw_exist = []
 		battery_kwh_exist = []
 		wind_kw_exist = []

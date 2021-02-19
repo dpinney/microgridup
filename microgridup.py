@@ -448,7 +448,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid):
 		writer.writerow(row)
 
 def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid):
-	''' TODO: describe this function in one line. '''
+	''' Generate a dictionary reports fr each key for all microgrids. '''
 	reopt_out = json.load(open(REOPT_FOLDER + inputName))
 	list_of_mg_dict = []
 	mg_dict = {}
@@ -595,6 +595,7 @@ if __name__ == '__main__':
 		"windMax": "100000",
 		"batteryPowerMax": "1000000",
 		"batteryCapacityMax": "1000000",
+		"dieselMax": "1000000",
 		"solarExisting": 0,
 		"criticalLoadFactor": "1",
 		"outage_start_hour": "200",
@@ -634,7 +635,7 @@ if __name__ == '__main__':
 	# 2nd run outputs.
 	FULL_NAME2 = 'lehigh_fuller.dss'
 	REOPT_FOLDER2 = 'lehigh_reopt_2'
-	BIGGER_OUT_NAME = 'output_full_analysis_lehigh2.html'
+	BIG_OUT_NAME2 = 'output_full_analysis_lehigh2.html'
 	# other_microgrids = {
 	# 	'm2': {
 	# 		'loads': ['675a_hospital','675b_residential1','675c_residential1'],
@@ -656,4 +657,4 @@ if __name__ == '__main__':
 	# 	}
 	# }
 	main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, GEN_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER, BIG_OUT_NAME)
-	main(FULL_NAME, LOAD_NAME, REOPT_INPUTS, microgrid2, GEN_NAME, FULL_NAME2, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER2, BIGGER_OUT_NAME)
+	main(FULL_NAME, LOAD_NAME, REOPT_INPUTS, microgrid2, GEN_NAME, FULL_NAME2, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER2, BIG_OUT_NAME2)

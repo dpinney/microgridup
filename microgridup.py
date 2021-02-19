@@ -542,6 +542,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, GEN_NAME, FULL_NAME, OMD
 	)
 	# opendss.voltagePlot(FULL_NAME, PU=True)
 	# opendss.currentPlot(FULL_NAME)
+	#TODO!!!! we're clobbering these outputs each time we run the full workflow. Consider keeping them separate.
 	make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year']) #TODO: pull year using reopt_out.get(f'year{mg_num}', 0.0) from allOutputData.json after refactor
 	# for timeseries_load, output ANSI Range A service bands (2,520V - 2,340V for 2.4kV and 291V - 263V for 0.277kV)
 	make_chart('timeseries_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'])

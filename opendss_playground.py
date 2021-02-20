@@ -61,55 +61,57 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 	if switchingTime <= lengthOfOutage:
 		totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, 0, None, None, None, 0)
 		key = 0
+		initialTimePassed = 1
 		while key < len(bestReclosers):
 			recloserName = bestReclosers[key].get('name','')
 			print(recloserName)
 			lineAction = 'open'
-			actionsDict[recloserName] = {'timePassed':timePassed, 'lineAction':lineAction}
-			timePassed+=1
+			actionsDict[recloserName] = {'timePassed':initialTimePassed, 'lineAction':lineAction}
+			initialTimePassed+=1
 			key+=1
 
 	# read in the set of tie lines in the system as a dataframe
-	tieLines = pd.read_csv(pathToTieLines)
-
-	#start the restoration piece of the algorithm
-	index = 0
-	terminate = False
-	goTo4 = False
-	goTo3 = False
-	goTo2 = True
-	while (terminate == False) and ((timePassed+switchingTime) < lengthOfOutage):
-		# Step 2
-		if goTo2 == True:
-			goTo2 = False
-			goTo3 = True
-			unpowered, powered, potentiallyViable = flisr.listPotentiallyViable(tree, tieLines, workDir)
-			print(potentiallyViable)
-		# Step 3
-		if goTo3 == True:
-			goTo3 = False
-			goTo4 = True
-			openSwitch = flisr.chooseOpenSwitch(potentiallyViable)
-		# Step 4
-		if goTo4 == True:
-			goTo4 = False
-			tree, potentiallyViable, tieLines, bestTies, bestReclosers, goTo2, goTo3, terminate, index = flisr.addTieLines(tree, faultedNode, potentiallyViable, unpowered, powered, openSwitch, tieLines, bestTies, bestReclosers, workDir, goTo2, goTo3, terminate, index, radial)
+	if pathToTieLines != None:
+		tieLines = pd.read_csv(pathToTieLines)
+	
+		#start the restoration piece of the algorithm
+		index = 0
+		terminate = False
+		goTo4 = False
+		goTo3 = False
+		goTo2 = True
+		while (terminate == False) and ((timePassed+switchingTime) < lengthOfOutage):
+			# Step 2
 			if goTo2 == True:
-				totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad, totalTime)
-				key = 0
-				while key < len(bestReclosers):
-					recloserName = bestReclosers[key].get('name','')
-					if recloserName not in actionsDict.keys():
-						lineAction = 'open'
-						actionsDict[recloserName] = {'timePassed':timePassed, 'lineAction':lineAction}
-					key+=1
-				key = 0
-				while key < len(bestTies):
-					tieName = bestTies[key].get('name','')
-					if tieName not in actionsDict.keys():
-						lineAction = 'close'
-						actionsDict[tieName] = {'timePassed':timePassed, 'lineAction':lineAction}
-					key+=1
+				goTo2 = False
+				goTo3 = True
+				unpowered, powered, potentiallyViable = flisr.listPotentiallyViable(tree, tieLines, workDir)
+				print(potentiallyViable)
+			# Step 3
+			if goTo3 == True:
+				goTo3 = False
+				goTo4 = True
+				openSwitch = flisr.chooseOpenSwitch(potentiallyViable)
+			# Step 4
+			if goTo4 == True:
+				goTo4 = False
+				tree, potentiallyViable, tieLines, bestTies, bestReclosers, goTo2, goTo3, terminate, index = flisr.addTieLines(tree, faultedNode, potentiallyViable, unpowered, powered, openSwitch, tieLines, bestTies, bestReclosers, workDir, goTo2, goTo3, terminate, index, radial)
+				if goTo2 == True:
+					totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad, totalTime)
+					key = 0
+					while key < len(bestReclosers):
+						recloserName = bestReclosers[key].get('name','')
+						if recloserName not in actionsDict.keys():
+							lineAction = 'open'
+							actionsDict[recloserName] = {'timePassed':timePassed, 'lineAction':lineAction}
+						key+=1
+					key = 0
+					while key < len(bestTies):
+						tieName = bestTies[key].get('name','')
+						if tieName not in actionsDict.keys():
+							lineAction = 'close'
+							actionsDict[tieName] = {'timePassed':timePassed, 'lineAction':lineAction}
+						key+=1
 	# when the outage is over, switch back to the main sourcebus
 	buses = []
 	sortvals = {}
@@ -132,6 +134,7 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 					busShapes[buses[0]][phase] = busShapes[buses[0]][phase] + listOfZeroes
 			phase+=1
 		del(buses[0])
+	print(busShapes)
 
 	tree = solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, bestReclosers, bestTies, lengthOfOutage)
 
@@ -146,11 +149,14 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 		buses.append(microgrids[key[0]].get('gen_bus', ''))
 	buses = [x for x in buses if x not in badBuses]
 
+	if busShapes ==None:
+		totalTime = 0
+		busShapes = {}
+		leftOverBusShapes = {}
+		leftOverLoad = {}
+
 	subtrees = {}
-	busShapes = {}
-	leftOverBusShapes = {}
-	leftOverLoad = {}
-	totalTime = 0
+	
 	i = 0
 	j = 0
 	# for each power source
@@ -432,16 +438,13 @@ def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, b
 		key+=1
 	# print(treeDSS)
 
-	FPREFIX = 'timezcontrol'
 	opendss.newQstsPlot(FULL_NAME,
 		stepSizeInMinutes=60, 
 		numberOfSteps=180,
 		keepAllFiles=False,
-		actions=actions,
-		filePrefix=FPREFIX
+		actions=actions
 	)
 
-	# TODO: only have one make_chart function.
 	def make_chart(csvName, category_name, x, y_list):
 		gen_data = pd.read_csv(csvName)
 		data = []
@@ -460,12 +463,13 @@ def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, b
 			yaxis = dict(title = str(y_list))
 		)
 		fig = py.graph_objs.Figure(data, layout)
-		py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
+		py.offline.plot(fig, filename=f'{csvName}.plot.html')
 	
-	# make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
-	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1','V2','V3'])
-	make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
-	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'])
+	# make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
+	make_chart('timeseries_load.csv', 'Name', 'hour', ['V1','V2','V3'])
+	make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
+	make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'])
+
 	return(tree)
 
 microgrids = {
@@ -495,5 +499,4 @@ microgrids = {
 	}
 }
 
-if __name__ == '__main__':
-	play('./lehigh.dss.omd', './lehigh_base_phased_playground.dss', './tiedata.csv', None, microgrids, '670671', False, 120, 30)
+play('C:/Users/granb/microgridup-main/lehigh.dss.omd', 'C:/Users/granb/microgridup-main/lehigh_base_phased_playground.dss', 'C:/Users/granb/omf/omf/scratch/RONM/tiedata.csv', None, microgrids, '670671', False, 120, 30)

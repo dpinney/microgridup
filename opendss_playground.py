@@ -466,7 +466,7 @@ def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, b
 			yaxis = dict(title = str(y_list))
 		)
 		fig = py.graph_objs.Figure(data, layout)
-		py.offline.plot(fig, filename=f'{csvName}.plot.html')
+		py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open = False)
 	
 	# make_chart('timezcontrol_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
 	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1','V2','V3'])
@@ -502,4 +502,4 @@ microgrids = {
 	}
 }
 
-play('./lehigh_playground.dss.omd', './lehigh_base_phased_playground.dss', './tiedata.csv', None, microgrids, '670671', False, 120, 30) 
+play('./lehigh_playground.dss.omd', './lehigh_base_phased_playground.dss', None, None, microgrids, '670671', False, 120, 30) 

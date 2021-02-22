@@ -55,16 +55,17 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 	for key in microgrids.keys():
 		buses.append(microgrids[key].get('gen_bus', ''))
 	tree, bestReclosers, badBuses = flisr.cutoffFault(tree, faultedNode, bestReclosers, workDir, radial, buses)
-	print(bestReclosers)
+	# print(bestReclosers)
 	# 2) get a list of loads associated with each microgrid component
 	# and create a loadshape containing all said loads
 	if switchingTime <= lengthOfOutage:
 		totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, 0, None, None, None, 0)
+
 		key = 0
 		initialTimePassed = 1
 		while key < len(bestReclosers):
 			recloserName = bestReclosers[key].get('name','')
-			print(recloserName)
+			# print(recloserName)
 			lineAction = 'open'
 			actionsDict[recloserName] = {'timePassed':initialTimePassed, 'lineAction':lineAction}
 			initialTimePassed+=1
@@ -86,7 +87,7 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 				goTo2 = False
 				goTo3 = True
 				unpowered, powered, potentiallyViable = flisr.listPotentiallyViable(tree, tieLines, workDir)
-				print(potentiallyViable)
+				# print(potentiallyViable)
 			# Step 3
 			if goTo3 == True:
 				goTo3 = False
@@ -134,7 +135,7 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 					busShapes[buses[0]][phase] = busShapes[buses[0]][phase] + listOfZeroes
 			phase+=1
 		del(buses[0])
-	print(busShapes)
+	# print(busShapes)
 
 	tree = solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, bestReclosers, bestTies, lengthOfOutage)
 
@@ -251,7 +252,6 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 										if '.3' in loadShapes:
 												loadShapes['.3'] = [a + b for a, b in zip(loadShapes.get('.3',''), loadshape)]
 										else: loadShapes['.3'] = loadshape
-	
 # 3) obtain the diesel loadshape by subtracting off solar from load
 			dieselShapes = {}
 			leftOverShapes = {}
@@ -260,6 +260,7 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 			maximum = 1.0
 			for key in tree.keys():
 				if tree[key].get('object','').startswith('generator'):
+					print(bus)
 					if tree[key].get('name','').startswith('solar') and tree[key].get('parent','') == bus:
 						solarshapeName = tree[key].get('yearly','')
 						if alreadySeen == False:
@@ -438,11 +439,13 @@ def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, b
 		key+=1
 	# print(treeDSS)
 
+	FPREFIX = 'timezcontrol'
 	opendss.newQstsPlot(FULL_NAME,
 		stepSizeInMinutes=60, 
 		numberOfSteps=180,
 		keepAllFiles=False,
-		actions=actions
+		actions=actions,
+		filePrefix=FPREFIX
 	)
 
 	def make_chart(csvName, category_name, x, y_list):
@@ -465,10 +468,10 @@ def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, b
 		fig = py.graph_objs.Figure(data, layout)
 		py.offline.plot(fig, filename=f'{csvName}.plot.html')
 	
-	# make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
-	make_chart('timeseries_load.csv', 'Name', 'hour', ['V1','V2','V3'])
-	make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
-	make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'])
+	# make_chart('timezcontrol_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
+	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1','V2','V3'])
+	make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
+	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'])
 
 	return(tree)
 
@@ -499,4 +502,4 @@ microgrids = {
 	}
 }
 
-play('C:/Users/granb/microgridup-main/lehigh.dss.omd', 'C:/Users/granb/microgridup-main/lehigh_base_phased_playground.dss', 'C:/Users/granb/omf/omf/scratch/RONM/tiedata.csv', None, microgrids, '670671', False, 120, 30)
+play('./lehigh_playground.dss.omd', './lehigh_base_phased_playground.dss', './tiedata.csv', None, microgrids, '670671', False, 120, 30) 

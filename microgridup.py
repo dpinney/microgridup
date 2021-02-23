@@ -24,7 +24,7 @@ def _name_to_key(glm):
 			mapping[val['name']] = key
 	return mapping
 
-def reopt_gen_mg_specs(LOAD_NAME, REOPT_FOLDER):
+def reopt_gen_mg_specs(LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid):
 	''' Generate the microgrid specs with REOpt.
 	SIDE-EFFECTS: generates REOPT_FOLDER'''
 	load_df = pd.read_csv(LOAD_NAME)
@@ -148,7 +148,7 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid):
 			'object':f'generator.solar_{gen_bus_name}',
 			'bus1':f'{gen_bus_name}.1.2.3',
 			'phases':'3', #todo: what about multiple smaller phases?
-			'kv':'4.16', #todo: fix, make non-generic
+			'kv':'2.4', #todo: fix, make non-generic
 			'kw':f'{solar_size_new}',
 			'pf':'1'
 		})
@@ -164,7 +164,7 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid):
 			'!CMD': 'new',
 			'object':f'generator.diesel_{gen_bus_name}',
 			'bus1':f'{gen_bus_name}.1.2.3',
-			'kv':'4.16', #todo: fix, make non-generic
+			'kv':'2.4', #todo: fix, make non-generic
 			'kw':f'{diesel_size_new}',
 			'phases':'3', #todo: what about multiple smaller phases?
 			'pf':'1',
@@ -187,7 +187,7 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid):
 			'object':f'generator.wind_{gen_bus_name}',
 			'bus1':f'{gen_bus_name}.1.2.3',
 			'phases':'3', #todo: what about multiple smaller phases?
-			'kv':'4.16', #todo: fix, make non-generic
+			'kv':'2.4', #todo: fix, make non-generic
 			'kw':f'{wind_size_new}',
 			'pf':'1'
 		})
@@ -222,7 +222,7 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid):
 			'!CMD': 'new',
 			'object':f'storage.battery_{gen_bus_name}',
 			'bus1':f'{gen_bus_name}.1.2.3',
-			'kv':'4.16', #todo: fix, make non-generic
+			'kv':'2.4', #todo: fix, make non-generic
 			'kwrated':f'{battery_pow_new}',
 			'phases':'3',
 			'dispmode':'follow',
@@ -267,7 +267,7 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs):
 			ob_string = ob.get('object','')
 			if ob_string.startswith('load.'):
 				ob_name = ob_string[5:]
-				shape_data = load_df[ob_name] #load_df built in line 86 using load_df = pd.read_csv(LOAD_NAME)
+				shape_data = load_df[ob_name]
 				shape_name = ob_name + '_shape'
 				ob['yearly'] = shape_name
 				shape_insert_list[i] = {
@@ -367,7 +367,7 @@ def make_chart(csvName, category_name, x, y_list, year):
 	fig = plotly.graph_objs.Figure(data, layout)
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
-def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid):
+def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid): #naming oon this piece needs to be updated to output
 	''' Generate a report on each microgrid '''
 	reopt_out = json.load(open(REOPT_FOLDER + inputName))
 	with open(outputCsvName, 'w', newline='') as outcsv:
@@ -521,8 +521,8 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid):
 	#print(list_of_mg_dict)
 	return(list_of_mg_dict)
 
-def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, GEN_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER, BIG_OUT_NAME):
-	reopt_gen_mg_specs(LOAD_NAME, REOPT_FOLDER)
+def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER, BIG_OUT_NAME):
+	reopt_gen_mg_specs(LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid)
 	gen_obs = get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs)
 	gen_omd(FULL_NAME, OMD_NAME)
@@ -533,7 +533,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, GEN_NAME, FULL_NAME, OMD
 	# Powerflow outputs.
 	opendss.newQstsPlot(FULL_NAME,
 		stepSizeInMinutes=60, 
-		numberOfSteps=24*10,
+		numberOfSteps=24*20,
 		keepAllFiles=False,
 		actions={
 			#24*5:'open object=line.671692 term=1',
@@ -550,11 +550,9 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, GEN_NAME, FULL_NAME, OMD
 	make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'])
 	# Perform control sim.
 	import opendss_playground
-	opendss_playground.play('./lehigh.dss.omd', './lehigh_base_phased_playground.dss', './tiedata.csv', None, opendss_playground.microgrids, '670671', False, 120, 30) #TODO: unify the microgrids data structure.
-	microgrid_report_csv('/allOutputData.json','microgrid_report.csv', REOPT_FOLDER, microgrid) #TO DO: output as json or dict and convert report to list info in columns to reduce clutter in html output
-	# for use in output_template.html reporting
-	#summary_rdr= csv.reader( open('microgrid_report.csv', "r" ) )
-	#summary_data = [row for row in summary_rdr]
+	# opendss_playground.play('./lehigh.dss.omd', './lehigh_base_phased_playground.dss', './tiedata.csv', None, opendss_playground.microgrids, '670671', False, 120, 30) #TODO: unify the microgrids data structure.
+	opendss_playground.play('./lehigh.dss.omd', './lehigh_base_phased.dss', None, None, playground_microgrids, '670671', False, 120, 30) #TODO: unify the microgrids data structure.
+	microgrid_report_csv('/allOutputData.json', f'{microgrid}_report.csv', REOPT_FOLDER, microgrid)
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER, microgrid)
 	# convert to dict of lists for columnar output in output_template.html
 	mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
@@ -572,89 +570,4 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, GEN_NAME, FULL_NAME, OMD
 	os.system(f'open {BIG_OUT_NAME}')
 
 if __name__ == '__main__':
-	# Input data.
-	BASE_NAME = 'lehigh_base_phased.dss'
-	LOAD_NAME = 'lehigh_load.csv'
-	REOPT_INPUTS = {
-		"solar" : "on",
-		"wind" : "off",
-		"battery" : "on",
-		"year" : '2017',
-		"energyCost" : "0.12",
-		"demandCost" : '20',
-		"solarCost" : "1600",
-		"windCost" : "4989",
-		"batteryPowerCost" : "840",
-		"batteryCapacityCost" : "420",
-		"dieselGenCost": "500",
-		"solarMin": 0,
-		"windMin": 0,
-		"batteryPowerMin": 0,
-		"batteryCapacityMin": 0,
-		"solarMax": "100000",
-		"windMax": "100000",
-		"batteryPowerMax": "1000000",
-		"batteryCapacityMax": "1000000",
-		"dieselMax": "1000000",
-		"solarExisting": 0,
-		"criticalLoadFactor": "1",
-		"outage_start_hour": "200",
-		"outageDuration": "48",
-		"fuelAvailable": "50000",
-		"genExisting": 0,
-		"minGenLoading": "0.3",
-		"batteryKwExisting": 0,
-		"batteryKwhExisting": 0,
-		"windExisting": 0,
-		"value_of_lost_load": "100",
-		"solarCanCurtail": True,
-		"solarCanExport": True
-	}
-	# gen_obs_existing include all generator objects already in the microgrid, preselected from base.dss
-	microgrid = {
-		'loads': ['634a_data_center','634b_radar','634c_atc_tower','675a_hospital','675b_residential1','675c_residential1','671_command_center','652_residential','645_hangar','646_office'],
-		'switch': '650632',
-		'gen_bus': '670',
-		'gen_obs_existing': ['solar_634_existing', 'diesel_684_existing']
-	}
-	# Output paths.
-	GEN_NAME = 'lehigh_gen.csv'
-	FULL_NAME = 'lehigh_full.dss'
-	OMD_NAME = 'lehigh.dss.omd'
-	ONELINE_NAME = 'lehigh.oneline.html'
-	MAP_NAME = 'lehigh_map'
-	REOPT_FOLDER = 'lehigh_reopt'
-	BIG_OUT_NAME = 'output_full_analysis_lehigh.html'
-	# 2nd run inputs.
-	microgrid2 = {
-		'loads': ['634a_data_center','634b_radar','634c_atc_tower'],
-		'switch': '632633',
-		'gen_bus': '634',
-		'gen_obs_existing': ['solar_634_existing']
-	}
-	# 2nd run outputs.
-	FULL_NAME2 = 'lehigh_fuller.dss'
-	REOPT_FOLDER2 = 'lehigh_reopt_2'
-	BIG_OUT_NAME2 = 'output_full_analysis_lehigh2.html'
-	# other_microgrids = {
-	# 	'm2': {
-	# 		'loads': ['675a_hospital','675b_residential1','675c_residential1'],
-	# 		'switch': '671692',
-	# 		'gen_bus': '675',
-	# 		'gen_obs_existing': []
-	# 	},
-	# 	'm3': {
-	# 		'loads': ['671_command_center','652_residential'],
-	# 		'switch': '671684',
-	# 		'gen_bus': '684',
-	# 		'gen_obs_existing': ['diesel_684_existing']
-	# 	},
-	# 	'm4': {
-	# 		'loads': ['645_hangar','646_office'],
-	# 		'switch': '632645',
-	# 		'gen_bus': '646',
-	# 		'gen_obs_existing': []
-	# 	}
-	# }
-	main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, GEN_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER, BIG_OUT_NAME)
-	main(FULL_NAME, LOAD_NAME, REOPT_INPUTS, microgrid2, GEN_NAME, FULL_NAME2, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER2, BIG_OUT_NAME2)
+	print('No Inputs Received')

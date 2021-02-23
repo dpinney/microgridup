@@ -24,7 +24,7 @@ def _name_to_key(glm):
 			mapping[val['name']] = key
 	return mapping
 
-def reopt_gen_mg_specs(LOAD_NAME, REOPT_FOLDER, microgrid):
+def reopt_gen_mg_specs(LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid):
 	''' Generate the microgrid specs with REOpt.
 	SIDE-EFFECTS: generates REOPT_FOLDER'''
 	load_df = pd.read_csv(LOAD_NAME)
@@ -521,8 +521,8 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid):
 	#print(list_of_mg_dict)
 	return(list_of_mg_dict)
 
-def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, GEN_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER, BIG_OUT_NAME):
-	reopt_gen_mg_specs(LOAD_NAME, REOPT_FOLDER, microgrid)
+def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER, BIG_OUT_NAME):
+	reopt_gen_mg_specs(LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid)
 	gen_obs = get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs)
 	gen_omd(FULL_NAME, OMD_NAME)
@@ -551,8 +551,8 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, GEN_NAME, FULL_NAME, OMD
 	# Perform control sim.
 	import opendss_playground
 	# opendss_playground.play('./lehigh.dss.omd', './lehigh_base_phased_playground.dss', './tiedata.csv', None, opendss_playground.microgrids, '670671', False, 120, 30) #TODO: unify the microgrids data structure.
-	opendss_playground.play('./lehigh.dss.omd', './lehigh_base_phased.dss', None, None, opendss_playground.microgrids, '670671', False, 120, 30) #TODO: unify the microgrids data structure.
-	microgrid_report_csv('/allOutputData.json',f'{microgrid}_report.csv', REOPT_FOLDER, microgrid)
+	opendss_playground.play('./lehigh.dss.omd', './lehigh_base_phased.dss', None, None, playground_microgrids, '670671', False, 120, 30) #TODO: unify the microgrids data structure.
+	microgrid_report_csv('/allOutputData.json', f'{microgrid}_report.csv', REOPT_FOLDER, microgrid)
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER, microgrid)
 	# convert to dict of lists for columnar output in output_template.html
 	mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
@@ -571,9 +571,9 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, GEN_NAME, FULL_NAME, OMD
 
 if __name__ == '__main__':
 	# Input data.
-	BASE_NAME = 'lehigh_base_phased_sequential.dss'
+	BASE_NAME = 'lehigh_base_phased.dss'
 	LOAD_NAME = 'lehigh_load.csv'
-	REOPT_INPUTS = {
+	REOPT_INPUTS_1 = {
 		"solar" : "on",
 		"wind" : "off",
 		"battery" : "on",
@@ -593,7 +593,7 @@ if __name__ == '__main__':
 		"windMax": "100000",
 		"batteryPowerMax": "1000000",
 		"batteryCapacityMax": "1000000",
-		"dieselMax": "1000000",
+		"dieselMax": "100000",
 		"solarExisting": 0,
 		"criticalLoadFactor": "1",
 		"outage_start_hour": "200",
@@ -626,7 +626,43 @@ if __name__ == '__main__':
 	REOPT_FOLDER_1 = 'lehigh_reopt_1'
 	BIG_OUT_NAME_1 = 'output_full_analysis_lehigh_1.html'
 	
+
 	# 2nd run inputs.
+	REOPT_INPUTS_2 = {
+		"solar" : "on",
+		"wind" : "off",
+		"battery" : "on",
+		"year" : '2017',
+		"energyCost" : "0.12",
+		"demandCost" : '20',
+		"solarCost" : "1600",
+		"windCost" : "4989",
+		"batteryPowerCost" : "840",
+		"batteryCapacityCost" : "420",
+		"dieselGenCost": "500",
+		"solarMin": 0,
+		"windMin": 0,
+		"batteryPowerMin": 0,
+		"batteryCapacityMin": 0,
+		"solarMax": "100000",
+		"windMax": "100000",
+		"batteryPowerMax": "1000000",
+		"batteryCapacityMax": "1000000",
+		"dieselMax": "100000",
+		"solarExisting": 0,
+		"criticalLoadFactor": "1",
+		"outage_start_hour": "200",
+		"outageDuration": "48",
+		"fuelAvailable": "50000",
+		"genExisting": 0,
+		"minGenLoading": "0.3",
+		"batteryKwExisting": 0,
+		"batteryKwhExisting": 0,
+		"windExisting": 0,
+		"value_of_lost_load": "100",
+		"solarCanCurtail": True,
+		"solarCanExport": True
+	}
 	microgrid_2 = {
 		'loads': ['675a_hospital','675b_residential1','675c_residential1'],
 		'switch': '671692',
@@ -641,6 +677,41 @@ if __name__ == '__main__':
 	BIG_OUT_NAME_2 = 'output_full_analysis_lehigh_2.html'
 
 	# 3rd run inputs
+	REOPT_INPUTS_3 = {
+		"solar" : "on",
+		"wind" : "off",
+		"battery" : "on",
+		"year" : '2017',
+		"energyCost" : "0.12",
+		"demandCost" : '20',
+		"solarCost" : "1600",
+		"windCost" : "4989",
+		"batteryPowerCost" : "840",
+		"batteryCapacityCost" : "420",
+		"dieselGenCost": "500",
+		"solarMin": 0,
+		"windMin": 0,
+		"batteryPowerMin": 0,
+		"batteryCapacityMin": 0,
+		"solarMax": "100000",
+		"windMax": "100000",
+		"batteryPowerMax": "1000000",
+		"batteryCapacityMax": "1000000",
+		"dieselMax": "100000",
+		"solarExisting": 0,
+		"criticalLoadFactor": "1",
+		"outage_start_hour": "200",
+		"outageDuration": "48",
+		"fuelAvailable": "50000",
+		"genExisting": 0,
+		"minGenLoading": "0.3",
+		"batteryKwExisting": 0,
+		"batteryKwhExisting": 0,
+		"windExisting": 0,
+		"value_of_lost_load": "100",
+		"solarCanCurtail": True,
+		"solarCanExport": True
+	}
 	microgrid_3 = {
 		'loads': ['671_command_center','652_residential'],
 		'switch': '671684',
@@ -655,6 +726,41 @@ if __name__ == '__main__':
 	BIG_OUT_NAME_3 = 'output_full_analysis_lehigh_3.html'
 
 	# 4rth run inputs
+	REOPT_INPUTS_4 = {
+		"solar" : "on",
+		"wind" : "off",
+		"battery" : "on",
+		"year" : '2017',
+		"energyCost" : "0.12",
+		"demandCost" : '20',
+		"solarCost" : "1600",
+		"windCost" : "4989",
+		"batteryPowerCost" : "840",
+		"batteryCapacityCost" : "420",
+		"dieselGenCost": "500",
+		"solarMin": 0,
+		"windMin": 0,
+		"batteryPowerMin": 0,
+		"batteryCapacityMin": 0,
+		"solarMax": "100000",
+		"windMax": "100000",
+		"batteryPowerMax": "1000000",
+		"batteryCapacityMax": "1000000",
+		"dieselMax": "100000",
+		"solarExisting": 0,
+		"criticalLoadFactor": "1",
+		"outage_start_hour": "200",
+		"outageDuration": "48",
+		"fuelAvailable": "50000",
+		"genExisting": 0,
+		"minGenLoading": "0.3",
+		"batteryKwExisting": 0,
+		"batteryKwhExisting": 0,
+		"windExisting": 0,
+		"value_of_lost_load": "100",
+		"solarCanCurtail": True,
+		"solarCanExport": True
+	}
 	microgrid_4 = {
 		'loads': ['645_hangar','646_office'],
 		'switch': '632645',
@@ -667,6 +773,12 @@ if __name__ == '__main__':
 	FULL_NAME_4 = 'lehigh_full_4.dss'
 	REOPT_FOLDER_4 = 'lehigh_reopt_4'
 	BIG_OUT_NAME_4 = 'output_full_analysis_lehigh_4.html'
+
+	playground_microgrids = {}
+	playground_microgrids['m1'] = microgrid_1
+	playground_microgrids['m2'] = microgrid_2
+	playground_microgrids['m3'] = microgrid_3
+	playground_microgrids['m4'] = microgrid_4
 
 	# # 5th (full) run inputs
 	# microgrid_5 = {
@@ -689,9 +801,7 @@ if __name__ == '__main__':
 	# 	'gen_obs_existing': ['solar_634_existing', 'diesel_684_existing']
 	# }
 
-
-	main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid_1, GEN_NAME, FULL_NAME_1, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_1, BIG_OUT_NAME_1)
-	main(FULL_NAME_1, LOAD_NAME, REOPT_INPUTS, microgrid_2, GEN_NAME, FULL_NAME_2, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_2, BIG_OUT_NAME_2)
-	main(FULL_NAME_2, LOAD_NAME, REOPT_INPUTS, microgrid_3, GEN_NAME, FULL_NAME_3, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_3, BIG_OUT_NAME_3)
-	main(FULL_NAME_3, LOAD_NAME, REOPT_INPUTS, microgrid_4, GEN_NAME, FULL_NAME_4, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_4, BIG_OUT_NAME_4)
-	main(FULL_NAME_4, LOAD_NAME, REOPT_INPUTS, microgrid_5, GEN_NAME, FULL_NAME_5, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_5, BIG_OUT_NAME_5)
+	main(BASE_NAME, LOAD_NAME, REOPT_INPUTS_1, microgrid_1, playground_microgrids, GEN_NAME, FULL_NAME_1, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_1, BIG_OUT_NAME_1)
+	main(FULL_NAME_1, LOAD_NAME, REOPT_INPUTS_2, microgrid_2, playground_microgrids, GEN_NAME, FULL_NAME_2, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_2, BIG_OUT_NAME_2)
+	main(FULL_NAME_2, LOAD_NAME, REOPT_INPUTS_3, microgrid_3, playground_microgrids, GEN_NAME, FULL_NAME_3, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_3, BIG_OUT_NAME_3)
+	main(FULL_NAME_3, LOAD_NAME, REOPT_INPUTS_4, microgrid_4, playground_microgrids, GEN_NAME, FULL_NAME_4, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_4, BIG_OUT_NAME_4)

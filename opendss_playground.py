@@ -442,7 +442,7 @@ def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, b
 	FPREFIX = 'timezcontrol'
 	opendss.newQstsPlot(FULL_NAME,
 		stepSizeInMinutes=60, 
-		numberOfSteps=180,
+		numberOfSteps=300,
 		keepAllFiles=False,
 		actions=actions,
 		filePrefix=FPREFIX
@@ -457,7 +457,8 @@ def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, b
 				trace = py.graph_objs.Scatter(
 					x = this_series[x],
 					y = this_series[y_name],
-					name = ob_name + '_' + y_name
+					name = ob_name + '_' + y_name,
+					hoverlabel = dict(namelength = -1)
 				)
 				data.append(trace)
 		layout = py.graph_objs.Layout(

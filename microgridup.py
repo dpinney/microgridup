@@ -552,7 +552,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	import opendss_playground
 	# opendss_playground.play('./lehigh.dss.omd', './lehigh_base_phased_playground.dss', './tiedata.csv', None, opendss_playground.microgrids, '670671', False, 120, 30) #TODO: unify the microgrids data structure.
 	opendss_playground.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, '670671', False, 120, 30) #TODO: unify the microgrids data structure.
-	microgrid_report_csv('/allOutputData.json', f'{microgrid}_report.csv', REOPT_FOLDER, microgrid)
+	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER, microgrid)
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER, microgrid)
 	# convert to dict of lists for columnar output in output_template.html
 	mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}

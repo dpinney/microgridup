@@ -391,17 +391,15 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid): #na
 		avg_daytime_load = np.average(np.average(daytime_kwh, axis=1))
 		max_load = max(load)
 		diesel_used_gal =reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0)
-
-		#TO DO: FIX THE TABBING ERROR IN THIS CODE SO IT PULLS THE VARIABELS FROM THIS LOOP INTO THE SUMMARY REPORT
 		solar_size_total = reopt_out.get(f'sizePV{mg_num}', 0.0)
 		solar_size_existing = reopt_out.get(f'sizePVExisting{mg_num}', 0.0)
 		solar_size_new = solar_size_total - solar_size_existing
-		wind_size_total = reopt_out.get(f'sizeWind{mg_num}', 0.0)# TO DO: Update size of wind based on existing generation once we find a way to get a loadshape for that wind if REopt recommends no wind
+		wind_size_total = reopt_out.get(f'sizeWind{mg_num}', 0.0)
 		wind_size_existing = reopt_out.get(f'windExisting{mg_num}', 0.0)
 		if wind_size_total - wind_size_existing > 0:
 			wind_size_new = wind_size_total - wind_size_existing
 		else:
-			wind_size_new = 0# TO DO: update logic here to make run more robust to oversized existing wind gen
+			wind_size_new = 0
 		diesel_size_total = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
 		diesel_size_existing = reopt_out.get(f'sizeDieselExisting{mg_num}', 0.0)
 		diesel_size_new = diesel_size_total - diesel_size_existing
@@ -439,7 +437,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid): #na
 								+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
 		ave_outage = reopt_out.get(f'avgOutage{mg_num}', 0.0)
 		
-		row =[mg_num, gen_bus_name, round(min_load,0), round(ave_load,0), round(avg_daytime_load,1), round(max_load,0),
+		row =[str(REOPT_FOLDER[-1]), gen_bus_name, round(min_load,0), round(ave_load,0), round(avg_daytime_load,1), round(max_load,0),
 		round(diesel_size_existing,1), round(diesel_size_new,1), round(diesel_used_gal, 0), round(solar_size_existing,1), 
 		round(solar_size_new,1), round(battery_pow_existing,1), round(battery_pow_new,1), round(battery_cap_existing,1), 
 		round(battery_cap_new,1), round(wind_size_existing,1), round(wind_size_new,1), round(total_gen,1),
@@ -454,9 +452,9 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid):
 	mg_dict = {}
 	mg_num = 1
 	mg_ob = microgrid
-	mg_dict["Microgrid Name"] = mg_num
+	mg_dict["Microgrid Name"] = str(REOPT_FOLDER[-1])
 	mg_dict["Generation Bus"] = mg_ob['gen_bus']
-	load = reopt_out.get(f'load{mg_num}', 0.0)
+	load = reopt_out.get(f'load1', 0.0)
 	mg_dict["Minimum Load (kWh)"] = round(min(load),0)
 	mg_dict["Average Load (kWh)"] = round(sum(load)/len(load),0)
 	# build the average daytime load

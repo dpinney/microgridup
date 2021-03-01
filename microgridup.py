@@ -24,7 +24,7 @@ def _name_to_key(glm):
 			mapping[val['name']] = key
 	return mapping
 
-def reopt_gen_mg_specs(LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid):
+def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid):
 	''' Generate the microgrid specs with REOpt.
 	SIDE-EFFECTS: generates REOPT_FOLDER'''
 	load_df = pd.read_csv(LOAD_NAME)
@@ -522,7 +522,7 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid):
 	return(list_of_mg_dict)
 
 def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER, BIG_OUT_NAME):
-	reopt_gen_mg_specs(LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid)
+	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid)
 	gen_obs = get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs)
 	gen_omd(FULL_NAME, OMD_NAME)
@@ -562,7 +562,8 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 		x='David',
 		y='Matt',
 		summary=mg_dict_of_lists_full,
-		inputs={'circuit':BASE_NAME,'loads':LOAD_NAME,'REopt inputs':REOPT_INPUTS,'microgrids':{'m1':microgrid}}
+		inputs={'circuit':BASE_NAME,'loads':LOAD_NAME,'REopt inputs':REOPT_INPUTS,'microgrid':microgrid},
+		reopt_folder=REOPT_FOLDER
 	)
 	#TODO: have an option where we make the template <iframe srcdoc="{{X}}"> to embed the html and create a single file.
 	with open(BIG_OUT_NAME,'w') as outFile:

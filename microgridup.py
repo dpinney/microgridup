@@ -68,7 +68,7 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 		battery_kw_exist = []
 		battery_kwh_exist = []
 		wind_kw_exist = []
-		gen_obs = microgrid['gen_obs_existing'] 
+		gen_obs = microgrid['gen_obs_existing']
 		for gen_ob in gen_obs: # gen_ob is a name of an object from base.dss
 			for ob in evil_glm.values(): # TODO: Change the syntax to match to the "tree" structure; See shape insertions at line 270 for an example
 				ob_name = ob.get('name','')
@@ -174,12 +174,14 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid):
 			'conn':'delta'
 		})
 		# 0-1 scale the power output loadshape to the total generation kw of that type of generator
-		gen_df_builder[f'diesel_{gen_bus_name}'] = pd.Series(reopt_out.get(f'powerDiesel{mg_num}'))/diesel_size_total
+		#bgen_df_builder[f'diesel_{gen_bus_name}'] = pd.Series(reopt_out.get(f'powerDiesel{mg_num}'))/diesel_size_total # insert the 0-1 diesel generation shape provided by REopt to simulate the outage specified in REopt
+		gen_df_builder[f'diesel_{gen_bus_name}'] = pd.DataFrame(np.zeros(8760)) # insert an array of zeros for the diesel generation shape to simulate no outage
 	# build loadshapes for existing generation from BASE_NAME, inputting the 0-1 diesel generation loadshape 
 	if diesel_size_existing > 0:	
 		for gen_ob_existing in gen_obs_existing:
 			if gen_ob_existing.startswith('diesel_'):
-				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerDiesel{mg_num}'))/diesel_size_total
+				# gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerDiesel{mg_num}'))/diesel_size_total # insert the 0-1 diesel generation shape provided by REopt to simulate the outage specified in REopt
+				gen_df_builder[f'{gen_ob_existing}'] = pd.DataFrame(np.zeros(8760)) # insert an array of zeros for the diesel generation shape to simulate no outage
 	# get loadshapes for new Wind
 	if wind_size_new > 0:
 		gen_obs.append({
@@ -236,7 +238,8 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid):
 			'%effdischarge':'100',
 			'%idlingkw':'0',
 			'%r':'0',
-			'%x':'50'
+			'%x':'50',
+			'%stored':'50'
 		})
 		gen_df_builder[f'battery_{gen_bus_name}'] = battery_load_0_1
 	# build loadshapes for existing battery generation from BASE_NAME

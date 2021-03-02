@@ -45,7 +45,7 @@ if __name__ == '__main__':
 		'switch': '632633',
 		'gen_bus': '634',
 		'gen_obs_existing': ['solar_634_existing'],
-		'max_potential': '700'
+		'max_potential': '700' # total kW rating on 634 bus is 500 kW
 	}
 
 	# Output paths.
@@ -63,7 +63,7 @@ if __name__ == '__main__':
 		'switch': '671692',
 		'gen_bus': '675',
 		'gen_obs_existing': [],
-		'max_potential': '900'
+		'max_potential': '900' # total kW rating on 675 bus is 843 kW
 	}
 	
 	# 2nd run output paths
@@ -77,7 +77,7 @@ if __name__ == '__main__':
 		'switch': '671684',
 		'gen_bus': '684',
 		'gen_obs_existing': ['diesel_684_existing'],
-		'max_potential': '650'
+		'max_potential': '650' # total kW rating on 671 and 652 is 1283 kW
 	}
 
 	# 3rd run output paths
@@ -91,7 +91,7 @@ if __name__ == '__main__':
 		'switch': '632645',
 		'gen_bus': '646',
 		'gen_obs_existing': [],
-		'max_potential': '800'
+		'max_potential': '800' 
 	}
 
 	playground_microgrids = {}

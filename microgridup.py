@@ -14,6 +14,7 @@ import jinja2 as j2
 import re
 import math
 import random
+import datetime
 
 def _name_to_key(glm):
 	''' Make fast lookup map by name in a glm.
@@ -347,7 +348,7 @@ def gen_omd(FULL_NAME, OMD_NAME):
 			# print(ob)
 	dssConvert.evilToOmd(evil_glm, OMD_NAME)
 
-def make_chart(csvName, category_name, x, y_list, year):
+def make_chart(csvName, category_name, x, y_list, year, qsts_steps, ansi_bands=False):
 	''' Charting outputs. '''
 	gen_data = pd.read_csv(csvName)
 	data = [] 
@@ -356,11 +357,12 @@ def make_chart(csvName, category_name, x, y_list, year):
 			this_series = gen_data[gen_data[category_name] == ob_name]
 			trace = plotly.graph_objs.Scatter(
 				x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
-				y = this_series[y_name], # ToDo: rounding to 3 decimals here would be ideal, but it doing so does not accept Inf values 
+				y = this_series[y_name], # ToDo: rounding to 3 decimals here would be ideal, but doing so does not accept Inf values 
 				name = ob_name + '_' + y_name,
 				hoverlabel = dict(namelength = -1)
 			)
 			data.append(trace)
+
 	layout = plotly.graph_objs.Layout(
 		title = f'{csvName} Output',
 		# xaxis = dict(title = x),
@@ -368,6 +370,24 @@ def make_chart(csvName, category_name, x, y_list, year):
 		yaxis = dict(title = str(y_list))
 	)
 	fig = plotly.graph_objs.Figure(data, layout)
+
+	if ansi_bands == True:
+		# trace = plotly.graph_objs.Scatter(
+		# 		x = pd.to_datetime(pd.Series(24*20), unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
+		# 		y = .95,
+		# 		name = "ANSI band"
+		# 	)
+		# data.append(trace)
+		date = pd.Timestamp(f'{year}-01-01')
+		fig.add_shape(type="line",
+ 			x0=date, y0=.95, x1=date+datetime.timedelta(hours=qsts_steps), y1=.95,
+ 			line=dict(color="Red", width=3, dash="dashdot")
+		)
+		fig.add_shape(type="line",
+ 			x0=date, y0=1.05, x1=date+datetime.timedelta(hours=qsts_steps), y1=1.05,
+ 			line=dict(color="Red", width=3, dash="dashdot")
+		)
+
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
 def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid): #naming oon this piece needs to be updated to output
@@ -522,7 +542,7 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid):
 	#print(list_of_mg_dict)
 	return(list_of_mg_dict)
 
-def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER, BIG_OUT_NAME):
+def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER, BIG_OUT_NAME, QSTS_STEPS):
 	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid)
 	gen_obs = get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs)
@@ -534,7 +554,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	# Powerflow outputs.
 	opendss.newQstsPlot(FULL_NAME,
 		stepSizeInMinutes=60, 
-		numberOfSteps=24*20,
+		numberOfSteps=QSTS_STEPS,
 		keepAllFiles=False,
 		actions={
 			#24*5:'open object=line.671692 term=1',
@@ -544,11 +564,11 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	# opendss.voltagePlot(FULL_NAME, PU=True)
 	# opendss.currentPlot(FULL_NAME)
 	#TODO!!!! we're clobbering these outputs each time we run the full workflow. Consider keeping them separate.
-	make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year']) #TODO: pull year using reopt_out.get(f'year{mg_num}', 0.0) from allOutputData.json after refactor
+	make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS) #TODO: pull year using reopt_out.get(f'year{mg_num}', 0.0) from allOutputData.json after refactor
 	# for timeseries_load, output ANSI Range A service bands (2,520V - 2,340V for 2.4kV and 291V - 263V for 0.277kV)
-	make_chart('timeseries_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'])
-	make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'])
-	make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'])
+	make_chart('timeseries_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'], QSTS_STEPS, ansi_bands = True)
+	make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS)
+	make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS)
 	# Perform control sim.
 	import opendss_playground
 	# opendss_playground.play('./lehigh.dss.omd', './lehigh_base_phased_playground.dss', './tiedata.csv', None, opendss_playground.microgrids, '670671', False, 120, 30) #TODO: unify the microgrids data structure.

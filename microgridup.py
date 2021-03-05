@@ -372,12 +372,6 @@ def make_chart(csvName, category_name, x, y_list, year, qsts_steps, ansi_bands=F
 	fig = plotly.graph_objs.Figure(data, layout)
 
 	if ansi_bands == True:
-		# trace = plotly.graph_objs.Scatter(
-		# 		x = pd.to_datetime(pd.Series(24*20), unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
-		# 		y = .95,
-		# 		name = "ANSI band"
-		# 	)
-		# data.append(trace)
 		date = pd.Timestamp(f'{year}-01-01')
 		fig.add_shape(type="line",
  			x0=date, y0=.95, x1=date+datetime.timedelta(hours=qsts_steps), y1=.95,

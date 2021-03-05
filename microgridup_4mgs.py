@@ -12,6 +12,7 @@ if __name__ == '__main__':
 		"year" : '2017',
 		"energyCost" : "0.12",
 		"demandCost" : '20',
+		"wholesaleCost" : "0.034",
 		"solarCost" : "1600",
 		"windCost" : "4989",
 		"batteryPowerCost" : "840",

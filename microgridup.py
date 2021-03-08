@@ -40,13 +40,36 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 		for load_name in loads:
 			mg_load_df['load'] = mg_load_df['load'] + load_df[load_name]
 		mg_load_df.to_csv(REOPT_FOLDER + '/loadShape.csv', header=False, index=False)
-		# Default inputs.
+		# Insert loadshape into /allInputData.json
 		allInputData = json.load(open(REOPT_FOLDER + '/allInputData.json'))
 		allInputData['loadShape'] = open(REOPT_FOLDER + '/loadShape.csv').read()
 		allInputData['fileName'] = 'loadShape.csv'
+
 		# Pulling user defined inputs from REOPT_INPUTS.
 		for key in REOPT_INPUTS:
 			allInputData[key] = REOPT_INPUTS[key]
+
+		# Set the REopt outage to be centered around the max load in the loadshape
+		# TODO: Make it safe for the max to be at begining or end of the year
+		# find max and index of max in mg_load_df['load']
+		max_load = mg_load_df.max()
+		print("max_load:", max_load)
+		max_load_index = int(mg_load_df.idxmax())
+		print("max_load_index:", max_load_index)
+		# reset the outage timing such that the length of REOPT_INPUTS falls half before and half after the hour of max load
+		outage_duration = int(REOPT_INPUTS["outageDuration"])
+		if max_load_index + outage_duration/2 > 8760:
+			outage_start_hour = 8760 - outage_duration
+			# REopt seems not to allow an outage on the last hour of the year
+		elif max_load_index - outage_duration/2 < 1:
+			outage_start_hour = 2
+		else:
+			outage_start_hour = max_load_index - outage_duration/2
+		print("outage_start_hour:", str(int(outage_start_hour)))
+		allInputData['outage_start_hour'] = str(int(outage_start_hour))
+		allInputData['dieselGenCost'] = str(int(499.0))
+
+
 		# Pulling coordinates and existing generation from BASE_NAME.dss into REopt allInputData.json:
 		tree = dssConvert.dssToTree(BASE_NAME) #TO DO: For Accuracy and slight efficiency gain, refactor all search parameters to search through the "tree" (list of OrderedDicts, len(list)= # lines in base.dss)
 		#print(tree)

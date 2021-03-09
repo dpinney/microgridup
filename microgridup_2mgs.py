@@ -5,6 +5,7 @@ if __name__ == '__main__':
 	BASE_NAME = 'lehigh_base_phased.dss'
 	LOAD_NAME = 'lehigh_load.csv'
 	QSTS_STEPS = 24*20
+	DIESEL_SAFETY_FACTOR = .2
 	REOPT_INPUTS = {
 		"solar" : "on",
 		"wind" : "off",
@@ -78,5 +79,5 @@ if __name__ == '__main__':
 		'm2':microgrid_2
 	}
 
-	main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid_1, playground_microgrids, GEN_NAME, FULL_NAME_1, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_1, BIG_OUT_NAME_1, QSTS_STEPS)
-	main(FULL_NAME_1, LOAD_NAME, REOPT_INPUTS, microgrid_2, playground_microgrids, GEN_NAME, FULL_NAME_2, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_2, BIG_OUT_NAME_2, QSTS_STEPS)
+	main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid_1, playground_microgrids, GEN_NAME, FULL_NAME_1, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_1, BIG_OUT_NAME_1, QSTS_STEPS, DIESEL_SAFETY_FACTOR)
+	main(FULL_NAME_1, LOAD_NAME, REOPT_INPUTS, microgrid_2, playground_microgrids, GEN_NAME, FULL_NAME_2, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_2, BIG_OUT_NAME_2, QSTS_STEPS, DIESEL_SAFETY_FACTOR)

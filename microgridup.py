@@ -53,9 +53,9 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 		# TODO: Make it safe for the max to be at begining or end of the year
 		# find max and index of max in mg_load_df['load']
 		max_load = mg_load_df.max()
-		print("max_load:", max_load)
+		#print("max_load:", max_load)
 		max_load_index = int(mg_load_df.idxmax())
-		print("max_load_index:", max_load_index)
+		#print("max_load_index:", max_load_index)
 		# reset the outage timing such that the length of REOPT_INPUTS falls half before and half after the hour of max load
 		outage_duration = int(REOPT_INPUTS["outageDuration"])
 		if max_load_index + outage_duration/2 > 8760:
@@ -67,8 +67,6 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 			outage_start_hour = max_load_index - outage_duration/2
 		print("outage_start_hour:", str(int(outage_start_hour)))
 		allInputData['outage_start_hour'] = str(int(outage_start_hour))
-		allInputData['dieselGenCost'] = str(int(499.0))
-
 
 		# Pulling coordinates and existing generation from BASE_NAME.dss into REopt allInputData.json:
 		tree = dssConvert.dssToTree(BASE_NAME) #TO DO: For Accuracy and slight efficiency gain, refactor all search parameters to search through the "tree" (list of OrderedDicts, len(list)= # lines in base.dss)
@@ -127,6 +125,44 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 			json.dump(allInputData, outfile, indent=4)
 		omf.models.__neoMetaModel__.runForeground(REOPT_FOLDER)
 		omf.models.__neoMetaModel__.renderTemplateToFile(REOPT_FOLDER)
+
+def max_net_load(inputName, REOPT_FOLDER):
+	''' Calculate max net load needing to be covered by diesel 
+	generation in an outage. This method assumes only solar, wind and diesel generation 
+	when islanded from main grid, with no support from battery in order to model 
+	the worst case long term outage. '''
+	reopt_out = json.load(open(REOPT_FOLDER + inputName))
+	mg_num = 1
+	load_df = pd.DataFrame()
+	load_df['total_load'] = pd.Series(reopt_out.get(f'load{mg_num}', np.zeros(8760)))
+	load_df['solar_shape'] = pd.Series(reopt_out.get(f'powerPV{mg_num}', np.zeros(8760)))
+	load_df['wind_shape'] = pd.Series(reopt_out.get(f'powerWind{mg_num}', np.zeros(8760)))
+	load_df['net_load'] = load_df['total_load']-load_df['solar_shape']-load_df['wind_shape']
+	# max load in loadshape
+	max_total_load = max(load_df['total_load'])
+	# max net load not covered by solar or wind
+	# Equivalent to diesel size needed for uninterupted power throughout the year
+	max_net_load = max(load_df['net_load'])
+	# diesel size recommended by REopt
+	# diesel_REopt = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
+	#print(load_df)
+	#print("Max total load for", REOPT_FOLDER, ":", max_total_load)
+	#print("Max load needed to be supported by diesel for", REOPT_FOLDER, ":", max_net_load)
+	#print("% more kW diesel needed than recommended by REopt for", REOPT_FOLDER, ":", round(100*(max_net_load - diesel_REopt)/diesel_REopt))
+	return max_net_load
+
+def diesel_sizing(inputName, REOPT_FOLDER, DIESEL_SAFETY_FACTOR, max_net_load):
+	''' Calculate total diesel kW needed to meet max net load at all hours of the year
+	plus a user-inputted design safety factor'''
+	reopt_out = json.load(open(REOPT_FOLDER + inputName))
+	mg_num = 1
+	diesel_total_REopt = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
+	if max_net_load >= diesel_total_REopt:
+		diesel_total_calc = max_net_load*(1+DIESEL_SAFETY_FACTOR)
+	elif max_net_load < diesel_total_REopt:
+		diesel_total_calc = diesel_total_REopt*(1+DIESEL_SAFETY_FACTOR)
+	#print(diesel_total_calc,"kW diesel_total_calc is", round(100*(diesel_total_calc-diesel_total_REopt)/diesel_total_REopt), "% more kW diesel than recommended by REopt for", REOPT_FOLDER)
+	return diesel_total_calc
 
 def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid):
 	''' Get generator objects and shapes from REOpt.
@@ -471,6 +507,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid): #na
 								+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
 								+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
 								+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
+		#TODO: UPDATE cap_ex_after_incentives_existing_gen_adj to include incentive structures for wind and batteries
 		cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives \
 								+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
 								+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
@@ -538,7 +575,7 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid):
 	npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
 	cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
 	cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
-	# economic outcomes with the capital costs of existing wind and batteries deducted:
+	# economic outcomes with the capital costs of existing wind and batteries deducted, and diesel size adjusted:
 	npv_existing_gen_adj = npv \
 							+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
 							+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
@@ -559,8 +596,10 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid):
 	#print(list_of_mg_dict)
 	return(list_of_mg_dict)
 
-def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER, BIG_OUT_NAME, QSTS_STEPS):
+def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER, BIG_OUT_NAME, QSTS_STEPS, DIESEL_SAFETY_FACTOR):
 	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid)
+	net_load = max_net_load('/allOutputData.json', REOPT_FOLDER)
+	diesel_total_calc = diesel_sizing('/allOutputData.json',REOPT_FOLDER, DIESEL_SAFETY_FACTOR, net_load)
 	gen_obs = get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs)
 	gen_omd(FULL_NAME, OMD_NAME)

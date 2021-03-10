@@ -94,7 +94,7 @@ if __name__ == '__main__':
 		'switch': '632645',
 		'gen_bus': '646',
 		'gen_obs_existing': [],
-		'max_potential': '800' 
+		'max_potential': '800' # total kW rating on 645 and 646 is 400 kW
 	}
 
 	playground_microgrids = {}

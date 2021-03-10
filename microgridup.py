@@ -443,7 +443,7 @@ def make_chart(csvName, category_name, x, y_list, year, qsts_steps, ansi_bands=F
 
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
-def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid): #naming oon this piece needs to be updated to output
+def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, diesel_total_calc): #naming oon this piece needs to be updated to output
 	''' Generate a report on each microgrid '''
 	reopt_out = json.load(open(REOPT_FOLDER + inputName))
 	with open(outputCsvName, 'w', newline='') as outcsv:
@@ -453,8 +453,8 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid): #na
 							"Diesel Fuel Used During Outage (gal)", "Existing Solar (kW)", "Recommended New Solar (kW)", 
 							"Existing Battery Power (kW)", "Recommended New Battery Power (kW)", "Existing Battery Capacity (kWh)", 
 							"Recommended New Battery Capacity (kWh)", "Existing Wind (kW)", "Recommended New Wind (kW)", 
-							"Total Generation on Grid (kW)", "NPV ($)", "CapEx ($)", "CapEx after Incentives ($)", 
-							"Average Outage Survived (h)"])
+							"Total Generation on Grid (kW)", "NPV ($)", "CapEx ($)", "CapEx after Incentives ($)"]) 
+							#,"Average Outage Survived (h)"])
 		mg_num = 1
 		mg_ob = microgrid
 		gen_bus_name = mg_ob['gen_bus']
@@ -476,9 +476,18 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid): #na
 			wind_size_new = wind_size_total - wind_size_existing
 		else:
 			wind_size_new = 0
-		diesel_size_total = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
+		diesel_size_REopt = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
 		diesel_size_existing = reopt_out.get(f'sizeDieselExisting{mg_num}', 0.0)
-		diesel_size_new = diesel_size_total - diesel_size_existing
+		# calculate additional diesel to be added to existing (if any) to support max_net_load + DIESEL_SAFETY_FACTOR
+		if diesel_total_calc - diesel_size_existing > 0:
+			diesel_size_new = diesel_total_calc - diesel_size_existing
+		else:
+			diesel_size_new = 0
+		# new diesel cost to be added, including 10$/kW/year fixed O+M cost for default 25 year period ($)
+		if diesel_total_calc - diesel_size_REopt > 0:
+			diesel_new_cost = (diesel_total_calc - diesel_size_REopt)*(reopt_out.get(f'dieselGenCost{mg_num}', 0.0) + 10*25)
+		else:
+			diesel_new_cost = 0
 		battery_cap_total = reopt_out.get(f'capacityBattery{mg_num}', 0.0)
 		battery_cap_existing = reopt_out.get(f'batteryKwhExisting{mg_num}', 0.0)
 		if battery_cap_total - battery_cap_existing > 0:
@@ -493,36 +502,40 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid): #na
 		else:
 			battery_pow_new = 0
 
-		total_gen = diesel_size_total + solar_size_total + battery_pow_total + wind_size_total
+		total_gen = diesel_total_calc + solar_size_total + battery_pow_total + wind_size_total
 
 		npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
 		cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
 		cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
 		# economic outcomes with the capital costs of existing wind and batteries deducted:
+		#TODO: The diesel is a bit overcosted; if it seems necessary, add in the 8.3% discount rate and 2.5% inflation rate and a calculation for Fuel spent across the 25 year period
 		npv_existing_gen_adj = npv \
 								+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
 								+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-								+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
+								+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+								- diesel_new_cost
 		cap_ex_existing_gen_adj = cap_ex \
-								+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
-								+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-								+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
-		#TODO: UPDATE cap_ex_after_incentives_existing_gen_adj to include incentive structures for wind and batteries
+								- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
+								- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
+								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+								+ diesel_new_cost
+		#TODO: UPDATE cap_ex_after_incentives_existing_gen_adj in 2022 to erase the 18% cost reduction for wind above 100kW as it will have ended
 		cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives \
-								+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
-								+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-								+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
-		ave_outage = reopt_out.get(f'avgOutage{mg_num}', 0.0)
+								- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0)*.82 \
+								- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
+								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+								+ diesel_new_cost
+		#TODO: Update the Average Outage if the updated diesel size is run back through REopt for recalculation
+		# ave_outage = reopt_out.get(f'avgOutage{mg_num}', 0.0)
 		
 		row =[str(REOPT_FOLDER[-1]), gen_bus_name, round(min_load,0), round(ave_load,0), round(avg_daytime_load,1), round(max_load,0),
 		round(diesel_size_existing,1), round(diesel_size_new,1), round(diesel_used_gal, 0), round(solar_size_existing,1), 
 		round(solar_size_new,1), round(battery_pow_existing,1), round(battery_pow_new,1), round(battery_cap_existing,1), 
 		round(battery_cap_new,1), round(wind_size_existing,1), round(wind_size_new,1), round(total_gen,1),
-		int(round(npv_existing_gen_adj)), int(round(cap_ex_existing_gen_adj)), int(round(cap_ex_after_incentives_existing_gen_adj)), 
-		round(ave_outage,1)]
+		int(round(npv_existing_gen_adj)), int(round(cap_ex_existing_gen_adj)), int(round(cap_ex_after_incentives_existing_gen_adj))]
 		writer.writerow(row)
 
-def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid):
+def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, diesel_total_calc):
 	''' Generate a dictionary reports fr each key for all microgrids. '''
 	reopt_out = json.load(open(REOPT_FOLDER + inputName))
 	list_of_mg_dict = []
@@ -591,7 +604,8 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid):
 							+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
 							+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
 	mg_dict["CapEx after Incentives ($)"] = f'{round(cap_ex_after_incentives_existing_gen_adj):,}'
-	mg_dict["Average Outage Survived (h)"] = round(reopt_out.get(f'avgOutage{mg_num}', 0.0),0)
+	#TODO: Update Average Outage if the updated diesel size is run back through REopt for recalculation
+	# mg_dict["Average Outage Survived (h)"] = round(reopt_out.get(f'avgOutage{mg_num}', 0.0),0)
 	list_of_mg_dict.append(mg_dict)
 	#print(list_of_mg_dict)
 	return(list_of_mg_dict)
@@ -628,9 +642,9 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	# Perform control sim.
 	import opendss_playground
 	# opendss_playground.play('./lehigh.dss.omd', './lehigh_base_phased_playground.dss', './tiedata.csv', None, opendss_playground.microgrids, '670671', False, 120, 30) #TODO: unify the microgrids data structure.
-	opendss_playground.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, '670671', False, 120, 30) #TODO: unify the microgrids data structure.
-	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER, microgrid)
-	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER, microgrid)
+	# opendss_playground.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, '670671', False, 120, 30) #TODO: unify the microgrids data structure.
+	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER, microgrid, diesel_total_calc)
+	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER, microgrid, diesel_total_calc)
 	# convert to dict of lists for columnar output in output_template.html
 	mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
 	# Create giant consolidated report.

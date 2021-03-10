@@ -79,10 +79,10 @@ def diesel_sizing(inputName, REOPT_FOLDER, DIESEL_SAFETY_FACTOR, max_net_load):
 # need a button in mgDesign for cost of fuel that is a pass through we can use in the econ analysis pulling from '/allOutputData.json'
 
 if __name__ == '__main__':
-	diesel_sizing('/allOutputData.json','lehigh_reopt_1',.2, max_net_load('/allOutputData.json','lehigh_reopt_1'))
+	#diesel_sizing('/allOutputData.json','lehigh_reopt_1',.2, max_net_load('/allOutputData.json','lehigh_reopt_1'))
 
-	# max_net_load('/allOutputData.json','lehigh_reopt_1')
-	# max_net_load('/allOutputData.json','lehigh_reopt_2')
-	# max_net_load('/allOutputData.json','lehigh_reopt_3')
-	# max_net_load('/allOutputData.json','lehigh_reopt_4')
+	max_net_load('/allOutputData.json','lehigh_reopt_1')
+	max_net_load('/allOutputData.json','lehigh_reopt_2')
+	max_net_load('/allOutputData.json','lehigh_reopt_3')
+	max_net_load('/allOutputData.json','lehigh_reopt_4')
 

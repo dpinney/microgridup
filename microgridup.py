@@ -164,7 +164,7 @@ def diesel_sizing(inputName, REOPT_FOLDER, DIESEL_SAFETY_FACTOR, max_net_load):
 	#print(diesel_total_calc,"kW diesel_total_calc is", round(100*(diesel_total_calc-diesel_total_REopt)/diesel_total_REopt), "% more kW diesel than recommended by REopt for", REOPT_FOLDER)
 	return diesel_total_calc
 
-def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid):
+def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_total_calc):
 	''' Get generator objects and shapes from REOpt.
 	SIDE EFFECTS: creates GEN_NAME generator shape, returns gen_obs'''
 	reopt_out = json.load(open(REOPT_FOLDER + '/allOutputData.json'))
@@ -174,8 +174,9 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid):
 	mg_ob = microgrid
 	gen_bus_name = mg_ob['gen_bus']
 	gen_obs_existing = mg_ob['gen_obs_existing']
-	''' calculate size of new generators at gen_bus based on REopt and existing gen from BASE_NAME for each microgrid.
+	''' Calculate size of new generators at gen_bus based on REopt and existing gen from BASE_NAME for each microgrid.
 		Existing solar and diesel are supported natively in REopt.
+		diesel_total_calc is used to set the total amount of diesel generation.
 		Existing wind and batteries require setting the minimimum generation threshold (windMin, batteryPowerMin, batteryCapacityMin)'''
 	solar_size_total = reopt_out.get(f'sizePV{mg_num}', 0.0)
 	solar_size_existing = reopt_out.get(f'sizePVExisting{mg_num}', 0.0)
@@ -186,9 +187,13 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid):
 		wind_size_new = wind_size_total - wind_size_existing 
 	else:
 		wind_size_new = 0 #TO DO: update logic here to make run more robust to oversized existing wind gen	
-	diesel_size_total = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
+	diesel_size_REopt = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
 	diesel_size_existing = reopt_out.get(f'sizeDieselExisting{mg_num}', 0.0)
-	diesel_size_new = diesel_size_total - diesel_size_existing
+	# calculate additional diesel to be added to existing diesel gen (if any) to adjust kW based on diesel_sizing()
+	if diesel_total_calc - diesel_size_existing > 0:
+		diesel_size_new = diesel_total_calc - diesel_size_existing
+	else:
+		diesel_size_new = 0	
 	battery_cap_total = reopt_out.get(f'capacityBattery{mg_num}', 0.0) 
 	battery_cap_existing = reopt_out.get(f'batteryKwhExisting{mg_num}', 0.0)
 	if battery_cap_total - battery_cap_existing > 0:
@@ -270,7 +275,7 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid):
 		if solar_size_total > 0:
 			pVToBat = pd.Series(reopt_out.get(f'powerPVToBattery{mg_num}'))
 		dieselToBat = np.zeros(8760)
-		if diesel_size_total > 0:
+		if diesel_total_calc > 0:
 			dieselToBat = pd.Series(reopt_out.get(f'powerDieselToBattery{mg_num}'))
 		windToBat = np.zeros(8760)
 		if wind_size_total > 0:
@@ -553,11 +558,25 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, diesel_to
 	daytime_kwh = np_load[:,9:17] #365 8-hour daytime arrays
 	mg_dict["Average Daytime Load (kWh)"] = round(np.average(np.average(daytime_kwh, axis=1)),0)
 	mg_dict["Maximum Load (kWh)"] = round(max(load),0)
-	diesel_size_total = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
+	diesel_size_REopt = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
 	diesel_size_existing = reopt_out.get(f'sizeDieselExisting{mg_num}', 0.0)
+	# calculate additional diesel to be added to existing (if any) to support max_net_load + DIESEL_SAFETY_FACTOR
+	if diesel_total_calc - diesel_size_existing > 0:
+		diesel_size_new = diesel_total_calc - diesel_size_existing
+	else:
+		diesel_size_new = 0
+	# new diesel cost to be added, including 10$/kW/year fixed O+M cost for default 25 year period ($)
+	if diesel_total_calc - diesel_size_REopt > 0:
+		diesel_new_cost = (diesel_total_calc - diesel_size_REopt)*(reopt_out.get(f'dieselGenCost{mg_num}', 0.0) + 10*25)
+	else:
+		diesel_new_cost = 0
+
 	mg_dict["Existing Diesel (kW)"] = round(diesel_size_existing,0)
-	mg_dict["Recommended New Diesel (kW)"] = round(diesel_size_total - diesel_size_existing,0)
+	mg_dict["Recommended New Diesel (kW)"] = round(diesel_size_new,0)
+	# For large gensets, diesel fuel used is approximated by REopt as linear against the kWh provided, so no adjustment is made here for the size of the diesel genset
 	mg_dict["Diesel Fuel Used During Outage (gal)"] = round(reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0),0)
+	
+
 	solar_size_total = reopt_out.get(f'sizePV{mg_num}', 0.0)
 	solar_size_existing = reopt_out.get(f'sizePVExisting{mg_num}', 0.0)
 	mg_dict["Existing Solar (kW)"] = round(solar_size_existing ,0)
@@ -583,7 +602,7 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, diesel_to
 		mg_dict["Recommended New Wind (kW)"] = round(wind_size_total - wind_size_existing,0)
 	else:
 		mg_dict["Recommended New Wind (kW)"] = 0.0
-	total_gen = diesel_size_total + solar_size_total + battery_pow_total + wind_size_total
+	total_gen = diesel_total_calc + solar_size_total + battery_pow_total + wind_size_total
 	mg_dict["Total Generation on Grid (kW)"] = round(total_gen,0)
 	npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
 	cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
@@ -592,17 +611,20 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, diesel_to
 	npv_existing_gen_adj = npv \
 							+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
 							+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-							+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
+							+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+							- diesel_new_cost
 	mg_dict["Net Present Value ($)"] = f'{round(npv_existing_gen_adj):,}'
 	cap_ex_existing_gen_adj = cap_ex \
-							+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
-							+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-							+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
+							- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
+							- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
+							- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+							+ diesel_new_cost
 	mg_dict["CapEx ($)"] = f'{round(cap_ex_existing_gen_adj):,}'
 	cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives \
-							+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
-							+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-							+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
+							- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0)*.82 \
+							- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
+							- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+							+ diesel_new_cost
 	mg_dict["CapEx after Incentives ($)"] = f'{round(cap_ex_after_incentives_existing_gen_adj):,}'
 	#TODO: Update Average Outage if the updated diesel size is run back through REopt for recalculation
 	# mg_dict["Average Outage Survived (h)"] = round(reopt_out.get(f'avgOutage{mg_num}', 0.0),0)
@@ -614,7 +636,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid)
 	net_load = max_net_load('/allOutputData.json', REOPT_FOLDER)
 	diesel_total_calc = diesel_sizing('/allOutputData.json',REOPT_FOLDER, DIESEL_SAFETY_FACTOR, net_load)
-	gen_obs = get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid)
+	gen_obs = get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_total_calc)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs)
 	gen_omd(FULL_NAME, OMD_NAME)
 	# Draw the circuit oneline.

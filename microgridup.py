@@ -166,7 +166,9 @@ def diesel_sizing(inputName, REOPT_FOLDER, DIESEL_SAFETY_FACTOR, max_net_load):
 
 def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_total_calc):
 	''' Get generator objects and shapes from REOpt.
-	SIDE EFFECTS: creates GEN_NAME generator shape, returns gen_obs'''
+	SIDE EFFECTS: creates GEN_NAME generator shape, returns gen_obs
+	TODO: To implement multiple same-type existing generators within a single microgrid, 
+	will need to implement searching the tree of FULL_NAME to find kw ratings of existing gens'''
 	reopt_out = json.load(open(REOPT_FOLDER + '/allOutputData.json'))
 	gen_df_builder = pd.DataFrame()
 	gen_obs = []
@@ -218,12 +220,13 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_to
 			'pf':'1'
 		})
 		# 0-1 scale the power output loadshape to the total generation kw of that type of generator using pandas
-		gen_df_builder[f'solar_{gen_bus_name}'] = pd.Series(reopt_out.get(f'powerPV{mg_num}'))/solar_size_total
-	# build loadshapes for existing generation from BASE_NAME, inputting the 0-1 solar generation loadshape 
+		gen_df_builder[f'solar_{gen_bus_name}'] = pd.Series(reopt_out.get(f'powerPV{mg_num}'))/solar_size_total*solar_size_new
+	# build loadshapes for existing generation from BASE_NAME, inputting the 0-1 solar generation loadshape and scaling by their rated kw
 	if solar_size_existing > 0:
 		for gen_ob_existing in gen_obs_existing:
 			if gen_ob_existing.startswith('solar_'):
-				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerPV{mg_num}'))/solar_size_total
+				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerPV{mg_num}'))/solar_size_total*solar_size_existing 
+				#HACK Implemented: TODO: IF multiple existing solar generator objects are in gen_obs, we need to scale the output loadshapes by their rated kW 
 	if diesel_size_new > 0:
 		gen_obs.append({
 			'!CMD': 'new',
@@ -239,13 +242,15 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_to
 			'conn':'delta'
 		})
 		# 0-1 scale the power output loadshape to the total generation kw of that type of generator
-		#bgen_df_builder[f'diesel_{gen_bus_name}'] = pd.Series(reopt_out.get(f'powerDiesel{mg_num}'))/diesel_size_total # insert the 0-1 diesel generation shape provided by REopt to simulate the outage specified in REopt
+		# gen_df_builder[f'diesel_{gen_bus_name}'] = pd.Series(reopt_out.get(f'powerDiesel{mg_num}'))/diesel_size_total # insert the 0-1 diesel generation shape provided by REopt to simulate the outage specified in REopt
+		# TODO: if using real loadshapes for diesel, need to scale them based on rated kw of the new diesel
 		gen_df_builder[f'diesel_{gen_bus_name}'] = pd.DataFrame(np.zeros(8760)) # insert an array of zeros for the diesel generation shape to simulate no outage
 	# build loadshapes for existing generation from BASE_NAME, inputting the 0-1 diesel generation loadshape 
 	if diesel_size_existing > 0:	
 		for gen_ob_existing in gen_obs_existing:
 			if gen_ob_existing.startswith('diesel_'):
 				# gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerDiesel{mg_num}'))/diesel_size_total # insert the 0-1 diesel generation shape provided by REopt to simulate the outage specified in REopt
+				# TODO: if using real loadshapes for diesel, need to scale them based on rated kw of that individual generator object
 				gen_df_builder[f'{gen_ob_existing}'] = pd.DataFrame(np.zeros(8760)) # insert an array of zeros for the diesel generation shape to simulate no outage
 	# get loadshapes for new Wind
 	if wind_size_new > 0:
@@ -258,13 +263,14 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_to
 			'kw':f'{wind_size_new}',
 			'pf':'1'
 		})
-		# 0-1 scale the power output loadshape to the total generation kw of that type of generator
-		gen_df_builder[f'wind_{gen_bus_name}'] = pd.Series(reopt_out.get(f'powerWind{mg_num}'))/wind_size_total
+		# 0-1 scale the power output loadshape to the total generation and multiply by the new kw of that type of generator
+		gen_df_builder[f'wind_{gen_bus_name}'] = pd.Series(reopt_out.get(f'powerWind{mg_num}'))/wind_size_total*wind_size_new
 	# build loadshapes for existing Wind generation from BASE_NAME
 	if wind_size_existing > 0:	
 		for gen_ob_existing in gen_obs_existing:
 			if gen_ob_existing.startswith('wind_'):
-				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerWind{mg_num}'))/wind_size_total
+				#HACK Implemented: TODO: IF multiple existing wind generator objects are in gen_obs, we need to scale the output loadshapes by their rated kW
+				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerWind{mg_num}'))/wind_size_total*wind_size_existing
 	# calculate battery loadshape (serving load - charging load)
 	if battery_cap_total > 0:	
 		batToLoad = pd.Series(reopt_out.get(f'powerBatteryToLoad{mg_num}'))
@@ -281,8 +287,6 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_to
 		if wind_size_total > 0:
 			windToBat = pd.Series(reopt_out.get(f'powerWindToBattery{mg_num}'))
 		battery_load = batToLoad - gridToBat - pVToBat - dieselToBat - windToBat
-		# 0-1 scale the full battery loadshape to the total battery power kw
-		battery_load_0_1 = battery_load/battery_pow_total
 	# get DSS objects and loadshapes for new battery
 	if battery_cap_new > 0: 
 		gen_obs.append({
@@ -306,12 +310,14 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_to
 			'%x':'50',
 			'%stored':'50'
 		})
-		gen_df_builder[f'battery_{gen_bus_name}'] = battery_load_0_1
+		# 0-1 scale the power output loadshape to the total generation and multiply by the new kw of that type of generator
+		gen_df_builder[f'battery_{gen_bus_name}'] = battery_load/battery_pow_total*battery_pow_new
 	# build loadshapes for existing battery generation from BASE_NAME
 	if battery_cap_existing > 0:	
 		for gen_ob_existing in gen_obs_existing:
 			if gen_ob_existing.startswith('battery_'):
-				gen_df_builder[f'{gen_ob_existing}'] = battery_load_0_1
+				#HACK Implemented: TODO: IF multiple existing wind generator objects are in gen_obs, we need to scale the output loadshapes by their rated kW
+				gen_df_builder[f'{gen_ob_existing}'] = battery_load/battery_pow_total*battery_pow_existing
 	gen_df_builder.to_csv(GEN_NAME, index=False)
 	return gen_obs
 
@@ -343,7 +349,7 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs):
 					'object': f'loadshape.{shape_name}',
 					'npts': f'{len(shape_data)}',
 					'interval': '1',
-					'useactual': 'yes', #todo: move back to [0,1] shapes?
+					'useactual': 'yes', 
 					'mult': f'{list(shape_data)}'.replace(' ','')
 				}
 			elif ob_string.startswith('generator.'):
@@ -358,7 +364,7 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs):
 					'object': f'loadshape.{shape_name}',
 					'npts': f'{len(shape_data)}',
 					'interval': '1',
-					'useactual': 'no',
+					'useactual': 'yes',
 					'mult': f'{list(shape_data)}'.replace(' ','')
 				}
 			elif ob_string.startswith('storage.'):
@@ -373,7 +379,7 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs):
 					'object': f'loadshape.{shape_name}',
 					'npts': f'{len(shape_data)}',
 					'interval': '1',
-					'useactual': 'no',
+					'useactual': 'yes',
 					'mult': f'{list(shape_data)}'.replace(' ','')
 				}
 		except:

@@ -276,6 +276,7 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 			leftOverHere = {}
 			maximum = 1.0
 			# check if there exists a solar generator connected to the generating bus of the microgrid under consideration
+			solarExists = False
 			for key in tree.keys():
 				if tree[key].get('object','').startswith('generator'):
 					if tree[key].get('name','').startswith('solar') and tree[key].get('parent','') == bus:
@@ -287,35 +288,45 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 								# if the solar loadshape exists in the tree, get the loadshape itself
 								if tree[key1].get('name','') == solarshapeName:
 									solarshape = eval(tree[key1].get('mult',''))
-									for entry in microgrids:
-										# populate the dieselShapes dictionary with the values of solar subtracted from total load needed to be supported
-										if buses[0] == microgrids[entry].get('gen_bus', ''):
-											maximum = microgrids[entry].get('max_potential', '')
-											if '.1' in loadShapes:
-												dieselShapes['.1'] = [a - b for a, b in zip(loadShapes.get('.1',''), solarshape)]
-											if '.2' in loadShapes:
-												dieselShapes['.2'] = [a - b for a, b in zip(loadShapes.get('.2',''), solarshape)]
-											if '.3' in loadShapes:
-												dieselShapes['.3'] = [a - b for a, b in zip(loadShapes.get('.3',''), solarshape)]
-									# check if the needed diesel generation exceeds the maximum potential of the generator.
-									for shape in dieselShapes:
-										if not shape in dieselShapesNew.keys():
-											dieselShapesNew[shape] = []
-										if not shape in leftOverShapes.keys():
-											leftOverShapes[shape] = []
-										if not shape in leftOverHere.keys():
-											leftOverHere[shape] = []
-										# if the needed power does not exceed the max, it is fully supported by the diesel
-										for entry in dieselShapes[shape]:
-											if (float(maximum) - float(entry)) >= 0:
-												dieselShapesNew[shape].append(float(entry))
-												leftOverShapes[shape].append(0.0)
-												leftOverHere[shape].append(False)
-											# otherwise, keep track of how much load cannot be supported so it can be supported by other generators
-											else:
-												dieselShapesNew[shape].append(float(maximum))
-												leftOverShapes[shape].append(float(entry)-float(maximum))
-												leftOverHere[shape].append(True)
+									solarExists = True
+			for entry in microgrids:
+				# populate the dieselShapes dictionary with the values of solar subtracted from total load needed to be supported
+				if buses[0] == microgrids[entry].get('gen_bus', ''):
+					maximum = microgrids[entry].get('max_potential', '')
+					if '.1' in loadShapes:
+						if solarExists == True:
+							dieselShapes['.1'] = [a - b for a, b in zip(loadShapes.get('.1',''), solarshape)]
+						else:
+							dieselShapes['.1'] = loadShapes.get('.1','')
+					if '.2' in loadShapes:
+						if solarExists == True:
+							dieselShapes['.2'] = [a - b for a, b in zip(loadShapes.get('.2',''), solarshape)]
+						else:
+							dieselShapes['.2'] = loadShapes.get('.2','')
+					if '.3' in loadShapes:
+						if solarExists == True:
+							dieselShapes['.3'] = [a - b for a, b in zip(loadShapes.get('.3',''), solarshape)]
+						else:
+							dieselShapes['.3'] = loadShapes.get('.3','')
+			# check if the needed diesel generation exceeds the maximum potential of the generator.
+			for shape in dieselShapes:
+				if not shape in dieselShapesNew.keys():
+					dieselShapesNew[shape] = []
+				if not shape in leftOverShapes.keys():
+					leftOverShapes[shape] = []
+				if not shape in leftOverHere.keys():
+					leftOverHere[shape] = []
+				# if the needed power does not exceed the max, it is fully supported by the diesel
+				for entry in dieselShapes[shape]:
+					if (float(maximum) - float(entry)) >= 0:
+						dieselShapesNew[shape].append(float(entry))
+						leftOverShapes[shape].append(0.0)
+						leftOverHere[shape].append(False)
+					# otherwise, keep track of how much load cannot be supported so it can be supported by other generators
+					else:
+						dieselShapesNew[shape].append(float(maximum))
+						leftOverShapes[shape].append(float(entry)-float(maximum))
+						leftOverHere[shape].append(True)
 		# if it's the beinning of the simulation, fill the whole loadshape
 		if timePassed == 0:
 			busShapes[buses[0]] = [dieselShapesNew.get('.1',''), dieselShapesNew.get('.2',''), dieselShapesNew.get('.3','')]
@@ -396,7 +407,7 @@ def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, b
 							'object': f'loadshape.{shape_name}',
 							'npts': f'{len(shape_data)}',
 							'interval': '1',
-							'useactual': 'no',
+							'useactual': 'yes',
 							'mult': str(list(shape_data)).replace(' ','')
 						}
 					i+=1
@@ -508,7 +519,7 @@ def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, b
 			yaxis = dict(title = str(y_list))
 		)
 		fig = py.graph_objs.Figure(data, layout)
-		py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
+		py.offline.plot(fig, filename=f'{csvName}.plot.html')
 	
 	# make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
 	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1','V2','V3'])

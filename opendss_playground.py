@@ -380,7 +380,7 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 						maxTime = time
 
 				# continue shedding load until all the loads not shed are supported
-				while maxTimeValue > 0.0:
+				if maxTimeValue > 0.0:
 
 					# fill a dictionary of all loads connected to the microgrid and their corresponding loadshapes			
 					for node in subtrees[element]:

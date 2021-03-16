@@ -463,7 +463,7 @@ def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, b
 							'phases': '1',
 							'angle': str(angle),
 							'amps': str(amps),
-							'daily': 'newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape'
+							'yearly': 'newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape'
 						}
 					j+=1
 					# add an isource representation for the solar generation to the dictionary of all generators to be added
@@ -475,7 +475,7 @@ def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, b
 							'phases': '1',
 							'angle': str(angle),
 							'amps': str(amps),
-							'daily': 'solar_' + str(buses[0]) + '_shape'
+							'yearly': 'solar_' + str(buses[0]) + '_shape'
 						}
 					j+=1
 			phase += 1
@@ -501,9 +501,6 @@ def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, b
 		convertedKey = collections.OrderedDict(gen_insert_list[key])
 		treeDSS.insert(max_pos, convertedKey)
 		max_pos+=1
-
-	# insert a line telling the file to solve when run by OpenDSS
-	treeDSS.insert(max_pos, {'!CMD': 'solve'})
 
 	# Write new DSS file.
 	FULL_NAME = 'lehigh_full_newDiesel.dss'

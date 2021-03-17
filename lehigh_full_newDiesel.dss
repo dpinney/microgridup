@@ -91,6 +91,8 @@ setbusxy bus=692 y=30.285513 x=-84.074493
 setbusxy bus=675 y=30.287013 x=-84.074493
 setbusxy bus=652 y=30.284013 x=-84.075493
 setbusxy bus=680 y=30.285013 x=-84.075493
+set voltagebases=[115,4.16,0.48]
+calcvoltagebases
 new object=isource.isource_newdiesel675_1_shape bus1=675.1 phases=1 angle=240.000000 amps=219.969000 yearly=newdiesel_675_1_shape
 new object=isource.isource_solar675_1_shape bus1=675.1 phases=1 angle=240.000000 amps=219.969000 yearly=solar_675_shape
 new object=isource.isource_newdiesel675_2_shape bus1=675.2 phases=1 angle=120.000000 amps=65.000000 yearly=newdiesel_675_2_shape
@@ -103,5 +105,3 @@ new object=isource.isource_newdiesel684_2_shape bus1=684.2 phases=1 angle=120.00
 new object=isource.isource_solar684_2_shape bus1=684.2 phases=1 angle=120.000000 amps=65.000000 yearly=solar_684_shape
 new object=isource.isource_newdiesel684_3_shape bus1=684.3 phases=1 angle=0.000000 amps=169.120000 yearly=newdiesel_684_3_shape
 new object=isource.isource_solar684_3_shape bus1=684.3 phases=1 angle=0.000000 amps=169.120000 yearly=solar_684_shape
-set voltagebases=[115,4.16,0.48]
-calcvoltagebases

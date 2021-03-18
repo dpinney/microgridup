@@ -174,27 +174,27 @@ def mg_phase_and_kv(BASE_NAME, microgrid):
 	load_phase_list = []
 	gen_bus_kv = []
 	#TODO: for efficiency, can I build a mapping of the object names from the tree, and then get that item from the map/dict?
-
+	load_map = {x.get('object',''):i for i, x in enumerate(tree)}
 	for load_name in mg_loads:
-		for i, ob in enumerate(tree):
-			ob_string = ob.get('object','')
-			if ob_string.startswith('load.'):
-				ob_name = ob_string[5:]
-				if ob_name == load_name:
-					# find the phase of the load
-					bus_name = ob.get('bus1','')
-					bus_name_list = bus_name.split('.')
-					load_phases = []
-					load_phases = bus_name_list[-(len(bus_name_list)-1):]
-					for phase in load_phases:
-						if phase not in load_phase_list:
-							load_phase_list.append(phase)
-					# set the voltage for the gen_bus and check that all loads match in voltage
-					load_kv = ob.get('kv','')
-					if load_kv not in gen_bus_kv and len(gen_bus_kv) > 0:
-						raise Exception(f'More than one load voltage is specified on gen_bus {gen_bus_name}. Check voltage of {load_name}.')
-					elif load_kv not in gen_bus_kv and len(gen_bus_kv) == 0:
-						gen_bus_kv = load_kv
+		ob = tree[load_map[f'load.{load_name}']]
+		ob_string = ob.get('object','')
+		if ob_string.startswith('load.'):
+			ob_name = ob_string[5:]
+			if ob_name == load_name:
+				# find the phase of the load
+				bus_name = ob.get('bus1','')
+				bus_name_list = bus_name.split('.')
+				load_phases = []
+				load_phases = bus_name_list[-(len(bus_name_list)-1):]
+				for phase in load_phases:
+					if phase not in load_phase_list:
+						load_phase_list.append(phase)
+				# set the voltage for the gen_bus and check that all loads match in voltage
+				load_kv = ob.get('kv','')
+				if load_kv not in gen_bus_kv and len(gen_bus_kv) > 0:
+					raise Exception(f'More than one load voltage is specified on gen_bus {gen_bus_name}. Check voltage of {load_name}.')
+				elif load_kv not in gen_bus_kv and len(gen_bus_kv) == 0:
+					gen_bus_kv = load_kv
 	load_phase_list.sort()
 	out_dict = {}
 	out_dict['gen_bus'] = gen_bus_name
@@ -430,33 +430,6 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs):
 	# Write new DSS file.
 	dssConvert.treeToDss(tree, FULL_NAME)
 
-def gen_omd(FULL_NAME, OMD_NAME):
-	''' Generate an OMD.
-	SIDE-EFFECTS: creates the OMD'''
-	tree = dssConvert.dssToTree(FULL_NAME)
-	evil_glm = dssConvert.evilDssTreeToGldTree(tree)
-	# Injecting additional coordinates.
-	RADIUS = 0.0002 #TODO: derive sensible RADIUS from lat/lon numbers.
-	tree = dssConvert.dssToTree(FULL_NAME)
-	evil_glm = dssConvert.evilDssTreeToGldTree(tree)
-	name_map = _name_to_key(evil_glm)
-	for ob in evil_glm.values():
-		ob_name = ob.get('name','')
-		ob_type = ob.get('object','')
-		if 'parent' in ob:
-			parent_loc = name_map[ob['parent']]
-			parent_ob = evil_glm[parent_loc]
-			parent_lat = parent_ob.get('latitude', None)
-			parent_lon = parent_ob.get('longitude', None)
-			# place randomly on circle around parent.
-			angle = random.random()*3.14159265*2;
-			x = math.cos(angle)*RADIUS;
-			y = math.sin(angle)*RADIUS;
-			ob['latitude'] = str(float(parent_lat) + x)
-			ob['longitude'] = str(float(parent_lon) + y)
-			# print(ob)
-	dssConvert.evilToOmd(evil_glm, OMD_NAME)
-
 def make_chart(csvName, category_name, x, y_list, year, qsts_steps, ansi_bands=False):
 	''' Charting outputs. '''
 	gen_data = pd.read_csv(csvName)
@@ -683,7 +656,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	diesel_total_calc = diesel_sizing('/allOutputData.json',REOPT_FOLDER, DIESEL_SAFETY_FACTOR, net_load)
 	gen_obs = get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_total_calc, BASE_NAME)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs)
-	gen_omd(FULL_NAME, OMD_NAME)
+	dssConvert.dssToOmd(FULL_NAME, OMD_NAME, RADIUS=0.0002)
 	# Draw the circuit oneline.
 	distNetViz.viz(OMD_NAME, forceLayout=False, outputPath='.', outputName=ONELINE_NAME, open_file=False)
 	# Draw the map.

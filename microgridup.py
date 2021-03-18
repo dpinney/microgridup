@@ -164,7 +164,46 @@ def diesel_sizing(inputName, REOPT_FOLDER, DIESEL_SAFETY_FACTOR, max_net_load):
 	#print(diesel_total_calc,"kW diesel_total_calc is", round(100*(diesel_total_calc-diesel_total_REopt)/diesel_total_REopt), "% more kW diesel than recommended by REopt for", REOPT_FOLDER)
 	return diesel_total_calc
 
-def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_total_calc):
+def mg_phase_and_kv(BASE_NAME, microgrid):
+	'''Returns a dict with the phases at the gen_bus and kv 
+	of the loads for a given microgrid.'''
+	tree = dssConvert.dssToTree(BASE_NAME)
+	mg_ob = microgrid
+	gen_bus_name = mg_ob['gen_bus']
+	mg_loads = mg_ob['loads']
+	load_phase_list = []
+	gen_bus_kv = []
+	#TODO: for efficiency, can I build a mapping of the object names from the tree, and then get that item from the map/dict?
+
+	for load_name in mg_loads:
+		for i, ob in enumerate(tree):
+			ob_string = ob.get('object','')
+			if ob_string.startswith('load.'):
+				ob_name = ob_string[5:]
+				if ob_name == load_name:
+					# find the phase of the load
+					bus_name = ob.get('bus1','')
+					bus_name_list = bus_name.split('.')
+					load_phases = []
+					load_phases = bus_name_list[-(len(bus_name_list)-1):]
+					for phase in load_phases:
+						if phase not in load_phase_list:
+							load_phase_list.append(phase)
+					# set the voltage for the gen_bus and check that all loads match in voltage
+					load_kv = ob.get('kv','')
+					if load_kv not in gen_bus_kv and len(gen_bus_kv) > 0:
+						raise Exception(f'More than one load voltage is specified on gen_bus {gen_bus_name}. Check voltage of {load_name}.')
+					elif load_kv not in gen_bus_kv and len(gen_bus_kv) == 0:
+						gen_bus_kv = load_kv
+	load_phase_list.sort()
+	out_dict = {}
+	out_dict['gen_bus'] = gen_bus_name
+	out_dict['phases'] = load_phase_list
+	out_dict['kv'] = gen_bus_kv
+	#print('out_dict', out_dict)
+	return out_dict
+
+def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_total_calc, BASE_NAME):
 	''' Get generator objects and shapes from REOpt.
 	SIDE EFFECTS: creates GEN_NAME generator shape, returns gen_obs
 	TODO: To implement multiple same-type existing generators within a single microgrid, 
@@ -176,6 +215,7 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_to
 	mg_ob = microgrid
 	gen_bus_name = mg_ob['gen_bus']
 	gen_obs_existing = mg_ob['gen_obs_existing']
+	phase_and_kv = mg_phase_and_kv(BASE_NAME, microgrid)
 	''' Calculate size of new generators at gen_bus based on REopt and existing gen from BASE_NAME for each microgrid.
 		Existing solar and diesel are supported natively in REopt.
 		diesel_total_calc is used to set the total amount of diesel generation.
@@ -213,9 +253,9 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_to
 		gen_obs.append({
 			'!CMD': 'new',
 			'object':f'generator.solar_{gen_bus_name}',
-			'bus1':f'{gen_bus_name}.1.2.3',
-			'phases':'3', #todo: what about multiple smaller phases?
-			'kv':'2.4', #todo: fix, make non-generic
+			'bus1':f"{gen_bus_name}.{'.'.join(phase_and_kv['phases'])}",
+			'phases':len(phase_and_kv['phases']), #todo: what about multiple smaller phases?
+			'kv':phase_and_kv['kv'],
 			'kw':f'{solar_size_new}',
 			'pf':'1'
 		})
@@ -231,11 +271,10 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_to
 		gen_obs.append({
 			'!CMD': 'new',
 			'object':f'generator.diesel_{gen_bus_name}',
-			'bus1':f'{gen_bus_name}.1.2.3',
-			'kv':'2.4', #todo: fix, make non-generic
+			'bus1':f"{gen_bus_name}.{'.'.join(phase_and_kv['phases'])}",
+			'kv':phase_and_kv['kv'],
 			'kw':f'{diesel_size_new}',
-			'phases':'3', #todo: what about multiple smaller phases?
-			'pf':'1',
+			'phases':len(phase_and_kv['phases']),
 			'xdp':'0.27',
 			'xdpp':'0.2',
 			'h':'2',
@@ -257,9 +296,9 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_to
 		gen_obs.append({
 			'!CMD': 'new',
 			'object':f'generator.wind_{gen_bus_name}',
-			'bus1':f'{gen_bus_name}.1.2.3',
-			'phases':'3', #todo: what about multiple smaller phases?
-			'kv':'2.4', #todo: fix, make non-generic
+			'bus1':f"{gen_bus_name}.{'.'.join(phase_and_kv['phases'])}",
+			'phases':len(phase_and_kv['phases']),
+			'kv':phase_and_kv['kv'],
 			'kw':f'{wind_size_new}',
 			'pf':'1'
 		})
@@ -292,10 +331,10 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_to
 		gen_obs.append({
 			'!CMD': 'new',
 			'object':f'storage.battery_{gen_bus_name}',
-			'bus1':f'{gen_bus_name}.1.2.3',
-			'kv':'2.4', #todo: fix, make non-generic
+			'bus1':f"{gen_bus_name}.{'.'.join(phase_and_kv['phases'])}",
+			'kv':phase_and_kv['kv'],
 			'kwrated':f'{battery_pow_new}',
-			'phases':'3',
+			'phases':len(phase_and_kv['phases']),
 			'dispmode':'follow',
 			'kwhstored':f'{battery_cap_new}',
 			'kwhrated':f'{battery_cap_new}',
@@ -642,7 +681,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid)
 	net_load = max_net_load('/allOutputData.json', REOPT_FOLDER)
 	diesel_total_calc = diesel_sizing('/allOutputData.json',REOPT_FOLDER, DIESEL_SAFETY_FACTOR, net_load)
-	gen_obs = get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_total_calc)
+	gen_obs = get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_total_calc, BASE_NAME)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs)
 	gen_omd(FULL_NAME, OMD_NAME)
 	# Draw the circuit oneline.

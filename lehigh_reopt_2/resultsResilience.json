@@ -122462,8 +122462,8 @@
             0.0
         ]
     ],
-    "avoided_outage_costs_us_dollars": 89652182.58,
+    "avoided_outage_costs_us_dollars": 89652180.35,
     "present_worth_factor": 1.0,
-    "avg_critical_load": 402.53134,
+    "avg_critical_load": 402.53133,
     "help_text": "The present_worth_factor and avg_critical_load are provided such that one can calculate an avoided outage cost in dollars by multiplying a value of load load ($/kWh) by the avg_critical_load, resilience_hours_avg, and present_worth_factor. Note that if the outage event is 'major' (i.e. only occurs once), then the present_worth_factor is 1."
 }

@@ -76,11 +76,11 @@ if __name__ == '__main__':
 
 	# 3rd run inputs
 	microgrid_3 = {
-		'loads': ['671_command_center','652_residential'],
+		'loads': ['684_command_center','652_residential'],
 		'switch': '671684',
 		'gen_bus': '684',
 		'gen_obs_existing': ['diesel_684_existing'],
-		'max_potential': '650' # total kW rating on 671 and 652 is 1283 kW
+		'max_potential': '1300' # total kW rating on 684 and 652 is 1283 kW
 	}
 
 	# 3rd run output paths

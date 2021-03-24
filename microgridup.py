@@ -18,7 +18,8 @@ import datetime
 
 def _name_to_key(glm):
 	''' Make fast lookup map by name in a glm.
-	WARNING: if the glm changes, the map will no longer be valid.'''
+	WARNING: if the glm changes, the map will no longer be valid.
+	TODO: Where does microgridup use this? Remove if no longer used'''
 	mapping = {}
 	for key, val in glm.items():
 		if 'name' in val:
@@ -68,43 +69,59 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 		print("outage_start_hour:", str(int(outage_start_hour)))
 		allInputData['outage_start_hour'] = str(int(outage_start_hour))
 
-		# Pulling coordinates and existing generation from BASE_NAME.dss into REopt allInputData.json:
-		tree = dssConvert.dssToTree(BASE_NAME) #TO DO: For Accuracy and slight efficiency gain, refactor all search parameters to search through the "tree" (list of OrderedDicts, len(list)= # lines in base.dss)
+		# Pulling coordinates from BASE_NAME.dss into REopt allInputData.json:
+		tree = dssConvert.dssToTree(BASE_NAME)
 		#print(tree)
 		evil_glm = dssConvert.evilDssTreeToGldTree(tree)
 		#print(evil_glm)
+		# using evil_glm to get around the fact that buses in openDSS are created in memory and do not exist in the BASE_NAME dss file
 		for ob in evil_glm.values():
 			ob_name = ob.get('name','')
 			ob_type = ob.get('object','')
-			# pull out long and lat; When running one microgrid per REopt run, ob_name should be updated to the gen_bus from microgrids
-			if ob_type == "bus" and ob_name == "sourcebus":
+			# pull out long and lat of the gen_bus
+			# if ob_type == "bus" and ob_name == "sourcebus":
+			if ob_type == "bus" and ob_name == microgrid['gen_bus']:
 				ob_lat = ob.get('latitude','')
 				ob_long = ob.get('longitude','')
 				#print('lat:', float(ob_lat), 'long:', float(ob_long))
 				allInputData['latitude'] = float(ob_lat)
 				allInputData['longitude'] = float(ob_long)
-		# Pull out and add up kw of all solar and diesel generators in the microgrid
-		# requires pre-selection of all objects in a given microgrid in microgrids[key]['gen_obs_existing']
+
+		# Pull out and add up kw of all exostong generators in the microgrid
+		# requires pre-selection of all objects in a given microgrid in microgrids['gen_obs_existing']
+		load_map = {x.get('object',''):i for i, x in enumerate(tree)}
+		# TODO: update for CHP and other types of generation
 		solar_kw_exist = []
 		diesel_kw_exist = []
 		battery_kw_exist = []
 		battery_kwh_exist = []
 		wind_kw_exist = []
 		gen_obs = microgrid['gen_obs_existing']
-		for gen_ob in gen_obs: # gen_ob is a name of an object from base.dss
-			for ob in evil_glm.values(): # TODO: Change the syntax to match to the "tree" structure; See shape insertions at line 270 for an example
-				ob_name = ob.get('name','')
-				#print(ob_name)
-				ob_type = ob.get('object','')
-				if ob_name == gen_ob and ob_type == "generator" and re.search('solar.+', ob_name):
-					solar_kw_exist.append(float(ob.get('kw')))
-				elif ob_name == gen_ob and ob_type == "generator" and re.search('wind.+', ob_name):
-					wind_kw_exist.append(float(ob.get('kw')))
-				elif ob_name == gen_ob and ob_type == "generator" and re.search('diesel.+', ob_name):
-					diesel_kw_exist.append(float(ob.get('kw')))
-				elif ob_name == gen_ob and ob_type == "storage" and re.search('battery.+', ob_name):
-					battery_kw_exist.append(float(ob.get('kwrated')))
-					battery_kwh_exist.append(float(ob.get('kwhrated')))
+		for gen_ob in gen_obs:
+			if gen_ob.startswith('solar_'):
+				solar_kw_exist.append(float(tree[load_map[f'generator.{gen_ob}']].get('kw')))
+			elif gen_ob.startswith('diesel_'):
+				diesel_kw_exist.append(float(tree[load_map[f'generator.{gen_ob}']].get('kw')))
+			elif gen_ob.startswith('wind_'):
+				wind_kw_exist.append(float(tree[load_map[f'generator.{gen_ob}']].get('kw')))
+			elif gen_ob.startswith('battery_'):
+				battery_kw_exist.append(float(tree[load_map[f'storage.{gen_ob}']].get('kwrated')))
+				battery_kwh_exist.append(float(tree[load_map[f'storage.{gen_ob}']].get('kwhrated')))
+
+		# for gen_ob in gen_obs:
+		# 	for ob in evil_glm.values(): # TODO: Change the syntax to match to the "tree" structure; See shape insertions at line 270 for an example
+		# 		ob_name = ob.get('name','')
+		# 		#print(ob_name)
+		# 		ob_type = ob.get('object','')
+		# 		if ob_name == gen_ob and ob_type == "generator" and re.search('solar.+', ob_name):
+		# 			solar_kw_exist.append(float(ob.get('kw')))
+		# 		elif ob_name == gen_ob and ob_type == "generator" and re.search('wind.+', ob_name):
+		# 			wind_kw_exist.append(float(ob.get('kw')))
+		# 		elif ob_name == gen_ob and ob_type == "generator" and re.search('diesel.+', ob_name):
+		# 			diesel_kw_exist.append(float(ob.get('kw')))
+		# 		elif ob_name == gen_ob and ob_type == "storage" and re.search('battery.+', ob_name):
+		# 			battery_kw_exist.append(float(ob.get('kwrated')))
+		# 			battery_kwh_exist.append(float(ob.get('kwhrated')))
 		allInputData['genExisting'] = str(sum(diesel_kw_exist))
 		if sum(solar_kw_exist) > 0:
 			allInputData['solarExisting'] = str(sum(solar_kw_exist))
@@ -140,12 +157,10 @@ def max_net_load(inputName, REOPT_FOLDER):
 	load_df['net_load'] = load_df['total_load']-load_df['solar_shape']-load_df['wind_shape']
 	# max load in loadshape
 	max_total_load = max(load_df['total_load'])
-	# max net load not covered by solar or wind
-	# Equivalent to diesel size needed for uninterupted power throughout the year
+	# max net load not covered by solar or wind; Equivalent to diesel size needed for uninterupted power throughout the year
 	max_net_load = max(load_df['net_load'])
 	# diesel size recommended by REopt
 	# diesel_REopt = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
-	#print(load_df)
 	#print("Max total load for", REOPT_FOLDER, ":", max_total_load)
 	#print("Max load needed to be supported by diesel for", REOPT_FOLDER, ":", max_net_load)
 	#print("% more kW diesel needed than recommended by REopt for", REOPT_FOLDER, ":", round(100*(max_net_load - diesel_REopt)/diesel_REopt))
@@ -173,28 +188,23 @@ def mg_phase_and_kv(BASE_NAME, microgrid):
 	mg_loads = mg_ob['loads']
 	load_phase_list = []
 	gen_bus_kv = []
-	#TODO: for efficiency, can I build a mapping of the object names from the tree, and then get that item from the map/dict?
 	load_map = {x.get('object',''):i for i, x in enumerate(tree)}
 	for load_name in mg_loads:
 		ob = tree[load_map[f'load.{load_name}']]
-		ob_string = ob.get('object','')
-		if ob_string.startswith('load.'):
-			ob_name = ob_string[5:]
-			if ob_name == load_name:
-				# find the phase of the load
-				bus_name = ob.get('bus1','')
-				bus_name_list = bus_name.split('.')
-				load_phases = []
-				load_phases = bus_name_list[-(len(bus_name_list)-1):]
-				for phase in load_phases:
-					if phase not in load_phase_list:
-						load_phase_list.append(phase)
-				# set the voltage for the gen_bus and check that all loads match in voltage
-				load_kv = ob.get('kv','')
-				if load_kv not in gen_bus_kv and len(gen_bus_kv) > 0:
-					raise Exception(f'More than one load voltage is specified on gen_bus {gen_bus_name}. Check voltage of {load_name}.')
-				elif load_kv not in gen_bus_kv and len(gen_bus_kv) == 0:
-					gen_bus_kv = load_kv
+		# print("mg_phase_and_kv ob:", ob)
+		bus_name = ob.get('bus1','')
+		bus_name_list = bus_name.split('.')
+		load_phases = []
+		load_phases = bus_name_list[-(len(bus_name_list)-1):]
+		for phase in load_phases:
+			if phase not in load_phase_list:
+				load_phase_list.append(phase)
+		# set the voltage for the gen_bus and check that all loads match in voltage
+		load_kv = ob.get('kv','')
+		if load_kv not in gen_bus_kv and len(gen_bus_kv) > 0:
+			raise Exception(f'More than one load voltage is specified on gen_bus {gen_bus_name}. Check voltage of {load_name}.')
+		elif load_kv not in gen_bus_kv and len(gen_bus_kv) == 0:
+			gen_bus_kv = load_kv
 	load_phase_list.sort()
 	out_dict = {}
 	out_dict['gen_bus'] = gen_bus_name
@@ -254,7 +264,7 @@ def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_to
 			'!CMD': 'new',
 			'object':f'generator.solar_{gen_bus_name}',
 			'bus1':f"{gen_bus_name}.{'.'.join(phase_and_kv['phases'])}",
-			'phases':len(phase_and_kv['phases']), #todo: what about multiple smaller phases?
+			'phases':len(phase_and_kv['phases']),
 			'kv':phase_and_kv['kv'],
 			'kw':f'{solar_size_new}',
 			'pf':'1'

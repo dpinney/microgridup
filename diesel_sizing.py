@@ -117,9 +117,9 @@ def mg_phase_and_kv(BASE_NAME, microgrid):
 	#print('out_dict', out_dict)
 	return out_dict
 
-def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc):
+def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 	''' Get generator objects from REopt. Calculate new gen sizes, using updated diesel size 
-	from diesel_total_calc. Returns all gens in a dictionary.
+	from diesel_total_calc if True. Returns all gens in a dictionary.
 	TODO: To implement multiple same-type existing generators within a single microgrid, 
 	will need to implement searching the tree of FULL_NAME to find kw ratings of existing gens'''
 	reopt_out = json.load(open(REOPT_FOLDER + '/allOutputData.json'))
@@ -137,11 +137,14 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc):
 		wind_size_new = wind_size_total - wind_size_existing 
 	else:
 		wind_size_new = 0 #TO DO: update logic here to make run more robust to oversized existing wind gen	
-	#diesel_size_REopt = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
-	diesel_size_existing = reopt_out.get(f'sizeDieselExisting{mg_num}', 0.0)
 	# calculate additional diesel to be added to existing diesel gen (if any) to adjust kW based on diesel_sizing()
-	if diesel_total_calc - diesel_size_existing > 0:
-		diesel_size_new = diesel_total_calc - diesel_size_existing
+	if diesel_total_calc == False:
+		diesel_size_total = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
+	else:
+		diesel_size_total = diesel_total_calc
+	diesel_size_existing = reopt_out.get(f'sizeDieselExisting{mg_num}', 0.0)
+	if diesel_size_total - diesel_size_existing > 0:
+		diesel_size_new = diesel_size_total - diesel_size_existing
 	else:
 		diesel_size_new = 0	
 	battery_cap_total = reopt_out.get(f'capacityBattery{mg_num}', 0.0) 
@@ -159,7 +162,7 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc):
 
 	gen_sizes.update({'solar_size_total':solar_size_total,'solar_size_existing':solar_size_existing, 'solar_size_new':solar_size_new, \
 		'wind_size_total':wind_size_total, 'wind_size_existing':wind_size_existing, 'wind_size_new':wind_size_new, \
-		'diesel_size_total':diesel_total_calc, 'diesel_size_existing':diesel_size_existing, 'diesel_size_new':diesel_size_new, \
+		'diesel_size_total':diesel_size_total, 'diesel_size_existing':diesel_size_existing, 'diesel_size_new':diesel_size_new, \
 		'battery_cap_total':battery_cap_total, 'battery_cap_existing':battery_cap_existing, 'battery_cap_new':battery_cap_new, \
 		'battery_pow_total':battery_pow_total, 'battery_pow_existing':battery_pow_existing, 'battery_pow_new':battery_pow_new})
 
@@ -325,6 +328,6 @@ if __name__ == '__main__':
 	
 	# print('.'.join(phase_and_kv['phases']))
 
-	gen_sizes_out = get_gen_ob_from_reopt('lehigh_reopt_1', 100)
+	gen_sizes_out = get_gen_ob_from_reopt('lehigh_reopt_3', 100)
 	print("gen_sizes", gen_sizes_out)
 

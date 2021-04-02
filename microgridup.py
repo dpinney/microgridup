@@ -678,9 +678,26 @@ def make_chart(csvName, category_name, x, y_list, year, qsts_steps, ansi_bands=F
 
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
-def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, diesel_total_calc): #naming oon this piece needs to be updated to output
+def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, diesel_total_calc): #naming on this piece needs to be updated to output
 	''' Generate a report on each microgrid '''
 	reopt_out = json.load(open(REOPT_FOLDER + inputName))
+	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=diesel_total_calc)
+	solar_size_total = gen_sizes.get('solar_size_total')
+	solar_size_new = gen_sizes.get('solar_size_new')
+	solar_size_existing = gen_sizes.get('solar_size_existing')
+	diesel_size_total = gen_sizes.get('diesel_size_total')
+	diesel_size_new = gen_sizes.get('diesel_size_new')
+	diesel_size_existing = gen_sizes.get('diesel_size_existing')
+	wind_size_total = gen_sizes.get('wind_size_total')
+	wind_size_new = gen_sizes.get('wind_size_new')
+	wind_size_existing = gen_sizes.get('wind_size_existing')
+	battery_cap_total = gen_sizes.get('battery_cap_total')
+	battery_cap_new = gen_sizes.get('battery_cap_new')
+	battery_cap_existing = gen_sizes.get('battery_cap_existing')
+	battery_pow_total = gen_sizes.get('battery_pow_total')
+	battery_pow_new = gen_sizes.get('battery_pow_new')
+	battery_pow_existing = gen_sizes.get('battery_pow_existing')
+
 	with open(outputCsvName, 'w', newline='') as outcsv:
 		writer = csv.writer(outcsv)
 		writer.writerow(["Microgrid Name", "Generation Bus", "Minimum Load (kWh)", "Average Load (kWh)",
@@ -702,43 +719,22 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, dies
 		avg_daytime_load = np.average(np.average(daytime_kwh, axis=1))
 		max_load = max(load)
 		diesel_used_gal =reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0)
-		solar_size_total = reopt_out.get(f'sizePV{mg_num}', 0.0)
-		solar_size_existing = reopt_out.get(f'sizePVExisting{mg_num}', 0.0)
-		solar_size_new = solar_size_total - solar_size_existing
-		wind_size_total = reopt_out.get(f'sizeWind{mg_num}', 0.0)
-		wind_size_existing = reopt_out.get(f'windExisting{mg_num}', 0.0)
-		if wind_size_total - wind_size_existing > 0:
-			wind_size_new = wind_size_total - wind_size_existing
-		else:
-			wind_size_new = 0
 		diesel_size_REopt = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
-		diesel_size_existing = reopt_out.get(f'sizeDieselExisting{mg_num}', 0.0)
 		# calculate additional diesel to be added to existing (if any) to support max_net_load + DIESEL_SAFETY_FACTOR
-		if diesel_total_calc - diesel_size_existing > 0:
-			diesel_size_new = diesel_total_calc - diesel_size_existing
-		else:
-			diesel_size_new = 0
+		# if diesel_total_calc - diesel_size_existing > 0:
+		# 	diesel_size_new = diesel_total_calc - diesel_size_existing
+		# else:
+		# 	diesel_size_new = 0
 		# new diesel cost to be added, including 10$/kW/year fixed O+M cost for default 25 year period ($)
+		# TODO: if running REopt a second time to incorporate diesel_total_calc, re-calculate costs
 		if diesel_total_calc - diesel_size_REopt > 0:
-			diesel_new_cost = (diesel_total_calc - diesel_size_REopt)*(reopt_out.get(f'dieselGenCost{mg_num}', 0.0) + 10*25)
+			diesel_new_cost = (diesel_total_calc - diesel_size_REopt)*(reopt_out.get(f'dieselGenCost{mg_num}', 0.0) + 10*25) #TODO update "25" to be equal to years of analysis and 10$/kw/yr equal to O+M cost
 		else:
 			diesel_new_cost = 0
-		battery_cap_total = reopt_out.get(f'capacityBattery{mg_num}', 0.0)
-		battery_cap_existing = reopt_out.get(f'batteryKwhExisting{mg_num}', 0.0)
-		if battery_cap_total - battery_cap_existing > 0:
-			battery_cap_new = battery_cap_total - battery_cap_existing
-		else:
-			battery_cap_new = 0
 
-		battery_pow_total = reopt_out.get(f'powerBattery{mg_num}', 0.0)
-		battery_pow_existing = reopt_out.get(f'batteryKwExisting{mg_num}', 0.0)
-		if battery_pow_total - battery_pow_existing > 0:
-			battery_pow_new = battery_pow_total - battery_pow_existing
-		else:
-			battery_pow_new = 0
+		total_gen = diesel_size_total + solar_size_total + battery_pow_total + wind_size_total
 
-		total_gen = diesel_total_calc + solar_size_total + battery_pow_total + wind_size_total
-
+		#TODO: Redo post-REopt economic calculations to match updated discounts, taxations, etc
 		npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
 		cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
 		cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives

@@ -108,20 +108,6 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 				battery_kw_exist.append(float(tree[load_map[f'storage.{gen_ob}']].get('kwrated')))
 				battery_kwh_exist.append(float(tree[load_map[f'storage.{gen_ob}']].get('kwhrated')))
 
-		# for gen_ob in gen_obs:
-		# 	for ob in evil_glm.values(): # TODO: Change the syntax to match to the "tree" structure; See shape insertions at line 270 for an example
-		# 		ob_name = ob.get('name','')
-		# 		#print(ob_name)
-		# 		ob_type = ob.get('object','')
-		# 		if ob_name == gen_ob and ob_type == "generator" and re.search('solar.+', ob_name):
-		# 			solar_kw_exist.append(float(ob.get('kw')))
-		# 		elif ob_name == gen_ob and ob_type == "generator" and re.search('wind.+', ob_name):
-		# 			wind_kw_exist.append(float(ob.get('kw')))
-		# 		elif ob_name == gen_ob and ob_type == "generator" and re.search('diesel.+', ob_name):
-		# 			diesel_kw_exist.append(float(ob.get('kw')))
-		# 		elif ob_name == gen_ob and ob_type == "storage" and re.search('battery.+', ob_name):
-		# 			battery_kw_exist.append(float(ob.get('kwrated')))
-		# 			battery_kwh_exist.append(float(ob.get('kwhrated')))
 		allInputData['genExisting'] = str(sum(diesel_kw_exist))
 		if sum(solar_kw_exist) > 0:
 			allInputData['solarExisting'] = str(sum(solar_kw_exist))
@@ -232,7 +218,7 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 	if wind_size_total - wind_size_existing > 0:
 		wind_size_new = wind_size_total - wind_size_existing 
 	else:
-		wind_size_new = 0 #TO DO: update logic here to make run more robust to oversized existing wind gen	
+		wind_size_new = 0.0 #TO DO: update logic here to make run more robust to oversized existing wind gen	
 	# calculate additional diesel to be added to existing diesel gen (if any) to adjust kW based on diesel_sizing()
 	if diesel_total_calc == False:
 		diesel_size_total = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
@@ -242,19 +228,19 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 	if diesel_size_total - diesel_size_existing > 0:
 		diesel_size_new = diesel_size_total - diesel_size_existing
 	else:
-		diesel_size_new = 0	
+		diesel_size_new = 0.0	
 	battery_cap_total = reopt_out.get(f'capacityBattery{mg_num}', 0.0) 
 	battery_cap_existing = reopt_out.get(f'batteryKwhExisting{mg_num}', 0.0)
 	if battery_cap_total - battery_cap_existing > 0:
 		battery_cap_new = battery_cap_total - battery_cap_existing 
 	else:
-		battery_cap_new = 0 #TO DO: update logic here to make run more robust to oversized existing battery generation
+		battery_cap_new = 0.0 #TO DO: update logic here to make run more robust to oversized existing battery generation
 	battery_pow_total = reopt_out.get(f'powerBattery{mg_num}', 0.0) 
 	battery_pow_existing = reopt_out.get(f'batteryKwExisting{mg_num}', 0.0)
 	if battery_pow_total - battery_pow_existing > 0:
 		battery_pow_new = battery_pow_total - battery_pow_existing 
 	else:
-		battery_pow_new = 0 #TO DO: Fix logic so that new batteries cannot add kwh without adding kw
+		battery_pow_new = 0.0 #TO DO: Fix logic so that new batteries cannot add kwh without adding kw
 
 	gen_sizes.update({'solar_size_total':solar_size_total,'solar_size_existing':solar_size_existing, 'solar_size_new':solar_size_new, \
 		'wind_size_total':wind_size_total, 'wind_size_existing':wind_size_existing, 'wind_size_new':wind_size_new, \
@@ -415,163 +401,6 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, diesel_total_c
 	gen_df_builder.to_csv(GEN_NAME, index=False)
 	return gen_obs
 
-# def get_gen_ob_and_shape_from_reopt(REOPT_FOLDER, GEN_NAME, microgrid, diesel_total_calc, BASE_NAME):
-# 	''' Get generator objects and shapes from REOpt.
-# 	SIDE EFFECTS: creates GEN_NAME generator shape, returns gen_obs
-# 	TODO: To implement multiple same-type existing generators within a single microgrid, 
-# 	will need to implement searching the tree of FULL_NAME to find kw ratings of existing gens'''
-# 	reopt_out = json.load(open(REOPT_FOLDER + '/allOutputData.json'))
-# 	gen_df_builder = pd.DataFrame()
-# 	gen_obs = []
-# 	mg_num = 1
-# 	mg_ob = microgrid
-# 	gen_bus_name = mg_ob['gen_bus']
-# 	gen_obs_existing = mg_ob['gen_obs_existing']
-# 	phase_and_kv = mg_phase_and_kv(BASE_NAME, microgrid)
-# 	''' Calculate size of new generators at gen_bus based on REopt and existing gen from BASE_NAME for each microgrid.
-# 		Existing solar and diesel are supported natively in REopt.
-# 		diesel_total_calc is used to set the total amount of diesel generation.
-# 		Existing wind and batteries require setting the minimimum generation threshold (windMin, batteryPowerMin, batteryCapacityMin)'''
-# 	solar_size_total = reopt_out.get(f'sizePV{mg_num}', 0.0)
-# 	solar_size_existing = reopt_out.get(f'sizePVExisting{mg_num}', 0.0)
-# 	solar_size_new = solar_size_total - solar_size_existing
-# 	wind_size_total = reopt_out.get(f'sizeWind{mg_num}', 0.0) # TO DO: Update size of wind based on existing generation once we find a way to get a loadshape for that wind if REopt recommends no wind
-# 	wind_size_existing = reopt_out.get(f'windExisting{mg_num}', 0.0)
-# 	if wind_size_total - wind_size_existing > 0:
-# 		wind_size_new = wind_size_total - wind_size_existing 
-# 	else:
-# 		wind_size_new = 0 #TO DO: update logic here to make run more robust to oversized existing wind gen	
-# 	diesel_size_REopt = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
-# 	diesel_size_existing = reopt_out.get(f'sizeDieselExisting{mg_num}', 0.0)
-# 	# calculate additional diesel to be added to existing diesel gen (if any) to adjust kW based on diesel_sizing()
-# 	if diesel_total_calc - diesel_size_existing > 0:
-# 		diesel_size_new = diesel_total_calc - diesel_size_existing
-# 	else:
-# 		diesel_size_new = 0	
-# 	battery_cap_total = reopt_out.get(f'capacityBattery{mg_num}', 0.0) 
-# 	battery_cap_existing = reopt_out.get(f'batteryKwhExisting{mg_num}', 0.0)
-# 	if battery_cap_total - battery_cap_existing > 0:
-# 		battery_cap_new = battery_cap_total - battery_cap_existing 
-# 	else:
-# 		battery_cap_new = 0 #TO DO: update logic here to make run more robust to oversized existing battery generation
-# 	battery_pow_total = reopt_out.get(f'powerBattery{mg_num}', 0.0) 
-# 	battery_pow_existing = reopt_out.get(f'batteryKwExisting{mg_num}', 0.0)
-# 	if battery_pow_total - battery_pow_existing > 0:
-# 		battery_pow_new = battery_pow_total - battery_pow_existing 
-# 	else:
-# 		battery_pow_new = 0 #TO DO: Fix logic so that new batteries cannot add kwh without adding kw
-# 	# Build new solar gen objects and loadshapes as recommended by REopt
-# 	if solar_size_new > 0:
-# 		gen_obs.append({
-# 			'!CMD': 'new',
-# 			'object':f'generator.solar_{gen_bus_name}',
-# 			'bus1':f"{gen_bus_name}.{'.'.join(phase_and_kv['phases'])}",
-# 			'phases':len(phase_and_kv['phases']),
-# 			'kv':phase_and_kv['kv'],
-# 			'kw':f'{solar_size_new}',
-# 			'pf':'1'
-# 		})
-# 		# 0-1 scale the power output loadshape to the total generation kw of that type of generator using pandas
-# 		gen_df_builder[f'solar_{gen_bus_name}'] = pd.Series(reopt_out.get(f'powerPV{mg_num}'))/solar_size_total*solar_size_new
-# 	# build loadshapes for existing generation from BASE_NAME, inputting the 0-1 solar generation loadshape and scaling by their rated kw
-# 	if solar_size_existing > 0:
-# 		for gen_ob_existing in gen_obs_existing:
-# 			if gen_ob_existing.startswith('solar_'):
-# 				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerPV{mg_num}'))/solar_size_total*solar_size_existing 
-# 				#HACK Implemented: TODO: IF multiple existing solar generator objects are in gen_obs, we need to scale the output loadshapes by their rated kW 
-# 	if diesel_size_new > 0:
-# 		gen_obs.append({
-# 			'!CMD': 'new',
-# 			'object':f'generator.diesel_{gen_bus_name}',
-# 			'bus1':f"{gen_bus_name}.{'.'.join(phase_and_kv['phases'])}",
-# 			'kv':phase_and_kv['kv'],
-# 			'kw':f'{diesel_size_new}',
-# 			'phases':len(phase_and_kv['phases']),
-# 			'xdp':'0.27',
-# 			'xdpp':'0.2',
-# 			'h':'2',
-# 			'conn':'delta'
-# 		})
-# 		# 0-1 scale the power output loadshape to the total generation kw of that type of generator
-# 		# gen_df_builder[f'diesel_{gen_bus_name}'] = pd.Series(reopt_out.get(f'powerDiesel{mg_num}'))/diesel_size_total # insert the 0-1 diesel generation shape provided by REopt to simulate the outage specified in REopt
-# 		# TODO: if using real loadshapes for diesel, need to scale them based on rated kw of the new diesel
-# 		gen_df_builder[f'diesel_{gen_bus_name}'] = pd.DataFrame(np.zeros(8760)) # insert an array of zeros for the diesel generation shape to simulate no outage
-# 	# build loadshapes for existing generation from BASE_NAME, inputting the 0-1 diesel generation loadshape 
-# 	if diesel_size_existing > 0:	
-# 		for gen_ob_existing in gen_obs_existing:
-# 			if gen_ob_existing.startswith('diesel_'):
-# 				# gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerDiesel{mg_num}'))/diesel_size_total # insert the 0-1 diesel generation shape provided by REopt to simulate the outage specified in REopt
-# 				# TODO: if using real loadshapes for diesel, need to scale them based on rated kw of that individual generator object
-# 				gen_df_builder[f'{gen_ob_existing}'] = pd.DataFrame(np.zeros(8760)) # insert an array of zeros for the diesel generation shape to simulate no outage
-# 	# get loadshapes for new Wind
-# 	if wind_size_new > 0:
-# 		gen_obs.append({
-# 			'!CMD': 'new',
-# 			'object':f'generator.wind_{gen_bus_name}',
-# 			'bus1':f"{gen_bus_name}.{'.'.join(phase_and_kv['phases'])}",
-# 			'phases':len(phase_and_kv['phases']),
-# 			'kv':phase_and_kv['kv'],
-# 			'kw':f'{wind_size_new}',
-# 			'pf':'1'
-# 		})
-# 		# 0-1 scale the power output loadshape to the total generation and multiply by the new kw of that type of generator
-# 		gen_df_builder[f'wind_{gen_bus_name}'] = pd.Series(reopt_out.get(f'powerWind{mg_num}'))/wind_size_total*wind_size_new
-# 	# build loadshapes for existing Wind generation from BASE_NAME
-# 	if wind_size_existing > 0:	
-# 		for gen_ob_existing in gen_obs_existing:
-# 			if gen_ob_existing.startswith('wind_'):
-# 				#HACK Implemented: TODO: IF multiple existing wind generator objects are in gen_obs, we need to scale the output loadshapes by their rated kW
-# 				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerWind{mg_num}'))/wind_size_total*wind_size_existing
-# 	# calculate battery loadshape (serving load - charging load)
-# 	if battery_cap_total > 0:	
-# 		batToLoad = pd.Series(reopt_out.get(f'powerBatteryToLoad{mg_num}'))
-# 		gridToBat = np.zeros(8760)
-# 		# TO DO: add logic to update insertion of grid charging when Daniel's islanding framework is complete 	
-# 		gridToBat = pd.Series(reopt_out.get(f'powerGridToBattery{mg_num}'))
-# 		pVToBat = np.zeros(8760)
-# 		if solar_size_total > 0:
-# 			pVToBat = pd.Series(reopt_out.get(f'powerPVToBattery{mg_num}'))
-# 		dieselToBat = np.zeros(8760)
-# 		if diesel_total_calc > 0:
-# 			dieselToBat = pd.Series(reopt_out.get(f'powerDieselToBattery{mg_num}'))
-# 		windToBat = np.zeros(8760)
-# 		if wind_size_total > 0:
-# 			windToBat = pd.Series(reopt_out.get(f'powerWindToBattery{mg_num}'))
-# 		battery_load = batToLoad - gridToBat - pVToBat - dieselToBat - windToBat
-# 	# get DSS objects and loadshapes for new battery
-# 	if battery_cap_new > 0: 
-# 		gen_obs.append({
-# 			'!CMD': 'new',
-# 			'object':f'storage.battery_{gen_bus_name}',
-# 			'bus1':f"{gen_bus_name}.{'.'.join(phase_and_kv['phases'])}",
-# 			'kv':phase_and_kv['kv'],
-# 			'kwrated':f'{battery_pow_new}',
-# 			'phases':len(phase_and_kv['phases']),
-# 			'dispmode':'follow',
-# 			'kwhstored':f'{battery_cap_new}',
-# 			'kwhrated':f'{battery_cap_new}',
-# 			# 'kva':f'{battery_pow_total}',
-# 			# 'kvar':f'{battery_pow_total}',
-# 			'%charge':'100',
-# 			'%discharge':'100',
-# 			'%effcharge':'100',
-# 			'%effdischarge':'100',
-# 			'%idlingkw':'0',
-# 			'%r':'0',
-# 			'%x':'50',
-# 			'%stored':'50'
-# 		})
-# 		# 0-1 scale the power output loadshape to the total generation and multiply by the new kw of that type of generator
-# 		gen_df_builder[f'battery_{gen_bus_name}'] = battery_load/battery_pow_total*battery_pow_new
-# 	# build loadshapes for existing battery generation from BASE_NAME
-# 	if battery_cap_existing > 0:	
-# 		for gen_ob_existing in gen_obs_existing:
-# 			if gen_ob_existing.startswith('battery_'):
-# 				#HACK Implemented: TODO: IF multiple existing wind generator objects are in gen_obs, we need to scale the output loadshapes by their rated kW
-# 				gen_df_builder[f'{gen_ob_existing}'] = battery_load/battery_pow_total*battery_pow_existing
-# 	gen_df_builder.to_csv(GEN_NAME, index=False)
-# 	return gen_obs
-
 def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs):
 	''' insert generation objects into dss.
 	SIDE EFFECTS: writes FULL_NAME dss'''
@@ -720,15 +549,11 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, dies
 		max_load = max(load)
 		diesel_used_gal =reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0)
 		diesel_size_REopt = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
-		# calculate additional diesel to be added to existing (if any) to support max_net_load + DIESEL_SAFETY_FACTOR
-		# if diesel_total_calc - diesel_size_existing > 0:
-		# 	diesel_size_new = diesel_total_calc - diesel_size_existing
-		# else:
-		# 	diesel_size_new = 0
 		# new diesel cost to be added, including 10$/kW/year fixed O+M cost for default 25 year period ($)
 		# TODO: if running REopt a second time to incorporate diesel_total_calc, re-calculate costs
+		# TODO update "25" to be equal to years of analysis and 10$/kw/yr equal to O+M cost
 		if diesel_total_calc - diesel_size_REopt > 0:
-			diesel_new_cost = (diesel_total_calc - diesel_size_REopt)*(reopt_out.get(f'dieselGenCost{mg_num}', 0.0) + 10*25) #TODO update "25" to be equal to years of analysis and 10$/kw/yr equal to O+M cost
+			diesel_new_cost = (diesel_total_calc - diesel_size_REopt)*(reopt_out.get(f'dieselGenCost{mg_num}', 0.0) + 10*25)
 		else:
 			diesel_new_cost = 0
 
@@ -769,6 +594,22 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, dies
 def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, diesel_total_calc):
 	''' Generate a dictionary reports fr each key for all microgrids. '''
 	reopt_out = json.load(open(REOPT_FOLDER + inputName))
+	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=diesel_total_calc)
+	solar_size_total = gen_sizes.get('solar_size_total')
+	solar_size_new = gen_sizes.get('solar_size_new')
+	solar_size_existing = gen_sizes.get('solar_size_existing')
+	diesel_size_total = gen_sizes.get('diesel_size_total')
+	diesel_size_new = gen_sizes.get('diesel_size_new')
+	diesel_size_existing = gen_sizes.get('diesel_size_existing')
+	wind_size_total = gen_sizes.get('wind_size_total')
+	wind_size_new = gen_sizes.get('wind_size_new')
+	wind_size_existing = gen_sizes.get('wind_size_existing')
+	battery_cap_total = gen_sizes.get('battery_cap_total')
+	battery_cap_new = gen_sizes.get('battery_cap_new')
+	battery_cap_existing = gen_sizes.get('battery_cap_existing')
+	battery_pow_total = gen_sizes.get('battery_pow_total')
+	battery_pow_new = gen_sizes.get('battery_pow_new')
+	battery_pow_existing = gen_sizes.get('battery_pow_existing')
 	list_of_mg_dict = []
 	mg_dict = {}
 	mg_num = 1
@@ -784,51 +625,27 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, diesel_to
 	daytime_kwh = np_load[:,9:17] #365 8-hour daytime arrays
 	mg_dict["Average Daytime Load (kWh)"] = round(np.average(np.average(daytime_kwh, axis=1)),0)
 	mg_dict["Maximum Load (kWh)"] = round(max(load),0)
+	
 	diesel_size_REopt = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
-	diesel_size_existing = reopt_out.get(f'sizeDieselExisting{mg_num}', 0.0)
-	# calculate additional diesel to be added to existing (if any) to support max_net_load + DIESEL_SAFETY_FACTOR
-	if diesel_total_calc - diesel_size_existing > 0:
-		diesel_size_new = diesel_total_calc - diesel_size_existing
-	else:
-		diesel_size_new = 0
 	# new diesel cost to be added, including 10$/kW/year fixed O+M cost for default 25 year period ($)
 	if diesel_total_calc - diesel_size_REopt > 0:
 		diesel_new_cost = (diesel_total_calc - diesel_size_REopt)*(reopt_out.get(f'dieselGenCost{mg_num}', 0.0) + 10*25)
 	else:
 		diesel_new_cost = 0
-
 	mg_dict["Existing Diesel (kW)"] = round(diesel_size_existing,0)
 	mg_dict["Recommended New Diesel (kW)"] = round(diesel_size_new,0)
 	# For large gensets, diesel fuel used is approximated by REopt as linear against the kWh provided, so no adjustment is made here for the size of the diesel genset
 	mg_dict["Diesel Fuel Used During Outage (gal)"] = round(reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0),0)
 	
-
-	solar_size_total = reopt_out.get(f'sizePV{mg_num}', 0.0)
-	solar_size_existing = reopt_out.get(f'sizePVExisting{mg_num}', 0.0)
 	mg_dict["Existing Solar (kW)"] = round(solar_size_existing ,0)
 	mg_dict["Recommended New Solar (kW)"] = round(solar_size_total - solar_size_existing,0)
-	battery_pow_total = reopt_out.get(f'powerBattery{mg_num}', 0.0)
-	battery_pow_existing = reopt_out.get(f'batteryKwExisting{mg_num}', 0.0)
 	mg_dict["Existing Battery Power (kW)"] = round(battery_pow_existing,0)
-	if battery_pow_total - battery_pow_existing > 0:
-		mg_dict["Recommended New Battery Power (kW)"] = round(battery_pow_total - battery_pow_existing,0)
-	else:
-		mg_dict["Recommended New Battery Power (kW)"] = 0.0
-	battery_cap_total = reopt_out.get(f'capacityBattery{mg_num}', 0.0)
-	battery_cap_existing = reopt_out.get(f'batteryKwhExisting{mg_num}', 0.0)
+	mg_dict["Recommended New Battery Power (kW)"] = round(battery_pow_new,0)
 	mg_dict["Existing Battery Capacity (kWh)"] = round(battery_cap_existing,0)
-	if battery_cap_total - battery_cap_existing > 0:
-		mg_dict["Recommended New Battery Capacity (kWh)"] = round(battery_cap_total - battery_cap_existing,0)
-	else:
-		mg_dict["Recommended New Battery Capacity (kWh)"] = 0.0
-	wind_size_total = reopt_out.get(f'sizeWind{mg_num}', 0.0)
-	wind_size_existing = reopt_out.get(f'windExisting{mg_num}', 0.0)
+	mg_dict["Recommended New Battery Capacity (kWh)"] = round(battery_cap_new,0)
 	mg_dict["Existing Wind (kW)"] = round(wind_size_existing,0)
-	if wind_size_total - wind_size_existing > 0:
-		mg_dict["Recommended New Wind (kW)"] = round(wind_size_total - wind_size_existing,0)
-	else:
-		mg_dict["Recommended New Wind (kW)"] = 0.0
-	total_gen = diesel_total_calc + solar_size_total + battery_pow_total + wind_size_total
+	mg_dict["Recommended New Wind (kW)"] = round(wind_size_new,0)
+	total_gen = diesel_size_total + solar_size_total + battery_pow_total + wind_size_total
 	mg_dict["Total Generation on Grid (kW)"] = round(total_gen,0)
 	npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
 	cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
@@ -895,7 +712,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	# opendss_playground.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, '670671', False, 120, 30) #TODO: unify the microgrids data structure.
 	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER, microgrid, diesel_total_calc)
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER, microgrid, diesel_total_calc)
-	# convert to dict of lists for columnar output in output_template.html
+	# convert mg_list_of_dicts_full to dict of lists for columnar output in output_template.html
 	mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
 	# Create giant consolidated report.
 	template = j2.Template(open('output_template.html').read())

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>This report was made by David and Matt.</title>
+	<style type="text/css">iframe {width:95%;height:600px}</style>
+</head>
+<body>
+	<pre>INPUTS {'circuit': 'lehigh_full_fb_3.dss', 'loads': 'lehigh_load.csv', 'REopt inputs': {'solar': 'on', 'wind': 'off', 'battery': 'on', 'year': '2017', 'energyCost': '0.12', 'demandCost': '20', 'wholesaleCost': '0.034', 'solarCost': '1600', 'windCost': '4989', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'dieselGenCost': '500', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '100000', 'windMax': '100000', 'batteryPowerMax': '1000000', 'batteryCapacityMax': '1000000', 'dieselMax': '1000000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outageDuration': '48', 'fuelAvailable': '50000', 'genExisting': 0, 'minGenLoading': '0.3', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True}, 'microgrid': {'loads': ['645_hangar', '646_office'], 'switch': '632645', 'gen_bus': '646', 'gen_obs_existing': [], 'max_potential': '800'}}</pre>
+	<!-- formatted below for a dict of lists -->
+	<pre>Overview of Microgrids</pre>
+	<table style="">
+		
+			<tr>
+				<td>Microgrid Name</td>
+				
+				<td style="text-align:right">4</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Generation Bus</td>
+				
+				<td style="text-align:right">646</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Minimum Load (kWh)</td>
+				
+				<td style="text-align:right">25.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Average Load (kWh)</td>
+				
+				<td style="text-align:right">139.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Average Daytime Load (kWh)</td>
+				
+				<td style="text-align:right">216.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Maximum Load (kWh)</td>
+				
+				<td style="text-align:right">385.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Existing Diesel (kW)</td>
+				
+				<td style="text-align:right">0.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Recommended New Diesel (kW)</td>
+				
+				<td style="text-align:right">408.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Diesel Fuel Used During Outage (gal)</td>
+				
+				<td style="text-align:right">366.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Existing Solar (kW)</td>
+				
+				<td style="text-align:right">0.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Recommended New Solar (kW)</td>
+				
+				<td style="text-align:right">732.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Existing Battery Power (kW)</td>
+				
+				<td style="text-align:right">0.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Recommended New Battery Power (kW)</td>
+				
+				<td style="text-align:right">174.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Existing Battery Capacity (kWh)</td>
+				
+				<td style="text-align:right">0.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Recommended New Battery Capacity (kWh)</td>
+				
+				<td style="text-align:right">416.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Existing Wind (kW)</td>
+				
+				<td style="text-align:right">0.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Recommended New Wind (kW)</td>
+				
+				<td style="text-align:right">0.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Total Generation on Grid (kW)</td>
+				
+				<td style="text-align:right">1314.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Net Present Value ($)</td>
+				
+				<td style="text-align:right">-19,562</td>
+				
+			</tr>
+		
+			<tr>
+				<td>CapEx ($)</td>
+				
+				<td style="text-align:right">1,695,607</td>
+				
+			</tr>
+		
+			<tr>
+				<td>CapEx after Incentives ($)</td>
+				
+				<td style="text-align:right">1,093,058</td>
+				
+			</tr>
+		
+	</table>
+	<iframe src="lehigh_map_fb/geoJsonMap_offline.html"></iframe>
+	<iframe src="lehigh_fb.oneline.html"></iframe>
+	<iframe src="timeseries_fb_gen.csv.plot.html"></iframe>
+	<iframe src="timeseries_fb_load.csv.plot.html"></iframe>
+	<iframe src="timeseries_fb_source.csv.plot.html"></iframe>
+	<iframe src="timeseries_fb_control.csv.plot.html"></iframe>
+	<iframe src="lehigh_reopt_fb_final_4/inlineTemplate.html"></iframe>
+	<!-- <iframe src="timezcontrol_gen.csv.plot.html"></iframe> -->
+	<iframe src="timezcontrol_load.csv.plot.html"></iframe>
+	<iframe src="timezcontrol_source.csv.plot.html"></iframe>
+	<iframe src="timezcontrol_control.csv.plot.html"></iframe>
+</body>
+</html>

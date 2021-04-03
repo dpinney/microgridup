@@ -1,0 +1,121 @@
+clear 
+set defaultbasefrequency=60
+
+! around 3.5 mw of load
+new object=circuit.lehigh basekv=115 pu=1.0001 phases=3 bus1=sourcebus angle=30 mvasc3=20000 mvasc1=21000 
+edit object=vsource.source basekv=115 bus1=sourcebus.1.2.3 pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001
+
+! second sub at other end of circuit
+new object=vsource.secondsource basekv=4.16 bus1=680.1.2.3 pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001
+
+!sub transformer definition 
+new object=transformer.sub phases=3 windings=2 xhl=0.008 buses=[sourcebus.1.2.3,650.1.2.3] conns=[delta,wye] kvs=[115,4.16] kvas=[5000,5000] %rs=[0.0005,0.0005]
+
+! feeder 1-phase voltage regulators
+! define low-impedance 2-wdg transformer
+new object=transformer.reg1 phases=1 bank=reg1 xhl=0.01 kvas=[1666,1666] buses=[650.1,rg60.1] kvs=[2.4,2.4] %loadloss=0.01
+new object=regcontrol.reg1 transformer=reg1 winding=2 vreg=121 band=2 ptratio=20 ctprim=700 r=3 x=9 
+new object=transformer.reg2 phases=1 bank=reg1 xhl=0.01 kvas=[1666,1666] buses=[650.2,rg60.2] kvs=[2.4,2.4] %loadloss=0.01
+new object=regcontrol.reg2 transformer=reg2 winding=2 vreg=121 band=2 ptratio=20 ctprim=700 r=3 x=9 
+new object=transformer.reg3 phases=1 bank=reg1 xhl=0.01 kvas=[1666,1666] buses=[650.3,rg60.3] kvs=[2.4,2.4] %loadloss=0.01
+new object=regcontrol.reg3 transformer=reg3 winding=2 vreg=121 band=2 ptratio=20 ctprim=700 r=3 x=9 
+
+!transformer definition 
+new object=transformer.xfm1 phases=3 windings=2 xhl=2 buses=[633.1.2.3,634.1.2.3] conns=[wye,wye] kvs=[4.16,0.480] kvas=[500,500] %rs=[0.55,0.55] xht=1 xlt=1
+
+! these are local matrix line codes
+new object=linecode.mtx601 nphases=3 basefreq=60 rmatrix=[0.3465|0.1560,0.3375|0.1580,0.1535,0.3414] xmatrix=[1.0179|0.5017,1.0478|0.4236,0.3849,1.0348] units=mi 
+new object=linecode.mtx602 nphases=3 basefreq=60 rmatrix=[0.7526|0.1580,0.7475|0.1560,0.1535,0.7436] xmatrix=[1.1814|0.4236,1.1983|0.5017,0.3849,1.2112] units=mi 
+new object=linecode.mtx603 nphases=2 basefreq=60 rmatrix=[1.3238|0.2066,1.3294] xmatrix=[1.3569|0.4591,1.3471] units=mi 
+new object=linecode.mtx604 nphases=2 basefreq=60 rmatrix=[1.3238|0.2066,1.3294] xmatrix=[1.3569|0.4591,1.3471] units=mi 
+new object=linecode.mtx605 nphases=1 basefreq=60 rmatrix=[1.3292] xmatrix=[1.3475] units=mi 
+new object=linecode.mtx606 nphases=3 units=mi rmatrix=[0.791721|0.318476,0.781649|0.28345,0.318476,0.791721] xmatrix=[0.438352|0.0276838,0.396697|-0.0184204,0.0276838,0.438352] cmatrix=[383.948|0,383.948|0,0,383.948]
+new object=linecode.mtx607 nphases=1 basefreq=60 rmatrix=[1.3425] xmatrix=[0.5124] cmatrix=[236] units=mi 
+
+!load definitions
+! new object=load.671_command_center bus1=671.1.2.3 phases=3 conn=delta model=1 kv=2.4 kw=1155 kvar=660
+new object=load.684_command_center bus1=684.3 phases=1 conn=delta model=1 kv=2.4 kw=1155 kvar=660
+new object=load.634a_data_center bus1=634.1 phases=1 conn=wye model=1 kv=0.277 kw=160 kvar=110
+new object=load.634b_radar bus1=634.1 phases=1 conn=wye model=1 kv=0.277 kw=120 kvar=90
+new object=load.634c_atc_tower bus1=634.1 phases=1 conn=wye model=1 kv=0.277 kw=120 kvar=90
+new object=load.645_hangar bus1=645.2 phases=1 conn=wye model=1 kv=2.4 kw=170 kvar=125
+new object=load.646_office bus1=646.2 phases=1 conn=delta model=2 kv=2.4 kw=230 kvar=132
+new object=load.692_warehouse2 bus1=692.1.2.3 phases=3 conn=delta model=5 kv=2.4 kw=170 kvar=151 
+new object=load.675a_hospital bus1=675.1.2.3 phases=3 conn=wye model=1 kv=2.4 kw=485 kvar=190
+new object=load.675b_residential1 bus1=675.1.2.3 phases=3 conn=wye model=1 kv=2.4 kw=68 kvar=60
+new object=load.675c_residential1 bus1=675.1.2.3 phases=3 conn=wye model=1 kv=2.4 kw=290 kvar=212
+new object=load.611_runway bus1=611.3 phases=1 conn=wye model=5 kv=2.4 kw=170 kvar=80
+new object=load.652_residential bus1=652.3 phases=1 conn=wye model=2 kv=2.4 kw=128 kvar=86
+new object=load.670a_residential2 bus1=670.1 phases=1 conn=wye model=1 kv=2.4 kw=17 kvar=10
+new object=load.670b_residential2 bus1=670.2 phases=1 conn=wye model=1 kv=2.4 kw=66 kvar=38
+new object=load.670c_residential2 bus1=670.3 phases=1 conn=wye model=1 kv=2.4 kw=117 kvar=68
+
+! microgrid m1 generator definitions
+new object=generator.solar_634_existing bus1=634.1 kv=0.277 kw=440 pf=1
+! new object=generator.wind_634_existing bus1=634.1 kv=0.277 kw=300 pf=1
+! new object=generator.diesel_634_existing bus1=634.1 kw=165 pf=1 kv=0.277 xdp=0.27 xdpp=0.2 h=2 conn=delta
+! new object=storage.battery_634_existing phases=3 bus1=634.1.2.3 kv=0.277 kwrated=79 kwhstored=307 kwhrated=307 dispmode=follow %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
+
+! microgrid m2 generator definitions
+! new object=generator.solar_675_existing bus1=675.1.2.3 kv=2.4 kw=1234 pf=1
+! new object=generator.diesel_675_existing bus1=675.1.2.3 kw=265 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 conn=delta
+! new object=storage.battery_675_existing phases=3 bus1=675.1.2.3 kv=2.4 kwrated=198 kwhstored=553 kwhrated=553 dispmode=follow %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
+
+! microgrid m3 generator definitions
+! new object=generator.solar_684_existing bus1=684.3 kv=2.4 kw=432 pf=1
+! new object=generator.wind_684_existing bus1=684.3 kv=2.4 kw=50 pf=1
+new object=generator.diesel_684_existing bus1=684.3 kw=81 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 conn=delta
+! new object=storage.battery_684_existing phases=3 bus1=684.1.2.3 kv=2.4 kwrated=20 kwhstored=100 kwhrated=100 dispmode=follow %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
+
+! microgrid m4 generator definitions
+! new object=generator.solar_646_existing bus1=646.2 kv=4.16 kw=590 pf=1
+! new object=generator.diesel_646_existing bus1=646.2 kw=145 pf=1 kv=4.16 xdp=0.27 xdpp=0.2 h=2 conn=delta
+! new object=storage.battery_646_existing phases=1 bus1=646.2 kv=4.16 kwrated=98 kwhstored=346 kwhrated=346 dispmode=follow %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
+
+!capacitor definitions
+new object=capacitor.cap1 bus1=675 phases=3 kvar=600 kv=4.16 
+new object=capacitor.cap2 bus1=611.3 phases=1 kvar=100 kv=2.4 
+
+!line definitions 
+new object=line.670671 phases=3 bus1=670.1.2.3 bus2=671.1.2.3 linecode=mtx601 length=1333 units=ft 
+new object=line.645646 phases=1 bus1=645.2 bus2=646.2 linecode=mtx603 length=300 units=ft 
+new object=line.692675 phases=3 bus1=692.1.2.3 bus2=675.1.2.3 linecode=mtx606 length=500 units=ft 
+new object=line.684611 phases=1 bus1=684.3 bus2=611.3 linecode=mtx605 length=300 units=ft 
+new object=line.684652 phases=1 bus1=684.3 bus2=652.3 linecode=mtx607 length=800 units=ft 
+
+!microgrid switch definitions 
+new object=line.671692 phases=3 bus1=671.1.2.3 bus2=692.1.2.3 switch=y r1=1e-4 r0=1e-4 x1=0.000 x0=0.000 c1=0.000 c0=0.000
+new object=line.632633 phases=1 bus1=632.1 bus2=633.1 switch=y linecode=mtx602 length=500 units=ft 
+new object=line.671684 phases=1 bus1=671.3 bus2=684.3 switch=y linecode=mtx604 length=300 units=ft 
+new object=line.632645 phases=1 bus1=632.2 bus2=645.2 switch=y linecode=mtx603 length=500 units=ft 
+
+!reconfiguration switches
+new object=line.632670 phases=3 bus1=632.1.2.3 bus2=670.1.2.3 switch=y linecode=mtx601 length=667 units=ft
+new object=line.650632 phases=3 bus1=rg60.1.2.3 bus2=632.1.2.3 switch=y linecode=mtx601 length=2000 units=ft
+
+!second sub switch (normal open)
+new object=line.671680 phases=3 bus1=671.1.2.3 bus2=680.1.2.3 switch=y linecode=mtx601 length=1000 units=ft
+open object=line.671680 term=1
+
+! bus coords in lat/lon format
+makebuslist
+setbusxy bus=sourcebus y=30.285013 x=-84.071493
+setbusxy bus=650 y=30.285013 x=-84.071993
+setbusxy bus=rg60 y=30.285013 x=-84.072493
+setbusxy bus=646 y=30.283013 x=-84.072993
+setbusxy bus=645 y=30.284013 x=-84.072993
+setbusxy bus=632 y=30.285013 x=-84.072993
+setbusxy bus=633 y=30.286513 x=-84.072993
+setbusxy bus=634 y=30.287013 x=-84.072993
+setbusxy bus=670 y=30.285013 x=-84.073493
+setbusxy bus=611 y=30.283013 x=-84.074493
+setbusxy bus=684 y=30.284013 x=-84.074493
+setbusxy bus=671 y=30.285013 x=-84.074493
+setbusxy bus=692 y=30.285513 x=-84.074493
+setbusxy bus=675 y=30.287013 x=-84.074493
+setbusxy bus=652 y=30.284013 x=-84.075493
+setbusxy bus=680 y=30.285013 x=-84.075493
+
+! set voltages
+set voltagebases=[115,4.16,0.48]
+calcvoltagebases

@@ -250,9 +250,6 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 
 	return gen_sizes #dictionary of all gen sizes
 
-def set_reopt_gen_values():
-	pass
-
 def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, diesel_total_calc, BASE_NAME):
 	'''Create new generator objects and shapes. 
 	Returns a list of generator objects formatted for reading into openDSS tree.
@@ -361,7 +358,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, diesel_total_c
 		if solar_size_total > 0:
 			pVToBat = pd.Series(reopt_out.get(f'powerPVToBattery{mg_num}'))
 		dieselToBat = np.zeros(8760)
-		if diesel_total_calc > 0:
+		if diesel_size_total > 0:
 			dieselToBat = pd.Series(reopt_out.get(f'powerDieselToBattery{mg_num}'))
 		windToBat = np.zeros(8760)
 		if wind_size_total > 0:

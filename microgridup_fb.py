@@ -639,8 +639,8 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, dies
 							"Diesel Fuel Used During Outage (gal)", "Existing Solar (kW)", "Recommended New Solar (kW)", 
 							"Existing Battery Power (kW)", "Recommended New Battery Power (kW)", "Existing Battery Capacity (kWh)", 
 							"Recommended New Battery Capacity (kWh)", "Existing Wind (kW)", "Recommended New Wind (kW)", 
-							"Total Generation on Grid (kW)", "NPV ($)", "CapEx ($)", "CapEx after Incentives ($)"]) 
-							#,"Average Outage Survived (h)"])
+							"Total Generation on Grid (kW)", "NPV ($)", "CapEx ($)", "CapEx after Incentives ($)", 
+							"Average Outage Survived (h)"])
 		mg_num = 1
 		mg_ob = microgrid
 		gen_bus_name = mg_ob['gen_bus']
@@ -653,15 +653,6 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, dies
 		avg_daytime_load = np.average(np.average(daytime_kwh, axis=1))
 		max_load = max(load)
 		diesel_used_gal =reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0)
-		diesel_size_REopt = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
-		# new diesel cost to be added, including 10$/kW/year fixed O+M cost for default 25 year period ($)
-		# TODO: if running REopt a second time to incorporate diesel_total_calc, re-calculate costs
-		# TODO update "25" to be equal to years of analysis and 10$/kw/yr equal to O+M cost
-		if diesel_total_calc - diesel_size_REopt > 0:
-			diesel_new_cost = (diesel_total_calc - diesel_size_REopt)*(reopt_out.get(f'dieselGenCost{mg_num}', 0.0) + 10*25)
-		else:
-			diesel_new_cost = 0
-
 		total_gen = diesel_size_total + solar_size_total + battery_pow_total + wind_size_total
 
 		#TODO: Redo post-REopt economic calculations to match updated discounts, taxations, etc
@@ -669,31 +660,28 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, dies
 		cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
 		cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
 		# economic outcomes with the capital costs of existing wind and batteries deducted:
-		#TODO: The diesel is a bit overcosted; if it seems necessary, add in the 8.3% discount rate and 2.5% inflation rate and a calculation for Fuel spent across the 25 year period
 		npv_existing_gen_adj = npv \
 								+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
 								+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-								+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-								- diesel_new_cost
+								+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
 		cap_ex_existing_gen_adj = cap_ex \
 								- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
 								- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-								+ diesel_new_cost
+								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
 		#TODO: UPDATE cap_ex_after_incentives_existing_gen_adj in 2022 to erase the 18% cost reduction for wind above 100kW as it will have ended
 		cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives \
 								- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0)*.82 \
 								- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-								+ diesel_new_cost
-		#TODO: Update the Average Outage if the updated diesel size is run back through REopt for recalculation
-		# ave_outage = reopt_out.get(f'avgOutage{mg_num}', 0.0)
+								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
+		ave_outage = reopt_out.get(f'avgOutage{mg_num}')
+		if ave_outage is not None:
+			int(round(ave_outage))
 		
 		row =[str(REOPT_FOLDER[-1]), gen_bus_name, round(min_load,0), round(ave_load,0), round(avg_daytime_load,1), round(max_load,0),
 		round(diesel_size_existing,1), round(diesel_size_new,1), round(diesel_used_gal, 0), round(solar_size_existing,1), 
 		round(solar_size_new,1), round(battery_pow_existing,1), round(battery_pow_new,1), round(battery_cap_existing,1), 
 		round(battery_cap_new,1), round(wind_size_existing,1), round(wind_size_new,1), round(total_gen,1),
-		int(round(npv_existing_gen_adj)), int(round(cap_ex_existing_gen_adj)), int(round(cap_ex_after_incentives_existing_gen_adj))]
+		int(round(npv_existing_gen_adj)), int(round(cap_ex_existing_gen_adj)), int(round(cap_ex_after_incentives_existing_gen_adj)),ave_outage]
 		writer.writerow(row)
 
 def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, diesel_total_calc):
@@ -730,18 +718,9 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, diesel_to
 	daytime_kwh = np_load[:,9:17] #365 8-hour daytime arrays
 	mg_dict["Average Daytime Load (kWh)"] = round(np.average(np.average(daytime_kwh, axis=1)),0)
 	mg_dict["Maximum Load (kWh)"] = round(max(load),0)
-	
-	diesel_size_REopt = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
-	# new diesel cost to be added, including 10$/kW/year fixed O+M cost for default 25 year period ($)
-	if diesel_total_calc - diesel_size_REopt > 0:
-		diesel_new_cost = (diesel_total_calc - diesel_size_REopt)*(reopt_out.get(f'dieselGenCost{mg_num}', 0.0) + 10*25)
-	else:
-		diesel_new_cost = 0
 	mg_dict["Existing Diesel (kW)"] = round(diesel_size_existing,0)
 	mg_dict["Recommended New Diesel (kW)"] = round(diesel_size_new,0)
-	# For large gensets, diesel fuel used is approximated by REopt as linear against the kWh provided, so no adjustment is made here for the size of the diesel genset
 	mg_dict["Diesel Fuel Used During Outage (gal)"] = round(reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0),0)
-	
 	mg_dict["Existing Solar (kW)"] = round(solar_size_existing ,0)
 	mg_dict["Recommended New Solar (kW)"] = round(solar_size_total - solar_size_existing,0)
 	mg_dict["Existing Battery Power (kW)"] = round(battery_pow_existing,0)
@@ -755,27 +734,27 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, diesel_to
 	npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
 	cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
 	cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
-	# economic outcomes with the capital costs of existing wind and batteries deducted, and diesel size adjusted:
+	# economic outcomes with the capital costs of existing wind and batteries deducted:
 	npv_existing_gen_adj = npv \
 							+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
 							+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-							+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-							- diesel_new_cost
+							+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
 	mg_dict["Net Present Value ($)"] = f'{round(npv_existing_gen_adj):,}'
 	cap_ex_existing_gen_adj = cap_ex \
 							- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
 							- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-							- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-							+ diesel_new_cost
+							- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
 	mg_dict["CapEx ($)"] = f'{round(cap_ex_existing_gen_adj):,}'
 	cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives \
 							- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0)*.82 \
 							- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-							- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-							+ diesel_new_cost
+							- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) 
 	mg_dict["CapEx after Incentives ($)"] = f'{round(cap_ex_after_incentives_existing_gen_adj):,}'
-	#TODO: Update Average Outage if the updated diesel size is run back through REopt for recalculation
-	# mg_dict["Average Outage Survived (h)"] = round(reopt_out.get(f'avgOutage{mg_num}', 0.0),0)
+	ave_outage = reopt_out.get(f'avgOutage{mg_num}')
+	if ave_outage is not None:
+		int(round(ave_outage))
+	mg_dict["Average Outage Survived (h)"] = ave_outage
+
 	list_of_mg_dict.append(mg_dict)
 	#print(list_of_mg_dict)
 	return(list_of_mg_dict)

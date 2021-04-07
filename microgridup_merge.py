@@ -675,7 +675,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, dies
 								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
 		ave_outage = reopt_out.get(f'avgOutage{mg_num}')
 		if ave_outage is not None:
-			int(round(ave_outage))
+			ave_outage = int(round(ave_outage))
 		
 		row =[str(REOPT_FOLDER[-1]), gen_bus_name, round(min_load,0), round(ave_load,0), round(avg_daytime_load,1), round(max_load,0),
 		round(diesel_size_existing,1), round(diesel_size_new,1), round(diesel_used_gal, 0), round(solar_size_existing,1), 
@@ -752,7 +752,7 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, diesel_to
 	mg_dict["CapEx after Incentives ($)"] = f'{round(cap_ex_after_incentives_existing_gen_adj):,}'
 	ave_outage = reopt_out.get(f'avgOutage{mg_num}')
 	if ave_outage is not None:
-		int(round(ave_outage))
+		ave_outage = int(round(ave_outage))
 	mg_dict["Average Outage Survived (h)"] = ave_outage
 
 	list_of_mg_dict.append(mg_dict)
@@ -784,16 +784,16 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 			#24*5:'open object=line.671692 term=1',
 			#24*8:'new object=fault.f1 bus1=670.1.2.3 phases=3 r=0 ontime=0.0'
 		},
-		filePrefix='timeseries'
+		filePrefix='timeseries_fb'
 	)
 	# opendss.voltagePlot(FULL_NAME, PU=True)
 	# opendss.currentPlot(FULL_NAME)
 	#TODO!!!! we're clobbering these outputs each time we run the full workflow. Consider keeping them separate.
-	make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS) #TODO: pull year using reopt_out.get(f'year{mg_num}', 0.0) from allOutputData.json after refactor
+	make_chart('timeseries_fb_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS) #TODO: pull year using reopt_out.get(f'year{mg_num}', 0.0) from allOutputData.json after refactor
 	# for timeseries_load, output ANSI Range A service bands (2,520V - 2,340V for 2.4kV and 291V - 263V for 0.277kV)
-	make_chart('timeseries_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'], QSTS_STEPS, ansi_bands = True)
-	make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS)
-	make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS)
+	make_chart('timeseries_fb_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'], QSTS_STEPS, ansi_bands = True)
+	make_chart('timeseries_fb_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS)
+	make_chart('timeseries_fb_control.csv', 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS)
 	# Perform control sim.
 	import opendss_playground
 	# opendss_playground.play('./lehigh.dss.omd', './lehigh_base_phased_playground.dss', './tiedata.csv', None, opendss_playground.microgrids, '670671', False, 120, 30) #TODO: unify the microgrids data structure.
@@ -803,7 +803,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	# convert mg_list_of_dicts_full to dict of lists for columnar output in output_template.html
 	mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
 	# Create giant consolidated report.
-	template = j2.Template(open('output_template.html').read())
+	template = j2.Template(open('output_template_fb.html').read())
 	out = template.render(
 		x='David',
 		y='Matt',

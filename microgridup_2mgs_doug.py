@@ -53,12 +53,13 @@ if __name__ == '__main__':
 
 	# Output paths.
 	GEN_NAME = 'lehigh_gen.csv'
-	FULL_NAME_1 = 'lehigh_full_1_doug.dss'
+	FULL_NAME_1 = 'lehigh_full_doug_1.dss'
 	OMD_NAME = 'lehigh.dss.omd'
 	ONELINE_NAME = 'lehigh.oneline.html'
 	MAP_NAME = 'lehigh_map'
-	REOPT_FOLDER_1 = 'lehigh_reopt_1_doug'
-	BIG_OUT_NAME_1 = 'output_full_analysis_lehigh_1_doug.html'
+	REOPT_FOLDER_BASE_1 = 'lehigh_reopt_base_doug_1'
+	REOPT_FOLDER_FINAL_1 = 'lehigh_reopt_final_doug_1'
+	BIG_OUT_NAME_1 = 'output_full_analysis_lehigh_doug_1.html'
 	
 	# 2nd run inputs.
 	microgrid_2 = {
@@ -70,9 +71,10 @@ if __name__ == '__main__':
 	}
 	
 	# 2nd run output paths
-	FULL_NAME_2 = 'lehigh_full_2_doug.dss'
-	REOPT_FOLDER_2 = 'lehigh_reopt_2_doug'
-	BIG_OUT_NAME_2 = 'output_full_analysis_lehigh_2_doug.html'
+	FULL_NAME_2 = 'lehigh_full_doug_2.dss'
+	REOPT_FOLDER_BASE_2 = 'lehigh_reopt_base_doug_2'
+	REOPT_FOLDER_FINAL_2 = 'lehigh_reopt_final_doug_2'
+	BIG_OUT_NAME_2 = 'output_full_analysis_lehigh_doug_2.html'
 
 	playground_microgrids = {
 		'm1':microgrid_1,

@@ -5,7 +5,7 @@
 	<style type="text/css">iframe {width:95%;height:600px}</style>
 </head>
 <body>
-	<pre>INPUTS {'circuit': 'lehigh_full_2.dss', 'loads': 'lehigh_load.csv', 'REopt inputs': {'solar': 'on', 'wind': 'off', 'battery': 'on', 'year': '2017', 'energyCost': '0.12', 'demandCost': '20', 'wholesaleCost': '0.034', 'solarCost': '1600', 'windCost': '4989', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'dieselGenCost': '500', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '100000', 'windMax': '100000', 'batteryPowerMax': '1000000', 'batteryCapacityMax': '1000000', 'dieselMax': '1000000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outage_start_hour': '200', 'outageDuration': '48', 'fuelAvailable': '50000', 'genExisting': 0, 'minGenLoading': '0.3', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True}, 'microgrid': {'loads': ['684_command_center', '652_residential'], 'switch': '671684', 'gen_bus': '684', 'gen_obs_existing': ['diesel_684_existing'], 'max_potential': '1300'}}</pre>
+	<pre>INPUTS {'circuit': 'lehigh_full_2.dss', 'loads': 'lehigh_load.csv', 'REopt inputs': {'solar': 'on', 'wind': 'off', 'battery': 'on', 'year': '2017', 'energyCost': '0.12', 'demandCost': '20', 'wholesaleCost': '0.034', 'solarCost': '1600', 'windCost': '4989', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'dieselGenCost': '500', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '100000', 'windMax': '100000', 'batteryPowerMax': '1000000', 'batteryCapacityMax': '1000000', 'dieselMax': '1000000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outageDuration': '48', 'fuelAvailable': '50000', 'genExisting': 0, 'minGenLoading': '0.3', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True}, 'microgrid': {'loads': ['684_command_center', '652_residential'], 'switch': '671684', 'gen_bus': '684', 'gen_obs_existing': ['diesel_684_existing'], 'max_potential': '1300'}}</pre>
 	<!-- formatted below for a dict of lists -->
 	<pre>Overview of Microgrids</pre>
 	<table style="">
@@ -62,14 +62,14 @@
 			<tr>
 				<td>Recommended New Diesel (kW)</td>
 				
-				<td style="text-align:right">882.0</td>
+				<td style="text-align:right">963.0</td>
 				
 			</tr>
 		
 			<tr>
 				<td>Diesel Fuel Used During Outage (gal)</td>
 				
-				<td style="text-align:right">1808.0</td>
+				<td style="text-align:right">1797.0</td>
 				
 			</tr>
 		
@@ -132,28 +132,35 @@
 			<tr>
 				<td>Total Generation on Grid (kW)</td>
 				
-				<td style="text-align:right">2978.0</td>
+				<td style="text-align:right">3059.0</td>
 				
 			</tr>
 		
 			<tr>
 				<td>Net Present Value ($)</td>
 				
-				<td style="text-align:right">99,599</td>
+				<td style="text-align:right">111,555</td>
 				
 			</tr>
 		
 			<tr>
 				<td>CapEx ($)</td>
 				
-				<td style="text-align:right">3,908,105</td>
+				<td style="text-align:right">3,849,964</td>
 				
 			</tr>
 		
 			<tr>
 				<td>CapEx after Incentives ($)</td>
 				
-				<td style="text-align:right">2,504,175</td>
+				<td style="text-align:right">2,446,034</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Average Outage Survived (h)</td>
+				
+				<td style="text-align:right">1974</td>
 				
 			</tr>
 		
@@ -164,7 +171,7 @@
 	<iframe src="timeseries_load.csv.plot.html"></iframe>
 	<iframe src="timeseries_source.csv.plot.html"></iframe>
 	<iframe src="timeseries_control.csv.plot.html"></iframe>
-	<iframe src="lehigh_reopt_3/inlineTemplate.html"></iframe>
+	<iframe src="lehigh_reopt_final_3/inlineTemplate.html"></iframe>
 	<!-- <iframe src="timezcontrol_gen.csv.plot.html"></iframe> -->
 	<iframe src="timezcontrol_load.csv.plot.html"></iframe>
 	<iframe src="timezcontrol_source.csv.plot.html"></iframe>

@@ -5,7 +5,7 @@
 	<style type="text/css">iframe {width:95%;height:600px}</style>
 </head>
 <body>
-	<pre>INPUTS {'circuit': 'lehigh_base_phased.dss', 'loads': 'lehigh_load.csv', 'REopt inputs': {'solar': 'on', 'wind': 'off', 'battery': 'on', 'year': '2017', 'energyCost': '0.12', 'demandCost': '20', 'wholesaleCost': '0.034', 'solarCost': '1600', 'windCost': '4989', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'dieselGenCost': '500', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '100000', 'windMax': '100000', 'batteryPowerMax': '1000000', 'batteryCapacityMax': '1000000', 'dieselMax': '1000000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outage_start_hour': '200', 'outageDuration': '48', 'fuelAvailable': '50000', 'genExisting': 0, 'minGenLoading': '0.3', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True}, 'microgrid': {'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'switch': '632633', 'gen_bus': '634', 'gen_obs_existing': ['solar_634_existing'], 'max_potential': '700'}}</pre>
+	<pre>INPUTS {'circuit': 'lehigh_base_phased.dss', 'loads': 'lehigh_load.csv', 'REopt inputs': {'solar': 'on', 'wind': 'off', 'battery': 'on', 'year': '2017', 'energyCost': '0.12', 'demandCost': '20', 'wholesaleCost': '0.034', 'solarCost': '1600', 'windCost': '4989', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'dieselGenCost': '500', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '100000', 'windMax': '100000', 'batteryPowerMax': '1000000', 'batteryCapacityMax': '1000000', 'dieselMax': '1000000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outageDuration': '48', 'fuelAvailable': '50000', 'genExisting': 0, 'minGenLoading': '0.3', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True}, 'microgrid': {'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'switch': '632633', 'gen_bus': '634', 'gen_obs_existing': ['solar_634_existing'], 'max_potential': '700'}}</pre>
 	<!-- formatted below for a dict of lists -->
 	<pre>Overview of Microgrids</pre>
 	<table style="">
@@ -69,7 +69,7 @@
 			<tr>
 				<td>Diesel Fuel Used During Outage (gal)</td>
 				
-				<td style="text-align:right">393.0</td>
+				<td style="text-align:right">311.0</td>
 				
 			</tr>
 		
@@ -83,7 +83,7 @@
 			<tr>
 				<td>Recommended New Solar (kW)</td>
 				
-				<td style="text-align:right">208.0</td>
+				<td style="text-align:right">648.0</td>
 				
 			</tr>
 		
@@ -132,28 +132,35 @@
 			<tr>
 				<td>Total Generation on Grid (kW)</td>
 				
-				<td style="text-align:right">1058.0</td>
+				<td style="text-align:right">1498.0</td>
 				
 			</tr>
 		
 			<tr>
 				<td>Net Present Value ($)</td>
 				
-				<td style="text-align:right">-208,037</td>
+				<td style="text-align:right">-325,042</td>
 				
 			</tr>
 		
 			<tr>
 				<td>CapEx ($)</td>
 				
-				<td style="text-align:right">738,102</td>
+				<td style="text-align:right">1,404,530</td>
 				
 			</tr>
 		
 			<tr>
 				<td>CapEx after Incentives ($)</td>
 				
-				<td style="text-align:right">539,546</td>
+				<td style="text-align:right">889,921</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Average Outage Survived (h)</td>
+				
+				<td style="text-align:right">None</td>
 				
 			</tr>
 		
@@ -164,7 +171,7 @@
 	<iframe src="timeseries_load.csv.plot.html"></iframe>
 	<iframe src="timeseries_source.csv.plot.html"></iframe>
 	<iframe src="timeseries_control.csv.plot.html"></iframe>
-	<iframe src="lehigh_reopt_1/inlineTemplate.html"></iframe>
+	<iframe src="lehigh_reopt_final_1/inlineTemplate.html"></iframe>
 	<!-- <iframe src="timezcontrol_gen.csv.plot.html"></iframe> -->
 	<iframe src="timezcontrol_load.csv.plot.html"></iframe>
 	<iframe src="timezcontrol_source.csv.plot.html"></iframe>

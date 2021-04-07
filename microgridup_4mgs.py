@@ -30,7 +30,7 @@ if __name__ == '__main__':
 		"dieselMax": "1000000",
 		"solarExisting": 0,
 		"criticalLoadFactor": "1",
-		"outage_start_hour": "200",
+		#"outage_start_hour": "200",
 		"outageDuration": "48",
 		"fuelAvailable": "50000",
 		"genExisting": 0,
@@ -57,7 +57,8 @@ if __name__ == '__main__':
 	OMD_NAME = 'lehigh.dss.omd'
 	ONELINE_NAME = 'lehigh.oneline.html'
 	MAP_NAME = 'lehigh_map'
-	REOPT_FOLDER_1 = 'lehigh_reopt_1'
+	REOPT_FOLDER_BASE_1 = 'lehigh_reopt_base_1'
+	REOPT_FOLDER_FINAL_1 = 'lehigh_reopt_final_1'
 	BIG_OUT_NAME_1 = 'output_full_analysis_lehigh_1.html'
 	
 	# 2nd run inputs.
@@ -71,7 +72,8 @@ if __name__ == '__main__':
 	
 	# 2nd run output paths
 	FULL_NAME_2 = 'lehigh_full_2.dss'
-	REOPT_FOLDER_2 = 'lehigh_reopt_2'
+	REOPT_FOLDER_BASE_2 = 'lehigh_reopt_base_2'
+	REOPT_FOLDER_FINAL_2 = 'lehigh_reopt_final_2'
 	BIG_OUT_NAME_2 = 'output_full_analysis_lehigh_2.html'
 
 	# 3rd run inputs
@@ -85,7 +87,8 @@ if __name__ == '__main__':
 
 	# 3rd run output paths
 	FULL_NAME_3 = 'lehigh_full_3.dss'
-	REOPT_FOLDER_3 = 'lehigh_reopt_3'
+	REOPT_FOLDER_BASE_3 = 'lehigh_reopt_base_3'
+	REOPT_FOLDER_FINAL_3 = 'lehigh_reopt_final_3'
 	BIG_OUT_NAME_3 = 'output_full_analysis_lehigh_3.html'
 
 	# 4rth run inputs
@@ -105,7 +108,8 @@ if __name__ == '__main__':
 
 	# 4rth run output paths
 	FULL_NAME_4 = 'lehigh_full_4.dss'
-	REOPT_FOLDER_4 = 'lehigh_reopt_4'
+	REOPT_FOLDER_BASE_4 = 'lehigh_reopt_base_4'
+	REOPT_FOLDER_FINAL_4 = 'lehigh_reopt_final_4'
 	BIG_OUT_NAME_4 = 'output_full_analysis_lehigh_4.html'
 
 	# # 5th (full) run inputs
@@ -129,8 +133,8 @@ if __name__ == '__main__':
 	# 	'gen_obs_existing': ['solar_634_existing', 'diesel_684_existing']
 	# }
 
-	main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid_1, playground_microgrids, GEN_NAME, FULL_NAME_1, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_1, BIG_OUT_NAME_1, QSTS_STEPS, DIESEL_SAFETY_FACTOR)
-	main(FULL_NAME_1, LOAD_NAME, REOPT_INPUTS, microgrid_2, playground_microgrids, GEN_NAME, FULL_NAME_2, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_2, BIG_OUT_NAME_2, QSTS_STEPS, DIESEL_SAFETY_FACTOR)
-	main(FULL_NAME_2, LOAD_NAME, REOPT_INPUTS, microgrid_3, playground_microgrids, GEN_NAME, FULL_NAME_3, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_3, BIG_OUT_NAME_3, QSTS_STEPS, DIESEL_SAFETY_FACTOR)
-	main(FULL_NAME_3, LOAD_NAME, REOPT_INPUTS, microgrid_4, playground_microgrids, GEN_NAME, FULL_NAME_4, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_4, BIG_OUT_NAME_4, QSTS_STEPS, DIESEL_SAFETY_FACTOR)
+	main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid_1, playground_microgrids, GEN_NAME, FULL_NAME_1, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE_1, REOPT_FOLDER_FINAL_1, BIG_OUT_NAME_1, QSTS_STEPS, DIESEL_SAFETY_FACTOR)
+	main(FULL_NAME_1, LOAD_NAME, REOPT_INPUTS, microgrid_2, playground_microgrids, GEN_NAME, FULL_NAME_2, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE_2, REOPT_FOLDER_FINAL_2, BIG_OUT_NAME_2, QSTS_STEPS, DIESEL_SAFETY_FACTOR)
+	main(FULL_NAME_2, LOAD_NAME, REOPT_INPUTS, microgrid_3, playground_microgrids, GEN_NAME, FULL_NAME_3, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE_3, REOPT_FOLDER_FINAL_3, BIG_OUT_NAME_3, QSTS_STEPS, DIESEL_SAFETY_FACTOR)
+	main(FULL_NAME_3, LOAD_NAME, REOPT_INPUTS, microgrid_4, playground_microgrids, GEN_NAME, FULL_NAME_4, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE_4, REOPT_FOLDER_FINAL_4, BIG_OUT_NAME_4, QSTS_STEPS, DIESEL_SAFETY_FACTOR)
 	# main(FULL_NAME_4, LOAD_NAME, REOPT_INPUTS, microgrid_5, playground_microgrids, GEN_NAME, FULL_NAME_5, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_5, BIG_OUT_NAME_5)

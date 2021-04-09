@@ -2,6 +2,7 @@ from omf.solvers import opendss
 from omf.solvers.opendss import dssConvert
 from omf import distNetViz
 from omf import geo
+import opendss_playground
 import shutil
 import os
 from pprint import pprint as pp
@@ -658,20 +659,22 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, dies
 		npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
 		cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
 		cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
+		
+		# TODO: Once incentive structure is finalized, update NPV and cap_ex_after_incentives calculation to include depreciation over time if appropriate
 		# economic outcomes with the capital costs of existing wind and batteries deducted:
-		npv_existing_gen_adj = npv \
-								+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
-								+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-								+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
+		# npv_existing_gen_adj = npv \
+		# 						+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
+		# 						+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
+		# 						+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
 		cap_ex_existing_gen_adj = cap_ex \
 								- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
 								- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
 								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
 		#TODO: UPDATE cap_ex_after_incentives_existing_gen_adj in 2022 to erase the 18% cost reduction for wind above 100kW as it will have ended
-		cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives \
-								- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0)*.82 \
-								- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
+		# cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives \
+		# 						- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0)*.82 \
+		# 						- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
+		# 						- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
 		ave_outage = reopt_out.get(f'avgOutage{mg_num}')
 		if ave_outage is not None:
 			ave_outage = int(round(ave_outage))
@@ -680,7 +683,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, dies
 		round(diesel_size_existing,1), round(diesel_size_new,1), round(diesel_used_gal, 0), round(solar_size_existing,1), 
 		round(solar_size_new,1), round(battery_pow_existing,1), round(battery_pow_new,1), round(battery_cap_existing,1), 
 		round(battery_cap_new,1), round(wind_size_existing,1), round(wind_size_new,1), round(total_gen,1),
-		int(round(npv_existing_gen_adj)), int(round(cap_ex_existing_gen_adj)), int(round(cap_ex_after_incentives_existing_gen_adj)),ave_outage]
+		int(round(npv)), int(round(cap_ex_existing_gen_adj)), int(round(cap_ex_after_incentives)),ave_outage]
 		writer.writerow(row)
 
 def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, diesel_total_calc):
@@ -733,22 +736,26 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, diesel_to
 	npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
 	cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
 	cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
+	
+	#TODO: Once incentive structure is finalized, update NPV and cap_ex_after_incentives calculation to include depreciation over time if appropriate
 	# economic outcomes with the capital costs of existing wind and batteries deducted:
-	npv_existing_gen_adj = npv \
-							+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
-							+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-							+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
-	mg_dict["Net Present Value ($)"] = f'{round(npv_existing_gen_adj):,}'
+	# npv_existing_gen_adj = npv \
+	# 						+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
+	# 						+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
+	# 						+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
+	# mg_dict["Net Present Value ($)"] = f'{round(npv_existing_gen_adj):,}'
+	mg_dict["Net Present Value ($)"] = f'{round(npv):,}'
 	cap_ex_existing_gen_adj = cap_ex \
 							- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
 							- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
 							- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
 	mg_dict["CapEx ($)"] = f'{round(cap_ex_existing_gen_adj):,}'
-	cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives \
-							- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0)*.82 \
-							- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-							- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) 
-	mg_dict["CapEx after Incentives ($)"] = f'{round(cap_ex_after_incentives_existing_gen_adj):,}'
+	# cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives \
+	# 						- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0)*.82 \
+	# 						- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
+	# 						- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) 
+	# mg_dict["CapEx after Incentives ($)"] = f'{round(cap_ex_after_incentives_existing_gen_adj):,}'
+	mg_dict["CapEx after Incentives ($)"] = f'{round(cap_ex_after_incentives):,}'
 	ave_outage = reopt_out.get(f'avgOutage{mg_num}')
 	if ave_outage is not None:
 		ave_outage = int(round(ave_outage))
@@ -794,8 +801,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS)
 	make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS)
 	# Perform control sim.
-	import opendss_playground
-	# opendss_playground.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, '670671', False, 1, 120, 30) #TODO: unify the microgrids data structure.
+	opendss_playground.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, '670671', False, 1, 120, 30) #TODO: unify the microgrids data structure.
 	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, diesel_total_calc=False)
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, diesel_total_calc=False)
 	# convert mg_list_of_dicts_full to dict of lists for columnar output in output_template.html

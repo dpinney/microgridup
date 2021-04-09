@@ -667,4 +667,4 @@ microgrids = {
 	}
 }
 
-play('./lehigh.dss.omd', './lehigh_full.dss', None, None, microgrids, '670671', False, 1, 120, 30) 
+# play('./lehigh.dss.omd', './lehigh_full.dss', None, None, microgrids, '670671', False, 1, 120, 30)

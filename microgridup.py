@@ -510,6 +510,10 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs):
 	''' insert generation objects into dss.
 	SIDE EFFECTS: writes FULL_NAME dss'''
 	tree = dssConvert.dssToTree(BASE_NAME)
+	# make a list of names all existing loadshape objects
+	load_map = {x.get('object',''):i for i, x in enumerate(tree)}
+	#print(load_map)
+
 	bus_list_pos = -1
 	for i, ob in enumerate(tree):
 		if ob.get('!CMD','') == 'makebuslist':
@@ -529,14 +533,16 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs):
 				shape_data = load_df[ob_name]
 				shape_name = ob_name + '_shape'
 				ob['yearly'] = shape_name
-				shape_insert_list[i] = {
-					'!CMD': 'new',
-					'object': f'loadshape.{shape_name}',
-					'npts': f'{len(shape_data)}',
-					'interval': '1',
-					'useactual': 'yes', 
-					'mult': f'{list(shape_data)}'.replace(' ','')
-				}
+				# check to make sure not duplicating loadshapes in DSS file
+				if f'loadshape.{shape_name}' not in load_map:
+					shape_insert_list[i] = {
+						'!CMD': 'new',
+						'object': f'loadshape.{shape_name}',
+						'npts': f'{len(shape_data)}',
+						'interval': '1',
+						'useactual': 'yes', 
+						'mult': f'{list(shape_data)}'.replace(' ','')
+					}
 			elif ob_string.startswith('generator.'):
 				ob_name = ob_string[10:]
 				#print('ob_name:', ob_name)

@@ -1991,7 +1991,7 @@ hour,t(sec),Tap(pu),Type,Name,Step_1,Unnamed:3
 70,0.0,1.00625,Transformer,monregcontrol-reg3,,
 71,0.0,1.00625,Transformer,monregcontrol-reg3,,
 72,0.0,1.00625,Transformer,monregcontrol-reg3,,
-73,0.0,1.0,Transformer,monregcontrol-reg3,,
+73,0.0,1.00625,Transformer,monregcontrol-reg3,,
 74,0.0,1.0,Transformer,monregcontrol-reg3,,
 75,0.0,1.0,Transformer,monregcontrol-reg3,,
 76,0.0,1.0,Transformer,monregcontrol-reg3,,

@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/Users/dpinney/gdrive/LATERBASE/omf/omf/models/__neoMetaModel__.py", line 51, in heavyProcessing
+    outData = work(modelDir, inputDict)
+  File "/Users/dpinney/gdrive/LATERBASE/omf/omf/models/microgridDesign.py", line 204, in work
+    with open(pJoin(modelDir, 'results.json')) as jsonFile:
+FileNotFoundError: [Errno 2] No such file or directory: 'reopt_final_2/results.json'

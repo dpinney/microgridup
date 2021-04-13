@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>This report was made by David and Matt.</title>
+	<style type="text/css">iframe {width:95%;height:600px}</style>
+</head>
+<body>
+	<pre>INPUTS {'circuit': 'circuit.dss', 'loads': 'loads.csv', 'REopt inputs': {'solar': 'on', 'wind': 'off', 'battery': 'on', 'year': '2017', 'energyCost': '0.12', 'demandCost': '20', 'wholesaleCost': '0.034', 'solarCost': '1600', 'windCost': '4989', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'dieselGenCost': '500', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '100000', 'windMax': '100000', 'batteryPowerMax': '1000000', 'batteryCapacityMax': '1000000', 'dieselMax': '1000000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outage_start_hour': '200', 'outageDuration': '48', 'fuelAvailable': '50000', 'genExisting': 0, 'minGenLoading': '0.3', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True}, 'microgrid': {'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'switch': '632633', 'gen_bus': '634', 'gen_obs_existing': ['solar_634_existing', 'battery_634_existing'], 'max_potential': '700'}}</pre>
+	<!-- formatted below for a dict of lists -->
+	<pre>Overview of Microgrids</pre>
+	<table style="">
+		
+			<tr>
+				<td>Microgrid Name</td>
+				
+				<td style="text-align:right">0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Generation Bus</td>
+				
+				<td style="text-align:right">634</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Minimum Load (kWh)</td>
+				
+				<td style="text-align:right">60.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Average Load (kWh)</td>
+				
+				<td style="text-align:right">178.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Average Daytime Load (kWh)</td>
+				
+				<td style="text-align:right">248.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Maximum Load (kWh)</td>
+				
+				<td style="text-align:right">306.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Existing Diesel (kW)</td>
+				
+				<td style="text-align:right">0.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Recommended New Diesel (kW)</td>
+				
+				<td style="text-align:right">327.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Diesel Fuel Used During Outage (gal)</td>
+				
+				<td style="text-align:right">311.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Existing Solar (kW)</td>
+				
+				<td style="text-align:right">440.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Recommended New Solar (kW)</td>
+				
+				<td style="text-align:right">648.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Existing Battery Power (kW)</td>
+				
+				<td style="text-align:right">79.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Recommended New Battery Power (kW)</td>
+				
+				<td style="text-align:right">4.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Existing Battery Capacity (kWh)</td>
+				
+				<td style="text-align:right">307.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Recommended New Battery Capacity (kWh)</td>
+				
+				<td style="text-align:right">13.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Existing Wind (kW)</td>
+				
+				<td style="text-align:right">0.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Recommended New Wind (kW)</td>
+				
+				<td style="text-align:right">0.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Total Generation on Grid (kW)</td>
+				
+				<td style="text-align:right">1498.0</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Net Present Value ($)</td>
+				
+				<td style="text-align:right">-325,042</td>
+				
+			</tr>
+		
+			<tr>
+				<td>CapEx ($)</td>
+				
+				<td style="text-align:right">1,209,230</td>
+				
+			</tr>
+		
+			<tr>
+				<td>CapEx after Incentives ($)</td>
+				
+				<td style="text-align:right">889,921</td>
+				
+			</tr>
+		
+			<tr>
+				<td>Average Outage Survived (h)</td>
+				
+				<td style="text-align:right">None</td>
+				
+			</tr>
+		
+	</table>
+	<iframe src="circuit_map/geoJsonMap_offline.html"></iframe>
+	<iframe src="circuit_oneline.html"></iframe>
+	<iframe src="timeseries_gen.csv.plot.html"></iframe>
+	<iframe src="timeseries_load.csv.plot.html"></iframe>
+	<iframe src="timeseries_source.csv.plot.html"></iframe>
+	<iframe src="timeseries_control.csv.plot.html"></iframe>
+	<iframe src="reopt_final_0/inlineTemplate.html"></iframe>
+	<!-- <iframe src="timezcontrol_gen.csv.plot.html"></iframe> -->
+	<iframe src="timezcontrol_load.csv.plot.html"></iframe>
+	<iframe src="timezcontrol_source.csv.plot.html"></iframe>
+	<iframe src="timezcontrol_control.csv.plot.html"></iframe>
+</body>
+</html>

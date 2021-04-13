@@ -17,6 +17,8 @@ import math
 import random
 import datetime
 
+MGU_FOLDER = os.path.dirname(__file__)
+
 def _name_to_key(glm):
 	''' Make fast lookup map by name in a glm.
 	WARNING: if the glm changes, the map will no longer be valid.
@@ -860,6 +862,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	# Draw the map.
 	geo.mapOmd(OMD_NAME, MAP_NAME, 'html', openBrowser=False, conversion=False, offline=True)
 	# Powerflow outputs.
+	print('QSTS with ', FULL_NAME, 'AND CWD IS ', os.getcwd())
 	opendss.newQstsPlot(FULL_NAME,
 		stepSizeInMinutes=60, 
 		numberOfSteps=QSTS_STEPS,
@@ -885,7 +888,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	# convert mg_list_of_dicts_full to dict of lists for columnar output in output_template.html
 	mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
 	# Create giant consolidated report.
-	template = j2.Template(open('output_template.html').read())
+	template = j2.Template(open(f'{MGU_FOLDER}/output_template.html').read())
 	out = template.render(
 		x='David',
 		y='Matt',
@@ -897,6 +900,27 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	with open(BIG_OUT_NAME,'w') as outFile:
 		outFile.write(out)
 	os.system(f'open {BIG_OUT_NAME}')
+
+def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_INPUTS, MICROGRIDS):
+	# CONSTANTS
+	MODEL_DSS = 'circuit.dss'
+	MODEL_LOAD_CSV = 'loads.csv'
+	GEN_NAME = 'generation.csv'
+	OMD_NAME = 'circuit.dss.omd'
+	MAP_NAME = 'circuit_map'
+	ONELINE_NAME = 'circuit_oneline.html'
+	# Create initial files.
+	if not os.path.isdir(MODEL_DIR):
+		os.mkdir(MODEL_DIR)
+	shutil.copyfile(BASE_DSS, f'{MODEL_DIR}/{MODEL_DSS}')
+	shutil.copyfile(LOAD_CSV, f'{MODEL_DIR}/{MODEL_LOAD_CSV}')
+	# HACK: work in directory because we're very picky about the current dir.
+	os.chdir(MODEL_DIR)
+	# Run the analysis
+	mgs_name_sorted = sorted(MICROGRIDS.keys())
+	for i, mg_name in enumerate(mgs_name_sorted):
+		STEP_FULL_NAME = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
+		main(MODEL_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], MICROGRIDS, GEN_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, DIESEL_SAFETY_FACTOR)
 
 if __name__ == '__main__':
 	print('No Inputs Received')

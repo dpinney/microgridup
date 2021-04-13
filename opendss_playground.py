@@ -568,7 +568,7 @@ def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, b
 	# treeDSS.insert(max_pos, {'!CMD': 'solve'})
 
 	# Write new DSS file.
-	FULL_NAME = 'lehigh_full_newDiesel.dss'
+	FULL_NAME = 'circuit_control.dss'
 	dssConvert.treeToDss(treeDSS, FULL_NAME)
 
 	# get a dictionary of all the line openings and closings to be graphed

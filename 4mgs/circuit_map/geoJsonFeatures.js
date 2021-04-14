@@ -6,8 +6,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07166821823998,
-                    30.284916570915268
+                    -84.07165944307317,
+                    30.284902109498173
                 ]
             },
             "properties": {
@@ -32,8 +32,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07129490045607,
-                    30.28498549416984
+                    -84.07166085314425,
+                    30.284904255703754
                 ]
             },
             "properties": {
@@ -45,8 +45,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07568786776898,
-                    30.285058017247913
+                    -84.0756763442271,
+                    30.285092905534125
                 ]
             },
             "properties": {
@@ -123,8 +123,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.0744144335477,
-                    30.284829077971484
+                    -84.0743916950034,
+                    30.284185445056945
                 ]
             },
             "properties": {
@@ -137,11 +137,11 @@ var geojson ={
                 "type": "Point",
                 "coordinates": [
                     -84.074493,
-                    30.285013
+                    30.284013
                 ]
             },
             "properties": {
-                "name": "671"
+                "name": "684"
             }
         },
         {
@@ -149,8 +149,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.0730272732414,
-                    30.28721004148021
+                    -84.07287316855681,
+                    30.286852873721013
                 ]
             },
             "properties": {
@@ -162,8 +162,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07292269996654,
-                    30.2872002375638
+                    -84.0730558444558,
+                    30.28720286988802
                 ]
             },
             "properties": {
@@ -175,8 +175,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.0731208438133,
-                    30.287166804939453
+                    -84.07289283954151,
+                    30.28718611234085
                 ]
             },
             "properties": {
@@ -188,8 +188,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07297188011823,
-                    30.28421188175028
+                    -84.07288786624194,
+                    30.28384286213556
                 ]
             },
             "properties": {
@@ -214,8 +214,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07291567925242,
-                    30.283197449185394
+                    -84.07305073800956,
+                    30.283204484522223
                 ]
             },
             "properties": {
@@ -240,8 +240,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.0745479128293,
-                    30.28532068624288
+                    -84.07430167097779,
+                    30.285454748774598
                 ]
             },
             "properties": {
@@ -266,8 +266,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07452257241496,
-                    30.286815198401744
+                    -84.0746209670922,
+                    30.287166702385523
                 ]
             },
             "properties": {
@@ -292,8 +292,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07462369712923,
-                    30.287164387781583
+                    -84.07459870282418,
+                    30.286843215097957
                 ]
             },
             "properties": {
@@ -305,8 +305,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07461242841069,
-                    30.286852572899043
+                    -84.07432907159523,
+                    30.287127575207208
                 ]
             },
             "properties": {
@@ -318,8 +318,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07445777975369,
-                    30.28320987441238
+                    -84.07433667779442,
+                    30.283137753228583
                 ]
             },
             "properties": {
@@ -344,8 +344,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07535132590777,
-                    30.283871831832222
+                    -84.07529321815178,
+                    30.284003661203318
                 ]
             },
             "properties": {
@@ -370,8 +370,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07331506331055,
-                    30.285104315576678
+                    -84.07329625946753,
+                    30.285048960573963
                 ]
             },
             "properties": {
@@ -396,8 +396,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.0733077432891,
-                    30.28508836545011
+                    -84.07336009221433,
+                    30.285162450729363
                 ]
             },
             "properties": {
@@ -409,8 +409,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07369079275877,
-                    30.28498336852049
+                    -84.07358287551962,
+                    30.28519166838269
                 ]
             },
             "properties": {
@@ -422,8 +422,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07318392783584,
-                    30.286953446985805
+                    -84.07289333245365,
+                    30.286839603401983
                 ]
             },
             "properties": {
@@ -435,12 +435,12 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07296056654727,
-                    30.287210352656796
+                    -84.0742932994876,
+                    30.287023940993954
                 ]
             },
             "properties": {
-                "name": "battery_634_existing"
+                "name": "solar_675_existing"
             }
         },
         {
@@ -448,8 +448,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07429502643356,
-                    30.283984601637602
+                    -84.07460474331236,
+                    30.283847128265997
                 ]
             },
             "properties": {
@@ -461,21 +461,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.074493,
-                    30.284013
-                ]
-            },
-            "properties": {
-                "name": "684"
-            }
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    -84.0743249782441,
-                    30.28690451640887
+                    -84.07442241123874,
+                    30.287200128904193
                 ]
             },
             "properties": {
@@ -487,12 +474,25 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07463854094755,
-                    30.282875821894642
+                    -84.07456731751604,
+                    30.282827320418978
                 ]
             },
             "properties": {
                 "name": "cap2"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.074493,
+                    30.285013
+                ]
+            },
+            "properties": {
+                "name": "671"
             }
         },
         {
@@ -513,8 +513,125 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.0731652346721,
-                    30.283114662272858
+                    -84.07287250172645,
+                    30.287172625079712
+                ]
+            },
+            "properties": {
+                "name": "battery_634"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07284284109889,
+                    30.286880892829803
+                ]
+            },
+            "properties": {
+                "name": "diesel_634"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07286797028641,
+                    30.286856898844597
+                ]
+            },
+            "properties": {
+                "name": "solar_634"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07431644513817,
+                    30.2869190405366
+                ]
+            },
+            "properties": {
+                "name": "battery_675"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07433804310139,
+                    30.286886554914805
+                ]
+            },
+            "properties": {
+                "name": "diesel_675"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07429660141378,
+                    30.287050783532514
+                ]
+            },
+            "properties": {
+                "name": "solar_675"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07466474800644,
+                    30.283910517697706
+                ]
+            },
+            "properties": {
+                "name": "battery_684"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07430364154185,
+                    30.284077369047864
+                ]
+            },
+            "properties": {
+                "name": "diesel_684"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.0742998569866,
+                    30.283961079133547
+                ]
+            },
+            "properties": {
+                "name": "solar_684"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -84.07297390546425,
+                    30.282813913589855
                 ]
             },
             "properties": {
@@ -526,8 +643,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.07292769307305,
-                    30.28282396295259
+                    -84.07285927309592,
+                    30.283161718240724
                 ]
             },
             "properties": {
@@ -539,8 +656,8 @@ var geojson ={
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -84.073190492347,
-                    30.28304457171006
+                    -84.07312648150808,
+                    30.283161938534295
                 ]
             },
             "properties": {
@@ -553,8 +670,8 @@ var geojson ={
                 "type": "LineString",
                 "coordinates": [
                     [
-                        -84.07166821823998,
-                        30.284916570915268
+                        -84.07165944307317,
+                        30.284902109498173
                     ],
                     [
                         -84.071493,
@@ -574,8 +691,8 @@ var geojson ={
                         30.285013
                     ],
                     [
-                        -84.07129490045607,
-                        30.28498549416984
+                        -84.07166085314425,
+                        30.284904255703754
                     ]
                 ]
             },
@@ -604,8 +721,8 @@ var geojson ={
                 "type": "LineString",
                 "coordinates": [
                     [
-                        -84.07568786776898,
-                        30.285058017247913
+                        -84.0756763442271,
+                        30.285092905534125
                     ],
                     [
                         -84.075493,
@@ -710,8 +827,8 @@ var geojson ={
                         30.287013
                     ],
                     [
-                        -84.0730272732414,
-                        30.28721004148021
+                        -84.07287316855681,
+                        30.286852873721013
                     ]
                 ]
             },
@@ -727,8 +844,8 @@ var geojson ={
                         30.287013
                     ],
                     [
-                        -84.07292269996654,
-                        30.2872002375638
+                        -84.0730558444558,
+                        30.28720286988802
                     ]
                 ]
             },
@@ -744,8 +861,8 @@ var geojson ={
                         30.287013
                     ],
                     [
-                        -84.0731208438133,
-                        30.287166804939453
+                        -84.07289283954151,
+                        30.28718611234085
                     ]
                 ]
             },
@@ -761,8 +878,8 @@ var geojson ={
                         30.287013
                     ],
                     [
-                        -84.07318392783584,
-                        30.286953446985805
+                        -84.07289333245365,
+                        30.286839603401983
                     ]
                 ]
             },
@@ -778,8 +895,8 @@ var geojson ={
                         30.287013
                     ],
                     [
-                        -84.07296056654727,
-                        30.287210352656796
+                        -84.07287250172645,
+                        30.287172625079712
                     ]
                 ]
             },
@@ -791,12 +908,12 @@ var geojson ={
                 "type": "LineString",
                 "coordinates": [
                     [
-                        -84.0744144335477,
-                        30.284829077971484
+                        -84.072993,
+                        30.287013
                     ],
                     [
-                        -84.074493,
-                        30.285013
+                        -84.07284284109889,
+                        30.286880892829803
                     ]
                 ]
             },
@@ -808,12 +925,12 @@ var geojson ={
                 "type": "LineString",
                 "coordinates": [
                     [
-                        -84.074493,
-                        30.285013
+                        -84.072993,
+                        30.287013
                     ],
                     [
-                        -84.073493,
-                        30.285013
+                        -84.07286797028641,
+                        30.286856898844597
                     ]
                 ]
             },
@@ -825,25 +942,8 @@ var geojson ={
                 "type": "LineString",
                 "coordinates": [
                     [
-                        -84.074493,
-                        30.285013
-                    ],
-                    [
-                        -84.074493,
-                        30.285513
-                    ]
-                ]
-            },
-            "properties": {}
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        -84.074493,
-                        30.285013
+                        -84.0743916950034,
+                        30.284185445056945
                     ],
                     [
                         -84.074493,
@@ -859,12 +959,12 @@ var geojson ={
                 "type": "LineString",
                 "coordinates": [
                     [
-                        -84.07297188011823,
-                        30.28421188175028
+                        -84.074493,
+                        30.284013
                     ],
                     [
-                        -84.072993,
-                        30.284013
+                        -84.07460474331236,
+                        30.283847128265997
                     ]
                 ]
             },
@@ -876,214 +976,10 @@ var geojson ={
                 "type": "LineString",
                 "coordinates": [
                     [
-                        -84.072993,
-                        30.284013
-                    ],
-                    [
-                        -84.072993,
-                        30.283013
-                    ]
-                ]
-            },
-            "properties": {}
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        -84.072993,
+                        -84.074493,
                         30.284013
                     ],
                     [
-                        -84.072993,
-                        30.285013
-                    ]
-                ]
-            },
-            "properties": {}
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        -84.07291567925242,
-                        30.283197449185394
-                    ],
-                    [
-                        -84.072993,
-                        30.283013
-                    ]
-                ]
-            },
-            "properties": {}
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        -84.072993,
-                        30.283013
-                    ],
-                    [
-                        -84.0731652346721,
-                        30.283114662272858
-                    ]
-                ]
-            },
-            "properties": {}
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        -84.072993,
-                        30.283013
-                    ],
-                    [
-                        -84.07292769307305,
-                        30.28282396295259
-                    ]
-                ]
-            },
-            "properties": {}
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        -84.072993,
-                        30.283013
-                    ],
-                    [
-                        -84.073190492347,
-                        30.28304457171006
-                    ]
-                ]
-            },
-            "properties": {}
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        -84.0745479128293,
-                        30.28532068624288
-                    ],
-                    [
-                        -84.074493,
-                        30.285513
-                    ]
-                ]
-            },
-            "properties": {}
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        -84.074493,
-                        30.285513
-                    ],
-                    [
-                        -84.074493,
-                        30.287013
-                    ]
-                ]
-            },
-            "properties": {}
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        -84.07452257241496,
-                        30.286815198401744
-                    ],
-                    [
-                        -84.074493,
-                        30.287013
-                    ]
-                ]
-            },
-            "properties": {}
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        -84.074493,
-                        30.287013
-                    ],
-                    [
-                        -84.07462369712923,
-                        30.287164387781583
-                    ]
-                ]
-            },
-            "properties": {}
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        -84.074493,
-                        30.287013
-                    ],
-                    [
-                        -84.07461242841069,
-                        30.286852572899043
-                    ]
-                ]
-            },
-            "properties": {}
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        -84.074493,
-                        30.287013
-                    ],
-                    [
-                        -84.0743249782441,
-                        30.28690451640887
-                    ]
-                ]
-            },
-            "properties": {}
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        -84.07445777975369,
-                        30.28320987441238
-                    ],
-                    [
                         -84.074493,
                         30.283013
                     ]
@@ -1096,43 +992,9 @@ var geojson ={
             "geometry": {
                 "type": "LineString",
                 "coordinates": [
-                    [
-                        -84.074493,
-                        30.283013
-                    ],
-                    [
-                        -84.07463854094755,
-                        30.282875821894642
-                    ]
-                ]
-            },
-            "properties": {}
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        -84.074493,
-                        30.283013
-                    ],
                     [
                         -84.074493,
                         30.284013
-                    ]
-                ]
-            },
-            "properties": {}
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        -84.07535132590777,
-                        30.283871831832222
                     ],
                     [
                         -84.075493,
@@ -1148,11 +1010,79 @@ var geojson ={
                 "type": "LineString",
                 "coordinates": [
                     [
-                        -84.075493,
+                        -84.074493,
                         30.284013
                     ],
                     [
                         -84.074493,
+                        30.285013
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.074493,
+                        30.284013
+                    ],
+                    [
+                        -84.07466474800644,
+                        30.283910517697706
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.074493,
+                        30.284013
+                    ],
+                    [
+                        -84.07430364154185,
+                        30.284077369047864
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.074493,
+                        30.284013
+                    ],
+                    [
+                        -84.0742998569866,
+                        30.283961079133547
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.07288786624194,
+                        30.28384286213556
+                    ],
+                    [
+                        -84.072993,
                         30.284013
                     ]
                 ]
@@ -1165,8 +1095,348 @@ var geojson ={
                 "type": "LineString",
                 "coordinates": [
                     [
-                        -84.07331506331055,
-                        30.285104315576678
+                        -84.072993,
+                        30.284013
+                    ],
+                    [
+                        -84.072993,
+                        30.283013
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.072993,
+                        30.284013
+                    ],
+                    [
+                        -84.072993,
+                        30.285013
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.07305073800956,
+                        30.283204484522223
+                    ],
+                    [
+                        -84.072993,
+                        30.283013
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.072993,
+                        30.283013
+                    ],
+                    [
+                        -84.07297390546425,
+                        30.282813913589855
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.072993,
+                        30.283013
+                    ],
+                    [
+                        -84.07285927309592,
+                        30.283161718240724
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.072993,
+                        30.283013
+                    ],
+                    [
+                        -84.07312648150808,
+                        30.283161938534295
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.07430167097779,
+                        30.285454748774598
+                    ],
+                    [
+                        -84.074493,
+                        30.285513
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.074493,
+                        30.285513
+                    ],
+                    [
+                        -84.074493,
+                        30.287013
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.074493,
+                        30.285513
+                    ],
+                    [
+                        -84.074493,
+                        30.285013
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.0746209670922,
+                        30.287166702385523
+                    ],
+                    [
+                        -84.074493,
+                        30.287013
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.074493,
+                        30.287013
+                    ],
+                    [
+                        -84.07459870282418,
+                        30.286843215097957
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.074493,
+                        30.287013
+                    ],
+                    [
+                        -84.07432907159523,
+                        30.287127575207208
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.074493,
+                        30.287013
+                    ],
+                    [
+                        -84.0742932994876,
+                        30.287023940993954
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.074493,
+                        30.287013
+                    ],
+                    [
+                        -84.07442241123874,
+                        30.287200128904193
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.074493,
+                        30.287013
+                    ],
+                    [
+                        -84.07431644513817,
+                        30.2869190405366
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.074493,
+                        30.287013
+                    ],
+                    [
+                        -84.07433804310139,
+                        30.286886554914805
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.074493,
+                        30.287013
+                    ],
+                    [
+                        -84.07429660141378,
+                        30.287050783532514
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.07433667779442,
+                        30.283137753228583
+                    ],
+                    [
+                        -84.074493,
+                        30.283013
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.074493,
+                        30.283013
+                    ],
+                    [
+                        -84.07456731751604,
+                        30.282827320418978
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.07529321815178,
+                        30.284003661203318
+                    ],
+                    [
+                        -84.075493,
+                        30.284013
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.07329625946753,
+                        30.285048960573963
                     ],
                     [
                         -84.073493,
@@ -1186,8 +1456,8 @@ var geojson ={
                         30.285013
                     ],
                     [
-                        -84.0733077432891,
-                        30.28508836545011
+                        -84.07336009221433,
+                        30.285162450729363
                     ]
                 ]
             },
@@ -1203,8 +1473,25 @@ var geojson ={
                         30.285013
                     ],
                     [
-                        -84.07369079275877,
-                        30.28498336852049
+                        -84.07358287551962,
+                        30.28519166838269
+                    ]
+                ]
+            },
+            "properties": {}
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -84.073493,
+                        30.285013
+                    ],
+                    [
+                        -84.074493,
+                        30.285013
                     ]
                 ]
             },
@@ -1222,23 +1509,6 @@ var geojson ={
                     [
                         -84.072993,
                         30.285013
-                    ]
-                ]
-            },
-            "properties": {}
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        -84.07429502643356,
-                        30.283984601637602
-                    ],
-                    [
-                        -84.074493,
-                        30.284013
                     ]
                 ]
             },

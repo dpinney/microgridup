@@ -4,7 +4,9 @@ MicrogridUp Design Tool - for a given circuit, determine an optimal set of micro
 
 ## Installation
 
-TBD
+install the omf https://github.com/dpinney/omf/wiki/Dev-~-Installation-Instructions
+
+Then, clone the microgripUp Github repo and run the setup file: 'python setup.py develop'
 
 ## Running the Model
 

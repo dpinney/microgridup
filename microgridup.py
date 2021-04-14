@@ -919,8 +919,9 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_
 	# Run the analysis
 	mgs_name_sorted = sorted(MICROGRIDS.keys())
 	for i, mg_name in enumerate(mgs_name_sorted):
-		STEP_FULL_NAME = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
-		main(MODEL_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], MICROGRIDS, GEN_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, DIESEL_SAFETY_FACTOR)
+		# STEP_FULL_NAME = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
+		BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
+		main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], MICROGRIDS, GEN_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, DIESEL_SAFETY_FACTOR)
 
 if __name__ == '__main__':
 	print('No Inputs Received')

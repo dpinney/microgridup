@@ -545,6 +545,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, die
 
 def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs, microgrid):
 	''' insert generation objects into dss.
+	ASSUMPTIONS: 
 	SIDE EFFECTS: writes FULL_NAME dss'''
 	tree = dssConvert.dssToTree(BASE_NAME)
 	# print(tree)
@@ -564,15 +565,19 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs, microgrid)
 	gen_df = pd.read_csv(GEN_NAME)
 	shape_insert_list = {}
 	load_df = pd.read_csv(LOAD_NAME)
+	listofzeros = [0.0] * 8760
 	for i, ob in enumerate(tree):
 		try:
 			ob_string = ob.get('object','')
+			# reset shape_data to be blank list needed?
+			shape_data = None
+			# insert loadshapes for load objects
 			if ob_string.startswith('load.'):
 				ob_name = ob_string[5:]
 				shape_data = load_df[ob_name]
 				shape_name = ob_name + '_shape'
 				ob['yearly'] = shape_name
-				# check to make sure not duplicating loadshapes in DSS file
+				# check to make sure no duplication of loadshapes in DSS file
 				if f'loadshape.{shape_name}' not in load_map:
 					shape_insert_list[i] = {
 						'!CMD': 'new',
@@ -582,48 +587,108 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs, microgrid)
 						'useactual': 'yes', 
 						'mult': f'{list(shape_data)}'.replace(' ','')
 					}
+			# insert loadshapes for generator objects
 			elif ob_string.startswith('generator.'):
 				print("1_gen:", ob)
 				ob_name = ob_string[10:]
 				print('ob_name:', ob_name)
-				shape_data = gen_df[ob_name]
-				#print('shape_data', shape_data)
 				shape_name = ob_name + '_shape'
-				ob['yearly'] = shape_name
-				print("ob['yearly']", ob['yearly'])
-				print("1a_gen:", ob)
 				# insert loadshape for existing generators
 				if ob_name.endswith('_existing'):
+					# TODO: if actual production loadshape is available for a given object, insert it, else use synthetic loadshapes as defined here
 					print("2_gen:", ob)
-					# if object is outside of microgrid and without a loadshape, give it a loadshape of zeros
+					# if object is outside of microgrid and without a loadshape, give it a valid production loadshape for solar and wind or a loadshape of zeros for diesel
 					if ob_name not in gen_obs_existing and f'loadshape.{shape_name}' not in load_map:					
 						print("3_gen:", ob)
-						shape_insert_list[i] = {
-							'!CMD': 'new',
-							'object': f'loadshape.{shape_name}',
-							'npts': '8760',
-							'interval': '1',
-							'useactual': 'yes',
-							'mult': f'{list(pd.DataFrame(np.zeros(8760)))}'.replace(' ','')
-						}
-					# if generator object is located in the microgrid, overwrite any existing loadshape and insert new one
+						if ob_name.startswith('diesel_'):
+							print("3a_gen:", ob)
+							ob['yearly'] = shape_name
+							print("ob['yearly']:", ob['yearly'])
+							shape_insert_list[i] = {
+								'!CMD': 'new',
+								'object': f'loadshape.{shape_name}',
+								'npts': '8760',
+								'interval': '1',
+								'useactual': 'yes',
+								'mult': f'{listofzeros}'.replace(' ','')
+							}
+						elif ob_name.startswith('solar_'):
+							print("3b_gen:", ob)
+							ob['yearly'] = shape_name
+							print("ob['yearly']:", ob['yearly'])
+							# TODO: Fix loadshape to match actual production potential of the generator using a reference shapes from the first run of REopt 
+							# shape_data = pd.DataFrame(np.zeros(8760))
+							# print('shape_data:', shape_data.head(10))
+							shape_insert_list[i] = {
+								'!CMD': 'new',
+								'object': f'loadshape.{shape_name}',
+								'npts': '8760',
+								'interval': '1',
+								'useactual': 'yes',
+								# 'mult': f'{list(shape_data)}'.replace(' ','')
+								'mult': f'{listofzeros}'.replace(' ','')
+							}
+						elif ob_name.startswith('wind_'):
+							print("3c_gen:", ob)
+							ob['yearly'] = shape_name
+							print("ob['yearly']:", ob['yearly'])
+							# TODO: Fix loadshape to match actual production potential of the generator using a reference shapes from the first run of REopt 
+							# shape_data = pd.DataFrame(np.zeros(8760))
+							# print('shape_data:', shape_data.head(10))
+							shape_insert_list[i] = {
+								'!CMD': 'new',
+								'object': f'loadshape.{shape_name}',
+								'npts': '8760',
+								'interval': '1',
+								'useactual': 'yes',
+								# 'mult': f'{list(shape_data)}'.replace(' ','')
+								'mult': f'{listofzeros}'.replace(' ','')
+							}
+						#TODO: build in support for all other generator types (CHP)
+						#else:
+							#pass
+					# if generator object is located in the microgrid, insert new loadshape object
 					elif ob_name in gen_obs_existing:
 						print("4_gen:", ob)
+						# if loadshape object already exists, erase it from tree and insert a new one
+						# ASSUMPTION: Existing generators will be reconfigured to be controlled by new microgrid
 						if f'loadshape.{shape_name}' in load_map:
-							print("5_gen:", ob)
+							print("4a_gen:", ob)
 							j = load_map.get(f'loadshape.{shape_name}') # indexes of load_map and tree match
-							tree[j] = OrderedDict() # this will destroy the existing loadshape object in the tree
-						shape_insert_list[i] = {
-							'!CMD': 'new',
-							'object': f'loadshape.{shape_name}',
-							'npts': f'{len(shape_data)}',
-							'interval': '1',
-							'useactual': 'yes',
-							'mult': f'{list(shape_data)}'.replace(' ','')
-						}
+							tree.pop(j) # this will erase an existing loadshape object of the same name in the tree so that a new on can be entered
+							shape_data = gen_df[ob_name]
+							print('shape_data', shape_data.head(10))
+							# enter the loadshape at index j, equivalent to where it previously was located
+							shape_insert_list[j] = {
+								'!CMD': 'new',
+								'object': f'loadshape.{shape_name}',
+								'npts': f'{len(shape_data)}',
+								'interval': '1',
+								'useactual': 'yes',
+								'mult': f'{list(shape_data)}'.replace(' ','')
+							}
+							print("4a achieved insert")
+						else:
+							ob['yearly'] = shape_name
+							print("ob['yearly']:", ob['yearly'])
+							shape_data = gen_df[ob_name]
+							print('shape_data', shape_data.head(10))
+							shape_insert_list[i] = {
+								'!CMD': 'new',
+								'object': f'loadshape.{shape_name}',
+								'npts': f'{len(shape_data)}',
+								'interval': '1',
+								'useactual': 'yes',
+								'mult': f'{list(shape_data)}'.replace(' ','')
+							}
 				# insert loadshape for new generators
 				else:
-					print("6_gen:", ob)
+					print("5_gen:", ob)
+					shape_name = ob_name + '_shape'
+					ob['yearly'] = shape_name
+					print("ob['yearly']:", ob['yearly'])
+					shape_data = gen_df[ob_name]
+					print('shape_data', shape_data.head(10))
 					shape_insert_list[i] = {
 						'!CMD': 'new',
 						'object': f'loadshape.{shape_name}',
@@ -632,7 +697,9 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs, microgrid)
 						'useactual': 'yes',
 						'mult': f'{list(shape_data)}'.replace(' ','')
 					}
+			# insert loadshapes for storage objects
 			elif ob_string.startswith('storage.'):
+				print("1_storage:", ob)
 				ob_name = ob_string[8:]
 				#print('ob_name:', ob_name)
 				shape_data = gen_df[ob_name]

@@ -49,7 +49,7 @@ if __name__ == '__main__':
 			'loads': ['634a_data_center','634b_radar','634c_atc_tower'],
 			'switch': '632633',
 			'gen_bus': '634',
-			'gen_obs_existing': ['solar_634_existing'],
+			'gen_obs_existing': ['solar_634_existing','battery_634_existing'],
 			'max_potential': '700' # total kW rating on 634 bus is 500 kW
 		},
 		'm2': {
@@ -63,7 +63,7 @@ if __name__ == '__main__':
 			'loads': ['684_command_center','652_residential'],
 			'switch': '671684',
 			'gen_bus': '684',
-			'gen_obs_existing': ['diesel_684_existing'],
+			'gen_obs_existing': ['diesel_684_existing','battery_684_existing'],
 			'max_potential': '1300' # total kW rating on 684 and 652 is 1283 kW
 		},
 		'm4': {

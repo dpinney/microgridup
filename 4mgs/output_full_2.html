@@ -5,7 +5,7 @@
 	<style type="text/css">iframe {width:95%;height:600px}</style>
 </head>
 <body>
-	<pre>INPUTS {'circuit': 'circuit_plusmg_1.dss', 'loads': 'loads.csv', 'REopt inputs': {'solar': 'on', 'wind': 'off', 'battery': 'on', 'year': '2017', 'energyCost': '0.12', 'demandCost': '20', 'wholesaleCost': '0.034', 'solarCost': '1600', 'windCost': '4989', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'dieselGenCost': '500', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '100000', 'windMax': '100000', 'batteryPowerMax': '1000000', 'batteryCapacityMax': '1000000', 'dieselMax': '1000000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outageDuration': '48', 'fuelAvailable': '50000', 'genExisting': 0, 'minGenLoading': '0.3', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True}, 'microgrid': {'loads': ['684_command_center', '652_residential'], 'switch': '671684', 'gen_bus': '684', 'gen_obs_existing': ['diesel_684_existing'], 'max_potential': '1300'}}</pre>
+	<pre>INPUTS {'circuit': 'circuit_plusmg_1.dss', 'loads': 'loads.csv', 'REopt inputs': {'solar': 'on', 'wind': 'off', 'battery': 'on', 'year': '2017', 'energyCost': '0.12', 'demandCost': '20', 'wholesaleCost': '0.034', 'solarCost': '1600', 'windCost': '4989', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'dieselGenCost': '500', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '100000', 'windMax': '100000', 'batteryPowerMax': '1000000', 'batteryCapacityMax': '1000000', 'dieselMax': '1000000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outageDuration': '48', 'fuelAvailable': '50000', 'genExisting': 0, 'minGenLoading': '0.3', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True}, 'microgrid': {'loads': ['684_command_center', '652_residential'], 'switch': '671684', 'gen_bus': '684', 'gen_obs_existing': ['diesel_684_existing', 'battery_684_existing'], 'max_potential': '1300'}}</pre>
 	<!-- formatted below for a dict of lists -->
 	<pre>Overview of Microgrids</pre>
 	<table style="">
@@ -90,28 +90,28 @@
 			<tr>
 				<td>Existing Battery Power (kW)</td>
 				
-				<td style="text-align:right">0.0</td>
+				<td style="text-align:right">20.0</td>
 				
 			</tr>
 		
 			<tr>
 				<td>Recommended New Battery Power (kW)</td>
 				
-				<td style="text-align:right">234.0</td>
+				<td style="text-align:right">214.0</td>
 				
 			</tr>
 		
 			<tr>
 				<td>Existing Battery Capacity (kWh)</td>
 				
-				<td style="text-align:right">0.0</td>
+				<td style="text-align:right">100.0</td>
 				
 			</tr>
 		
 			<tr>
 				<td>Recommended New Battery Capacity (kWh)</td>
 				
-				<td style="text-align:right">766.0</td>
+				<td style="text-align:right">666.0</td>
 				
 			</tr>
 		
@@ -146,7 +146,7 @@
 			<tr>
 				<td>CapEx ($)</td>
 				
-				<td style="text-align:right">3,809,464</td>
+				<td style="text-align:right">3,750,664</td>
 				
 			</tr>
 		

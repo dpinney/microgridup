@@ -67,8 +67,6 @@ new object=generator.solar_675_existing bus1=675.1.2.3 phases=3 kv=2.4 kw=800 pf
 new object=generator.diesel_684_existing bus1=684.3 phases=1 kw=81 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2
 new object=storage.battery_684_existing bus1=684.3 phases=1 kv=2.4 kwrated=20 kwhstored=100 kwhrated=100 dispmode=follow %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
 
-
-
 ! microgrid m4 generator definitions
 ! new object=generator.solar_646_existing bus1=646.2 kv=4.16 kw=590 pf=1
 ! new object=generator.diesel_646_existing bus1=646.2  phases=1 kw=145 pf=1 kv=4.16 xdp=0.27 xdpp=0.2 h=2

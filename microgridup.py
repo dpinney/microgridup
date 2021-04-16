@@ -19,16 +19,6 @@ import datetime
 
 MGU_FOLDER = os.path.dirname(__file__)
 
-def _name_to_key(glm):
-	''' Make fast lookup map by name in a glm.
-	WARNING: if the glm changes, the map will no longer be valid.
-	TODO: Where does microgridup use this? Remove if no longer used'''
-	mapping = {}
-	for key, val in glm.items():
-		if 'name' in val:
-			mapping[val['name']] = key
-	return mapping
-
 def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid):
 	''' Generate the microgrid specs with REOpt.
 	SIDE-EFFECTS: generates REOPT_FOLDER'''
@@ -69,7 +59,7 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 			outage_start_hour = 2
 		else:
 			outage_start_hour = max_load_index - outage_duration/2
-		print("outage_start_hour:", str(int(outage_start_hour)))
+		#print("outage_start_hour:", str(int(outage_start_hour)))
 		allInputData['outage_start_hour'] = str(int(outage_start_hour))
 
 		# Pulling coordinates from BASE_NAME.dss into REopt allInputData.json:
@@ -126,6 +116,17 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 			allInputData['windMin'] = str(sum(wind_kw_exist))
 			allInputData['wind'] = 'on' #failsafe to include wind if found in base_dss
 			 # To Do: update logic if windMin, windExisting and other generation variables are enabled to be set by the user as inputs
+		
+		# if not already turned on, set solar and wind on to 10 kw to provide loadshapes for existing gen in make_full_dss()
+		# if allInputData['wind'] == 'off':
+		# 	allInputData['wind'] = 'on'
+		# 	allInputData['windMax'] = '10'
+		# 	allInputData['windMin'] = '10'
+		# if allInputData['solar'] == 'off':
+		# 	allInputData['solar'] = 'on'
+		# 	allInputData['solarMax'] = '10'
+		# 	allInputData['solarMin'] = '10'
+
 		# run REopt via microgridDesign
 		with open(REOPT_FOLDER + '/allInputData.json','w') as outfile:
 			json.dump(allInputData, outfile, indent=4)
@@ -198,12 +199,14 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 		diesel_size_new = diesel_size_total - diesel_size_existing
 	else:
 		diesel_size_new = 0.0	
+	# battery capacity refers to the amount of energy that can be stored (kwh)
 	battery_cap_total = reopt_out.get(f'capacityBattery{mg_num}', 0.0) 
 	battery_cap_existing = reopt_out.get(f'batteryKwhExisting{mg_num}', 0.0)
 	if battery_cap_total - battery_cap_existing > 0:
 		battery_cap_new = battery_cap_total - battery_cap_existing 
 	else:
 		battery_cap_new = 0.0 #TO DO: update logic here to make run more robust to oversized existing battery generation
+	# battery power refers to the power rating of the battery (kw)
 	battery_pow_total = reopt_out.get(f'powerBattery{mg_num}', 0.0) 
 	battery_pow_existing = reopt_out.get(f'batteryKwExisting{mg_num}', 0.0)
 	if battery_pow_total - battery_pow_existing > 0:
@@ -301,7 +304,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			allInputData['dieselMax'] = diesel_size_total
 			allInputData['dieselMin'] = diesel_size_total
 			allInputData['genExisting'] = diesel_size_existing
-		if solar_size_total > 0:
+		if solar_size_total > 0: #and solar_size_total != 10: # enable the dual condition to let user decide whether to optimize on solar or not
 			allInputData['solarMin'] = solar_size_total
 			allInputData['solarMax'] = solar_size_total
 			allInputData['solarExisting'] = solar_size_existing
@@ -314,52 +317,17 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			allInputData['batteryCapacityMax'] = battery_cap_total
 			allInputData['batteryKwhExisting'] = battery_cap_existing
 			allInputData['battery'] = 'on'
-		if wind_size_total > 0:
+		if wind_size_total > 0: #and wind_size_total != 10: # enable the dual condition to let user decide whether to optimize on wind or not
 			allInputData['windMin'] = wind_size_total
 			allInputData['windMax'] = wind_size_total
 			allInputData['windExisting'] = wind_size_existing
 			allInputData['wind'] = 'on' #failsafe to include wind if found in base_dss
-			 # To Do: update logic if windMin, windExisting and other generation variables are enabled to be set by the user as inputs
+			 # TO DO: update logic if windMin, windExisting and other generation variables are enabled to be set by the user as inputs
 		# run REopt via microgridDesign
 		with open(REOPT_FOLDER_FINAL + '/allInputData.json','w') as outfile:
 			json.dump(allInputData, outfile, indent=4)
 		omf.models.__neoMetaModel__.runForeground(REOPT_FOLDER_FINAL)
 		omf.models.__neoMetaModel__.renderTemplateToFile(REOPT_FOLDER_FINAL)
-
-def mg_phase_and_kv(BASE_NAME, microgrid):
-	'''Returns a dict with the phases at the gen_bus and kv 
-	of the loads for a given microgrid.
-	TODO: If needing to set connection type explicitly, could use this function to check that all "conn=" are the same (wye or empty for default, or delta)'''
-	tree = dssConvert.dssToTree(BASE_NAME)
-	mg_ob = microgrid
-	gen_bus_name = mg_ob['gen_bus']
-	mg_loads = mg_ob['loads']
-	load_phase_list = []
-	gen_bus_kv = []
-	load_map = {x.get('object',''):i for i, x in enumerate(tree)}
-	for load_name in mg_loads:
-		ob = tree[load_map[f'load.{load_name}']]
-		# print("mg_phase_and_kv ob:", ob)
-		bus_name = ob.get('bus1','')
-		bus_name_list = bus_name.split('.')
-		load_phases = []
-		load_phases = bus_name_list[-(len(bus_name_list)-1):]
-		for phase in load_phases:
-			if phase not in load_phase_list:
-				load_phase_list.append(phase)
-		# set the voltage for the gen_bus and check that all loads match in voltage
-		load_kv = ob.get('kv','')
-		if load_kv not in gen_bus_kv and len(gen_bus_kv) > 0:
-			raise Exception(f'More than one load voltage is specified on gen_bus {gen_bus_name}. Check voltage of {load_name}.')
-		elif load_kv not in gen_bus_kv and len(gen_bus_kv) == 0:
-			gen_bus_kv = load_kv
-	load_phase_list.sort()
-	out_dict = {}
-	out_dict['gen_bus'] = gen_bus_name
-	out_dict['phases'] = load_phase_list
-	out_dict['kv'] = gen_bus_kv
-	#print('out_dict', out_dict)
-	return out_dict
 
 def mg_phase_and_kv(BASE_NAME, microgrid):
 	'''Returns a dict with the phases at the gen_bus and kv 
@@ -510,7 +478,8 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, die
 			windToBat = pd.Series(reopt_out.get(f'powerWindToBattery{mg_num}'))
 		battery_load = batToLoad - gridToBat - pVToBat - dieselToBat - windToBat
 	# get DSS objects and loadshapes for new battery
-	if battery_cap_new > 0: 
+	# TO DO: in the case of new kw but not new kwh (or vice versa) recommedned by feedback_reopt(), integrate a way to add new batteries with a minimal kwh and kw so that powerflow can be performed
+	if battery_cap_new > 0: # or battery_pow_new > 0: 
 		gen_obs.append({
 			'!CMD': 'new',
 			'object':f'storage.battery_{gen_bus_name}',
@@ -707,7 +676,6 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs, microgrid)
 					if ob_name not in gen_obs_existing and f'loadshape.{shape_name}' not in load_map:					
 						# print("3_storage:", ob)
 						ob['yearly'] = shape_name
-						# print("ob['yearly']:", ob['yearly'])
 						shape_data = list_of_zeros
 						shape_insert_list[i] = {
 							'!CMD': 'new',
@@ -738,13 +706,18 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs, microgrid)
 								'useactual': 'yes',
 								'mult': f'{list(shape_data)}'.replace(' ','')
 							}
-							# print("4a achieved insert")
+						# 	# print("4a achieved insert")
+						# if f'loadshape.{shape_name}' in load_map:
+						# 	print("4a_storage:", ob)
+						# 	j = load_map.get(f'loadshape.{shape_name}') # indexes of load_map and tree match				
+						# 	shape_data = gen_df[ob_name]
+						# 	print('shape_data', shape_data.head(10))
+						# 	tree[j]['mult'] = f'{list(shape_data)}'.replace(' ','')
+						# 	print("4a_storage achieved insert")
 						else:
 							# print("4b_storage:", ob)
 							ob['yearly'] = shape_name
-							# print("ob['yearly']:", ob['yearly'])
 							shape_data = gen_df[ob_name]
-							# print('shape_data', shape_data.head(10))
 							shape_insert_list[i] = {
 								'!CMD': 'new',
 								'object': f'loadshape.{shape_name}',
@@ -995,6 +968,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	# opendss.voltagePlot(FULL_NAME, PU=True)
 	# opendss.currentPlot(FULL_NAME)
 	#TODO!!!! we're clobbering these outputs each time we run the full workflow. Consider keeping them separate.
+	#HACK: If only analyzing a set of generators with a single phase, remove ['P2(kW)','P3(kW)'] of make_chart('timeseries_gen.csv',...) below
 	make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS) #TODO: pull year using reopt_out.get(f'year{mg_num}', 0.0) from allOutputData.json after refactor
 	# for timeseries_load, output ANSI Range A service bands (2,520V - 2,340V for 2.4kV and 291V - 263V for 0.277kV)
 	make_chart('timeseries_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'], QSTS_STEPS, ansi_bands = True)

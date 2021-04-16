@@ -37,10 +37,10 @@
     "value_of_lost_load": "100",
     "solarCanCurtail": true,
     "solarCanExport": true,
-    "created": "2021-04-14 17:04:41.392944",
+    "created": "2021-04-15 20:19:52.984902",
     "batteryKwExisting": 79.0,
     "batteryKwhExisting": 307.0,
     "windExisting": 0,
-    "runStartTime": "2021-04-14T17:04:41.489741",
+    "runStartTime": "2021-04-15T20:19:53.085379",
     "runtimeEst_min": 2.0
 }

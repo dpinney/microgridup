@@ -84,7 +84,7 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 		loadsTooHigh = True
 		loadsShed = None
 		while loadsTooHigh == True:
-			totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad, loadsShed, loadsTooHigh = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, None, None, 0, loadsShed)
+			totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad, loadsShed, loadsTooHigh = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, None, None, 0, loadsShed, microgrids)
 			for mg in loadsShed:
 				for phase in loadsShed[mg]:
 					for loadElement in loadsShed[mg][phase]:
@@ -131,7 +131,7 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 					# make sure we re-run a single step of the simulation as many times as necessary to ensure all loads not shed can be supported
 					loadsTooHigh = True
 					while loadsTooHigh == True:
-						totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad, loadsShed, loadsTooHigh = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, None, None, 0, loadsShed)
+						totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad, loadsShed, loadsTooHigh = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, None, None, 0, loadsShed, microgrids)
 						for mg in loadsShed:
 							for phase in loadsShed[mg]:
 								for loadElement in loadsShed[mg][phase]:
@@ -176,8 +176,8 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 
 	tree = solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, bestReclosers, bestTies, lengthOfOutage, outageStart, loadsShed)
 
-def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePassed, outageStart, busShapes, leftOverBusShapes, leftOverLoad, totalTime, loadsShed):
-	'function that prepares a single timestep of the simulation to be solved'
+def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePassed, outageStart, busShapes, leftOverBusShapes, leftOverLoad, totalTime, loadsShed, microgrids):
+	'''function that prepares a single timestep of the simulation to be solved'''
 	
 	# create a list of the diesel generators
 	buses = createListOfBuses(microgrids, badBuses)
@@ -640,31 +640,31 @@ def solveSystem(busShapes, actionsDict, microgrids, tree, pathToDss, badBuses, b
 
 	return(tree)
 
-microgrids = {
-	'm1': {
-		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
-		'switch': '632633',
-		'gen_bus': '634',
-		'max_potential': '1600'
-	},
-	'm2': {
-		'loads': ['675a_hospital','675b_residential1','675c_residential1'],
-		'switch': '671692',
-		'gen_bus': '675',
-		'max_potential': '15000'
-	},
-	'm3': {
-		'loads': ['671_command_center','652_med_apartment'],
-		'switch': '671684',
-		'gen_bus': '684',
-		'max_potential': '6500'
-	},
-	'm4': {
-		'loads': ['645_warehouse1','646_med_office'],
-		'switch': '632645',
-		'gen_bus': '646',
-		'max_potential': '1800'
-	}
-}
+# microgrids = {
+# 	'm1': {
+# 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
+# 		'switch': '632633',
+# 		'gen_bus': '634',
+# 		'max_potential': '1600'
+# 	},
+# 	'm2': {
+# 		'loads': ['675a_hospital','675b_residential1','675c_residential1'],
+# 		'switch': '671692',
+# 		'gen_bus': '675',
+# 		'max_potential': '15000'
+# 	},
+# 	'm3': {
+# 		'loads': ['671_command_center','652_med_apartment'],
+# 		'switch': '671684',
+# 		'gen_bus': '684',
+# 		'max_potential': '6500'
+# 	},
+# 	'm4': {
+# 		'loads': ['645_warehouse1','646_med_office'],
+# 		'switch': '632645',
+# 		'gen_bus': '646',
+# 		'max_potential': '1800'
+# 	}
+# }
 
 # play('./lehigh.dss.omd', './lehigh_full.dss', None, None, microgrids, '670671', False, 1, 120, 30)

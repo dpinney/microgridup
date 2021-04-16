@@ -2,7 +2,7 @@ from omf.solvers import opendss
 from omf.solvers.opendss import dssConvert
 from omf import distNetViz
 from omf import geo
-import opendss_playground
+import microgridup_control
 import shutil
 import os
 from pprint import pprint as pp
@@ -975,7 +975,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS)
 	make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS)
 	# Perform control sim.
-	opendss_playground.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, '670671', False, 1, 120, 30) #TODO: unify the microgrids data structure.
+	microgridup_control.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, '670671', False, 1, 120, 30) #TODO: unify the microgrids data structure.
 	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, diesel_total_calc=False)
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, diesel_total_calc=False)
 	# convert mg_list_of_dicts_full to dict of lists for columnar output in output_template.html

@@ -305,7 +305,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			allInputData['dieselMin'] = diesel_size_total
 			allInputData['genExisting'] = diesel_size_existing
 		if solar_size_total > 0: #and solar_size_total != 10: # enable the dual condition to let user decide whether to optimize on solar or not
-			allInputData['solarMin'] = solar_size_total
+			allInputData['solarMin'] = solar_size_total - solar_size_existing
 			allInputData['solarMax'] = solar_size_total
 			allInputData['solarExisting'] = solar_size_existing
 			allInputData['solar'] = 'on'

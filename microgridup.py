@@ -937,7 +937,7 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, diesel_to
 	# print(list_of_mg_dict)
 	return(list_of_mg_dict)
 
-def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, DIESEL_SAFETY_FACTOR):
+def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, DIESEL_SAFETY_FACTOR, open_results=True):
 	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, microgrid)
 	
 	# to run microgridup with automatic feedback loop, include the following:
@@ -983,16 +983,17 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	# Create giant consolidated report.
 	template = j2.Template(open(f'{MGU_FOLDER}/output_template.html').read())
 	out = template.render(
-		x='David',
+		x='Daniel, David',
 		y='Matt',
 		summary=mg_dict_of_lists_full,
 		inputs={'circuit':BASE_NAME,'loads':LOAD_NAME,'REopt inputs':REOPT_INPUTS,'microgrid':microgrid},
-		reopt_folder=REOPT_FOLDER_FINAL
+		reopt_folders=[REOPT_FOLDER_FINAL]
 	)
 	#TODO: have an option where we make the template <iframe srcdoc="{{X}}"> to embed the html and create a single file.
 	with open(BIG_OUT_NAME,'w') as outFile:
 		outFile.write(out)
-	os.system(f'open {BIG_OUT_NAME}')
+	if open_results:
+		os.system(f'open {BIG_OUT_NAME}')
 
 def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_INPUTS, MICROGRIDS):
 	# CONSTANTS
@@ -1014,7 +1015,23 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_
 	for i, mg_name in enumerate(mgs_name_sorted):
 		# STEP_FULL_NAME = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
 		BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
-		main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], MICROGRIDS, GEN_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, DIESEL_SAFETY_FACTOR)
+		main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], MICROGRIDS, GEN_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, DIESEL_SAFETY_FACTOR, open_results=False)
+	# Final report
+	reports = [x for x in os.listdir('.') if x.startswith('ultimate_rep_')]
+	reopt_folders = [x for x in os.listdir('.') if x.startswith('reopt_final_')]
+	reps = pd.concat([pd.read_csv(x) for x in reports]).to_dict(orient='list')
+	template = j2.Template(open(f'{MGU_FOLDER}/output_template.html').read())
+	out = template.render(
+		x='Daniel, David',
+		y='Matt',
+		summary=reps,
+		inputs={'circuit':BASE_DSS,'loads':LOAD_CSV,'REopt inputs':REOPT_INPUTS,'microgrid':MICROGRIDS},
+		reopt_folders=reopt_folders
+	)
+	FINAL_REPORT = 'output_final.html'
+	with open(FINAL_REPORT,'w') as outFile:
+		outFile.write(out)
+	os.system(f'open {FINAL_REPORT}')
 
 if __name__ == '__main__':
 	print('No Inputs Received')

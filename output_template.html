@@ -5,7 +5,7 @@
 	<style type="text/css">iframe {width:95%;height:600px}</style>
 </head>
 <body>
-	<pre>INPUTS {{inputs}}</pre>
+	<pre style="width:95%; white-space:pre-wrap">INPUTS {{inputs}}</pre>
 	<!-- formatted below for a dict of lists -->
 	<pre>Overview of Microgrids</pre>
 	<table style="">
@@ -24,7 +24,9 @@
 	<iframe src="timeseries_load.csv.plot.html"></iframe>
 	<iframe src="timeseries_source.csv.plot.html"></iframe>
 	<iframe src="timeseries_control.csv.plot.html"></iframe>
+	{% for reopt_folder in reopt_folders %}
 	<iframe src="{{reopt_folder}}/inlineTemplate.html"></iframe>
+	{% endfor %}
 	<!-- <iframe src="timezcontrol_gen.csv.plot.html"></iframe> -->
 	<iframe src="timezcontrol_load.csv.plot.html"></iframe>
 	<iframe src="timezcontrol_source.csv.plot.html"></iframe>

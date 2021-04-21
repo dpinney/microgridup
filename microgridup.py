@@ -304,7 +304,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			allInputData['dieselMax'] = diesel_size_total
 			allInputData['dieselMin'] = diesel_size_total
 			allInputData['genExisting'] = diesel_size_existing
-		if solar_size_total > 0: #and solar_size_total != 10: # enable the dual condition to let user decide whether to optimize on solar or not
+		if solar_size_total > 0: #and solar_size_total != 10: # enable the dual condition when using gen_existing_ref_shapes()
 			allInputData['solarMin'] = solar_size_total - solar_size_existing
 			allInputData['solarMax'] = solar_size_total
 			allInputData['solarExisting'] = solar_size_existing
@@ -317,7 +317,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			allInputData['batteryCapacityMax'] = battery_cap_total
 			allInputData['batteryKwhExisting'] = battery_cap_existing
 			allInputData['battery'] = 'on'
-		if wind_size_total > 0: #and wind_size_total != 10: # enable the dual condition to let user decide whether to optimize on wind or not
+		if wind_size_total > 0: #and wind_size_total != 10: # enable the dual condition when using gen_existing_ref_shapes()
 			allInputData['windMin'] = wind_size_total
 			allInputData['windMax'] = wind_size_total
 			allInputData['windExisting'] = wind_size_existing
@@ -809,8 +809,8 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, dies
 		writer.writerow(["Microgrid Name", "Generation Bus", "Minimum Load (kWh)", "Average Load (kWh)",
 							"Average Daytime Load (kWh)", "Maximum Load (kWh)", "Existing Diesel (kW)", "Recommended New Diesel (kW)",
 							"Diesel Fuel Used During Outage (gal)", "Existing Solar (kW)", "Recommended New Solar (kW)", 
-							"Existing Battery Power (kW)", "Recommended New Battery Power (kW)", "Existing Battery Capacity (kWh)", 
-							"Recommended New Battery Capacity (kWh)", "Existing Wind (kW)", "Recommended New Wind (kW)", 
+							"Existing Battery Power (kW)", "Recommended New Battery Power (kW)", "Existing Battery Energy Storage (kWh)", 
+							"Recommended New Battery Energy Storage (kWh)", "Existing Wind (kW)", "Recommended New Wind (kW)", 
 							"Total Generation on Grid (kW)", "NPV ($)", "CapEx ($)", "CapEx after Incentives ($)", 
 							"Average Outage Survived (h)"])
 		mg_num = 1
@@ -899,8 +899,8 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, diesel_to
 	mg_dict["Recommended New Solar (kW)"] = round(solar_size_total - solar_size_existing,0)
 	mg_dict["Existing Battery Power (kW)"] = round(battery_pow_existing,0)
 	mg_dict["Recommended New Battery Power (kW)"] = round(battery_pow_new,0)
-	mg_dict["Existing Battery Capacity (kWh)"] = round(battery_cap_existing,0)
-	mg_dict["Recommended New Battery Capacity (kWh)"] = round(battery_cap_new,0)
+	mg_dict["Existing Battery Energy Storage (kWh)"] = round(battery_cap_existing,0)
+	mg_dict["Recommended New Battery Energy Storage (kWh)"] = round(battery_cap_new,0)
 	mg_dict["Existing Wind (kW)"] = round(wind_size_existing,0)
 	mg_dict["Recommended New Wind (kW)"] = round(wind_size_new,0)
 	total_gen = diesel_size_total + solar_size_total + battery_pow_total + wind_size_total
@@ -936,6 +936,37 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, diesel_to
 	list_of_mg_dict.append(mg_dict)
 	# print(list_of_mg_dict)
 	return(list_of_mg_dict)
+
+def summary_stats(reps):
+	'''Helper function within full() to take in a dict of lists of the microgrid
+	attributes and append a summary value for each attribute'''
+
+	reps['Microgrid Name'].append('Summary')
+	reps['Generation Bus'].append('None')
+	reps['Minimum Load (kWh)'].append(round(sum(reps['Minimum Load (kWh)']),0))
+	reps['Average Load (kWh)'].append(round(sum(reps['Average Load (kWh)']),0))
+	reps['Average Daytime Load (kWh)'].append(round(sum(reps['Average Daytime Load (kWh)']),0))
+	reps['Maximum Load (kWh)'].append(round(sum(reps['Maximum Load (kWh)']),0))
+	reps['Existing Diesel (kW)'].append(round(sum(reps['Existing Diesel (kW)']),0))
+	reps['Recommended New Diesel (kW)'].append(round(sum(reps['Recommended New Diesel (kW)']),0))
+	reps['Diesel Fuel Used During Outage (gal)'].append(round(sum(reps['Diesel Fuel Used During Outage (gal)']),0))
+	reps['Existing Solar (kW)'].append(round(sum(reps['Existing Solar (kW)']),0))
+	reps['Recommended New Solar (kW)'].append(round(sum(reps['Recommended New Solar (kW)']),0))
+	reps['Existing Battery Power (kW)'].append(round(sum(reps['Existing Battery Power (kW)']),0))
+	reps['Recommended New Battery Power (kW)'].append(round(sum(reps['Recommended New Battery Power (kW)']),0))
+	reps['Existing Battery Energy Storage (kWh)'].append(round(sum(reps['Existing Battery Energy Storage (kWh)']),0))
+	reps['Recommended New Battery Energy Storage (kWh)'].append(round(sum(reps['Recommended New Battery Energy Storage (kWh)']),0))
+	reps['Existing Wind (kW)'].append(round(sum(reps['Existing Wind (kW)']),0))
+	reps['Recommended New Wind (kW)'].append(round(sum(reps['Recommended New Wind (kW)']),0))
+	reps['Total Generation on Grid (kW)'].append(round(sum(reps['Total Generation on Grid (kW)']),0))
+	reps['NPV ($)'].append(sum(reps['NPV ($)']))
+	reps['CapEx ($)'].append(sum(reps['CapEx ($)']))
+	reps['CapEx after Incentives ($)'].append(sum(reps['CapEx after Incentives ($)']))
+	if all([h != None for h in reps['Average Outage Survived (h)']]):
+		reps['Average Outage Survived (h)'].append(round(min(reps['Average Outage Survived (h)']),0))
+	else:
+		reps['Average Outage Survived (h)'].append(None)
+	return(reps)
 
 def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, DIESEL_SAFETY_FACTOR, open_results=True):
 	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, microgrid)
@@ -1018,13 +1049,17 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_
 		main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], MICROGRIDS, GEN_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, DIESEL_SAFETY_FACTOR, open_results=False)
 	# Final report
 	reports = [x for x in os.listdir('.') if x.startswith('ultimate_rep_')]
+	reports.sort()
 	reopt_folders = [x for x in os.listdir('.') if x.startswith('reopt_final_')]
+	reopt_folders.sort()
 	reps = pd.concat([pd.read_csv(x) for x in reports]).to_dict(orient='list')
+	stats = summary_stats(reps)
+	#TODO: Reformat $ values with thousands place marked in output_template.html (equivalent to [f'{x:,}' for x in stats['NPV ($)']] in Python)
 	template = j2.Template(open(f'{MGU_FOLDER}/output_template.html').read())
 	out = template.render(
 		x='Daniel, David',
 		y='Matt',
-		summary=reps,
+		summary=stats,
 		inputs={'circuit':BASE_DSS,'loads':LOAD_CSV,'REopt inputs':REOPT_INPUTS,'microgrid':MICROGRIDS},
 		reopt_folders=reopt_folders
 	)

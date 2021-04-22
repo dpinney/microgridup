@@ -44,14 +44,14 @@ if __name__ == '__main__':
 		"solarCanExport": True
 	}
 	MICROGRIDS = {
-		'm1': {
+		'm0': {
 			'loads': ['634a_data_center','634b_radar','634c_atc_tower'],
 			'switch': '632633',
 			'gen_bus': '634',
 			'gen_obs_existing': ['solar_634_existing', 'battery_634_existing'],
 			'max_potential': '700'
 		},
-		'm2': {
+		'm1': {
 			'loads': ['675a_hospital','675b_residential1','675c_residential1'],
 			'switch': '671692',
 			'gen_bus': '675',

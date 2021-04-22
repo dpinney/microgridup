@@ -1011,6 +1011,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, diesel_total_calc=False)
 	# convert mg_list_of_dicts_full to dict of lists for columnar output in output_template.html
 	mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
+	# TO DO?: remove the following jinja call if completed in full()?
 	# Create giant consolidated report.
 	template = j2.Template(open(f'{MGU_FOLDER}/output_template.html').read())
 	out = template.render(
@@ -1055,6 +1056,16 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_
 	reps = pd.concat([pd.read_csv(x) for x in reports]).to_dict(orient='list')
 	stats = summary_stats(reps)
 	#TODO: Reformat $ values with thousands place marked in output_template.html (equivalent to [f'{x:,}' for x in stats['NPV ($)']] in Python)
+	
+	# define a Flask filter to add comma separation in number outputs
+	# how do I get the filter into the j2 Template? Shuold call the function with {{ v_i | numberFormat }}
+	# env = j2.Environment(autoescape=True, loader=loader)
+
+	# def numberFormat(value):
+	# 	return f'{value:,}'
+
+	# env.filters['numberFormat'] = numberFormat
+	
 	template = j2.Template(open(f'{MGU_FOLDER}/output_template.html').read())
 	out = template.render(
 		x='Daniel, David',

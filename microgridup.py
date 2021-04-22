@@ -117,6 +117,7 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 			allInputData['wind'] = 'on' #failsafe to include wind if found in base_dss
 			 # To Do: update logic if windMin, windExisting and other generation variables are enabled to be set by the user as inputs
 		
+		# enable following 9 lines when using gen_existing_ref_shapes()
 		# if not already turned on, set solar and wind on to 10 kw to provide loadshapes for existing gen in make_full_dss()
 		# if allInputData['wind'] == 'off':
 		# 	allInputData['wind'] = 'on'
@@ -151,9 +152,9 @@ def max_net_load(inputName, REOPT_FOLDER):
 	max_net_load = max(load_df['net_load'])
 	# diesel size recommended by REopt
 	# diesel_REopt = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
-	#print("Max total load for", REOPT_FOLDER, ":", max_total_load)
-	#print("Max load needed to be supported by diesel for", REOPT_FOLDER, ":", max_net_load)
-	#print("% more kW diesel needed than recommended by REopt for", REOPT_FOLDER, ":", round(100*(max_net_load - diesel_REopt)/diesel_REopt))
+	# print("Max total load for", REOPT_FOLDER, ":", max_total_load)
+	# print("Max load needed to be supported by diesel for", REOPT_FOLDER, ":", max_net_load)
+	# print("% more kW diesel needed than recommended by REopt for", REOPT_FOLDER, ":", round(100*(max_net_load - diesel_REopt)/diesel_REopt))
 	return max_net_load
 
 def diesel_sizing(inputName, REOPT_FOLDER, DIESEL_SAFETY_FACTOR, max_net_load):
@@ -166,7 +167,7 @@ def diesel_sizing(inputName, REOPT_FOLDER, DIESEL_SAFETY_FACTOR, max_net_load):
 		diesel_total_calc = max_net_load*(1+DIESEL_SAFETY_FACTOR)
 	elif max_net_load < diesel_total_REopt:
 		diesel_total_calc = diesel_total_REopt*(1+DIESEL_SAFETY_FACTOR)
-	#print(diesel_total_calc,"kW diesel_total_calc is", round(100*(diesel_total_calc-diesel_total_REopt)/diesel_total_REopt), "% more kW diesel than recommended by REopt for", REOPT_FOLDER)
+	# print(diesel_total_calc,"kW diesel_total_calc is", round(100*(diesel_total_calc-diesel_total_REopt)/diesel_total_REopt), "% more kW diesel than recommended by REopt for", REOPT_FOLDER)
 	return diesel_total_calc
 
 def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
@@ -306,7 +307,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			allInputData['genExisting'] = diesel_size_existing
 		if solar_size_total > 0: #and solar_size_total != 10: # enable the dual condition when using gen_existing_ref_shapes()
 			allInputData['solarMin'] = solar_size_total - solar_size_existing
-			allInputData['solarMax'] = solar_size_total
+			allInputData['solarMax'] = solar_size_total - solar_size_existing
 			allInputData['solarExisting'] = solar_size_existing
 			allInputData['solar'] = 'on'
 		if battery_cap_total > 0:
@@ -512,6 +513,42 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, die
 	gen_df_builder.to_csv(GEN_NAME, index=False)
 	return gen_obs
 
+# def gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL):
+# 	'''Create new generator 1kw reference loadshapes for existing gen located outside of the microgrid in analysis. 
+# 	SIDE EFFECTS: creates REF_NAME generator reference shape'''
+# 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER_FINAL, diesel_total_calc=False)
+# 	reopt_final_out = json.load(open(REOPT_FOLDER_FINAL + '/allOutputData.json'))
+# 	reopt_base_out = json.load(open(REOPT_FOLDER_BASE + '/allOutputData.json'))
+# 	#reopt_final_out = json.load(open(REOPT_FOLDER_FINAL + '/allOutputData.json'))
+# 	mg_num = 1
+# 	ref_df_builder = pd.DataFrame()
+
+# 	solar_size_total = gen_sizes.get('solar_size_total')
+# 	# if solar was enabled by user, take shape from REOPT_FOLDER_FINAL and normalize by solar_size_total
+# 	if solar_size_total > 0 and solar_size_total != 10:
+# 		ref_df_builder['solar_ref_shape'] = pd.Series(reopt_final_out.get(f'powerPV{mg_num}'))/solar_size_total
+# 		print('solar_1')
+# 	# if solar was not enabled by user, take shape from REOPT_FOLDER_BASE
+# 	elif reopt_base_out.get(f'sizePV{mg_num}') == 10:
+# 		ref_df_builder['solar_ref_shape'] = pd.Series(reopt_base_out.get(f'powerPV{mg_num}'))/10
+# 		print('solar_2')
+# 	print('solar_ref_shape', ref_df_builder['solar_ref_shape'].head(20))
+	
+# 	wind_size_total = gen_sizes.get('wind_size_total')
+# 	# if wind was enabled by user, take shape from REOPT_FOLDER_FINAL and normalize by wind_size_total
+# 	if wind_size_total > 0 and wind_size_total != 10:
+# 		ref_df_builder['wind_ref_shape'] = pd.Series(reopt_final_out.get(f'powerWind{mg_num}'))/wind_size_total
+# 		print('wind_1')
+# 	# if wind was not enabled by user, take shape from REOPT_FOLDER_BASE
+# 	elif reopt_base_out.get(f'sizePV{mg_num}') == 10:
+# 		ref_df_builder['wind_ref_shape'] = pd.Series(reopt_base_out.get(f'powerWind{mg_num}'))/10
+# 		print('wind_2')
+# 	print('wind_ref_shape', ref_df_builder['wind_ref_shape'].head(20))
+
+# 	ref_df_builder.to_csv(REF_NAME, index=False)
+
+# def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, microgrid):
+
 def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs, microgrid):
 	''' insert generation objects into dss.
 	ASSUMPTIONS: 
@@ -532,9 +569,13 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs, microgrid)
 		tree.insert(bus_list_pos, ob)
 	# Gather loadshapes and generator duties.
 	gen_df = pd.read_csv(GEN_NAME)
-	shape_insert_list = {}
 	load_df = pd.read_csv(LOAD_NAME)
+	# build 1kw reference loadshapes for solar and wind existing gens that are outside of 'microgrid'
+ 	# ref_df = pd.read_csv(REF_NAME) # enable when using gen_existing_ref_shapes()
 	list_of_zeros = [0.0] * 8760
+	shape_insert_list = {}
+
+
 	for i, ob in enumerate(tree):
 		try:
 			ob_string = ob.get('object','')
@@ -585,6 +626,9 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs, microgrid)
 							# print("3b_gen:", ob)
 							ob['yearly'] = shape_name
 							# TODO: Fix loadshape to match actual production potential of the generator using a reference shapes from the first run of REopt
+							# scale 1kw reference loadshape by kw rating of generator
+							# shape_data = ref_df['solar_ref_shape']*ob['kw']  # enable when using gen_existing_ref_shapes()
+							# print("solar shape data:", shape_name, shape_data.head(20))
 							shape_data = list_of_zeros
 							shape_insert_list[i] = {
 								'!CMD': 'new',
@@ -599,6 +643,9 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs, microgrid)
 							# print("3c_gen:", ob)
 							ob['yearly'] = shape_name
 							# TODO: Fix loadshape to match actual production potential of the generator using a reference shapes from the first run of REopt 
+							# scale 1kw reference loadshape by kw rating of generator
+							# shape_data = ref_df['wind_ref_shape']*ob['kw'] # enable when using gen_existing_ref_shapes()
+							# print("wind shape data:", shape_name, shape_data.head(20))
 							shape_data = list_of_zeros
 							shape_insert_list[i] = {
 								'!CMD': 'new',

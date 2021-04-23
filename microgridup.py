@@ -660,25 +660,16 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs, microgrid)
 							#pass
 					# if generator object is located in the microgrid, insert new loadshape object
 					elif ob_name in gen_obs_existing:
-						# print("4_gen:", ob)
-						# if loadshape object already exists, erase it from tree and insert a new one
+						print("4_gen:", ob)
+						# if loadshape object already exists, overwrite the 8760 hour data in ['mult']
 						# ASSUMPTION: Existing generators will be reconfigured to be controlled by new microgrid
 						if f'loadshape.{shape_name}' in load_map:
 							# print("4a_gen:", ob)
-							j = load_map.get(f'loadshape.{shape_name}') # indexes of load_map and tree match
-							tree.pop(j) # this will erase an existing loadshape object of the same name in the tree so that a new on can be entered
+							j = load_map.get(f'loadshape.{shape_name}') # indexes of load_map and tree match				
 							shape_data = gen_df[ob_name]
-							# print('shape_data', shape_data.head(10))
-							# NOTE: enter the loadshape at index j, equivalent to where it previously was located
-							shape_insert_list[j] = {
-								'!CMD': 'new',
-								'object': f'loadshape.{shape_name}',
-								'npts': f'{len(shape_data)}',
-								'interval': '1',
-								'useactual': 'yes',
-								'mult': f'{list(shape_data)}'.replace(' ','')
-							}
-							# print("4a achieved insert")
+							# print(shape_name, 'shape_data:', shape_data.head(20))
+							tree[j]['mult'] = f'{list(shape_data)}'.replace(' ','')
+							# print("4a_gen achieved insert")
 						else:
 							ob['yearly'] = shape_name
 							# print("ob['yearly']:", ob['yearly'])
@@ -731,38 +722,22 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, gen_obs, microgrid)
 							'interval': '1',
 							'useactual': 'yes',
 							'mult': f'{list(shape_data)}'.replace(' ','')
-							#'mult': f'{list_of_zeros}'.replace(' ','')
 						}
 					
 					elif ob_name in gen_obs_existing:
-						# print("4_storage:", ob)
-						# if loadshape object already exists, erase it from tree and insert a new one
-						# ASSUMPTION: Existing generators will be reconfigured to be controlled by new microgrid
+						print("4_storage:", ob)
+						# if loadshape object already exists, overwrite the 8760 hour data in ['mult']
+						# ASSUMPTION: Existing generators in gen_obs_existing will be reconfigured to be controlled by new microgrid
 						if f'loadshape.{shape_name}' in load_map:
-							# print("4a_storage:", ob)
-							j = load_map.get(f'loadshape.{shape_name}') # indexes of load_map and tree match
-							tree.pop(j) # this will erase an existing loadshape object of the same name in the tree so that a new on can be entered
+							print("4a_storage:", ob)
+							j = load_map.get(f'loadshape.{shape_name}') # indexes of load_map and tree match				
 							shape_data = gen_df[ob_name]
-							# print('shape_data', shape_data.head(10))
-							# enter the loadshape at index j, equivalent to where it previously was located
-							shape_insert_list[j] = {
-								'!CMD': 'new',
-								'object': f'loadshape.{shape_name}',
-								'npts': f'{len(shape_data)}',
-								'interval': '1',
-								'useactual': 'yes',
-								'mult': f'{list(shape_data)}'.replace(' ','')
-							}
-						# 	# print("4a achieved insert")
-						# if f'loadshape.{shape_name}' in load_map:
-						# 	print("4a_storage:", ob)
-						# 	j = load_map.get(f'loadshape.{shape_name}') # indexes of load_map and tree match				
-						# 	shape_data = gen_df[ob_name]
-						# 	print('shape_data', shape_data.head(10))
-						# 	tree[j]['mult'] = f'{list(shape_data)}'.replace(' ','')
-						# 	print("4a_storage achieved insert")
+							print(shape_name, 'shape_data:', shape_data.head(20))
+							tree[j]['mult'] = f'{list(shape_data)}'.replace(' ','')
+							print(shape_name, "tree[j]['mult']:", tree[j]['mult'][:20])
+							print("4a_storage achieved insert")
 						else:
-							# print("4b_storage:", ob)
+							print("4b_storage:", ob)
 							ob['yearly'] = shape_name
 							shape_data = gen_df[ob_name]
 							shape_insert_list[i] = {

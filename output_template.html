@@ -5,6 +5,7 @@
 	<style type="text/css">iframe {width:95%;height:600px}</style>
 </head>
 <body>
+	<pre style="width:95%; white-space:pre-wrap">Report Generated {{ now }}</pre>
 	<pre style="width:95%; white-space:pre-wrap">INPUTS {{inputs}}</pre>
 	<!-- formatted below for a dict of lists -->
 	<pre>Overview of Microgrids</pre>
@@ -13,7 +14,13 @@
 			<tr>
 				<td>{{ k }}</td>
 				{% for v_i in v %}
-				<td style="text-align:right">{{ v_i }}</td>
+					{% if v_i is string %}
+						<td style="text-align:right">{{ v_i }}</td>
+					{% elif v_i is not none %}
+						<td style="text-align:right">{{ '{:,}'.format(v_i) }}</td>
+					{% else %}
+						<td style="text-align:right">{{ v_i }}</td>
+					{% endif %}
 				{% endfor %}
 			</tr>
 		{% endfor %}

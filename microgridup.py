@@ -191,13 +191,12 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 	solar_size_total = reopt_out.get(f'sizePV{mg_num}', 0.0)
 	solar_size_existing = reopt_out.get(f'sizePVExisting{mg_num}', 0.0)
 	solar_size_new = solar_size_total - solar_size_existing
-	wind_size_total = reopt_out.get(f'sizeWind{mg_num}', 0.0) # TO DO: Update size of wind based on existing generation once we find a way to get a loadshape for that wind if REopt recommends no wind
+	wind_size_total = reopt_out.get(f'sizeWind{mg_num}', 0.0)
 	wind_size_existing = reopt_out.get(f'windExisting{mg_num}', 0.0)
 	if wind_size_total - wind_size_existing > 0:
 		wind_size_new = wind_size_total - wind_size_existing 
 	else:
-		wind_size_new = 0.0 #TO DO: update logic here to make run more robust to oversized existing wind gen	
-	print('wind_size_total:',wind_size_total,', wind_size_existing:',wind_size_existing,', wind_size_new:',wind_size_new)
+		wind_size_new = 0.0
 	# calculate additional diesel to be added to existing diesel gen (if any) to adjust kW based on diesel_sizing()
 	if diesel_total_calc == False:
 		diesel_size_total = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
@@ -328,7 +327,6 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			allInputData['solarMax'] = solar_size_total - solar_size_existing
 			allInputData['solarExisting'] = solar_size_existing
 			allInputData['solar'] = 'on'
-
 		if battery_cap_total > 0:
 			allInputData['batteryPowerMin'] = battery_pow_total
 			allInputData['batteryPowerMax'] = battery_pow_total
@@ -338,17 +336,14 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			allInputData['batteryKwhExisting'] = battery_cap_existing
 			allInputData['battery'] = 'on'
 		if wind_size_total > 0 and wind_size_total != 1: # enable the dual condition when using gen_existing_ref_shapes()
-			print("wind_size_total != 1 if statement entered")
 			allInputData['windMin'] = wind_size_total
 			allInputData['windMax'] = wind_size_total
 			allInputData['windExisting'] = wind_size_existing
 			allInputData['wind'] = 'on' #failsafe to include wind if found in base_dss
 		elif wind_size_total == 1: # enable the elif condition when using gen_existing_ref_shapes()
-			print("wind_size_total == 1 if statement entered")
 			allInputData['windMax'] = 0
 			allInputData['wind'] = 'off'
 
-			 # TO DO: update logic if windMin, windExisting and other generation variables are enabled to be set by the user as inputs
 		# run REopt via microgridDesign
 		with open(REOPT_FOLDER_FINAL + '/allInputData.json','w') as outfile:
 			json.dump(allInputData, outfile, indent=4)
@@ -387,7 +382,7 @@ def mg_phase_and_kv(BASE_NAME, microgrid):
 	out_dict['gen_bus'] = gen_bus_name
 	out_dict['phases'] = load_phase_list
 	out_dict['kv'] = gen_bus_kv
-	#print('out_dict', out_dict)
+	# print('out_dict', out_dict)
 	return out_dict
 	
 def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, diesel_total_calc=False):
@@ -623,19 +618,19 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 					}
 			# insert loadshapes for generator objects
 			elif ob_string.startswith('generator.'):
-				print("1_gen:", ob)
+				# print("1_gen:", ob)
 				ob_name = ob_string[10:]
 				# print('ob_name:', ob_name)
 				shape_name = ob_name + '_shape'
 				# insert loadshape for existing generators
 				if ob_name.endswith('_existing'):
 					# TODO: if actual production loadshape is available for a given object, insert it, else use synthetic loadshapes as defined here
-					print("2_gen:", ob)
+					# print("2_gen:", ob)
 					# if object is outside of microgrid and without a loadshape, give it a valid production loadshape for solar and wind or a loadshape of zeros for diesel
 					if ob_name not in gen_obs_existing and f'loadshape.{shape_name}' not in load_map:					
-						print("3_gen:", ob)
+						# print("3_gen:", ob)
 						if ob_name.startswith('diesel_'):
-							print("3a_gen:", ob)
+							# print("3a_gen:", ob)
 							ob['yearly'] = shape_name
 							shape_data = list_of_zeros
 							shape_insert_list[i] = {
@@ -647,7 +642,7 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 								'mult': f'{list(shape_data)}'.replace(' ','')
 							}
 						elif ob_name.startswith('solar_'):
-							print("3b_gen:", ob)
+							# print("3b_gen:", ob)
 							ob['yearly'] = shape_name
 							# TODO: Fix loadshape to match actual production potential of the generator using a reference shapes from the first run of REopt
 							# scale 1kw reference loadshape by kw rating of generator
@@ -664,7 +659,7 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 								# 'mult': f'{list_of_zeros}'.replace(' ','')
 							}
 						elif ob_name.startswith('wind_'):
-							print("3c_gen:", ob)
+							# print("3c_gen:", ob)
 							ob['yearly'] = shape_name
 							# TODO: Fix loadshape to match actual production potential of the generator using a reference shapes from the first run of REopt 
 							# scale 1kw reference loadshape by kw rating of generator
@@ -684,20 +679,19 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 							#pass
 					# if generator object is located in the microgrid, insert new loadshape object
 					elif ob_name in gen_obs_existing:
-						print("4_gen:", ob)
+						# print("4_gen:", ob)
 						# if loadshape object already exists, overwrite the 8760 hour data in ['mult']
 						# ASSUMPTION: Existing generators will be reconfigured to be controlled by new microgrid
 						if f'loadshape.{shape_name}' in load_map:
-							print("4a_gen:", ob)
+							# print("4a_gen:", ob)
 							j = load_map.get(f'loadshape.{shape_name}') # indexes of load_map and tree match				
 							shape_data = gen_df[ob_name]
 							# print("shape data:", shape_name, shape_data.head(20))
 							tree[j]['mult'] = f'{list(shape_data)}'.replace(' ','')
 							# print("4a_gen achieved insert")
 						else:
-							print("4b_gen:", ob)
+							# print("4b_gen:", ob)
 							ob['yearly'] = shape_name
-							# print("ob['yearly']:", ob['yearly'])
 							shape_data = gen_df[ob_name]
 							# print('shape_data', shape_data.head(10))
 							shape_insert_list[i] = {
@@ -710,10 +704,9 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 							}
 				# insert loadshape for new generators with shape_data in GEN_NAME
 				elif f'loadshape.{shape_name}' not in load_map:
-					print("5_gen:", ob)
+					# print("5_gen:", ob)
 					# shape_name = ob_name + '_shape'
 					ob['yearly'] = shape_name
-					# print("ob['yearly']:", ob['yearly'])
 					shape_data = gen_df[ob_name]
 					# print('shape_data', shape_data.head(10))
 					shape_insert_list[i] = {

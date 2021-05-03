@@ -290,7 +290,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 				allInputData['latitude'] = float(ob_lat)
 				allInputData['longitude'] = float(ob_long)
 
-		# Update all generator specifications in the microgrid from outputs of REOPT_FOLDER_BASE
+		# Update all generator specifications in the microgrid to match outputs of REOPT_FOLDER_BASE
 		gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER_BASE, diesel_total_calc=diesel_total_calc)
 		solar_size_total = gen_sizes.get('solar_size_total')
 		solar_size_new = gen_sizes.get('solar_size_new')
@@ -313,7 +313,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			allInputData['dieselMin'] = diesel_size_total
 			allInputData['genExisting'] = diesel_size_existing
 		# handle peculiar logic of solar_size_total from REopt when using gen_existing_ref_shapes()
-		# TODO: stay up on updates to solar outputs from REopt, assuming they align Solar output bevior to be similar to wind, battery, etc
+		# TODO: check on updates to solar outputs from REopt, assuming they align Solar output bevior to be similar to wind, battery, etc
 		if solar_size_total == 1:
 			allInputData['solarMax'] = 0
 			allInputData['solar'] = 'off'
@@ -327,14 +327,36 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			allInputData['solarMax'] = solar_size_total - solar_size_existing
 			allInputData['solarExisting'] = solar_size_existing
 			allInputData['solar'] = 'on'
-		if battery_cap_total > 0:
+		# if additional battery power is recommended by REopt, remove existing batteries and add in new battery
+		if battery_pow_new > 0:
 			allInputData['batteryPowerMin'] = battery_pow_total
 			allInputData['batteryPowerMax'] = battery_pow_total
+			allInputData['batteryKwExisting'] = 0
+			# If recommended battery power is larger than existing, then let rerun of REopt suggest the best capacity of the battery instead of tying it to the original existing kwh
+			allInputData['batteryCapacityMin'] = 0
+			allInputData['batteryCapacityMax'] = 100000
+			allInputData['batteryKwhExisting'] = 0
+			allInputData['battery'] = 'on'
+		# if only additional energy storage (kWh) is recommended, add a battery of same power as existing battery with the recommended additional kWh
+		elif battery_cap_new > 0:
+			allInputData['batteryPowerMin'] = battery_pow_existing
+			allInputData['batteryPowerMax'] = battery_pow_existing
 			allInputData['batteryKwExisting'] = battery_pow_existing
 			allInputData['batteryCapacityMin'] = battery_cap_total
 			allInputData['batteryCapacityMax'] = battery_cap_total
 			allInputData['batteryKwhExisting'] = battery_cap_existing
 			allInputData['battery'] = 'on'
+		# if no new battery storage is recommended, keep existing if it exists
+		# Warning: logic for batteries affects behavior of loadshape generation in gen_existing_ref_shapes()
+		elif battery_cap_existing > 0:
+			allInputData['batteryPowerMin'] = battery_pow_existing
+			allInputData['batteryPowerMax'] = battery_pow_existing
+			allInputData['batteryKwExisting'] = battery_pow_existing
+			allInputData['batteryCapacityMin'] = battery_pow_existing
+			allInputData['batteryCapacityMax'] = battery_pow_existing
+			allInputData['batteryKwhExisting'] = battery_cap_existing
+			allInputData['battery'] = 'on'
+
 		if wind_size_total > 0 and wind_size_total != 1: # enable the dual condition when using gen_existing_ref_shapes()
 			allInputData['windMin'] = wind_size_total
 			allInputData['windMax'] = wind_size_total
@@ -393,6 +415,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, die
 	will need to implement searching the tree of FULL_NAME to find kw ratings of existing gens'''
 
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER)
+	print("gen_sizes:", gen_sizes)
 	reopt_out = json.load(open(REOPT_FOLDER + '/allOutputData.json'))
 	gen_df_builder = pd.DataFrame()
 	gen_obs = []
@@ -499,20 +522,21 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, die
 			windToBat = pd.Series(reopt_out.get(f'powerWindToBattery{mg_num}'))
 		battery_load = batToLoad - gridToBat - pVToBat - dieselToBat - windToBat
 	# get DSS objects and loadshapes for new battery
-	# TO DO: in the case of new kw but not new kwh (or vice versa) recommedned by feedback_reopt(), integrate a way to add new batteries with a minimal kwh and kw so that powerflow can be performed
-	if battery_cap_new > 0: # or battery_pow_new > 0: 
+	# if additional battery power is recommended by REopt, give existing batteries loadshape of zeros and add in full sized new battery
+	if battery_pow_new > 0:
+		print("build_new_gen() 1a")
 		gen_obs.append({
 			'!CMD': 'new',
 			'object':f'storage.battery_{gen_bus_name}',
 			'bus1':f"{gen_bus_name}.{'.'.join(phase_and_kv['phases'])}",
 			'phases':len(phase_and_kv['phases']),
 			'kv':phase_and_kv['kv'],
-			'kwrated':f'{battery_pow_new}',
+			'kwrated':f'{battery_pow_total}',
 			'dispmode':'follow',
-			'kwhstored':f'{battery_cap_new}',
-			'kwhrated':f'{battery_cap_new}',
+			'kwhstored':f'{battery_cap_total}',
+			'kwhrated':f'{battery_cap_total}',
 			# 'kva':f'{battery_pow_total}',
-			# 'kvar':f'{battery_pow_total}',
+			# 'kvar':f'{battery_pow_total}', #kwrated and pf are sufficient to define kva and kvar ratings
 			'%charge':'100',
 			'%discharge':'100',
 			'%effcharge':'100',
@@ -522,14 +546,90 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, die
 			'%x':'50',
 			'%stored':'50'
 		})
-		# 0-1 scale the power output loadshape to the total generation and multiply by the new kw of that type of generator
-		gen_df_builder[f'battery_{gen_bus_name}'] = battery_load/battery_pow_total*battery_pow_new
+		# new battery takes the full battery load, as existing is removed from service
+		gen_df_builder[f'battery_{gen_bus_name}'] = battery_load
+	# if only additional energy storage (kWh) is recommended, add a battery of same power as existing battery with the recommended additional kWh
+	elif battery_cap_new > 0:
+		print("build_new_gen() 1b")
+		print("Check that battery_pow_existing (",battery_pow_existing, ") and battery_pow_total (", battery_pow_total, ") are the same")
+		gen_obs.append({
+			'!CMD': 'new',
+			'object':f'storage.battery_{gen_bus_name}',
+			'bus1':f"{gen_bus_name}.{'.'.join(phase_and_kv['phases'])}",
+			'phases':len(phase_and_kv['phases']),
+			'kv':phase_and_kv['kv'],
+			'kwrated':f'{battery_pow_existing}', # in this case, battery_pow_existing = battery_pow_total
+			'dispmode':'follow',
+			'kwhstored':f'{battery_cap_new}',
+			'kwhrated':f'{battery_cap_new}',
+			# 'kva':f'{battery_pow_total}',
+			# 'kvar':f'{battery_pow_total}', #kwrated and pf are sufficient to define kva and kvar ratings
+			'%charge':'100',
+			'%discharge':'100',
+			'%effcharge':'100',
+			'%effdischarge':'100',
+			'%idlingkw':'0',
+			'%r':'0',
+			'%x':'50',
+			'%stored':'50'
+		})
+		# 0-1 scale the power output loadshape to the total storage kwh and multiply by the new energy storage kwh recommended
+		gen_df_builder[f'battery_{gen_bus_name}'] = battery_load/battery_cap_total*battery_cap_new
+	
 	# build loadshapes for existing battery generation from BASE_NAME
-	if battery_cap_existing > 0:	
-		for gen_ob_existing in gen_obs_existing:
-			if gen_ob_existing.startswith('battery_'):
-				#HACK Implemented: TODO: IF multiple existing battery generator objects are in gen_obs, we need to scale the output loadshapes by their rated kW
-				gen_df_builder[f'{gen_ob_existing}'] = battery_load/battery_pow_total*battery_pow_existing
+	# if battery_cap_existing > 0:
+	# 	print("build_new_gen() 1c")	
+	for gen_ob_existing in gen_obs_existing:
+		print("build_new_gen() storage 2", gen_ob_existing)
+		if gen_ob_existing.startswith('battery_'):
+			print("build_new_gen() storage 3", gen_ob_existing)
+			#TODO: IF multiple existing battery generator objects are in gen_obs, we need to scale the output loadshapes by their rated kW
+			# if additional battery power is recommended by REopt, give existing batteries loadshape of zeros as they are deprecated
+			if battery_pow_new > 0:
+				print("build_new_gen() storage 4", gen_ob_existing)
+				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(np.zeros(8760))
+				#TODO: collect this print statement as a warning in the output_template.html 
+				print("User Warning: Existing battery", gen_ob_existing, "will not be utilized to support loads in this microgrid." )
+			# if only additional energy storage (kWh) is recommended, scale the existing shape to the % of kwh storage capacity of the existing battery
+			elif battery_cap_new > 0:
+				print("build_new_gen() storage 5", gen_ob_existing)
+				gen_df_builder[f'{gen_ob_existing}'] = battery_load/battery_cap_total*battery_cap_existing
+			# if no new battery has been built, existing battery takes the full battery load
+			else:
+	 			print("build_new_gen() storage 6", gen_ob_existing)
+	 			gen_df_builder[f'{gen_ob_existing}'] = battery_load
+
+	# previous version
+	# if battery_cap_new > 0:
+	# 	gen_obs.append({
+	# 		'!CMD': 'new',
+	# 		'object':f'storage.battery_{gen_bus_name}',
+	# 		'bus1':f"{gen_bus_name}.{'.'.join(phase_and_kv['phases'])}",
+	# 		'phases':len(phase_and_kv['phases']),
+	# 		'kv':phase_and_kv['kv'],
+	# 		'kwrated':f'{battery_pow_new}',
+	# 		'dispmode':'follow',
+	# 		'kwhstored':f'{battery_cap_new}',
+	# 		'kwhrated':f'{battery_cap_new}',
+	# 		# 'kva':f'{battery_pow_total}',
+	# 		# 'kvar':f'{battery_pow_total}', #kwrated and pf are sufficient to define kva and kvar ratings
+	# 		'%charge':'100',
+	# 		'%discharge':'100',
+	# 		'%effcharge':'100',
+	# 		'%effdischarge':'100',
+	# 		'%idlingkw':'0',
+	# 		'%r':'0',
+	# 		'%x':'50',
+	# 		'%stored':'50'
+	# 	})
+	# 	# 0-1 scale the power output loadshape to the total generation and multiply by the new kw of that type of generator
+	# 	gen_df_builder[f'battery_{gen_bus_name}'] = battery_load/battery_pow_total*battery_pow_new
+	# # build loadshapes for existing battery generation from BASE_NAME
+	# if battery_cap_existing > 0:	
+	# 	for gen_ob_existing in gen_obs_existing:
+	# 		if gen_ob_existing.startswith('battery_'):
+	# 			#HACK Implemented: TODO: IF multiple existing battery generator objects are in gen_obs, we need to scale the output loadshapes by their rated kW
+	# 			gen_df_builder[f'{gen_ob_existing}'] = battery_load/battery_pow_total*battery_pow_existing
 	gen_df_builder.to_csv(GEN_NAME, index=False)
 	return gen_obs
 
@@ -747,15 +847,15 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 						# if loadshape object already exists, overwrite the 8760 hour data in ['mult']
 						# ASSUMPTION: Existing generators in gen_obs_existing will be reconfigured to be controlled by new microgrid
 						if f'loadshape.{shape_name}' in load_map:
-							# print("4a_storage:", ob)
+							print("4a_storage:", ob)
 							j = load_map.get(f'loadshape.{shape_name}') # indexes of load_map and tree match				
 							shape_data = gen_df[ob_name]
 							# print(shape_name, 'shape_data:', shape_data.head(20))
 							tree[j]['mult'] = f'{list(shape_data)}'.replace(' ','')
-							# print(shape_name, "tree[j]['mult']:", tree[j]['mult'][:20])
-							# print("4a_storage achieved insert")
+							print(shape_name, "tree[j]['mult']:", tree[j]['mult'][:20])
+							print("4a_storage achieved insert")
 						else:
-							# print("4b_storage:", ob)
+							print("4b_storage:", ob)
 							ob['yearly'] = shape_name
 							shape_data = gen_df[ob_name]
 							shape_insert_list[i] = {
@@ -766,6 +866,8 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 								'useactual': 'yes',
 								'mult': f'{list(shape_data)}'.replace(' ','')
 							}
+							print(shape_name, "shapedata:", shape_data.head(20))
+							print("4b_storage achieved insert")
 				# insert loadshapes for new storage objects with shape_data in GEN_NAME
 				elif f'loadshape.{shape_name}' not in load_map:
 					print("5_storage", ob)
@@ -873,6 +975,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, dies
 		cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
 		
 		# TODO: Once incentive structure is finalized, update NPV and cap_ex_after_incentives calculation to include depreciation over time if appropriate
+		# TODO: update logic to remove existing batteries if battery_pow_new > 0
 		# economic outcomes with the capital costs of existing wind and batteries deducted:
 		# npv_existing_gen_adj = npv \
 		# 						+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
@@ -950,6 +1053,7 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, diesel_to
 	cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
 	
 	#TODO: Once incentive structure is finalized, update NPV and cap_ex_after_incentives calculation to include depreciation over time if appropriate
+	# TODO: update logic to remove existing batteries if battery_pow_new > 0
 	# economic outcomes with the capital costs of existing wind and batteries deducted:
 	# npv_existing_gen_adj = npv \
 	# 						+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \

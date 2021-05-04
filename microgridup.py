@@ -269,7 +269,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			outage_start_hour = 2
 		else:
 			outage_start_hour = max_load_index - outage_duration/2
-		print("outage_start_hour:", str(int(outage_start_hour)))
+		# print("outage_start_hour:", str(int(outage_start_hour)))
 		allInputData['outage_start_hour'] = str(int(outage_start_hour))
 
 		# Pulling coordinates from BASE_NAME.dss into REopt allInputData.json:
@@ -415,7 +415,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, die
 	will need to implement searching the tree of FULL_NAME to find kw ratings of existing gens'''
 
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER)
-	print("gen_sizes:", gen_sizes)
+	# print("gen_sizes:", gen_sizes)
 	reopt_out = json.load(open(REOPT_FOLDER + '/allOutputData.json'))
 	gen_df_builder = pd.DataFrame()
 	gen_obs = []
@@ -524,7 +524,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, die
 	# get DSS objects and loadshapes for new battery
 	# if additional battery power is recommended by REopt, give existing batteries loadshape of zeros and add in full sized new battery
 	if battery_pow_new > 0:
-		print("build_new_gen() 1a")
+		# print("build_new_gen() 1a")
 		gen_obs.append({
 			'!CMD': 'new',
 			'object':f'storage.battery_{gen_bus_name}',
@@ -550,8 +550,8 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, die
 		gen_df_builder[f'battery_{gen_bus_name}'] = battery_load
 	# if only additional energy storage (kWh) is recommended, add a battery of same power as existing battery with the recommended additional kWh
 	elif battery_cap_new > 0:
-		print("build_new_gen() 1b")
-		print("Check that battery_pow_existing (",battery_pow_existing, ") and battery_pow_total (", battery_pow_total, ") are the same")
+		# print("build_new_gen() 1b")
+		# print("Check that battery_pow_existing (",battery_pow_existing, ") and battery_pow_total (", battery_pow_total, ") are the same")
 		gen_obs.append({
 			'!CMD': 'new',
 			'object':f'storage.battery_{gen_bus_name}',
@@ -580,23 +580,23 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, die
 	# if battery_cap_existing > 0:
 	# 	print("build_new_gen() 1c")	
 	for gen_ob_existing in gen_obs_existing:
-		print("build_new_gen() storage 2", gen_ob_existing)
+		# print("build_new_gen() storage 2", gen_ob_existing)
 		if gen_ob_existing.startswith('battery_'):
-			print("build_new_gen() storage 3", gen_ob_existing)
+			# print("build_new_gen() storage 3", gen_ob_existing)
 			#TODO: IF multiple existing battery generator objects are in gen_obs, we need to scale the output loadshapes by their rated kW
 			# if additional battery power is recommended by REopt, give existing batteries loadshape of zeros as they are deprecated
 			if battery_pow_new > 0:
-				print("build_new_gen() storage 4", gen_ob_existing)
+				# print("build_new_gen() storage 4", gen_ob_existing)
 				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(np.zeros(8760))
 				#TODO: collect this print statement as a warning in the output_template.html 
-				print("User Warning: Existing battery", gen_ob_existing, "will not be utilized to support loads in this microgrid." )
+				# print("User Warning: Existing battery", gen_ob_existing, "will not be utilized to support loads in this microgrid." )
 			# if only additional energy storage (kWh) is recommended, scale the existing shape to the % of kwh storage capacity of the existing battery
 			elif battery_cap_new > 0:
-				print("build_new_gen() storage 5", gen_ob_existing)
+				# print("build_new_gen() storage 5", gen_ob_existing)
 				gen_df_builder[f'{gen_ob_existing}'] = battery_load/battery_cap_total*battery_cap_existing
 			# if no new battery has been built, existing battery takes the full battery load
 			else:
-	 			print("build_new_gen() storage 6", gen_ob_existing)
+	 			# print("build_new_gen() storage 6", gen_ob_existing)
 	 			gen_df_builder[f'{gen_ob_existing}'] = battery_load
 
 	# previous version
@@ -819,18 +819,16 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 					}
 			# insert loadshapes for storage objects
 			elif ob_string.startswith('storage.'):
-				print("1_storage:", ob)
+				# print("1_storage:", ob)
 				ob_name = ob_string[8:]
-				# print('ob_name:', ob_name)
 				shape_name = ob_name + '_shape'
-				# print('shape_name:', shape_name)
 				
 				# TODO: if actual power production loadshape is available for a given storage object, insert it, else use synthetic loadshapes as defined here
 				if ob_name.endswith('_existing'):
-					print("2_storage:", ob)
+					# print("2_storage:", ob)
 					# if object is outside of microgrid and without a loadshape, give it a loadshape of zeros
 					if ob_name not in gen_obs_existing and f'loadshape.{shape_name}' not in load_map:					
-						print("3_storage:", ob)
+						# print("3_storage:", ob)
 						ob['yearly'] = shape_name
 						shape_data = list_of_zeros
 						shape_insert_list[i] = {
@@ -843,19 +841,19 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 						}
 					
 					elif ob_name in gen_obs_existing:
-						print("4_storage:", ob)
+						# print("4_storage:", ob)
 						# if loadshape object already exists, overwrite the 8760 hour data in ['mult']
 						# ASSUMPTION: Existing generators in gen_obs_existing will be reconfigured to be controlled by new microgrid
 						if f'loadshape.{shape_name}' in load_map:
-							print("4a_storage:", ob)
+							# print("4a_storage:", ob)
 							j = load_map.get(f'loadshape.{shape_name}') # indexes of load_map and tree match				
 							shape_data = gen_df[ob_name]
 							# print(shape_name, 'shape_data:', shape_data.head(20))
 							tree[j]['mult'] = f'{list(shape_data)}'.replace(' ','')
-							print(shape_name, "tree[j]['mult']:", tree[j]['mult'][:20])
-							print("4a_storage achieved insert")
+							# print(shape_name, "tree[j]['mult']:", tree[j]['mult'][:20])
+							# print("4a_storage achieved insert")
 						else:
-							print("4b_storage:", ob)
+							# print("4b_storage:", ob)
 							ob['yearly'] = shape_name
 							shape_data = gen_df[ob_name]
 							shape_insert_list[i] = {
@@ -866,11 +864,11 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 								'useactual': 'yes',
 								'mult': f'{list(shape_data)}'.replace(' ','')
 							}
-							print(shape_name, "shapedata:", shape_data.head(20))
-							print("4b_storage achieved insert")
+							# print(shape_name, "shapedata:", shape_data.head(20))
+							# print("4b_storage achieved insert")
 				# insert loadshapes for new storage objects with shape_data in GEN_NAME
 				elif f'loadshape.{shape_name}' not in load_map:
-					print("5_storage", ob)
+					# print("5_storage", ob)
 					shape_data = gen_df[ob_name]
 					ob['yearly'] = shape_name
 					shape_insert_list[i] = {

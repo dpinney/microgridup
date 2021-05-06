@@ -888,8 +888,12 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 	# Write new DSS file.
 	dssConvert.treeToDss(tree, FULL_NAME)
 
-def make_chart(csvName, category_name, x, y_list, year, qsts_steps, ansi_bands=False):
-	''' Charting outputs. '''
+def make_chart(csvName, category_name, x, y_list, year, qsts_steps, chart_name, ansi_bands=False):
+	''' Charting outputs.
+	y_list is a list of all three phases of the possible column headers from csvName
+	category_name is the column header for the names of the monitoring object in csvName
+	x is the column header of the timestep in csvName
+	chart_name is the name of the chart to be displayed'''
 	gen_data = pd.read_csv(csvName)
 	data = [] 
 	for ob_name in set(gen_data[category_name]):
@@ -904,9 +908,9 @@ def make_chart(csvName, category_name, x, y_list, year, qsts_steps, ansi_bands=F
 			data.append(trace)
 
 	layout = plotly.graph_objs.Layout(
-		title = f'{csvName} Output',
-		# xaxis = dict(title = x),
-		xaxis = dict(title="Time"),
+		#title = f'{csvName} Output',
+		title = chart_name,
+		xaxis = dict(title="Date"),
 		yaxis = dict(title = str(y_list))
 	)
 	fig = plotly.graph_objs.Figure(data, layout)
@@ -1143,11 +1147,11 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	# opendss.currentPlot(FULL_NAME)
 	#TODO!!!! we're clobbering these outputs each time we run the full workflow. Consider keeping them separate.
 	#HACK: If only analyzing a set of generators with a single phase, remove ['P2(kW)','P3(kW)'] of make_chart('timeseries_gen.csv',...) below
-	make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS) #TODO: pull year using reopt_out.get(f'year{mg_num}', 0.0) from allOutputData.json after refactor
+	make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Generator Output (kW per hour)") #TODO: pull year using reopt_out.get(f'year{mg_num}', 0.0) from allOutputData.json after refactor
 	# for timeseries_load, output ANSI Range A service bands (2,520V - 2,340V for 2.4kV and 291V - 263V for 0.277kV)
-	make_chart('timeseries_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'], QSTS_STEPS, ansi_bands = True)
-	make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS)
-	make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS)
+	make_chart('timeseries_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'], QSTS_STEPS, "Load Voltage (PU)", ansi_bands = True)
+	make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Voltage Source Output (kW per hour)")
+	make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS, "Tap Position (PU)")
 	# Perform control sim.
 	microgridup_control.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, '670671', False, 1, 120, 30) #TODO: unify the microgrids data structure.
 	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, diesel_total_calc=False)

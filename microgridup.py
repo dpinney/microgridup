@@ -19,6 +19,15 @@ import datetime
 
 MGU_FOLDER = os.path.dirname(__file__)
 
+def _getByName(tree, name):
+    ''' Return first object with name in tree as an OrderedDict. '''
+    matches =[]
+    for x in tree:
+        if x.get('object',''):
+            if x.get('object','').split('.')[1] == name:
+                matches.append(x)
+    return matches[0]
+
 def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid):
 	''' Generate the microgrid specs with REOpt.
 	SIDE-EFFECTS: generates REOPT_FOLDER'''
@@ -577,8 +586,6 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, die
 		gen_df_builder[f'battery_{gen_bus_name}'] = battery_load/battery_cap_total*battery_cap_new
 	
 	# build loadshapes for existing battery generation from BASE_NAME
-	# if battery_cap_existing > 0:
-	# 	print("build_new_gen() 1c")	
 	for gen_ob_existing in gen_obs_existing:
 		# print("build_new_gen() storage 2", gen_ob_existing)
 		if gen_ob_existing.startswith('battery_'):
@@ -599,37 +606,6 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, die
 	 			# print("build_new_gen() storage 6", gen_ob_existing)
 	 			gen_df_builder[f'{gen_ob_existing}'] = battery_load
 
-	# previous version
-	# if battery_cap_new > 0:
-	# 	gen_obs.append({
-	# 		'!CMD': 'new',
-	# 		'object':f'storage.battery_{gen_bus_name}',
-	# 		'bus1':f"{gen_bus_name}.{'.'.join(phase_and_kv['phases'])}",
-	# 		'phases':len(phase_and_kv['phases']),
-	# 		'kv':phase_and_kv['kv'],
-	# 		'kwrated':f'{battery_pow_new}',
-	# 		'dispmode':'follow',
-	# 		'kwhstored':f'{battery_cap_new}',
-	# 		'kwhrated':f'{battery_cap_new}',
-	# 		# 'kva':f'{battery_pow_total}',
-	# 		# 'kvar':f'{battery_pow_total}', #kwrated and pf are sufficient to define kva and kvar ratings
-	# 		'%charge':'100',
-	# 		'%discharge':'100',
-	# 		'%effcharge':'100',
-	# 		'%effdischarge':'100',
-	# 		'%idlingkw':'0',
-	# 		'%r':'0',
-	# 		'%x':'50',
-	# 		'%stored':'50'
-	# 	})
-	# 	# 0-1 scale the power output loadshape to the total generation and multiply by the new kw of that type of generator
-	# 	gen_df_builder[f'battery_{gen_bus_name}'] = battery_load/battery_pow_total*battery_pow_new
-	# # build loadshapes for existing battery generation from BASE_NAME
-	# if battery_cap_existing > 0:	
-	# 	for gen_ob_existing in gen_obs_existing:
-	# 		if gen_ob_existing.startswith('battery_'):
-	# 			#HACK Implemented: TODO: IF multiple existing battery generator objects are in gen_obs, we need to scale the output loadshapes by their rated kW
-	# 			gen_df_builder[f'{gen_ob_existing}'] = battery_load/battery_pow_total*battery_pow_existing
 	gen_df_builder.to_csv(GEN_NAME, index=False)
 	return gen_obs
 
@@ -888,16 +864,31 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 	# Write new DSS file.
 	dssConvert.treeToDss(tree, FULL_NAME)
 
-def make_chart(csvName, category_name, x, y_list, year, qsts_steps, chart_name, y_axis_name, ansi_bands=False):
+def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_steps, chart_name, y_axis_name, ansi_bands=False):
 	''' Charting outputs.
-	y_list is a list of all three phases of the possible column headers from csvName
+	y_list is a list of column headers from csvName including all possible phases
 	category_name is the column header for the names of the monitoring object in csvName
 	x is the column header of the timestep in csvName
 	chart_name is the name of the chart to be displayed'''
 	gen_data = pd.read_csv(csvName)
+	tree = dssConvert.dssToTree(circuitFilePath)
 	data = [] 
+
 	for ob_name in set(gen_data[category_name]):
-		for y_name in y_list:
+		# csv_column_headers = y_list
+		# search the tree of the updated circuit to find the phases associate with ob_name
+		dss_ob_name = ob_name.split('-')[1]
+		the_object = _getByName(tree, dss_ob_name)
+		# create phase list, removing neutral phases
+		phase_ids = the_object.get('bus1','').replace('.0','').split('.')[1:]
+		# when charting objects with the potential for multiple phases, if object is single phase, index out the correct column heading to match the phase
+		if len(y_list) == 3 and len(phase_ids) == 1:
+			csv_column_headers = []
+			csv_column_headers.append(y_list[int(phase_ids[0])-1])
+		else:
+			csv_column_headers = y_list
+
+		for y_name in csv_column_headers:
 			this_series = gen_data[gen_data[category_name] == ob_name]
 			trace = plotly.graph_objs.Scatter(
 				x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
@@ -1148,11 +1139,11 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	# opendss.currentPlot(FULL_NAME)
 	#TODO!!!! we're clobbering these outputs each time we run the full workflow. Consider keeping them separate.
 	#HACK: If only analyzing a set of generators with a single phase, remove ['P2(kW)','P3(kW)'] of make_chart('timeseries_gen.csv',...) below
-	make_chart('timeseries_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Generator Output", "kW per hour") #TODO: pull year using reopt_out.get(f'year{mg_num}', 0.0) from allOutputData.json after refactor
+	make_chart('timeseries_gen.csv', FULL_NAME, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Generator Output", "kW per hour") #TODO: pull year using reopt_out.get(f'year{mg_num}', 0.0) from allOutputData.json after refactor
 	# for timeseries_load, output ANSI Range A service bands (2,520V - 2,340V for 2.4kV and 291V - 263V for 0.277kV)
-	make_chart('timeseries_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'], QSTS_STEPS, "Load Voltage", "PU", ansi_bands = True)
-	make_chart('timeseries_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Voltage Source Output", "kW per hour")
-	make_chart('timeseries_control.csv', 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS, "Tap Position", "PU")
+	make_chart('timeseries_load.csv', FULL_NAME, 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'], QSTS_STEPS, "Load Voltage", "PU", ansi_bands = True)
+	make_chart('timeseries_source.csv', FULL_NAME, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Voltage Source Output", "kW per hour")
+	make_chart('timeseries_control.csv', FULL_NAME, 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS, "Tap Position", "PU")
 	# Perform control sim.
 	microgridup_control.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, '670671', False, 1, 120, 30) #TODO: unify the microgrids data structure.
 	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, diesel_total_calc=False)

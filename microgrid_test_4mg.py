@@ -45,28 +45,28 @@ if __name__ == '__main__':
 		"solarCanExport": True
 	}
 	MICROGRIDS = {
-		'm0': {
+		'mg0': {
 			'loads': ['634a_data_center','634b_radar','634c_atc_tower'],
 			'switch': '632633',
 			'gen_bus': '634',
 			'gen_obs_existing': ['solar_634_existing','battery_634_existing'],
 			'max_potential': '700' # total kW rating on 634 bus is 500 kW
 		},
-		'm1': {
+		'mg1': {
 			'loads': ['675a_hospital','675b_residential1','675c_residential1'],
 			'switch': '671692',
 			'gen_bus': '675',
 			'gen_obs_existing': ['solar_675_existing'],
 			'max_potential': '900' # total kW rating on 675 bus is 843 kW
 		},
-		'm2': {
+		'mg2': {
 			'loads': ['684_command_center','652_residential'],
 			'switch': '671684',
 			'gen_bus': '684',
 			'gen_obs_existing': ['diesel_684_existing','battery_684_existing'],
 			'max_potential': '1300' # total kW rating on 684 and 652 is 1283 kW
 		},
-		'm3': {
+		'mg3': {
 			'loads': ['645_hangar','646_office'],
 			'switch': '632645',
 			'gen_bus': '646',

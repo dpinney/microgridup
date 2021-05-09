@@ -416,7 +416,7 @@ def mg_phase_and_kv(BASE_NAME, microgrid):
 	# print('out_dict', out_dict)
 	return out_dict
 	
-def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, diesel_total_calc=False):
+def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_name, diesel_total_calc=False):
 	'''Create new generator objects and shapes. 
 	Returns a list of generator objects formatted for reading into openDSS tree.
 	SIDE EFFECTS: creates GEN_NAME generator shape
@@ -544,8 +544,6 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, die
 			'dispmode':'follow',
 			'kwhstored':f'{battery_cap_total}',
 			'kwhrated':f'{battery_cap_total}',
-			# 'kva':f'{battery_pow_total}',
-			# 'kvar':f'{battery_pow_total}', #kwrated and pf are sufficient to define kva and kvar ratings
 			'%charge':'100',
 			'%discharge':'100',
 			'%effcharge':'100',
@@ -571,8 +569,6 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, die
 			'dispmode':'follow',
 			'kwhstored':f'{battery_cap_new}',
 			'kwhrated':f'{battery_cap_new}',
-			# 'kva':f'{battery_pow_total}',
-			# 'kvar':f'{battery_pow_total}', #kwrated and pf are sufficient to define kva and kvar ratings
 			'%charge':'100',
 			'%discharge':'100',
 			'%effcharge':'100',
@@ -596,7 +592,10 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, die
 				# print("build_new_gen() storage 4", gen_ob_existing)
 				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(np.zeros(8760))
 				#TODO: collect this print statement as a warning in the output_template.html 
-				# print("User Warning: Existing battery", gen_ob_existing, "will not be utilized to support loads in this microgrid." )
+				warning_message = f'User Warning: Pre-existing battery {gen_ob_existing} will not be utilized to support loads in microgrid {mg_name}.'
+				print(warning_message)
+				# with open("test.txt", "a") as myfile:
+    				# myfile.write("appended text")
 			# if only additional energy storage (kWh) is recommended, scale the existing shape to the % of kwh storage capacity of the existing battery
 			elif battery_cap_new > 0:
 				# print("build_new_gen() storage 5", gen_ob_existing)
@@ -920,7 +919,7 @@ def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_st
 
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
-def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, diesel_total_calc):
+def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_name, diesel_total_calc):
 	''' Generate a report on each microgrid '''
 	reopt_out = json.load(open(REOPT_FOLDER + inputName))
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=diesel_total_calc)
@@ -949,7 +948,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, dies
 							"Recommended New Battery Energy Storage (kWh)", "Existing Wind (kW)", "Recommended New Wind (kW)", 
 							"Total Generation on Grid (kW)", "NPV ($)", "CapEx ($)", "CapEx after Incentives ($)", 
 							"Average Outage Survived (h)"])
-		mg_num = 1
+		mg_num = 1 # mg_num refers to the key suffix in allOutputData.json from reopt folder
 		mg_ob = microgrid
 		gen_bus_name = mg_ob['gen_bus']
 		load = reopt_out.get(f'load{mg_num}', 0.0)
@@ -988,14 +987,14 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, dies
 		if ave_outage is not None:
 			ave_outage = int(round(ave_outage))
 		
-		row =[str(REOPT_FOLDER[-1]), gen_bus_name, round(min_load,0), round(ave_load,0), round(avg_daytime_load,1), round(max_load,0),
+		row =[str(mg_name), gen_bus_name, round(min_load,0), round(ave_load,0), round(avg_daytime_load,1), round(max_load,0),
 		round(diesel_size_existing,1), round(diesel_size_new,1), round(diesel_used_gal, 0), round(solar_size_existing,1), 
 		round(solar_size_new,1), round(battery_pow_existing,1), round(battery_pow_new,1), round(battery_cap_existing,1), 
 		round(battery_cap_new,1), round(wind_size_existing,1), round(wind_size_new,1), round(total_gen,1),
 		int(round(npv)), int(round(cap_ex_existing_gen_adj)), int(round(cap_ex_after_incentives)),ave_outage]
 		writer.writerow(row)
 
-def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, diesel_total_calc):
+def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, diesel_total_calc):
 	''' Generate a dictionary reports fr each key for all microgrids. '''
 	reopt_out = json.load(open(REOPT_FOLDER + inputName))
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=diesel_total_calc)
@@ -1018,7 +1017,8 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, diesel_to
 	mg_dict = {}
 	mg_num = 1
 	mg_ob = microgrid
-	mg_dict["Microgrid Name"] = str(REOPT_FOLDER[-1])
+	# mg_dict["Microgrid Name"] = str(REOPT_FOLDER[-1]) # previously used sequential numerical naming
+	mg_dict["Microgrid Name"] = str(mg_name)
 	mg_dict["Generation Bus"] = mg_ob['gen_bus']
 	load = reopt_out.get(f'load1', 0.0)
 	mg_dict["Minimum Load (kWh)"] = round(min(load),0)
@@ -1106,7 +1106,7 @@ def summary_stats(reps):
 		reps['Average Outage Survived (h)'].append(None)
 	return(reps)
 
-def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, DIESEL_SAFETY_FACTOR, open_results=True):
+def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, DIESEL_SAFETY_FACTOR, mg_name, open_results=True):
 	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, microgrid)
 	
 	# to run microgridup with automatic feedback loop to update diesel size, include the following:
@@ -1115,7 +1115,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, microgrid, diesel_total_calc)
 	
 	# to run microgridup without automated diesel updates nor feedback loop, specify REOPT_FOLDER_BASE instead of REOPT_FOLDER_FINAL in build_new_gen_ob_and_shape(), microgrid_report_csv(), and microgrid_report_list_of_dicts() and out = template.render() below
-	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, diesel_total_calc=False)
+	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, diesel_total_calc=False)
 	gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, microgrid)
 	dssConvert.dssToOmd(FULL_NAME, OMD_NAME, RADIUS=0.0002)
@@ -1146,8 +1146,8 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	make_chart('timeseries_control.csv', FULL_NAME, 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS, "Tap Position", "PU")
 	# Perform control sim.
 	microgridup_control.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, '670671', False, 1, 120, 30) #TODO: unify the microgrids data structure.
-	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, diesel_total_calc=False)
-	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, diesel_total_calc=False)
+	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, diesel_total_calc=False)
+	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, diesel_total_calc=False)
 	# convert mg_list_of_dicts_full to dict of lists for columnar output in output_template.html
 	mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
 	# Create giant consolidated report.
@@ -1185,7 +1185,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_
 	mgs_name_sorted = sorted(MICROGRIDS.keys())
 	for i, mg_name in enumerate(mgs_name_sorted):
 		BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
-		main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], MICROGRIDS, GEN_NAME, REF_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, DIESEL_SAFETY_FACTOR, open_results=False)
+		main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], MICROGRIDS, GEN_NAME, REF_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, DIESEL_SAFETY_FACTOR, mg_name, open_results=False)
 	# Build Final report
 	reports = [x for x in os.listdir('.') if x.startswith('ultimate_rep_')]
 	reports.sort()

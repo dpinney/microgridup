@@ -592,10 +592,10 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 				# print("build_new_gen() storage 4", gen_ob_existing)
 				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(np.zeros(8760))
 				#TODO: collect this print statement as a warning in the output_template.html 
-				warning_message = f'User Warning: Pre-existing battery {gen_ob_existing} will not be utilized to support loads in microgrid {mg_name}.'
+				warning_message = f'User Warning: Pre-existing battery {gen_ob_existing} will not be utilized to support loads in microgrid {mg_name}.\n'
 				print(warning_message)
-				# with open("test.txt", "a") as myfile:
-    				# myfile.write("appended text")
+				with open("user_warnings.txt", "a") as myfile:
+					myfile.write(warning_message)
 			# if only additional energy storage (kWh) is recommended, scale the existing shape to the % of kwh storage capacity of the existing battery
 			elif battery_cap_new > 0:
 				# print("build_new_gen() storage 5", gen_ob_existing)
@@ -1193,7 +1193,9 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_
 	reopt_folders.sort()
 	reps = pd.concat([pd.read_csv(x) for x in reports]).to_dict(orient='list')
 	stats = summary_stats(reps)
-	current_time = datetime.datetime.now()
+	current_time = datetime.datetime.now() 
+	with open("user_warnings.txt") as myfile:
+		warnings = myfile.read()
 
 	template = j2.Template(open(f'{MGU_FOLDER}/output_template.html').read())
 	out = template.render(
@@ -1202,7 +1204,8 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_
 		now=current_time,
 		summary=stats,
 		inputs={'circuit':BASE_DSS,'loads':LOAD_CSV,'REopt inputs':REOPT_INPUTS,'microgrid':MICROGRIDS},
-		reopt_folders=reopt_folders
+		reopt_folders=reopt_folders,
+		warnings = warnings
 	)
 	FINAL_REPORT = 'output_final.html'
 	with open(FINAL_REPORT,'w') as outFile:

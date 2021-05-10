@@ -592,7 +592,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 				# print("build_new_gen() storage 4", gen_ob_existing)
 				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(np.zeros(8760))
 				#TODO: collect this print statement as a warning in the output_template.html 
-				warning_message = f'User Warning: Pre-existing battery {gen_ob_existing} will not be utilized to support loads in microgrid {mg_name}.\n'
+				warning_message = f'Pre-existing battery {gen_ob_existing} will not be utilized to support loads in microgrid {mg_name}.\n'
 				print(warning_message)
 				with open("user_warnings.txt", "a") as myfile:
 					myfile.write(warning_message)
@@ -1179,8 +1179,11 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_
 		os.mkdir(MODEL_DIR)
 	shutil.copyfile(BASE_DSS, f'{MODEL_DIR}/{MODEL_DSS}')
 	shutil.copyfile(LOAD_CSV, f'{MODEL_DIR}/{MODEL_LOAD_CSV}')
+
 	# HACK: work in directory because we're very picky about the current dir.
 	os.chdir(MODEL_DIR)
+	if os.path.exists("user_warnings.txt"):
+		os.remove("user_warnings.txt")
 	# Run the analysis
 	mgs_name_sorted = sorted(MICROGRIDS.keys())
 	for i, mg_name in enumerate(mgs_name_sorted):

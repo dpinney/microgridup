@@ -10,4 +10,4 @@ Then, clone the microgripUp Github repo and run the setup file: 'python setup.py
 
 ## Running the Model
 
-`python microgrid.py`
+`python microgrid_test_4mg.py`

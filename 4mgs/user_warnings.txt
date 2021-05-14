@@ -1,2 +1,0 @@
-User Warning: Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
-User Warning: Pre-existing battery battery_684_existing will not be utilized to support loads in microgrid mg2.

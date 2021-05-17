@@ -1198,8 +1198,10 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_
 	reps = pd.concat([pd.read_csv(x) for x in reports]).to_dict(orient='list')
 	stats = summary_stats(reps)
 	current_time = datetime.datetime.now() 
-	with open("user_warnings.txt") as myfile:
-		warnings = myfile.read()
+	warnings = "None"
+	if os.path.exists("user_warnings.txt"):
+		with open("user_warnings.txt") as myfile:
+			warnings = myfile.read()
 
 	template = j2.Template(open(f'{MGU_FOLDER}/output_template.html').read())
 	out = template.render(

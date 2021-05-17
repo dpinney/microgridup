@@ -60,9 +60,9 @@ if __name__ == '__main__':
 			'switch': '671692',
 			'gen_bus': '675',
 			'gen_obs_existing': ['solar_675_existing'],
-			'max_potential_battery': '900', # total kW rating on 675 bus is 843 kW
-			'max_potential_diesel': '300',
-			'battery_capacity': '20000'
+			'max_potential_battery': '100', # total kW rating on 675 bus is 843 kW
+			'max_potential_diesel': '900',
+			'battery_capacity': '2000'
 		},
 		'mg2': {
 			'loads': ['645_hangar','646_office'],
@@ -75,4 +75,4 @@ if __name__ == '__main__':
 		}
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, AMPS_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_INPUTS, MICROGRIDS)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_INPUTS, MICROGRIDS)

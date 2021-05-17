@@ -44,7 +44,7 @@ def createListOfBuses(microgrids, badBuses):
 	buses = [x for x in buses if x not in badBuses]
 	return buses
 
-def play(pathToOmd, pathToDss, pathToAmps, pathToTieLines, workDir, microgrids, faultedLine, radial, outageStart, lengthOfOutage, switchingTime):
+def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine, radial, outageStart, lengthOfOutage, switchingTime):
 	# 1) isolate the fault (using step one of flisr model)
 	if not workDir:
 		workDir = tempfile.mkdtemp()
@@ -253,7 +253,7 @@ def play(pathToOmd, pathToDss, pathToAmps, pathToTieLines, workDir, microgrids, 
 	else:
 		busShapes = {}
 
-	tree = solveSystem(pathToAmps, busShapesBattery, busShapesDiesel, actionsDict, microgrids, tree, pathToDss, badBuses, bestReclosers, bestTies, lengthOfOutage, outageStart, loadsShed)
+	tree = solveSystem(busShapesBattery, busShapesDiesel, actionsDict, microgrids, tree, pathToDss, badBuses, bestReclosers, bestTies, lengthOfOutage, outageStart, loadsShed)
 
 def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePassed, outageStart, busShapes, leftOverBusShapes, leftOverLoad, totalTime, isBattery, totalLoad, excessCharge):
 	'function that prepares a single timestep of the simulation to be solved'
@@ -617,10 +617,13 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 	# 		totalLoad[key].append(thisTotalLoad)
 	return totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad, totalLoad, excessCharge
 
-def solveSystem(pathToAmps, busShapesBattery, busShapesDiesel, actionsDict, microgrids, tree, pathToDss, badBuses, bestReclosers, bestTies, lengthOfOutage, outageStart, loadsShed):
+def solveSystem(busShapesBattery, busShapesDiesel, actionsDict, microgrids, tree, pathToDss, badBuses, bestReclosers, bestTies, lengthOfOutage, outageStart, loadsShed):
 	'Add diesel generation to the opendss formatted system and solve using OpenDSS'
 	# get a sorted list of the buses
 	buses = createListOfBuses(microgrids, badBuses)
+
+	# get a tree representation for the .dss file
+	treeDSS = dssConvert.dssToTree(pathToDss)
 
 	# indices for keeping track of which entries have been updated already
 	i = 0
@@ -641,25 +644,35 @@ def solveSystem(pathToAmps, busShapesBattery, busShapesDiesel, actionsDict, micr
 			del(buses[0])
 			continue
 		# consider every phase separately
-		ampData = pd.read_csv(pathToAmps)
+		# ampData = pd.read_csv(pathToAmps)
+		ampsDiesel = 0.0
+		ampsBattery = 0.0
+		ampsSolar = 0.0
+		for thing in treeDSS:
+			if thing.get('object','').startswith('generator.diesel_' + str(bus)):
+				ampsDiesel = float(thing.get('kw', '')) / float(thing.get('kv', '')) / 1000
+			if thing.get('object','').startswith('storage.battery_' + str(bus)):
+				ampsBattery = float(thing.get('kwrated', '')) / float(thing.get('kv', '')) / 1000
+			if thing.get('object','').startswith('generator.solar_' + str(bus)):
+				ampsSolar = float(thing.get('kw', '')) / float(thing.get('kv', '')) / 1000
 		phase = 1
 		while phase < 4:
 			if buses[0] in busShapesBattery.keys():
 				if busShapesBattery[buses[0]][phase-1]:
 					maxVal = max(busShapesBattery[buses[0]][phase-1])
-					entry = 0
-					while entry < ampData.shape[0]:
-						if buses[0] == str(ampData.loc[entry, 'bus']):
-							if phase == 1:
-								angle = '240.000000'
-								amps = str(ampData.loc[entry, 'amps_1'])
-							elif phase == 2:
-								angle = '120.000000'
-								amps = str(ampData.loc[entry, 'amps_2'])
-							else:
-								angle = '0.000000'
-								amps =  str(ampData.loc[entry, 'amps_3'])
-						entry += 1
+					# entry = 0
+					# while entry < ampData.shape[0]:
+					# 	if buses[0] == str(ampData.loc[entry, 'bus']):
+					if phase == 1:
+						angle = '240.000000'
+						# amps = str(ampData.loc[entry, 'amps_1'])
+					elif phase == 2:
+						angle = '120.000000'
+						# amps = str(ampData.loc[entry, 'amps_2'])
+					else:
+						angle = '0.000000'
+						# amps =  str(ampData.loc[entry, 'amps_3'])
+						# entry += 1
 					# add the battery loadshapes to the dictionary of all shapes to be added
 					shape_name = 'newbattery_' + str(buses[0]) + '_' + str(phase) + '_shape'
 					shape_data = busShapesBattery[bus][phase - 1]
@@ -692,7 +705,7 @@ def solveSystem(pathToAmps, busShapesBattery, busShapesDiesel, actionsDict, micr
 							'bus1': str(buses[0]) + '.' + str(phase),
 							'phases': '1',
 							'angle': str(angle),
-							'amps': str(amps),
+							'amps': str(ampsBattery),
 							'yearly': 'newbattery_' + str(buses[0]) + '_' + str(phase) + '_shape'
 						}
 					j+=1
@@ -704,7 +717,7 @@ def solveSystem(pathToAmps, busShapesBattery, busShapesDiesel, actionsDict, micr
 							'bus1': str(buses[0]) + '.' + str(phase),
 							'phases': '1',
 							'angle': str(angle),
-							'amps': str(amps),
+							'amps': str(ampsDiesel),
 							'yearly': 'newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape'
 						}
 					j+=1
@@ -716,7 +729,7 @@ def solveSystem(pathToAmps, busShapesBattery, busShapesDiesel, actionsDict, micr
 							'bus1': str(buses[0]) + '.' + str(phase),
 							'phases': '1',
 							'angle': str(angle),
-							'amps': str(amps),
+							'amps': str(ampsSolar),
 							'yearly': 'solar_' + str(buses[0]) + '_shape'
 						}
 					j+=1
@@ -724,8 +737,6 @@ def solveSystem(pathToAmps, busShapesBattery, busShapesDiesel, actionsDict, micr
 		# remove the bus so we can move on...
 		del (buses[0])
 
-	# get a tree representation for the .dss file
-	treeDSS = dssConvert.dssToTree(pathToDss)
 	# make a copy of the original for iterating purposes
 	tree2 = treeDSS.copy()
 	# remove every other (old) representation of generation in the model
@@ -861,4 +872,4 @@ microgrids = {
 	}
 }
 
-# play('./lehigh.dss.omd', './lehigh_full.dss', './lehighAmps.csv', None, None, microgrids, '670671', False, 60, 120, 30) 
+# play('./lehigh.dss.omd', './lehigh_full_4.dss', None, None, microgrids, '670671', False, 60, 120, 30) 

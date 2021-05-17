@@ -74,7 +74,8 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 		buses.append(microgrids[key].get('gen_bus', ''))
 
 	loadsShed = {}
-	loadsShedBasic = ['675b_residential1', '675c_residential1', '652_residential']
+	loadsShedBasic = ['675b_residential1', '675c_residential1', '652_residential'] #To Do: make this an input to microgrids for any circuit
+	# loadsShedBasic = ['','']
 	for element in buses:
 		if not element in loadsShed.keys():
 			loadsShed[element] = {}
@@ -101,9 +102,9 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 		
 		# make sure we re-run a single step of the simulation as many times as necessary to ensure all loads not shed can be supported
 		# first, populate the battery loadshapes
-		totalTime, timePassed, busShapesBattery, leftOverBusShapes, leftOverLoad, totalLoad, excessChargeTemp = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, None, None, 0, True, None, None)
+		totalTime, timePassed, busShapesBattery, leftOverBusShapes, leftOverLoad, totalLoad, excessChargeTemp = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, None, None, 0, True, None, None, microgrids)
 		# next, populate the diesel loadshapes
-		totalTime, timePassed, busShapesDieselTemp, leftOverBusShapesTemp, leftOverLoadTemp, totalLoadTemp, excessCharge = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, leftOverBusShapes, leftOverLoad, 0, False, totalLoad, None)
+		totalTime, timePassed, busShapesDieselTemp, leftOverBusShapesTemp, leftOverLoadTemp, totalLoadTemp, excessCharge = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, leftOverBusShapes, leftOverLoad, 0, False, totalLoad, None, microgrids)
 		
 		buses = createListOfBuses(microgrids, badBuses)
 		while len(buses) > 0:
@@ -149,7 +150,7 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 				phase += 1
 			del(buses[0])
 
-		totalTime, timePassed, busShapesDiesel, leftOverBusShapes, leftOverLoad, totalLoad, excessCharge = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, leftOverBusShapes, leftOverLoad, 0, False, totalLoad, excessCharge)
+		totalTime, timePassed, busShapesDiesel, leftOverBusShapes, leftOverLoad, totalLoad, excessCharge = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, leftOverBusShapes, leftOverLoad, 0, False, totalLoad, excessCharge, microgrids)
 		# update the amount of time that has passed in the simulation
 		timePassed = timePassed + switchingTime
 		# loadsShed = None
@@ -233,6 +234,7 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 
 	# when the outage is over, switch back to the main sourcebus
 	buses = createListOfBuses(microgrids, badBuses)
+	print("list of buses:", buses)
 	if totalTime > 0:
 		listOfZeroes = [0.00] * (totalTime - (lengthOfOutage + outageStart) + 1)
 	
@@ -255,7 +257,7 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 
 	tree = solveSystem(busShapesBattery, busShapesDiesel, actionsDict, microgrids, tree, pathToDss, badBuses, bestReclosers, bestTies, lengthOfOutage, outageStart, loadsShed)
 
-def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePassed, outageStart, busShapes, leftOverBusShapes, leftOverLoad, totalTime, isBattery, totalLoad, excessCharge):
+def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePassed, outageStart, busShapes, leftOverBusShapes, leftOverLoad, totalTime, isBattery, totalLoad, excessCharge, microgrids):
 	'function that prepares a single timestep of the simulation to be solved'
 	
 	# create a list of the diesel generators
@@ -766,7 +768,7 @@ def solveSystem(busShapesBattery, busShapesDiesel, actionsDict, microgrids, tree
 	# treeDSS.insert(max_pos, {'!CMD': 'solve'})
 
 	# Write new DSS file.
-	FULL_NAME = 'lehigh_full_newDiesel.dss'
+	FULL_NAME = 'lehigh_full_newDiesel.dss' #To Do: update path of dss file to match name of circuit
 	dssConvert.treeToDss(treeDSS, FULL_NAME)
 
 	# get a dictionary of all the line openings and closings to be graphed
@@ -845,31 +847,31 @@ def solveSystem(busShapesBattery, busShapesDiesel, actionsDict, microgrids, tree
 
 	return(tree)
 
-microgrids = {
-	'm1': {
-		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
-		'switch': '632633',
-		'gen_bus': '633',
-		'max_potential_battery': '1600',
-		'max_potential_diesel': '1000000',
-		'battery_capacity': '10000'
-	},
-	'm2': {
-		'loads': ['675a_hospital','675b_residential1','675c_residential1'],
-		'switch': '671692',
-		'gen_bus': '675',
-		'max_potential_battery': '350',
-		'max_potential_diesel': '300',
-		'battery_capacity': '20000'
-	},
-	'm4': {
-		'loads': ['645_warehouse1','646_med_office'],
-		'switch': '632645',
-		'gen_bus': '646',
-		'max_potential_battery': '1800',
-		'max_potential_diesel': '1000000',
-		'battery_capacity': '10000'
-	}
-}
+# microgrids = {
+# 	'm1': {
+# 		'loads': ['634a_supermarket','634b_supermarket','634c_supermarket'],
+# 		'switch': '632633',
+# 		'gen_bus': '633',
+# 		'max_potential_battery': '1600',
+# 		'max_potential_diesel': '1000000',
+# 		'battery_capacity': '10000'
+# 	},
+# 	'm2': {
+# 		'loads': ['675a_hospital','675b_residential1','675c_residential1'],
+# 		'switch': '671692',
+# 		'gen_bus': '675',
+# 		'max_potential_battery': '350',
+# 		'max_potential_diesel': '300',
+# 		'battery_capacity': '20000'
+# 	},
+# 	'm4': {
+# 		'loads': ['645_warehouse1','646_med_office'],
+# 		'switch': '632645',
+# 		'gen_bus': '646',
+# 		'max_potential_battery': '1800',
+# 		'max_potential_diesel': '1000000',
+# 		'battery_capacity': '10000'
+# 	}
+# }
 
 # play('./lehigh.dss.omd', './lehigh_full_4.dss', None, None, microgrids, '670671', False, 60, 120, 30) 

@@ -6,7 +6,7 @@ if __name__ == '__main__':
 	MODEL_DIR = '3mgs'
 	BASE_DSS = 'lehigh_base_phased.dss'
 	LOAD_CSV = 'lehigh_load.csv'
-	AMPS_CSV = 'lehigh_amps.csv'
+	FAULTED_LINE = '670671'
 	QSTS_STEPS = 24*20
 	DIESEL_SAFETY_FACTOR = .2
 	REOPT_INPUTS = {
@@ -75,4 +75,4 @@ if __name__ == '__main__':
 		}
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_INPUTS, MICROGRIDS)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE)

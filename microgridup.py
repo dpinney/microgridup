@@ -301,6 +301,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 
 		# Update all generator specifications in the microgrid to match outputs of REOPT_FOLDER_BASE
 		gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER_BASE, diesel_total_calc=diesel_total_calc)
+		# HACK: comment out the next two lines to turn up Solar quickly for Picatinny analysis
 		solar_size_total = gen_sizes.get('solar_size_total')
 		solar_size_new = gen_sizes.get('solar_size_new')
 		solar_size_existing = gen_sizes.get('solar_size_existing')
@@ -316,6 +317,9 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 		battery_pow_total = gen_sizes.get('battery_pow_total')
 		battery_pow_new = gen_sizes.get('battery_pow_new')
 		battery_pow_existing = gen_sizes.get('battery_pow_existing')
+		# HACK to turn up Solar quickly for Picatinny analysis
+		# solar_size_new = diesel_size_new*.4
+		# solar_size_total = solar_size_new + solar_size_existing
 
 		if diesel_size_total > 0:
 			allInputData['dieselMax'] = diesel_size_total
@@ -941,12 +945,12 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 
 	with open(outputCsvName, 'w', newline='') as outcsv:
 		writer = csv.writer(outcsv)
-		writer.writerow(["Microgrid Name", "Generation Bus", "Minimum Load (kWh)", "Average Load (kWh)",
-							"Average Daytime Load (kWh)", "Maximum Load (kWh)", "Existing Diesel (kW)", "Recommended New Diesel (kW)",
-							"Diesel Fuel Used During Outage (gal)", "Existing Solar (kW)", "Recommended New Solar (kW)", 
-							"Existing Battery Power (kW)", "Recommended New Battery Power (kW)", "Existing Battery Energy Storage (kWh)", 
-							"Recommended New Battery Energy Storage (kWh)", "Existing Wind (kW)", "Recommended New Wind (kW)", 
-							"Total Generation on Grid (kW)", "NPV ($)", "CapEx ($)", "CapEx after Incentives ($)", 
+		writer.writerow(["Microgrid Name", "Generation Bus", "Minimum 1 hr Load (kW)", "Average 1 hr Load (kW)",
+							"Average Daytime 1 hr Load (kW)", "Maximum 1 hr Load (kW)", "Existing Diesel (kW)", "New Diesel (kW)",
+							"Diesel Fuel Used During Outage (gal)", "Existing Solar (kW)", "New Solar (kW)", 
+							"Existing Battery Power (kW)", "New Battery Power (kW)", "Existing Battery Energy Storage (kWh)", 
+							"New Battery Energy Storage (kWh)", "Existing Wind (kW)", "New Wind (kW)", 
+							"Total Generation on Grid (kW)", "NPV over 25 years ($)", "CapEx ($)", "CapEx after Incentives ($)", 
 							"Average Outage Survived (h)"])
 		mg_num = 1 # mg_num refers to the key suffix in allOutputData.json from reopt folder
 		mg_ob = microgrid
@@ -1021,25 +1025,25 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	mg_dict["Microgrid Name"] = str(mg_name)
 	mg_dict["Generation Bus"] = mg_ob['gen_bus']
 	load = reopt_out.get(f'load1', 0.0)
-	mg_dict["Minimum Load (kWh)"] = round(min(load),0)
-	mg_dict["Average Load (kWh)"] = round(sum(load)/len(load),0)
+	mg_dict["Minimum 1 hr Load (kW)"] = round(min(load),0)
+	mg_dict["Average 1 hr Load (kW)"] = round(sum(load)/len(load),0)
 	# build the average daytime load
 	np_load = np.array_split(load, 365)
 	np_load = np.array(np_load) #a flattened array of 365 arrays of 24 hours each
 	daytime_kwh = np_load[:,9:17] #365 8-hour daytime arrays
-	mg_dict["Average Daytime Load (kWh)"] = round(np.average(np.average(daytime_kwh, axis=1)),0)
-	mg_dict["Maximum Load (kWh)"] = round(max(load),0)
+	mg_dict["Average Daytime 1 hr Load (kW)"] = round(np.average(np.average(daytime_kwh, axis=1)),0)
+	mg_dict["Maximum 1 hr Load (kW)"] = round(max(load),0)
 	mg_dict["Existing Diesel (kW)"] = round(diesel_size_existing,0)
-	mg_dict["Recommended New Diesel (kW)"] = round(diesel_size_new,0)
+	mg_dict["New Diesel (kW)"] = round(diesel_size_new,0)
 	mg_dict["Diesel Fuel Used During Outage (gal)"] = round(reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0),0)
 	mg_dict["Existing Solar (kW)"] = round(solar_size_existing ,0)
-	mg_dict["Recommended New Solar (kW)"] = round(solar_size_total - solar_size_existing,0)
+	mg_dict["New Solar (kW)"] = round(solar_size_total - solar_size_existing,0)
 	mg_dict["Existing Battery Power (kW)"] = round(battery_pow_existing,0)
-	mg_dict["Recommended New Battery Power (kW)"] = round(battery_pow_new,0)
+	mg_dict["New Battery Power (kW)"] = round(battery_pow_new,0)
 	mg_dict["Existing Battery Energy Storage (kWh)"] = round(battery_cap_existing,0)
-	mg_dict["Recommended New Battery Energy Storage (kWh)"] = round(battery_cap_new,0)
+	mg_dict["New Battery Energy Storage (kWh)"] = round(battery_cap_new,0)
 	mg_dict["Existing Wind (kW)"] = round(wind_size_existing,0)
-	mg_dict["Recommended New Wind (kW)"] = round(wind_size_new,0)
+	mg_dict["New Wind (kW)"] = round(wind_size_new,0)
 	total_gen = diesel_size_total + solar_size_total + battery_pow_total + wind_size_total
 	mg_dict["Total Generation on Grid (kW)"] = round(total_gen,0)
 	npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
@@ -1054,7 +1058,7 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	# 						+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
 	# 						+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
 	# mg_dict["Net Present Value ($)"] = f'{round(npv_existing_gen_adj):,}'
-	mg_dict["Net Present Value ($)"] = f'{round(npv):,}'
+	mg_dict["NPV over 25 years ($)"] = f'{round(npv):,}'
 	cap_ex_existing_gen_adj = cap_ex \
 							- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
 							- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
@@ -1081,23 +1085,23 @@ def summary_stats(reps):
 
 	reps['Microgrid Name'].append('Summary')
 	reps['Generation Bus'].append('None')
-	reps['Minimum Load (kWh)'].append(round(sum(reps['Minimum Load (kWh)']),0))
-	reps['Average Load (kWh)'].append(round(sum(reps['Average Load (kWh)']),0))
-	reps['Average Daytime Load (kWh)'].append(round(sum(reps['Average Daytime Load (kWh)']),0))
-	reps['Maximum Load (kWh)'].append(round(sum(reps['Maximum Load (kWh)']),0))
+	reps['Minimum 1 hr Load (kW)'].append(round(sum(reps['Minimum 1 hr Load (kW)']),0))
+	reps['Average 1 hr Load (kW)'].append(round(sum(reps['Average 1 hr Load (kW)']),0))
+	reps['Average Daytime 1 hr Load (kW)'].append(round(sum(reps['Average Daytime 1 hr Load (kW)']),0))
+	reps['Maximum 1 hr Load (kW)'].append(round(sum(reps['Maximum 1 hr Load (kW)']),0))
 	reps['Existing Diesel (kW)'].append(round(sum(reps['Existing Diesel (kW)']),0))
-	reps['Recommended New Diesel (kW)'].append(round(sum(reps['Recommended New Diesel (kW)']),0))
+	reps['New Diesel (kW)'].append(round(sum(reps['New Diesel (kW)']),0))
 	reps['Diesel Fuel Used During Outage (gal)'].append(round(sum(reps['Diesel Fuel Used During Outage (gal)']),0))
 	reps['Existing Solar (kW)'].append(round(sum(reps['Existing Solar (kW)']),0))
-	reps['Recommended New Solar (kW)'].append(round(sum(reps['Recommended New Solar (kW)']),0))
+	reps['New Solar (kW)'].append(round(sum(reps['New Solar (kW)']),0))
 	reps['Existing Battery Power (kW)'].append(round(sum(reps['Existing Battery Power (kW)']),0))
-	reps['Recommended New Battery Power (kW)'].append(round(sum(reps['Recommended New Battery Power (kW)']),0))
+	reps['New Battery Power (kW)'].append(round(sum(reps['New Battery Power (kW)']),0))
 	reps['Existing Battery Energy Storage (kWh)'].append(round(sum(reps['Existing Battery Energy Storage (kWh)']),0))
-	reps['Recommended New Battery Energy Storage (kWh)'].append(round(sum(reps['Recommended New Battery Energy Storage (kWh)']),0))
+	reps['New Battery Energy Storage (kWh)'].append(round(sum(reps['New Battery Energy Storage (kWh)']),0))
 	reps['Existing Wind (kW)'].append(round(sum(reps['Existing Wind (kW)']),0))
-	reps['Recommended New Wind (kW)'].append(round(sum(reps['Recommended New Wind (kW)']),0))
+	reps['New Wind (kW)'].append(round(sum(reps['New Wind (kW)']),0))
 	reps['Total Generation on Grid (kW)'].append(round(sum(reps['Total Generation on Grid (kW)']),0))
-	reps['NPV ($)'].append(sum(reps['NPV ($)']))
+	reps['NPV over 25 years ($)'].append(sum(reps['NPV over 25 years ($)']))
 	reps['CapEx ($)'].append(sum(reps['CapEx ($)']))
 	reps['CapEx after Incentives ($)'].append(sum(reps['CapEx after Incentives ($)']))
 	if all([h != None for h in reps['Average Outage Survived (h)']]):

@@ -311,6 +311,11 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 						k = 1
 						while k < 4:
 							val = 0
+							# print("key:", key)
+							# print("k:", k)
+							# print("val:", val)
+							# print("leftOverLoad[key][k][0:10]:", leftOverLoad[key][k][0:10])
+							# print("len(leftOverLoad[key]):", len(leftOverLoad[key]))
 							while val < len(leftOverLoad[key][k]):
 								if k == 1:
 									if not '.1' in shapes.keys():

@@ -2,43 +2,83 @@
 <html>
 <head>
 	<title>This report was made by {{x}} and {{y}}.</title>
-	<style type="text/css">iframe {width:95%;height:600px}</style>
+	<style type="text/css">iframe {width:100%;height:600px}</style>
+	<script>
+		function openTab(tabName) {
+			for (tag of document.getElementsByClassName("tab")) {
+				tag.style.visibility = "hidden";
+			}
+			document.getElementById(tabName).style.visibility = "visible";  
+		}
+		window.onload = function(){ document.getElementById("loading").style.display = "none" }
+	</script>
+	<style type="text/css">
+		.tab {position:fixed; top:30px; left:0px; width:100%; height:100vh; visibility:hidden}
+		#loading {width:100%; height:100%; top:0px; left:0px; position:fixed; display:block; z-index:99; background-color:rgba(0,0,0,0.5); text-align:center; line-height:60vh; font-size:80pt; font-family:Helvetica,Arial,Sans-Serif; text-shadow:0px 0px 5px white}
+	</style>
 </head>
-<body>
-	<pre style="width:95%; white-space:pre-wrap">Report Generated on {{ now }}</pre>
-	<pre style="width:95%; white-space:pre-wrap">INPUTS: {{inputs}}</pre>
-	<pre style="width:95%; white-space:pre-wrap">User Warnings:</pre>
-	<pre style="width:95%; white-space:pre-wrap">{{warnings}}</pre>
-	<!-- formatted below for a dict of lists -->
-	<pre>Overview of Microgrids</pre>
-	<table style="">
-		{% for k,v in summary.items() %}
-			<tr>
-				<td>{{ k }}</td>
-				{% for v_i in v %}
-					{% if v_i is string %}
-						<td style="text-align:right">{{ v_i }}</td>
-					{% elif v_i is not none %}
-						<td style="text-align:right">{{ '{:,}'.format(v_i) }}</td>
-					{% else %}
-						<td style="text-align:right">{{ v_i }}</td>
-					{% endif %}
-				{% endfor %}
-			</tr>
+<body style="margin:0px; height:30px">
+	<div id="loading">Loading</div>
+	<div>
+		<button onclick="openTab('overview')">Overview</button>
+		<button onclick="openTab('oneline')">Oneline</button>
+		<button onclick="openTab('map')">Map</button>
+		<button onclick="openTab('interconnection')">Interconnection</button>
+		<button onclick="openTab('control')">Control</button>
+		{% for reopt_folder in reopt_folders %}
+			<button onclick="openTab('{{reopt_folder}}')">{{reopt_folder}}</button>
 		{% endfor %}
-	</table>
-	<iframe src="circuit_map/geoJsonMap_offline.html"></iframe>
-	<iframe src="circuit_oneline.html"></iframe>
-	<iframe src="timeseries_gen.csv.plot.html"></iframe>
-	<iframe src="timeseries_load.csv.plot.html"></iframe>
-	<iframe src="timeseries_source.csv.plot.html"></iframe>
-	<iframe src="timeseries_control.csv.plot.html"></iframe>
+	</div>
+	<div id="overview" class="tab" style="margin:5px; overflow:scroll; visibility:visible">
+		<pre style="width:95%; white-space:pre-wrap">Report Generated on {{ now }}</pre>
+		<pre style="width:95%; white-space:pre-wrap">INPUTS: {{inputs}}</pre>
+		<pre style="width:95%; white-space:pre-wrap">User Warnings:</pre>
+		<pre style="width:95%; white-space:pre-wrap">{{warnings}}</pre>
+		<!-- formatted below for a dict of lists -->
+		<pre>Overview of Microgrids</pre>
+		<table style="">
+			{% for k,v in summary.items() %}
+				<tr>
+					<td>{{ k }}</td>
+					{% for v_i in v %}
+						{% if v_i is string %}
+							<td style="text-align:right">{{ v_i }}</td>
+						{% elif v_i is not none %}
+							<td style="text-align:right">{{ '{:,}'.format(v_i) }}</td>
+						{% else %}
+							<td style="text-align:right">{{ v_i }}</td>
+						{% endif %}
+					{% endfor %}
+				</tr>
+			{% endfor %}
+		</table>
+	</div>
+	<div id="oneline" class="tab" style="visibility:hidden">
+		<iframe src="circuit_oneline.html" style="height:100vh"></iframe>
+	</div>
+	<div id="map" class="tab" style="visibility:hidden">
+		<iframe src="circuit_map/geoJsonMap_offline.html" style="height:100vh"></iframe>
+	</div>
+	<div id="interconnection" class="tab" style="visibility:hidden">
+		<div style="height:100vh; overflow:scroll">
+			<iframe src="timeseries_gen.csv.plot.html"></iframe>
+			<iframe src="timeseries_load.csv.plot.html"></iframe>
+			<iframe src="timeseries_source.csv.plot.html"></iframe>
+			<iframe src="timeseries_control.csv.plot.html"></iframe>
+		</div>
+	</div>
+	<div id="control" class="tab" style="visibility:hidden">
+		<div style="height:100vh; overflow:scroll">
+			<!-- <iframe src="timezcontrol_gen.csv.plot.html"></iframe> -->
+			<iframe src="timezcontrol_load.csv.plot.html"></iframe>
+			<iframe src="timezcontrol_source.csv.plot.html"></iframe>
+			<iframe src="timezcontrol_control.csv.plot.html"></iframe>
+		</div>
+	</div>
 	{% for reopt_folder in reopt_folders %}
-	<iframe src="{{reopt_folder}}/inlineTemplate.html"></iframe>
+	<div id="{{reopt_folder}}" class="tab" style="visibility:hidden">
+		<iframe src="{{reopt_folder}}/inlineTemplate.html" style="height:100vh"></iframe>
+	</div>
 	{% endfor %}
-	<!-- <iframe src="timezcontrol_gen.csv.plot.html"></iframe> -->
-	<iframe src="timezcontrol_load.csv.plot.html"></iframe>
-	<iframe src="timezcontrol_source.csv.plot.html"></iframe>
-	<iframe src="timezcontrol_control.csv.plot.html"></iframe>
 </body>
 </html>

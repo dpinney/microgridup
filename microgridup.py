@@ -28,7 +28,29 @@ def _getByName(tree, name):
                 matches.append(x)
     return matches[0]
 
-def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid):
+def set_critical_load_percent(LOAD_NAME, microgrid):
+	''' Set the critical load percent for REopt by finding the ratio
+	of max critical load kws to the max load found in the loadshape of that mg'''
+	load_df = pd.read_csv(LOAD_NAME)
+	mg_load_df = pd.DataFrame()
+	loads = microgrid['loads']
+	mg_load_df['load'] = [0 for x in range(8760)]
+	for load_name in loads:
+		mg_load_df['load'] = mg_load_df['load'] + load_df[load_name]
+	max_load = float(mg_load_df.max())
+	# print("max_load:", max_load)
+
+	# TO DO: select specific critical loads from circuit.dss if meta data on max kw or loadshapes exist for those loads
+	# add up all max kws from critical loads to support during an outage
+	max_crit_load = sum(microgrid['critical_load_kws'])
+	# print("max_crit_load:", max_crit_load)
+
+	critical_load_percent = max_crit_load/max_load
+	# print('critical_load_percent:',critical_load_percent)
+	return critical_load_percent, max_crit_load
+
+
+def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid, critical_load_percent):
 	''' Generate the microgrid specs with REOpt.
 	SIDE-EFFECTS: generates REOPT_FOLDER'''
 	load_df = pd.read_csv(LOAD_NAME)
@@ -70,6 +92,7 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 			outage_start_hour = max_load_index - outage_duration/2
 		#print("outage_start_hour:", str(int(outage_start_hour)))
 		allInputData['outage_start_hour'] = str(int(outage_start_hour))
+		allInputData['criticalLoadFactor'] = str(critical_load_percent)
 
 		# Pulling coordinates from BASE_NAME.dss into REopt allInputData.json:
 		tree = dssConvert.dssToTree(BASE_NAME)
@@ -238,7 +261,7 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 		'battery_pow_total':battery_pow_total, 'battery_pow_existing':battery_pow_existing, 'battery_pow_new':battery_pow_new})
 	return gen_sizes #dictionary of all gen sizes
 
-def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, microgrid, diesel_total_calc):
+def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, microgrid, diesel_total_calc, critical_load_percent):
 	'''Update max and min generator sizes based on get_gen_ob_from_reopt() and rerun REopt
 	SIDE-EFFECTS: generates second REOPT_FOLDER'''
 	load_df = pd.read_csv(LOAD_NAME)
@@ -280,6 +303,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			outage_start_hour = max_load_index - outage_duration/2
 		# print("outage_start_hour:", str(int(outage_start_hour)))
 		allInputData['outage_start_hour'] = str(int(outage_start_hour))
+		allInputData['criticalLoadFactor'] = str(critical_load_percent)
 
 		# Pulling coordinates from BASE_NAME.dss into REopt allInputData.json:
 		tree = dssConvert.dssToTree(BASE_NAME)
@@ -612,8 +636,10 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	gen_df_builder.to_csv(GEN_NAME, index=False)
 	return gen_obs
 
+
 def gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL):
 	'''Create new generator 1kw reference loadshapes for existing gen located outside of the microgrid in analysis. 
+	To run this effectively when not running feedback_reopt_gen_values(), specify REOPT_FOLDER_BASE for both of the final arguments
 	SIDE EFFECTS: creates REF_NAME generator reference shape'''
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER_FINAL, diesel_total_calc=False)
 	reopt_final_out = json.load(open(REOPT_FOLDER_FINAL + '/allOutputData.json'))
@@ -645,6 +671,7 @@ def gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL):
 	# print('wind_ref_shape', ref_df_builder['wind_ref_shape'].head(20))
 
 	ref_df_builder.to_csv(REF_NAME, index=False)
+
 
 def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, microgrid):
 	''' insert generation objects into dss.
@@ -923,7 +950,7 @@ def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_st
 
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
-def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_name, diesel_total_calc):
+def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, diesel_total_calc):
 	''' Generate a report on each microgrid '''
 	reopt_out = json.load(open(REOPT_FOLDER + inputName))
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=diesel_total_calc)
@@ -946,7 +973,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 	with open(outputCsvName, 'w', newline='') as outcsv:
 		writer = csv.writer(outcsv)
 		writer.writerow(["Microgrid Name", "Generation Bus", "Minimum 1 hr Load (kW)", "Average 1 hr Load (kW)",
-							"Average Daytime 1 hr Load (kW)", "Maximum 1 hr Load (kW)", "Existing Diesel (kW)", "New Diesel (kW)",
+							"Average Daytime 1 hr Load (kW)", "Maximum 1 hr Load (kW)", "Maximum 1 hr Critical Load (kW)", "Existing Diesel (kW)", "New Diesel (kW)",
 							"Diesel Fuel Used During Outage (gal)", "Existing Solar (kW)", "New Solar (kW)", 
 							"Existing Battery Power (kW)", "New Battery Power (kW)", "Existing Battery Energy Storage (kWh)", 
 							"New Battery Energy Storage (kWh)", "Existing Wind (kW)", "New Wind (kW)", 
@@ -963,6 +990,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		daytime_kwh = np_load[:,9:17] #365 8-hour daytime arrays
 		avg_daytime_load = np.average(np.average(daytime_kwh, axis=1))
 		max_load = max(load)
+		max_crit_load = max_crit_load
 		diesel_used_gal =reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0)
 		total_gen = diesel_size_total + solar_size_total + battery_pow_total + wind_size_total
 
@@ -991,14 +1019,14 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		if ave_outage is not None:
 			ave_outage = int(round(ave_outage))
 		
-		row =[str(mg_name), gen_bus_name, round(min_load,0), round(ave_load,0), round(avg_daytime_load,1), round(max_load,0),
+		row =[str(mg_name), gen_bus_name, round(min_load), round(ave_load), round(avg_daytime_load), round(max_load), round(max_crit_load),
 		round(diesel_size_existing,1), round(diesel_size_new,1), round(diesel_used_gal, 0), round(solar_size_existing,1), 
 		round(solar_size_new,1), round(battery_pow_existing,1), round(battery_pow_new,1), round(battery_cap_existing,1), 
 		round(battery_cap_new,1), round(wind_size_existing,1), round(wind_size_new,1), round(total_gen,1),
 		int(round(npv)), int(round(cap_ex_existing_gen_adj)), int(round(cap_ex_after_incentives)),ave_outage]
 		writer.writerow(row)
 
-def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, diesel_total_calc):
+def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, diesel_total_calc):
 	''' Generate a dictionary reports fr each key for all microgrids. '''
 	reopt_out = json.load(open(REOPT_FOLDER + inputName))
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=diesel_total_calc)
@@ -1033,6 +1061,7 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	daytime_kwh = np_load[:,9:17] #365 8-hour daytime arrays
 	mg_dict["Average Daytime 1 hr Load (kW)"] = round(np.average(np.average(daytime_kwh, axis=1)),0)
 	mg_dict["Maximum 1 hr Load (kW)"] = round(max(load),0)
+	mg_dict["Maximum 1 hr Critical Load (kW)"] = round(max_crit_load,0)
 	mg_dict["Existing Diesel (kW)"] = round(diesel_size_existing,0)
 	mg_dict["New Diesel (kW)"] = round(diesel_size_new,0)
 	mg_dict["Diesel Fuel Used During Outage (gal)"] = round(reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0),0)
@@ -1089,6 +1118,7 @@ def summary_stats(reps):
 	reps['Average 1 hr Load (kW)'].append(round(sum(reps['Average 1 hr Load (kW)']),0))
 	reps['Average Daytime 1 hr Load (kW)'].append(round(sum(reps['Average Daytime 1 hr Load (kW)']),0))
 	reps['Maximum 1 hr Load (kW)'].append(round(sum(reps['Maximum 1 hr Load (kW)']),0))
+	reps['Maximum 1 hr Critical Load (kW)'].append(round(sum(reps['Maximum 1 hr Critical Load (kW)']),0))
 	reps['Existing Diesel (kW)'].append(round(sum(reps['Existing Diesel (kW)']),0))
 	reps['New Diesel (kW)'].append(round(sum(reps['New Diesel (kW)']),0))
 	reps['Diesel Fuel Used During Outage (gal)'].append(round(sum(reps['Diesel Fuel Used During Outage (gal)']),0))
@@ -1111,16 +1141,18 @@ def summary_stats(reps):
 	return(reps)
 
 def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, DIESEL_SAFETY_FACTOR, FAULTED_LINE, mg_name, open_results=True):
-	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, microgrid)
+	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_NAME, microgrid)
+	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, microgrid, critical_load_percent)
 	
 	# to run microgridup with automatic feedback loop to update diesel size, include the following:
-	net_load = max_net_load('/allOutputData.json', REOPT_FOLDER_BASE)
-	diesel_total_calc = diesel_sizing('/allOutputData.json',REOPT_FOLDER_BASE, DIESEL_SAFETY_FACTOR, net_load)
-	feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, microgrid, diesel_total_calc)
+	# net_load = max_net_load('/allOutputData.json', REOPT_FOLDER_BASE)
+	# diesel_total_calc = diesel_sizing('/allOutputData.json',REOPT_FOLDER_BASE, DIESEL_SAFETY_FACTOR, net_load)
+	# feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, microgrid, diesel_total_calc, critical_load_percent)
 	
-	# to run microgridup without automated diesel updates nor feedback loop, specify REOPT_FOLDER_BASE instead of REOPT_FOLDER_FINAL in build_new_gen_ob_and_shape(), microgrid_report_csv(), and microgrid_report_list_of_dicts() and out = template.render() below
-	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, diesel_total_calc=False)
-	gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL)
+	# to run microgridup without automated diesel updates nor feedback loop, specify REOPT_FOLDER_BASE instead of REOPT_FOLDER_FINAL in build_new_gen_ob_and_shape(), microgrid_report_csv(), and microgrid_report_list_of_dicts(), the last argument of gen_existing_ref_shapes() and out = template.render() below
+	# to run mgup with automated diesel updates, change the references back to REOPT_FOLDER_FINAL
+	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_BASE, GEN_NAME, microgrid, BASE_NAME, mg_name, diesel_total_calc=False)
+	gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_BASE)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, microgrid)
 	dssConvert.dssToOmd(FULL_NAME, OMD_NAME, RADIUS=0.0002)
 	# Draw the circuit oneline.
@@ -1151,8 +1183,8 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	# Perform control sim.
 
 	microgridup_control.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, FAULTED_LINE, False, 60, 120, 30) #TODO: calculate 'max_potential_battery' and other mg parameters specific to microgrid_control.py on the fly from the outputs of REopt
-	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, diesel_total_calc=False)
-	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, diesel_total_calc=False)
+	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_BASE, microgrid, mg_name, max_crit_load, diesel_total_calc=False)
+	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_BASE, microgrid, mg_name, max_crit_load, diesel_total_calc=False)
 	# convert mg_list_of_dicts_full to dict of lists for columnar output in output_template.html
 	mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
 	# Create giant consolidated report.
@@ -1162,7 +1194,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 		y='Matt',
 		summary=mg_dict_of_lists_full,
 		inputs={'circuit':BASE_NAME,'loads':LOAD_NAME,'REopt inputs':REOPT_INPUTS,'microgrid':microgrid},
-		reopt_folders=[REOPT_FOLDER_FINAL]
+		reopt_folders=[REOPT_FOLDER_BASE]
 	)
 	#TODO: have an option where we make the template <iframe srcdoc="{{X}}"> to embed the html and create a single file.
 	with open(BIG_OUT_NAME,'w') as outFile:

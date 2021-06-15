@@ -8,7 +8,7 @@ if __name__ == '__main__':
 	LOAD_CSV = 'lehigh_load.csv'
 	FAULTED_LINE = '670671'
 	QSTS_STEPS = 24*20
-	DIESEL_SAFETY_FACTOR = .2
+	DIESEL_SAFETY_FACTOR = 0
 	REOPT_INPUTS = {
 		"solar" : "on",
 		"wind" : "off",
@@ -33,7 +33,7 @@ if __name__ == '__main__':
 		"dieselMax": "1000000",
 		"solarExisting": 0,
 		"criticalLoadFactor": "1",
-		#"outage_start_hour": "200",
+		# "outage_start_hour": "200",
 		"outageDuration": "48",
 		"fuelAvailable": "50000",
 		"genExisting": 0,
@@ -41,7 +41,7 @@ if __name__ == '__main__':
 		"batteryKwExisting": 0,
 		"batteryKwhExisting": 0,
 		"windExisting": 0,
-		"value_of_lost_load": "100",
+		"value_of_lost_load": "1",
 		"solarCanCurtail": True,
 		"solarCanExport": True
 	}
@@ -51,6 +51,7 @@ if __name__ == '__main__':
 			'switch': '632633',
 			'gen_bus': '634',
 			'gen_obs_existing': ['solar_634_existing','battery_634_existing'],
+			'critical_load_kws': [70,100],
 			'max_potential_battery': '700', # total kW rating on 634 bus is 500 kW
 			'max_potential_diesel': '1000000',
 			'battery_capacity': '10000'
@@ -60,6 +61,7 @@ if __name__ == '__main__':
 			'switch': '671692',
 			'gen_bus': '675',
 			'gen_obs_existing': ['solar_675_existing'],
+			'critical_load_kws': [150,200,200],
 			'max_potential_battery': '100', # total kW rating on 675 bus is 843 kW
 			'max_potential_diesel': '900',
 			'battery_capacity': '2000'
@@ -69,6 +71,7 @@ if __name__ == '__main__':
 			'switch': '632645',
 			'gen_bus': '646',
 			'gen_obs_existing': [],
+			'critical_load_kws': [30,20,50],
 			'max_potential_battery': '800', # total kW rating on 645 and 646 is 400 kW
 			'max_potential_diesel': '1000000',
 			'battery_capacity': '10000'

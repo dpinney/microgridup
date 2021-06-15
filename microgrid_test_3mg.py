@@ -51,7 +51,7 @@ if __name__ == '__main__':
 			'switch': '632633',
 			'gen_bus': '634',
 			'gen_obs_existing': ['solar_634_existing','battery_634_existing'],
-			'critical_load_kws': [70,100],
+			'critical_load_kws': [70,90,10],
 			'max_potential_battery': '700', # total kW rating on 634 bus is 500 kW
 			'max_potential_diesel': '1000000',
 			'battery_capacity': '10000'
@@ -71,7 +71,7 @@ if __name__ == '__main__':
 			'switch': '632645',
 			'gen_bus': '646',
 			'gen_obs_existing': [],
-			'critical_load_kws': [30,20,50],
+			'critical_load_kws': [30,70],
 			'max_potential_battery': '800', # total kW rating on 645 and 646 is 400 kW
 			'max_potential_diesel': '1000000',
 			'battery_capacity': '10000'

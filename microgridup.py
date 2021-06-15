@@ -1229,7 +1229,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_
 	# Build Final report
 	reports = [x for x in os.listdir('.') if x.startswith('ultimate_rep_')]
 	reports.sort()
-	reopt_folders = [x for x in os.listdir('.') if x.startswith('reopt_final_')]
+	reopt_folders = [x for x in os.listdir('.') if x.startswith('reopt_base_')]
 	reopt_folders.sort()
 	reps = pd.concat([pd.read_csv(x) for x in reports]).to_dict(orient='list')
 	stats = summary_stats(reps)

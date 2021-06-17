@@ -1288,5 +1288,9 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, DIESE
 		outFile.write(out)
 	os.system(f'open {FINAL_REPORT}')
 
+def _tests():
+	pass
+
 if __name__ == '__main__':
+	# _tests()
 	print('No Inputs Received')

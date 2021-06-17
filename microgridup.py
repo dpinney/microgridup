@@ -28,9 +28,10 @@ def _getByName(tree, name):
                 matches.append(x)
     return matches[0]
 
-def set_critical_load_percent(LOAD_NAME, microgrid):
-	''' Set the critical load percent for REopt by finding the ratio
-	of max critical load kws to the max load found in the loadshape of that mg'''
+def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
+	''' Set the critical load percent input for REopt 
+	by finding the ratio of max critical load kws 
+	to the max kw of the loadshape of that mg'''
 	load_df = pd.read_csv(LOAD_NAME)
 	mg_load_df = pd.DataFrame()
 	loads = microgrid['loads']
@@ -44,13 +45,38 @@ def set_critical_load_percent(LOAD_NAME, microgrid):
 	# add up all max kws from critical loads to support during an outage
 	max_crit_load = sum(microgrid['critical_load_kws'])
 	# print("max_crit_load:", max_crit_load)
+	if max_crit_load > max_load:
+		max_crit_load = max_load
+		warning_message = f'The critical loads supplied for microgrid {mg_name} are greater than the max kw of the total loadshape. Critical load has been set to 100% of total load for {mg_name}.\n'
+		print(warning_message)
+		with open("user_warnings.txt", "a") as myfile:
+			myfile.write(warning_message)
 
 	critical_load_percent = max_crit_load/max_load
 	# print('critical_load_percent:',critical_load_percent)
 	return critical_load_percent, max_crit_load
 
+def set_fossil_max_kw(FOSSIL_BACKUP_PERCENT, max_crit_load):
+	'''User-selected fossil generation backup as a 
+	maximum percentage of the critical load.
+	Range: 0-1, which needs to be checked on input 
+	TODO: Test assumption that setting 'dieselMax' 
+	in microgridDesign does not override behavior 
+	of 'genExisting' in reopt_gen_mg_specs()'''
+	
+	# to run REopt without diesel
+	if FOSSIL_BACKUP_PERCENT == 0:
+		fossil_max_kw = 0
+	# to run REopt to cost optimize with diesel in the mix
+	elif FOSSIL_BACKUP_PERCENT == 1:
+		fossil_max_kw = 100000
+	elif FOSSIL_BACKUP_PERCENT > 0 and FOSSIL_BACKUP_PERCENT < 1:
+		fossil_max_kw = FOSSIL_BACKUP_PERCENT*max_crit_load
+	print("fossil_max_kw:", fossil_max_kw)
+	return fossil_max_kw
 
-def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid, critical_load_percent):
+
+def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load):
 	''' Generate the microgrid specs with REOpt.
 	SIDE-EFFECTS: generates REOPT_FOLDER'''
 	load_df = pd.read_csv(LOAD_NAME)
@@ -156,6 +182,14 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 			allInputData['wind'] = 'on' #failsafe to include wind if found in base_dss
 			 # To Do: update logic if windMin, windExisting and other generation variables are enabled to be set by the user as inputs
 		
+		#To Do: Test that dieselMax = 0 is passed to REopt if both diesel_max_kw and sum(diesel_kw_exist) == 0
+		# Set max fossil kw used to support critical load
+		diesel_max_kw = set_fossil_max_kw(FOSSIL_BACKUP_PERCENT, max_crit_load)
+		if diesel_max_kw <= sum(diesel_kw_exist):
+			allInputData['dieselMax'] = str(sum(diesel_kw_exist))	
+		elif diesel_max_kw > sum(diesel_kw_exist):
+			allInputData['dieselMax'] = diesel_max_kw
+
 		# enable following 9 lines when using gen_existing_ref_shapes()
 		# if not already turned on, set solar and wind on to 10 kw to provide loadshapes for existing gen in make_full_dss()
 		if allInputData['wind'] == 'off':
@@ -219,7 +253,8 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 	gen_sizes = {}
 	'''	Notes: Existing solar and diesel are supported natively in REopt.
 		diesel_total_calc is used to set the total amount of diesel generation.
-		Existing wind and batteries require setting the minimimum generation threshold (windMin, batteryPowerMin, batteryCapacityMin) in REopt'''
+		Existing wind and batteries require setting the minimimum generation threshold (windMin, batteryPowerMin, batteryCapacityMin) 
+		explicitly to the existing generator sizes in REopt'''
 	solar_size_total = reopt_out.get(f'sizePV{mg_num}', 0.0)
 	solar_size_existing = reopt_out.get(f'sizePVExisting{mg_num}', 0.0)
 	solar_size_new = solar_size_total - solar_size_existing
@@ -619,7 +654,6 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 			if battery_pow_new > 0:
 				# print("build_new_gen() storage 4", gen_ob_existing)
 				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(np.zeros(8760))
-				#TODO: collect this print statement as a warning in the output_template.html 
 				warning_message = f'Pre-existing battery {gen_ob_existing} will not be utilized to support loads in microgrid {mg_name}.\n'
 				print(warning_message)
 				with open("user_warnings.txt", "a") as myfile:
@@ -1140,9 +1174,9 @@ def summary_stats(reps):
 		reps['Average Outage Survived (h)'].append(None)
 	return(reps)
 
-def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, DIESEL_SAFETY_FACTOR, FAULTED_LINE, mg_name, open_results=True):
-	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_NAME, microgrid)
-	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, microgrid, critical_load_percent)
+def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, DIESEL_SAFETY_FACTOR, FAULTED_LINE, mg_name, FOSSIL_BACKUP_PERCENT, open_results=True):
+	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_NAME, microgrid, mg_name)
+	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load)
 	
 	# to run microgridup with automatic feedback loop to update diesel size, include the following:
 	# net_load = max_net_load('/allOutputData.json', REOPT_FOLDER_BASE)
@@ -1202,7 +1236,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	if open_results:
 		os.system(f'open {BIG_OUT_NAME}')
 
-def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE):
+def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE):
 	# CONSTANTS
 	MODEL_DSS = 'circuit.dss'
 	MODEL_LOAD_CSV = 'loads.csv'
@@ -1225,7 +1259,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_
 	mgs_name_sorted = sorted(MICROGRIDS.keys())
 	for i, mg_name in enumerate(mgs_name_sorted):
 		BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
-		main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], MICROGRIDS, GEN_NAME, REF_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, DIESEL_SAFETY_FACTOR, FAULTED_LINE, mg_name, open_results=False)
+		main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], MICROGRIDS, GEN_NAME, REF_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, DIESEL_SAFETY_FACTOR, FAULTED_LINE, mg_name, FOSSIL_BACKUP_PERCENT, open_results=False)
 	# Build Final report
 	reports = [x for x in os.listdir('.') if x.startswith('ultimate_rep_')]
 	reports.sort()

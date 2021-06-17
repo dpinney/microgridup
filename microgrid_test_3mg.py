@@ -8,6 +8,7 @@ if __name__ == '__main__':
 	LOAD_CSV = 'lehigh_load.csv'
 	FAULTED_LINE = '670671'
 	QSTS_STEPS = 24*20
+	FOSSIL_BACKUP_PERCENT = .01
 	DIESEL_SAFETY_FACTOR = 0
 	REOPT_INPUTS = {
 		"solar" : "on",
@@ -51,7 +52,7 @@ if __name__ == '__main__':
 			'switch': '632633',
 			'gen_bus': '634',
 			'gen_obs_existing': ['solar_634_existing','battery_634_existing'],
-			'critical_load_kws': [70,90,10],
+			'critical_load_kws': [70,90,10,300],
 			'max_potential_battery': '700', # total kW rating on 634 bus is 500 kW
 			'max_potential_diesel': '1000000',
 			'battery_capacity': '10000'
@@ -78,4 +79,4 @@ if __name__ == '__main__':
 		}
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE)

@@ -8,7 +8,8 @@ if __name__ == '__main__':
 	LOAD_CSV = 'lehigh_load.csv'
 	FAULTED_LINE = '670671'
 	QSTS_STEPS = 24*20
-	DIESEL_SAFETY_FACTOR = 0
+	FOSSIL_BACKUP_PERCENT = .5
+	DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth 
 	REOPT_INPUTS = {
 		"solar" : "on",
 		"wind" : "off",
@@ -78,4 +79,4 @@ if __name__ == '__main__':
 		}
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE)

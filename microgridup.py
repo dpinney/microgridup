@@ -46,8 +46,7 @@ def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
 	max_crit_load = sum(microgrid['critical_load_kws'])
 	# print("max_crit_load:", max_crit_load)
 	if max_crit_load > max_load:
-		max_crit_load = max_load
-		warning_message = f'The critical loads supplied for microgrid {mg_name} are greater than the max kw of the total loadshape. Critical load has been set to 100% of total load for {mg_name}.\n'
+		warning_message = f'The critical loads specified for microgrid {mg_name} are larger than the max kw of the total loadshape.\n'
 		print(warning_message)
 		with open("user_warnings.txt", "a") as myfile:
 			myfile.write(warning_message)
@@ -252,7 +251,7 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 	mg_num = 1
 	gen_sizes = {}
 	'''	Notes: Existing solar and diesel are supported natively in REopt.
-		diesel_total_calc is used to set the total amount of diesel generation.
+		If turned on, diesel_total_calc is used to set the total amount of diesel generation.
 		Existing wind and batteries require setting the minimimum generation threshold (windMin, batteryPowerMin, batteryCapacityMin) 
 		explicitly to the existing generator sizes in REopt'''
 	solar_size_total = reopt_out.get(f'sizePV{mg_num}', 0.0)
@@ -296,7 +295,7 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 		'battery_pow_total':battery_pow_total, 'battery_pow_existing':battery_pow_existing, 'battery_pow_new':battery_pow_new})
 	return gen_sizes #dictionary of all gen sizes
 
-def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, microgrid, diesel_total_calc, critical_load_percent):
+def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, microgrid, critical_load_percent, diesel_total_calc=False):
 	'''Update max and min generator sizes based on get_gen_ob_from_reopt() and rerun REopt
 	SIDE-EFFECTS: generates second REOPT_FOLDER'''
 	load_df = pd.read_csv(LOAD_NAME)
@@ -359,7 +358,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 				allInputData['longitude'] = float(ob_long)
 
 		# Update all generator specifications in the microgrid to match outputs of REOPT_FOLDER_BASE
-		gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER_BASE, diesel_total_calc=diesel_total_calc)
+		gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER_BASE, diesel_total_calc=False)
 		# HACK: comment out the next two lines to turn up Solar quickly for Picatinny analysis
 		solar_size_total = gen_sizes.get('solar_size_total')
 		solar_size_new = gen_sizes.get('solar_size_new')
@@ -984,10 +983,10 @@ def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_st
 
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
-def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, diesel_total_calc):
+def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, diesel_total_calc=False):
 	''' Generate a report on each microgrid '''
 	reopt_out = json.load(open(REOPT_FOLDER + inputName))
-	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=diesel_total_calc)
+	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False)
 	solar_size_total = gen_sizes.get('solar_size_total')
 	solar_size_new = gen_sizes.get('solar_size_new')
 	solar_size_existing = gen_sizes.get('solar_size_existing')
@@ -1007,11 +1006,11 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 	with open(outputCsvName, 'w', newline='') as outcsv:
 		writer = csv.writer(outcsv)
 		writer.writerow(["Microgrid Name", "Generation Bus", "Minimum 1 hr Load (kW)", "Average 1 hr Load (kW)",
-							"Average Daytime 1 hr Load (kW)", "Maximum 1 hr Load (kW)", "Maximum 1 hr Critical Load (kW)", "Existing Diesel (kW)", "New Diesel (kW)",
+							"Average Daytime 1 hr Load (kW)", "Maximum 1 hr Load (kW)", "Maximum 1 hr Critical Load (kW)", "Existing Fossil Generation (kW)", "New Fossil Generation (kW)",
 							"Diesel Fuel Used During Outage (gal)", "Existing Solar (kW)", "New Solar (kW)", 
-							"Existing Battery Power (kW)", "New Battery Power (kW)", "Existing Battery Energy Storage (kWh)", 
+							"Existing Battery Power (kW)", "Existing Battery Energy Storage (kWh)", "New Battery Power (kW)",
 							"New Battery Energy Storage (kWh)", "Existing Wind (kW)", "New Wind (kW)", 
-							"Total Generation on Grid (kW)", "NPV over 25 years ($)", "CapEx ($)", "CapEx after Incentives ($)", 
+							"Total Generation on Microgrid (kW)", "NPV over 25 years ($)", "CapEx ($)", "CapEx after Incentives ($)", 
 							"Average Outage Survived (h)"])
 		mg_num = 1 # mg_num refers to the key suffix in allOutputData.json from reopt folder
 		mg_ob = microgrid
@@ -1022,7 +1021,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		np_load = np.array_split(load, 365)
 		np_load = np.array(np_load) #a flattened array of 365 arrays of 24 hours each
 		daytime_kwh = np_load[:,9:17] #365 8-hour daytime arrays
-		avg_daytime_load = np.average(np.average(daytime_kwh, axis=1))
+		avg_daytime_load = round(np.average(np.average(daytime_kwh, axis=1)))
 		max_load = max(load)
 		max_crit_load = max_crit_load
 		diesel_used_gal =reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0)
@@ -1054,16 +1053,16 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 			ave_outage = int(round(ave_outage))
 		
 		row =[str(mg_name), gen_bus_name, round(min_load), round(ave_load), round(avg_daytime_load), round(max_load), round(max_crit_load),
-		round(diesel_size_existing,1), round(diesel_size_new,1), round(diesel_used_gal, 0), round(solar_size_existing,1), 
-		round(solar_size_new,1), round(battery_pow_existing,1), round(battery_pow_new,1), round(battery_cap_existing,1), 
-		round(battery_cap_new,1), round(wind_size_existing,1), round(wind_size_new,1), round(total_gen,1),
+		round(diesel_size_existing), round(diesel_size_new), round(diesel_used_gal), round(solar_size_existing), 
+		round(solar_size_new), round(battery_pow_existing), round(battery_cap_existing), round(battery_pow_new),
+		round(battery_cap_new), round(wind_size_existing), round(wind_size_new), round(total_gen),
 		int(round(npv)), int(round(cap_ex_existing_gen_adj)), int(round(cap_ex_after_incentives)),ave_outage]
 		writer.writerow(row)
 
-def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, diesel_total_calc):
+def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, diesel_total_calc=False):
 	''' Generate a dictionary reports fr each key for all microgrids. '''
 	reopt_out = json.load(open(REOPT_FOLDER + inputName))
-	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=diesel_total_calc)
+	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False)
 	solar_size_total = gen_sizes.get('solar_size_total')
 	solar_size_new = gen_sizes.get('solar_size_new')
 	solar_size_existing = gen_sizes.get('solar_size_existing')
@@ -1087,28 +1086,28 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	mg_dict["Microgrid Name"] = str(mg_name)
 	mg_dict["Generation Bus"] = mg_ob['gen_bus']
 	load = reopt_out.get(f'load1', 0.0)
-	mg_dict["Minimum 1 hr Load (kW)"] = round(min(load),0)
-	mg_dict["Average 1 hr Load (kW)"] = round(sum(load)/len(load),0)
+	mg_dict["Minimum 1 hr Load (kW)"] = round(min(load))
+	mg_dict["Average 1 hr Load (kW)"] = round(sum(load)/len(load))
 	# build the average daytime load
 	np_load = np.array_split(load, 365)
 	np_load = np.array(np_load) #a flattened array of 365 arrays of 24 hours each
 	daytime_kwh = np_load[:,9:17] #365 8-hour daytime arrays
-	mg_dict["Average Daytime 1 hr Load (kW)"] = round(np.average(np.average(daytime_kwh, axis=1)),0)
-	mg_dict["Maximum 1 hr Load (kW)"] = round(max(load),0)
-	mg_dict["Maximum 1 hr Critical Load (kW)"] = round(max_crit_load,0)
-	mg_dict["Existing Diesel (kW)"] = round(diesel_size_existing,0)
-	mg_dict["New Diesel (kW)"] = round(diesel_size_new,0)
-	mg_dict["Diesel Fuel Used During Outage (gal)"] = round(reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0),0)
-	mg_dict["Existing Solar (kW)"] = round(solar_size_existing ,0)
-	mg_dict["New Solar (kW)"] = round(solar_size_total - solar_size_existing,0)
-	mg_dict["Existing Battery Power (kW)"] = round(battery_pow_existing,0)
-	mg_dict["New Battery Power (kW)"] = round(battery_pow_new,0)
-	mg_dict["Existing Battery Energy Storage (kWh)"] = round(battery_cap_existing,0)
-	mg_dict["New Battery Energy Storage (kWh)"] = round(battery_cap_new,0)
-	mg_dict["Existing Wind (kW)"] = round(wind_size_existing,0)
-	mg_dict["New Wind (kW)"] = round(wind_size_new,0)
+	mg_dict["Average Daytime 1 hr Load (kW)"] = round(np.average(np.average(daytime_kwh, axis=1)))
+	mg_dict["Maximum 1 hr Load (kW)"] = round(max(load))
+	mg_dict["Maximum 1 hr Critical Load (kW)"] = round(max_crit_load)
+	mg_dict["Existing Fossil Generation (kW)"] = round(diesel_size_existing)
+	mg_dict["New Fossil Generation (kW)"] = round(diesel_size_new)
+	mg_dict["Diesel Fuel Used During Outage (gal)"] = round(reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0))
+	mg_dict["Existing Solar (kW)"] = round(solar_size_existing)
+	mg_dict["New Solar (kW)"] = round(solar_size_total - solar_size_existing)
+	mg_dict["Existing Battery Power (kW)"] = round(battery_pow_existing)
+	mg_dict["Existing Battery Energy Storage (kWh)"] = round(battery_cap_existing)
+	mg_dict["New Battery Power (kW)"] = round(battery_pow_new)
+	mg_dict["New Battery Energy Storage (kWh)"] = round(battery_cap_new)
+	mg_dict["Existing Wind (kW)"] = round(wind_size_existing)
+	mg_dict["New Wind (kW)"] = round(wind_size_new)
 	total_gen = diesel_size_total + solar_size_total + battery_pow_total + wind_size_total
-	mg_dict["Total Generation on Grid (kW)"] = round(total_gen,0)
+	mg_dict["Total Generation on Microgrid (kW)"] = round(total_gen)
 	npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
 	cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
 	cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
@@ -1148,23 +1147,23 @@ def summary_stats(reps):
 
 	reps['Microgrid Name'].append('Summary')
 	reps['Generation Bus'].append('None')
-	reps['Minimum 1 hr Load (kW)'].append(round(sum(reps['Minimum 1 hr Load (kW)']),0))
-	reps['Average 1 hr Load (kW)'].append(round(sum(reps['Average 1 hr Load (kW)']),0))
-	reps['Average Daytime 1 hr Load (kW)'].append(round(sum(reps['Average Daytime 1 hr Load (kW)']),0))
-	reps['Maximum 1 hr Load (kW)'].append(round(sum(reps['Maximum 1 hr Load (kW)']),0))
-	reps['Maximum 1 hr Critical Load (kW)'].append(round(sum(reps['Maximum 1 hr Critical Load (kW)']),0))
-	reps['Existing Diesel (kW)'].append(round(sum(reps['Existing Diesel (kW)']),0))
-	reps['New Diesel (kW)'].append(round(sum(reps['New Diesel (kW)']),0))
-	reps['Diesel Fuel Used During Outage (gal)'].append(round(sum(reps['Diesel Fuel Used During Outage (gal)']),0))
-	reps['Existing Solar (kW)'].append(round(sum(reps['Existing Solar (kW)']),0))
-	reps['New Solar (kW)'].append(round(sum(reps['New Solar (kW)']),0))
-	reps['Existing Battery Power (kW)'].append(round(sum(reps['Existing Battery Power (kW)']),0))
-	reps['New Battery Power (kW)'].append(round(sum(reps['New Battery Power (kW)']),0))
-	reps['Existing Battery Energy Storage (kWh)'].append(round(sum(reps['Existing Battery Energy Storage (kWh)']),0))
-	reps['New Battery Energy Storage (kWh)'].append(round(sum(reps['New Battery Energy Storage (kWh)']),0))
-	reps['Existing Wind (kW)'].append(round(sum(reps['Existing Wind (kW)']),0))
-	reps['New Wind (kW)'].append(round(sum(reps['New Wind (kW)']),0))
-	reps['Total Generation on Grid (kW)'].append(round(sum(reps['Total Generation on Grid (kW)']),0))
+	reps['Minimum 1 hr Load (kW)'].append(round(sum(reps['Minimum 1 hr Load (kW)'])))
+	reps['Average 1 hr Load (kW)'].append(round(sum(reps['Average 1 hr Load (kW)'])))
+	reps['Average Daytime 1 hr Load (kW)'].append(round(sum(reps['Average Daytime 1 hr Load (kW)'])))
+	reps['Maximum 1 hr Load (kW)'].append(round(sum(reps['Maximum 1 hr Load (kW)'])))
+	reps['Maximum 1 hr Critical Load (kW)'].append(round(sum(reps['Maximum 1 hr Critical Load (kW)'])))
+	reps['Existing Fossil Generation (kW)'].append(round(sum(reps['Existing Fossil Generation (kW)'])))
+	reps['New Fossil Generation (kW)'].append(round(sum(reps['New Fossil Generation (kW)'])))
+	reps['Diesel Fuel Used During Outage (gal)'].append(round(sum(reps['Diesel Fuel Used During Outage (gal)'])))
+	reps['Existing Solar (kW)'].append(round(sum(reps['Existing Solar (kW)'])))
+	reps['New Solar (kW)'].append(round(sum(reps['New Solar (kW)'])))
+	reps['Existing Battery Power (kW)'].append(round(sum(reps['Existing Battery Power (kW)'])))
+	reps['Existing Battery Energy Storage (kWh)'].append(round(sum(reps['Existing Battery Energy Storage (kWh)'])))
+	reps['New Battery Power (kW)'].append(round(sum(reps['New Battery Power (kW)'])))
+	reps['New Battery Energy Storage (kWh)'].append(round(sum(reps['New Battery Energy Storage (kWh)'])))
+	reps['Existing Wind (kW)'].append(round(sum(reps['Existing Wind (kW)'])))
+	reps['New Wind (kW)'].append(round(sum(reps['New Wind (kW)'])))
+	reps['Total Generation on Microgrid (kW)'].append(round(sum(reps['Total Generation on Microgrid (kW)'])))
 	reps['NPV over 25 years ($)'].append(sum(reps['NPV over 25 years ($)']))
 	reps['CapEx ($)'].append(sum(reps['CapEx ($)']))
 	reps['CapEx after Incentives ($)'].append(sum(reps['CapEx after Incentives ($)']))
@@ -1181,12 +1180,12 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	# to run microgridup with automatic feedback loop to update diesel size, include the following:
 	# net_load = max_net_load('/allOutputData.json', REOPT_FOLDER_BASE)
 	# diesel_total_calc = diesel_sizing('/allOutputData.json',REOPT_FOLDER_BASE, DIESEL_SAFETY_FACTOR, net_load)
-	# feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, microgrid, diesel_total_calc, critical_load_percent)
+	feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, microgrid, critical_load_percent, diesel_total_calc=False )
 	
-	# to run microgridup without automated diesel updates nor feedback loop, specify REOPT_FOLDER_BASE instead of REOPT_FOLDER_FINAL in build_new_gen_ob_and_shape(), microgrid_report_csv(), and microgrid_report_list_of_dicts(), the last argument of gen_existing_ref_shapes() and out = template.render() below
+	# to run microgridup without automated diesel updates nor feedback loop, specify REOPT_FOLDER_BASE instead of REOPT_FOLDER_FINAL in build_new_gen_ob_and_shape(), microgrid_report_csv(), and microgrid_report_list_of_dicts(), the last argument of gen_existing_ref_shapes() and out = template.render() below, as well as reopt_folders to pull from _final_ in full()
 	# to run mgup with automated diesel updates, change the references back to REOPT_FOLDER_FINAL
-	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_BASE, GEN_NAME, microgrid, BASE_NAME, mg_name, diesel_total_calc=False)
-	gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_BASE)
+	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, diesel_total_calc=False)
+	gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, microgrid)
 	dssConvert.dssToOmd(FULL_NAME, OMD_NAME, RADIUS=0.0002)
 	# Draw the circuit oneline.
@@ -1215,10 +1214,12 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	make_chart('timeseries_source.csv', FULL_NAME, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Voltage Source Output", "kW per hour")
 	make_chart('timeseries_control.csv', FULL_NAME, 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS, "Tap Position", "PU")
 	# Perform control sim.
-
-	microgridup_control.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, FAULTED_LINE, False, 60, 120, 30) #TODO: calculate 'max_potential_battery' and other mg parameters specific to microgrid_control.py on the fly from the outputs of REopt
-	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_BASE, microgrid, mg_name, max_crit_load, diesel_total_calc=False)
-	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_BASE, microgrid, mg_name, max_crit_load, diesel_total_calc=False)
+	try:
+		microgridup_control.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, FAULTED_LINE, False, 60, 120, 30) #TODO: calculate 'max_potential_battery' and other mg parameters specific to microgrid_control.py on the fly from the outputs of REopt
+	except:
+		print("microgridup_control.play() did not process")
+	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, diesel_total_calc=False)
+	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, diesel_total_calc=False)
 	# convert mg_list_of_dicts_full to dict of lists for columnar output in output_template.html
 	mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
 	# Create giant consolidated report.
@@ -1228,7 +1229,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 		y='Matt',
 		summary=mg_dict_of_lists_full,
 		inputs={'circuit':BASE_NAME,'loads':LOAD_NAME,'REopt inputs':REOPT_INPUTS,'microgrid':microgrid},
-		reopt_folders=[REOPT_FOLDER_BASE]
+		reopt_folders=[REOPT_FOLDER_FINAL]
 	)
 	#TODO: have an option where we make the template <iframe srcdoc="{{X}}"> to embed the html and create a single file.
 	with open(BIG_OUT_NAME,'w') as outFile:
@@ -1263,7 +1264,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, DIESE
 	# Build Final report
 	reports = [x for x in os.listdir('.') if x.startswith('ultimate_rep_')]
 	reports.sort()
-	reopt_folders = [x for x in os.listdir('.') if x.startswith('reopt_base_')]
+	reopt_folders = [x for x in os.listdir('.') if x.startswith('reopt_final_')]
 	reopt_folders.sort()
 	reps = pd.concat([pd.read_csv(x) for x in reports]).to_dict(orient='list')
 	stats = summary_stats(reps)

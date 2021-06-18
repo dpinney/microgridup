@@ -26,15 +26,15 @@
 		<button onclick="openTab('interconnection')">Interconnection</button>
 		<button onclick="openTab('control')">Control</button>
 		
-			<button onclick="openTab('reopt_base_0')">reopt_base_0</button>
+			<button onclick="openTab('reopt_final_0')">reopt_final_0</button>
 		
-			<button onclick="openTab('reopt_base_1')">reopt_base_1</button>
+			<button onclick="openTab('reopt_final_1')">reopt_final_1</button>
 		
-			<button onclick="openTab('reopt_base_2')">reopt_base_2</button>
+			<button onclick="openTab('reopt_final_2')">reopt_final_2</button>
 		
 	</div>
 	<div id="overview" class="tab" style="margin:5px; overflow:scroll; visibility:visible">
-		<pre style="width:95%; white-space:pre-wrap">Report Generated on 2021-06-17 10:06:08.782074</pre>
+		<pre style="width:95%; white-space:pre-wrap">Report Generated on 2021-06-17 16:15:56.678422</pre>
 		<pre style="width:95%; white-space:pre-wrap">INPUTS: {'circuit': 'circuit_plusmg_1.dss', 'loads': 'lehigh_load.csv', 'REopt inputs': {'solar': 'on', 'wind': 'off', 'battery': 'on', 'year': '2017', 'energyCost': '0.12', 'demandCost': '20', 'wholesaleCost': '0.034', 'solarCost': '1600', 'windCost': '4989', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'dieselGenCost': '500', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '100000', 'windMax': '100000', 'batteryPowerMax': '1000000', 'batteryCapacityMax': '1000000', 'dieselMax': '1000000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outageDuration': '48', 'fuelAvailable': '50000', 'genExisting': 0, 'minGenLoading': '0.3', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'value_of_lost_load': '1', 'solarCanCurtail': True, 'solarCanExport': True}, 'microgrid': {'mg0': {'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'switch': '632633', 'gen_bus': '634', 'gen_obs_existing': ['solar_634_existing', 'battery_634_existing'], 'critical_load_kws': [70, 90, 10], 'max_potential_battery': '700', 'max_potential_diesel': '1000000', 'battery_capacity': '10000'}, 'mg1': {'loads': ['675a_hospital', '675b_residential1', '675c_residential1'], 'switch': '671692', 'gen_bus': '675', 'gen_obs_existing': ['solar_675_existing'], 'critical_load_kws': [150, 200, 200], 'max_potential_battery': '100', 'max_potential_diesel': '900', 'battery_capacity': '2000'}, 'mg2': {'loads': ['645_hangar', '646_office'], 'switch': '632645', 'gen_bus': '646', 'gen_obs_existing': [], 'critical_load_kws': [30, 70], 'max_potential_battery': '800', 'max_potential_diesel': '1000000', 'battery_capacity': '10000'}}}</pre>
 		<pre style="width:95%; white-space:pre-wrap">User Warnings:</pre>
 		<pre style="width:95%; white-space:pre-wrap">Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
@@ -143,7 +143,7 @@
 						
 					
 						
-							<td style="text-align:right">958.0</td>
+							<td style="text-align:right">958</td>
 						
 					
 				</tr>
@@ -191,43 +191,43 @@
 				</tr>
 			
 				<tr>
-					<td>Existing Diesel (kW)</td>
+					<td>Existing Fossil Generation (kW)</td>
 					
 						
-							<td style="text-align:right">0.0</td>
-						
-					
-						
-							<td style="text-align:right">0.0</td>
+							<td style="text-align:right">0</td>
 						
 					
 						
-							<td style="text-align:right">0.0</td>
+							<td style="text-align:right">0</td>
 						
 					
 						
-							<td style="text-align:right">0.0</td>
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
 						
 					
 				</tr>
 			
 				<tr>
-					<td>New Diesel (kW)</td>
+					<td>New Fossil Generation (kW)</td>
 					
 						
-							<td style="text-align:right">60.6</td>
-						
-					
-						
-							<td style="text-align:right">275.0</td>
+							<td style="text-align:right">61</td>
 						
 					
 						
-							<td style="text-align:right">13.6</td>
+							<td style="text-align:right">275</td>
 						
 					
 						
-							<td style="text-align:right">349.0</td>
+							<td style="text-align:right">14</td>
+						
+					
+						
+							<td style="text-align:right">350</td>
 						
 					
 				</tr>
@@ -236,19 +236,19 @@
 					<td>Diesel Fuel Used During Outage (gal)</td>
 					
 						
-							<td style="text-align:right">153.0</td>
+							<td style="text-align:right">153</td>
 						
 					
 						
-							<td style="text-align:right">842.0</td>
+							<td style="text-align:right">842</td>
 						
 					
 						
-							<td style="text-align:right">19.0</td>
+							<td style="text-align:right">19</td>
 						
 					
 						
-							<td style="text-align:right">1,014.0</td>
+							<td style="text-align:right">1,014</td>
 						
 					
 				</tr>
@@ -257,19 +257,19 @@
 					<td>Existing Solar (kW)</td>
 					
 						
-							<td style="text-align:right">440.0</td>
+							<td style="text-align:right">440</td>
 						
 					
 						
-							<td style="text-align:right">800.0</td>
+							<td style="text-align:right">800</td>
 						
 					
 						
-							<td style="text-align:right">0.0</td>
+							<td style="text-align:right">0</td>
 						
 					
 						
-							<td style="text-align:right">1,240.0</td>
+							<td style="text-align:right">1,240</td>
 						
 					
 				</tr>
@@ -278,19 +278,19 @@
 					<td>New Solar (kW)</td>
 					
 						
-							<td style="text-align:right">191.1</td>
+							<td style="text-align:right">191</td>
 						
 					
 						
-							<td style="text-align:right">809.5</td>
+							<td style="text-align:right">810</td>
 						
 					
 						
-							<td style="text-align:right">648.5</td>
+							<td style="text-align:right">649</td>
 						
 					
 						
-							<td style="text-align:right">1,649.0</td>
+							<td style="text-align:right">1,650</td>
 						
 					
 				</tr>
@@ -299,40 +299,19 @@
 					<td>Existing Battery Power (kW)</td>
 					
 						
-							<td style="text-align:right">79.0</td>
+							<td style="text-align:right">0</td>
 						
 					
 						
-							<td style="text-align:right">0.0</td>
+							<td style="text-align:right">0</td>
 						
 					
 						
-							<td style="text-align:right">0.0</td>
+							<td style="text-align:right">0</td>
 						
 					
 						
-							<td style="text-align:right">79.0</td>
-						
-					
-				</tr>
-			
-				<tr>
-					<td>New Battery Power (kW)</td>
-					
-						
-							<td style="text-align:right">1.2</td>
-						
-					
-						
-							<td style="text-align:right">230.7</td>
-						
-					
-						
-							<td style="text-align:right">109.6</td>
-						
-					
-						
-							<td style="text-align:right">342.0</td>
+							<td style="text-align:right">0</td>
 						
 					
 				</tr>
@@ -341,19 +320,40 @@
 					<td>Existing Battery Energy Storage (kWh)</td>
 					
 						
-							<td style="text-align:right">307.0</td>
+							<td style="text-align:right">0</td>
 						
 					
 						
-							<td style="text-align:right">0.0</td>
+							<td style="text-align:right">0</td>
 						
 					
 						
-							<td style="text-align:right">0.0</td>
+							<td style="text-align:right">0</td>
 						
 					
 						
-							<td style="text-align:right">307.0</td>
+							<td style="text-align:right">0</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>New Battery Power (kW)</td>
+					
+						
+							<td style="text-align:right">80</td>
+						
+					
+						
+							<td style="text-align:right">231</td>
+						
+					
+						
+							<td style="text-align:right">110</td>
+						
+					
+						
+							<td style="text-align:right">421</td>
 						
 					
 				</tr>
@@ -362,19 +362,19 @@
 					<td>New Battery Energy Storage (kWh)</td>
 					
 						
-							<td style="text-align:right">0.0</td>
+							<td style="text-align:right">309</td>
 						
 					
 						
-							<td style="text-align:right">1,551.9</td>
+							<td style="text-align:right">1,555</td>
 						
 					
 						
-							<td style="text-align:right">260.4</td>
+							<td style="text-align:right">261</td>
 						
 					
 						
-							<td style="text-align:right">1,812.0</td>
+							<td style="text-align:right">2,125</td>
 						
 					
 				</tr>
@@ -383,19 +383,19 @@
 					<td>Existing Wind (kW)</td>
 					
 						
-							<td style="text-align:right">0.0</td>
+							<td style="text-align:right">0</td>
 						
 					
 						
-							<td style="text-align:right">0.0</td>
+							<td style="text-align:right">0</td>
 						
 					
 						
-							<td style="text-align:right">0.0</td>
+							<td style="text-align:right">0</td>
 						
 					
 						
-							<td style="text-align:right">0.0</td>
+							<td style="text-align:right">0</td>
 						
 					
 				</tr>
@@ -404,40 +404,40 @@
 					<td>New Wind (kW)</td>
 					
 						
-							<td style="text-align:right">1.0</td>
+							<td style="text-align:right">0</td>
 						
 					
 						
-							<td style="text-align:right">1.0</td>
+							<td style="text-align:right">0</td>
 						
 					
 						
-							<td style="text-align:right">1.0</td>
+							<td style="text-align:right">0</td>
 						
 					
 						
-							<td style="text-align:right">3.0</td>
+							<td style="text-align:right">0</td>
 						
 					
 				</tr>
 			
 				<tr>
-					<td>Total Generation on Grid (kW)</td>
+					<td>Total Generation on Microgrid (kW)</td>
 					
 						
-							<td style="text-align:right">773.0</td>
-						
-					
-						
-							<td style="text-align:right">2,116.2</td>
+							<td style="text-align:right">772</td>
 						
 					
 						
-							<td style="text-align:right">772.6</td>
+							<td style="text-align:right">2,115</td>
 						
 					
 						
-							<td style="text-align:right">3,662.0</td>
+							<td style="text-align:right">772</td>
+						
+					
+						
+							<td style="text-align:right">3,659</td>
 						
 					
 				</tr>
@@ -446,19 +446,19 @@
 					<td>NPV over 25 years ($)</td>
 					
 						
-							<td style="text-align:right">-18,178</td>
+							<td style="text-align:right">-17,412</td>
 						
 					
 						
-							<td style="text-align:right">-312,160</td>
+							<td style="text-align:right">-311,962</td>
 						
 					
 						
-							<td style="text-align:right">252,458</td>
+							<td style="text-align:right">253,377</td>
 						
 					
 						
-							<td style="text-align:right">-77,880</td>
+							<td style="text-align:right">-75,997</td>
 						
 					
 				</tr>
@@ -467,19 +467,19 @@
 					<td>CapEx ($)</td>
 					
 						
-							<td style="text-align:right">342,188</td>
+							<td style="text-align:right">533,209</td>
 						
 					
 						
-							<td style="text-align:right">2,283,286</td>
+							<td style="text-align:right">2,279,681</td>
 						
 					
 						
-							<td style="text-align:right">1,250,815</td>
+							<td style="text-align:right">1,246,166</td>
 						
 					
 						
-							<td style="text-align:right">3,876,289</td>
+							<td style="text-align:right">4,059,056</td>
 						
 					
 				</tr>
@@ -488,19 +488,19 @@
 					<td>CapEx after Incentives ($)</td>
 					
 						
-							<td style="text-align:right">350,946</td>
+							<td style="text-align:right">348,603</td>
 						
 					
 						
-							<td style="text-align:right">1,496,705</td>
+							<td style="text-align:right">1,494,874</td>
 						
 					
 						
-							<td style="text-align:right">734,519</td>
+							<td style="text-align:right">731,894</td>
 						
 					
 						
-							<td style="text-align:right">2,582,170</td>
+							<td style="text-align:right">2,575,371</td>
 						
 					
 				</tr>
@@ -551,16 +551,16 @@
 		</div>
 	</div>
 	
-	<div id="reopt_base_0" class="tab" style="visibility:hidden">
-		<iframe src="reopt_base_0/inlineTemplate.html" style="height:100vh"></iframe>
+	<div id="reopt_final_0" class="tab" style="visibility:hidden">
+		<iframe src="reopt_final_0/inlineTemplate.html" style="height:100vh"></iframe>
 	</div>
 	
-	<div id="reopt_base_1" class="tab" style="visibility:hidden">
-		<iframe src="reopt_base_1/inlineTemplate.html" style="height:100vh"></iframe>
+	<div id="reopt_final_1" class="tab" style="visibility:hidden">
+		<iframe src="reopt_final_1/inlineTemplate.html" style="height:100vh"></iframe>
 	</div>
 	
-	<div id="reopt_base_2" class="tab" style="visibility:hidden">
-		<iframe src="reopt_base_2/inlineTemplate.html" style="height:100vh"></iframe>
+	<div id="reopt_final_2" class="tab" style="visibility:hidden">
+		<iframe src="reopt_final_2/inlineTemplate.html" style="height:100vh"></iframe>
 	</div>
 	
 </body>

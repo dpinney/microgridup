@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>MicrogridUP</title>
+</head>
+<body style="margin:0px; height:30px">
+	<h1>MicrogridUP Design Tool</h1>
+	<h2>Load an Existing Analysis</h2>
+	{% for analysis in analyses %}
+		<p><a href='load/{{analysis}}'>{{analysis}}</a></p>
+	{% endfor %}
+	<h2>Create a New Analysis</h2>
+	<a href='/new'>New</a>
+</body>
+</html>

@@ -619,7 +619,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 			if battery_pow_new > 0:
 				# print("build_new_gen() storage 4", gen_ob_existing)
 				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(np.zeros(8760))
-				#TODO: collect this print statement as a warning in the output_template.html 
+				#TODO: collect this print statement as a warning in the template_output 
 				warning_message = f'Pre-existing battery {gen_ob_existing} will not be utilized to support loads in microgrid {mg_name}.\n'
 				print(warning_message)
 				with open("user_warnings.txt", "a") as myfile:
@@ -1185,10 +1185,10 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	microgridup_control.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, FAULTED_LINE, False, 60, 120, 30) #TODO: calculate 'max_potential_battery' and other mg parameters specific to microgrid_control.py on the fly from the outputs of REopt
 	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_BASE, microgrid, mg_name, max_crit_load, diesel_total_calc=False)
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_BASE, microgrid, mg_name, max_crit_load, diesel_total_calc=False)
-	# convert mg_list_of_dicts_full to dict of lists for columnar output in output_template.html
+	# convert mg_list_of_dicts_full to dict of lists for columnar output in template_output
 	mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
 	# Create giant consolidated report.
-	template = j2.Template(open(f'{MGU_FOLDER}/output_template.html').read())
+	template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
 	out = template.render(
 		x='Daniel, David',
 		y='Matt',
@@ -1239,7 +1239,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_
 		with open("user_warnings.txt") as myfile:
 			warnings = myfile.read()
 
-	template = j2.Template(open(f'{MGU_FOLDER}/output_template.html').read())
+	template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
 	out = template.render(
 		x='Daniel, David',
 		y='Matt',

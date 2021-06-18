@@ -1228,7 +1228,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 		x='Daniel, David',
 		y='Matt',
 		summary=mg_dict_of_lists_full,
-		inputs={'circuit':BASE_NAME,'loads':LOAD_NAME,'REopt inputs':REOPT_INPUTS,'microgrid':microgrid},
+		inputs={'circuit':BASE_NAME,'loads':LOAD_NAME, 'Maximum Proportion of critical load to be served by fossil generation':FOSSIL_BACKUP_PERCENT, 'REopt inputs':REOPT_INPUTS,'microgrid':microgrid},
 		reopt_folders=[REOPT_FOLDER_FINAL]
 	)
 	#TODO: have an option where we make the template <iframe srcdoc="{{X}}"> to embed the html and create a single file.
@@ -1280,7 +1280,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, DIESE
 		y='Matt',
 		now=current_time,
 		summary=stats,
-		inputs={'circuit':BASE_DSS,'loads':LOAD_CSV,'REopt inputs':REOPT_INPUTS,'microgrid':MICROGRIDS}, #TODO: Make the inputs clearer and maybe at the bottom, showing only the appropriate keys from MICROGRIDS as necessary
+		inputs={'circuit':BASE_DSS,'loads':LOAD_CSV, 'Maximum Proportion of critical load to be served by fossil generation':FOSSIL_BACKUP_PERCENT, 'REopt inputs':REOPT_INPUTS,'microgrid':MICROGRIDS}, #TODO: Make the inputs clearer and maybe at the bottom, showing only the appropriate keys from MICROGRIDS as necessary
 		reopt_folders=reopt_folders,
 		warnings = warnings
 	)

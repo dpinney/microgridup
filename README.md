@@ -12,7 +12,7 @@ Then, clone the microgripUp Github repo and run the setup file: 'python setup.py
 
 Test the code:
 
-`python microgrid_test_4mg.py`
+`python microgrid_test_3mg.py`
 
 Start the gui with:
 

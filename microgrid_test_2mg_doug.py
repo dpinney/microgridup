@@ -5,8 +5,10 @@ if __name__ == '__main__':
 	MODEL_DIR = 'lehigh_doug'
 	BASE_DSS = 'lehigh_base_phased.dss'
 	LOAD_CSV = 'lehigh_load.csv'
+	FAULTED_LINE = '670671'
 	QSTS_STEPS = 24*20
-	DIESEL_SAFETY_FACTOR = .2
+	FOSSIL_BACKUP_PERCENT = 1
+	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth
 	REOPT_INPUTS = {
 		"solar" : "on",
 		"wind" : "off",
@@ -31,7 +33,7 @@ if __name__ == '__main__':
 		"dieselMax": "1000000",
 		"solarExisting": 0,
 		"criticalLoadFactor": "1",
-		"outage_start_hour": "200",
+		# "outage_start_hour": "200",
 		"outageDuration": "48",
 		"fuelAvailable": "50000",
 		"genExisting": 0,
@@ -49,15 +51,19 @@ if __name__ == '__main__':
 			'switch': '632633',
 			'gen_bus': '634',
 			'gen_obs_existing': ['solar_634_existing', 'battery_634_existing'],
-			'max_potential': '700'
+			'max_potential': '700',
+			'max_potential_diesel': '1000000',
+			'battery_capacity': '10000'
 		},
 		'm1': {
 			'loads': ['675a_hospital','675b_residential1','675c_residential1'],
 			'switch': '671692',
 			'gen_bus': '675',
 			'gen_obs_existing': [],
-			'max_potential': '900'
+			'max_potential': '900',
+			'max_potential_diesel': '1000000',
+			'battery_capacity': '10000'
 		}
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, DIESEL_SAFETY_FACTOR, REOPT_INPUTS, MICROGRIDS)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE)

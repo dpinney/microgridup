@@ -1174,7 +1174,7 @@ def summary_stats(reps):
 		reps['Average Outage Survived (h)'].append(None)
 	return(reps)
 
-def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, DIESEL_SAFETY_FACTOR, FAULTED_LINE, mg_name, FOSSIL_BACKUP_PERCENT, open_results=True):
+def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, FAULTED_LINE, mg_name, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR = False, open_results=True):
 	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_NAME, microgrid, mg_name)
 	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load)
 	
@@ -1238,7 +1238,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	if open_results:
 		os.system(f'open {BIG_OUT_NAME}')
 
-def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE):
+def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, DIESEL_SAFETY_FACTOR = False):
 	# CONSTANTS
 	MODEL_DSS = 'circuit.dss'
 	MODEL_LOAD_CSV = 'loads.csv'
@@ -1261,7 +1261,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, DIESE
 	mgs_name_sorted = sorted(MICROGRIDS.keys())
 	for i, mg_name in enumerate(mgs_name_sorted):
 		BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
-		main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], MICROGRIDS, GEN_NAME, REF_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, DIESEL_SAFETY_FACTOR, FAULTED_LINE, mg_name, FOSSIL_BACKUP_PERCENT, open_results=False)
+		main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], MICROGRIDS, GEN_NAME, REF_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, FAULTED_LINE, mg_name, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR, open_results=False)
 	# Build Final report
 	reports = [x for x in os.listdir('.') if x.startswith('ultimate_rep_')]
 	reports.sort()

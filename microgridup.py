@@ -388,6 +388,9 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 		if solar_size_total == 1:
 			allInputData['solarMax'] = 0
 			allInputData['solar'] = 'off'
+			# Add in 1 extra kw of diesel to make sure no infeasible solution during final run of REopt for this mg
+			allInputData['dieselMax'] = diesel_size_total + 1
+			allInputData['dieselMin'] = diesel_size_total + 1
 		elif solar_size_total - solar_size_existing == 1:
 			allInputData['solarMin'] = 0
 			allInputData['solarMax'] = 0
@@ -436,6 +439,9 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 		elif wind_size_total == 1: # enable the elif condition when using gen_existing_ref_shapes()
 			allInputData['windMax'] = 0
 			allInputData['wind'] = 'off'
+			# Add in 1 extra kw of diesel to make sure no infeasible solution during final run of REopt for this mg
+			allInputData['dieselMax'] = diesel_size_total + 1
+			allInputData['dieselMin'] = diesel_size_total + 1
 
 		# run REopt via microgridDesign
 		with open(REOPT_FOLDER_FINAL + '/allInputData.json','w') as outfile:

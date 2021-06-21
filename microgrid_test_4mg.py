@@ -7,7 +7,7 @@ if __name__ == '__main__':
 	LOAD_CSV = 'lehigh_load.csv'
 	FAULTED_LINE = '670671'
 	QSTS_STEPS = 24*20
-	FOSSIL_BACKUP_PERCENT = 0
+	FOSSIL_BACKUP_PERCENT = 1
 	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth
 	REOPT_INPUTS = {
 		"solar" : "on",
@@ -51,6 +51,7 @@ if __name__ == '__main__':
 			'switch': '632633',
 			'gen_bus': '634',
 			'gen_obs_existing': ['solar_634_existing','battery_634_existing'],
+			'critical_load_kws': [70,90,10],
 			'max_potential_battery': '700', # total kW rating on 634 bus is 500 kW
 			'max_potential_diesel': '1000000',
 			'battery_capacity': '10000'
@@ -60,6 +61,7 @@ if __name__ == '__main__':
 			'switch': '671692',
 			'gen_bus': '675',
 			'gen_obs_existing': ['solar_675_existing'],
+			'critical_load_kws': [150,200,200],
 			'max_potential_battery': '900', # total kW rating on 675 bus is 843 kW
 			'max_potential_diesel': '300',
 			'battery_capacity': '20000'
@@ -69,6 +71,7 @@ if __name__ == '__main__':
 			'switch': '671684',
 			'gen_bus': '684',
 			'gen_obs_existing': ['diesel_684_existing','battery_684_existing'],
+			'critical_load_kws': [400,20],
 			'max_potential': '1300', # total kW rating on 684 and 652 is 1283 kW
 			'max_potential_diesel': '1000000',
 			'battery_capacity': '10000'
@@ -78,6 +81,7 @@ if __name__ == '__main__':
 			'switch': '632645',
 			'gen_bus': '646',
 			'gen_obs_existing': [],
+			'critical_load_kws': [30,70],
 			'max_potential_battery': '800', # total kW rating on 645 and 646 is 400 kW
 			'max_potential_diesel': '1000000',
 			'battery_capacity': '10000'

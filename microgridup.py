@@ -1013,12 +1013,14 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 	with open(outputCsvName, 'w', newline='') as outcsv:
 		writer = csv.writer(outcsv)
 		writer.writerow(["Microgrid Name", "Generation Bus", "Minimum 1 hr Load (kW)", "Average 1 hr Load (kW)",
-							"Average Daytime 1 hr Load (kW)", "Maximum 1 hr Load (kW)", "Maximum 1 hr Critical Load (kW)", "Existing Fossil Generation (kW)", "New Fossil Generation (kW)",
+							"Average Daytime 1 hr Load (kW)", "Maximum 1 hr Load (kW)", "Maximum 1 hr Critical Load (kW)", 
+							"Existing Fossil Generation (kW)", "New Fossil Generation (kW)",
 							"Diesel Fuel Used During Outage (gal)", "Existing Solar (kW)", "New Solar (kW)", 
 							"Existing Battery Power (kW)", "Existing Battery Energy Storage (kWh)", "New Battery Power (kW)",
 							"New Battery Energy Storage (kWh)", "Existing Wind (kW)", "New Wind (kW)", 
-							"Total Generation on Microgrid (kW)", "NPV over 25 years ($)", "CapEx ($)", "CapEx after Incentives ($)", 
-							"Average Outage Survived (h)"])
+							"Total Generation on Microgrid (kW)", "Renewable Generation (% of Yr 1 kWh)", "Emissions (Yr 1 Tons CO2)", 
+							"Emissions Reduced from BAU (Yr 1 Tons CO2)", "NPV over 25 years ($)", "CapEx ($)", "CapEx after Incentives ($)", 
+							"O+M Costs (Yr 1 $ before tax)", "Average Outage Survived (h)"])
 		mg_num = 1 # mg_num refers to the key suffix in allOutputData.json from reopt folder
 		mg_ob = microgrid
 		gen_bus_name = mg_ob['gen_bus']
@@ -1033,6 +1035,9 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		max_crit_load = max_crit_load
 		diesel_used_gal =reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0)
 		total_gen = diesel_size_total + solar_size_total + battery_pow_total + wind_size_total
+		renewable_gen = reopt_out.get(f'yearOnePercentRenewable{mg_num}', 0.0)
+		year_one_emissions = reopt_out.get(f'yearOneEmissionsTons{mg_num}', 0.0)
+		year_one_emissions_reduced = reopt_out.get(f'yearOneEmissionsReducedTons{mg_num}', 0.0)
 
 		#TODO: Redo post-REopt economic calculations to match updated discounts, taxations, etc
 		npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
@@ -1055,15 +1060,17 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		# 						- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0)*.82 \
 		# 						- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
 		# 						- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
+		year_one_OM = reopt_out.get(f'yearOneOMCostsBeforeTax{mg_num}', 0.0)
 		ave_outage = reopt_out.get(f'avgOutage{mg_num}')
 		if ave_outage is not None:
 			ave_outage = int(round(ave_outage))
 		
-		row =[str(mg_name), gen_bus_name, round(min_load), round(ave_load), round(avg_daytime_load), round(max_load), round(max_crit_load),
+		row =[str(mg_name), gen_bus_name, round(min_load), round(ave_load,0), round(avg_daytime_load), round(max_load), round(max_crit_load),
 		round(diesel_size_existing), round(diesel_size_new), round(diesel_used_gal), round(solar_size_existing), 
 		round(solar_size_new), round(battery_pow_existing), round(battery_cap_existing), round(battery_pow_new),
-		round(battery_cap_new), round(wind_size_existing), round(wind_size_new), round(total_gen),
-		int(round(npv)), int(round(cap_ex_existing_gen_adj)), int(round(cap_ex_after_incentives)),ave_outage]
+		round(battery_cap_new), round(wind_size_existing), round(wind_size_new), round(total_gen), round(renewable_gen),
+		round(year_one_emissions), round(year_one_emissions_reduced),
+		int(round(npv)), int(round(cap_ex_existing_gen_adj)), int(round(cap_ex_after_incentives)), int(round(year_one_OM)), ave_outage]
 		writer.writerow(row)
 
 def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, diesel_total_calc=False):
@@ -1115,6 +1122,10 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	mg_dict["New Wind (kW)"] = round(wind_size_new)
 	total_gen = diesel_size_total + solar_size_total + battery_pow_total + wind_size_total
 	mg_dict["Total Generation on Microgrid (kW)"] = round(total_gen)
+	mg_dict["Renewable Generation (% of Yr 1 kWh)"] = round(reopt_out.get(f'yearOnePercentRenewable{mg_num}', 0.0))	
+	mg_dict["Emissions (Yr 1 Tons CO2)"] = round(reopt_out.get(f'yearOneEmissionsTons{mg_num}', 0.0))
+	mg_dict["Emissions Reduced from BAU (Yr 1 Tons CO2)"] = round(reopt_out.get(f'yearOneEmissionsReducedTons{mg_num}', 0.0))
+
 	npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
 	cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
 	cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
@@ -1139,6 +1150,7 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	# 						- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) 
 	# mg_dict["CapEx after Incentives ($)"] = f'{round(cap_ex_after_incentives_existing_gen_adj):,}'
 	mg_dict["CapEx after Incentives ($)"] = f'{round(cap_ex_after_incentives):,}'
+	mg_dict["O+M Costs (Yr 1 $ before tax)"] = round(reopt_out.get(f'yearOneOMCostsBeforeTax{mg_num}', 0.0))
 	ave_outage = reopt_out.get(f'avgOutage{mg_num}')
 	if ave_outage is not None:
 		ave_outage = int(round(ave_outage))
@@ -1171,9 +1183,13 @@ def summary_stats(reps):
 	reps['Existing Wind (kW)'].append(round(sum(reps['Existing Wind (kW)'])))
 	reps['New Wind (kW)'].append(round(sum(reps['New Wind (kW)'])))
 	reps['Total Generation on Microgrid (kW)'].append(round(sum(reps['Total Generation on Microgrid (kW)'])))
+	reps['Renewable Generation (% of Yr 1 kWh)'].append(round(sum(reps['Renewable Generation (% of Yr 1 kWh)'])))
+	reps['Emissions (Yr 1 Tons CO2)'].append(round(sum(reps['Emissions (Yr 1 Tons CO2)'])))
+	reps['Emissions Reduced from BAU (Yr 1 Tons CO2)'].append(round(sum(reps['Emissions Reduced from BAU (Yr 1 Tons CO2)'])))
 	reps['NPV over 25 years ($)'].append(sum(reps['NPV over 25 years ($)']))
 	reps['CapEx ($)'].append(sum(reps['CapEx ($)']))
 	reps['CapEx after Incentives ($)'].append(sum(reps['CapEx after Incentives ($)']))
+	reps['O+M Costs (Yr 1 $ before tax)'].append(sum(reps['O+M Costs (Yr 1 $ before tax)']))
 	if all([h != None for h in reps['Average Outage Survived (h)']]):
 		reps['Average Outage Survived (h)'].append(round(min(reps['Average Outage Survived (h)']),0))
 	else:

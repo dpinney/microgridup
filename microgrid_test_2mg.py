@@ -51,7 +51,7 @@ if __name__ == '__main__':
 			'switch': '632633',
 			'gen_bus': '634',
 			'gen_obs_existing': ['solar_634_existing', 'battery_634_existing'],
-			'critical_load_kws': [70,90,10],
+			'critical_load_kws': [], #[70,90,10],
 			'max_potential': '700',
 			'max_potential_diesel': '1000000',
 			'battery_capacity': '10000'

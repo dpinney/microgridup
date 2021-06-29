@@ -8,13 +8,13 @@ RUN apt-get -y update && apt-get install -y python3 git sudo vim python3-pip pyt
 # Install the OMF
 # Warning: clone might be cached. Consider invalidating manually.
 RUN git clone --depth 1 https://github.com/dpinney/omf.git
-RUN cd omf; sudo python install.py
+RUN cd omf; sudo python3 install.py
 
 # Move files across.
 COPY . .
 
 # Run the MGU gui.
-WORKDIR /usr/src/app
+WORKDIR .
 ENTRYPOINT ["python3"]
 CMD ["microgridup_gui.py"]
 

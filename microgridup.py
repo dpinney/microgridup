@@ -71,6 +71,7 @@ def set_fossil_max_kw(FOSSIL_BACKUP_PERCENT, max_crit_load):
 		fossil_max_kw = 100000
 	elif FOSSIL_BACKUP_PERCENT > 0 and FOSSIL_BACKUP_PERCENT < 1:
 		fossil_max_kw = FOSSIL_BACKUP_PERCENT*max_crit_load
+	# TO DO: deal with edge case of FOSSIL_MAX_BACKUP > 1, or call it out as a warning
 	print("fossil_max_kw:", fossil_max_kw)
 	return fossil_max_kw
 
@@ -184,13 +185,16 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 		#To Do: Test that dieselMax = 0 is passed to REopt if both diesel_max_kw and sum(diesel_kw_exist) == 0
 		# Set max fossil kw used to support critical load
 		diesel_max_kw = set_fossil_max_kw(FOSSIL_BACKUP_PERCENT, max_crit_load)
+		print("reopt_gen_mg_specs.diesel_max_kw:", diesel_max_kw)
 		if diesel_max_kw <= sum(diesel_kw_exist):
 			allInputData['dieselMax'] = str(sum(diesel_kw_exist))	
 		elif diesel_max_kw > sum(diesel_kw_exist):
 			allInputData['dieselMax'] = diesel_max_kw
+		print("allInputData['dieselMax']:", allInputData['dieselMax'])
+		print("allInputData['genExisting']:", allInputData['genExisting'])
 
 		# enable following 9 lines when using gen_existing_ref_shapes()
-		# if not already turned on, set solar and wind on to 10 kw to provide loadshapes for existing gen in make_full_dss()
+		# if not already turned on, set solar and wind on to 1 kw to provide loadshapes for existing gen in make_full_dss()
 		if allInputData['wind'] == 'off':
 			allInputData['wind'] = 'on'
 			allInputData['windMax'] = '1'
@@ -280,7 +284,7 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 		battery_cap_new = battery_cap_total - battery_cap_existing 
 	else:
 		battery_cap_new = 0.0 #TO DO: update logic here to make run more robust to oversized existing battery generation
-	# battery power refers to the power rating of the battery (kw)
+	# battery power refers to the power rating of the battery's inverter  (kw)
 	battery_pow_total = reopt_out.get(f'powerBattery{mg_num}', 0.0) 
 	battery_pow_existing = reopt_out.get(f'batteryKwExisting{mg_num}', 0.0)
 	if battery_pow_total - battery_pow_existing > 0:
@@ -379,6 +383,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 		# solar_size_new = diesel_size_new*.4
 		# solar_size_total = solar_size_new + solar_size_existing
 
+		print("feedback_reopt_gen_values.diesel_size_total:", diesel_size_total)
 		if diesel_size_total > 0:
 			allInputData['dieselMax'] = diesel_size_total
 			allInputData['dieselMin'] = diesel_size_total
@@ -1015,7 +1020,8 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		writer.writerow(["Microgrid Name", "Generation Bus", "Minimum 1 hr Load (kW)", "Average 1 hr Load (kW)",
 							"Average Daytime 1 hr Load (kW)", "Maximum 1 hr Load (kW)", "Maximum 1 hr Critical Load (kW)", 
 							"Existing Fossil Generation (kW)", "New Fossil Generation (kW)",
-							"Diesel Fuel Used During Outage (gal)", "Existing Solar (kW)", "New Solar (kW)", 
+							# "Diesel Fuel Used During Outage (gal)", 
+							"Existing Solar (kW)", "New Solar (kW)", 
 							"Existing Battery Power (kW)", "Existing Battery Energy Storage (kWh)", "New Battery Power (kW)",
 							"New Battery Energy Storage (kWh)", "Existing Wind (kW)", "New Wind (kW)", 
 							"Total Generation on Microgrid (kW)", "Renewable Generation (% of Yr 1 kWh)", "Emissions (Yr 1 Tons CO2)", 
@@ -1033,7 +1039,13 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		avg_daytime_load = round(np.average(np.average(daytime_kwh, axis=1)))
 		max_load = max(load)
 		max_crit_load = max_crit_load
+		# hack to not show the needed 1kw diesel in final run of REopt
 		diesel_used_gal =reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0)
+		diesel_output_one_kw = False
+		if diesel_size_new == 1:
+			diesel_output_one_kw = True
+			diesel_size_new = 0
+			diesel_size_total = diesel_size_total - 1
 		total_gen = diesel_size_total + solar_size_total + battery_pow_total + wind_size_total
 		renewable_gen = reopt_out.get(f'yearOnePercentRenewable{mg_num}', 0.0)
 		year_one_emissions = reopt_out.get(f'yearOneEmissionsTons{mg_num}', 0.0)
@@ -1041,6 +1053,9 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 
 		#TODO: Redo post-REopt economic calculations to match updated discounts, taxations, etc
 		npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
+		if diesel_output_one_kw == True:
+			npv = npv - 1*reopt_out.get(f'dieselGenCost{mg_num}', 0.0)
+			#TODO: output O+M and subtract the cost here if this negligible cost seems important for accuracy
 		cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
 		cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
 		
@@ -1055,18 +1070,23 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 								- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
 								- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
 								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
+		# take away the 1kw diesel gen cost if necessary
+		if diesel_output_one_kw == True:
+			cap_ex_existing_gen_adj = cap_ex_existing_gen_adj - 1*reopt_out.get(f'dieselGenCost{mg_num}', 0.0)
 		#TODO: UPDATE cap_ex_after_incentives_existing_gen_adj in 2022 to erase the 18% cost reduction for wind above 100kW as it will have ended
 		# cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives \
 		# 						- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0)*.82 \
 		# 						- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
 		# 						- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
 		year_one_OM = reopt_out.get(f'yearOneOMCostsBeforeTax{mg_num}', 0.0)
+		
 		ave_outage = reopt_out.get(f'avgOutage{mg_num}')
 		if ave_outage is not None:
 			ave_outage = int(round(ave_outage))
 		
 		row =[str(mg_name), gen_bus_name, round(min_load), round(ave_load,0), round(avg_daytime_load), round(max_load), round(max_crit_load),
-		round(diesel_size_existing), round(diesel_size_new), round(diesel_used_gal), round(solar_size_existing), 
+		round(diesel_size_existing), round(diesel_size_new), # round(diesel_used_gal), 
+		round(solar_size_existing), 
 		round(solar_size_new), round(battery_pow_existing), round(battery_cap_existing), round(battery_pow_new),
 		round(battery_cap_new), round(wind_size_existing), round(wind_size_new), round(total_gen), round(renewable_gen),
 		round(year_one_emissions), round(year_one_emissions_reduced),
@@ -1083,6 +1103,12 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	diesel_size_total = gen_sizes.get('diesel_size_total')
 	diesel_size_new = gen_sizes.get('diesel_size_new')
 	diesel_size_existing = gen_sizes.get('diesel_size_existing')
+	diesel_output_one_kw = False
+	if diesel_size_new == 1:
+		diesel_output_one_kw = True
+		diesel_size_new = 0
+		diesel_size_total = diesel_size_total - 1
+		# To Do: subtract any fuel use from 1kw diesel if fuelUsedDiesel is an output
 	wind_size_total = gen_sizes.get('wind_size_total')
 	wind_size_new = gen_sizes.get('wind_size_new')
 	wind_size_existing = gen_sizes.get('wind_size_existing')
@@ -1111,7 +1137,7 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	mg_dict["Maximum 1 hr Critical Load (kW)"] = round(max_crit_load)
 	mg_dict["Existing Fossil Generation (kW)"] = round(diesel_size_existing)
 	mg_dict["New Fossil Generation (kW)"] = round(diesel_size_new)
-	mg_dict["Diesel Fuel Used During Outage (gal)"] = round(reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0))
+	# mg_dict["Diesel Fuel Used During Outage (gal)"] = round(reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0))
 	mg_dict["Existing Solar (kW)"] = round(solar_size_existing)
 	mg_dict["New Solar (kW)"] = round(solar_size_total - solar_size_existing)
 	mg_dict["Existing Battery Power (kW)"] = round(battery_pow_existing)
@@ -1127,6 +1153,10 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	mg_dict["Emissions Reduced from BAU (Yr 1 Tons CO2)"] = round(reopt_out.get(f'yearOneEmissionsReducedTons{mg_num}', 0.0))
 
 	npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
+	if diesel_output_one_kw == True:
+		npv = npv - 1*reopt_out.get(f'dieselGenCost{mg_num}', 0.0)
+		#TODO: output O+M and subtract the cost here if this negligible cost seems important for accuracy
+
 	cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
 	cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
 	
@@ -1143,6 +1173,8 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 							- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
 							- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
 							- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
+	if diesel_output_one_kw == True:
+		cap_ex_existing_gen_adj = cap_ex_existing_gen_adj - 1*reopt_out.get(f'dieselGenCost{mg_num}', 0.0)
 	mg_dict["CapEx ($)"] = f'{round(cap_ex_existing_gen_adj):,}'
 	# cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives \
 	# 						- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0)*.82 \
@@ -1173,7 +1205,7 @@ def summary_stats(reps):
 	reps['Maximum 1 hr Critical Load (kW)'].append(round(sum(reps['Maximum 1 hr Critical Load (kW)'])))
 	reps['Existing Fossil Generation (kW)'].append(round(sum(reps['Existing Fossil Generation (kW)'])))
 	reps['New Fossil Generation (kW)'].append(round(sum(reps['New Fossil Generation (kW)'])))
-	reps['Diesel Fuel Used During Outage (gal)'].append(round(sum(reps['Diesel Fuel Used During Outage (gal)'])))
+	# reps['Diesel Fuel Used During Outage (gal)'].append(round(sum(reps['Diesel Fuel Used During Outage (gal)'])))
 	reps['Existing Solar (kW)'].append(round(sum(reps['Existing Solar (kW)'])))
 	reps['New Solar (kW)'].append(round(sum(reps['New Solar (kW)'])))
 	reps['Existing Battery Power (kW)'].append(round(sum(reps['Existing Battery Power (kW)'])))

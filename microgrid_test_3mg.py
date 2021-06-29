@@ -1,5 +1,7 @@
 from microgridup import *
 
+'''Test to confirm FOSSIL_BACKUP_PERCENT sets criticalLoadFactor; '''
+
 if __name__ == '__main__':
 	# Input data.
 	MODEL_DIR = '3mgs'

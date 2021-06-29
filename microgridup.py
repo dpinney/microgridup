@@ -1297,7 +1297,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 			'FAULTED_LINE':FAULTED_LINE,
 			'DIESEL_SAFETY_FACTOR':DIESEL_SAFETY_FACTOR
 		}
-		json.dump(inputs, inputs_file)
+		json.dump(inputs, inputs_file, indent=4)
 	# Run the analysis
 	mgs_name_sorted = sorted(MICROGRIDS.keys())
 	for i, mg_name in enumerate(mgs_name_sorted):

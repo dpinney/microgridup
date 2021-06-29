@@ -1274,11 +1274,24 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		os.mkdir(MODEL_DIR)
 	shutil.copyfile(BASE_DSS, f'{MODEL_DIR}/{MODEL_DSS}')
 	shutil.copyfile(LOAD_CSV, f'{MODEL_DIR}/{MODEL_LOAD_CSV}')
-
 	# HACK: work in directory because we're very picky about the current dir.
 	os.chdir(MODEL_DIR)
 	if os.path.exists("user_warnings.txt"):
 		os.remove("user_warnings.txt")
+	# Dump the inputs for future reference.
+	with open('allInputData.json','w') as inputs_file:
+		inputs = {
+			'MODEL_DIR':MODEL_DIR,
+			'BASE_DSS':BASE_DSS,
+			'LOAD_CSV':LOAD_CSV,
+			'QSTS_STEPS':QSTS_STEPS,
+			'FOSSIL_BACKUP_PERCENT':FOSSIL_BACKUP_PERCENT,
+			'REOPT_INPUTS':REOPT_INPUTS,
+			'MICROGRIDS':MICROGRIDS,
+			'FAULTED_LINE':FAULTED_LINE,
+			'DIESEL_SAFETY_FACTOR':DIESEL_SAFETY_FACTOR
+		}
+		json.dump(inputs, inputs_file)
 	# Run the analysis
 	mgs_name_sorted = sorted(MICROGRIDS.keys())
 	for i, mg_name in enumerate(mgs_name_sorted):
@@ -1296,14 +1309,13 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 	if os.path.exists("user_warnings.txt"):
 		with open("user_warnings.txt") as myfile:
 			warnings = myfile.read()
-
 	template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
 	out = template.render(
 		x='Daniel, David',
 		y='Matt',
 		now=current_time,
 		summary=stats,
-		inputs={'circuit':BASE_DSS,'loads':LOAD_CSV, 'Maximum Proportion of critical load to be served by fossil generation':FOSSIL_BACKUP_PERCENT, 'REopt inputs':REOPT_INPUTS,'microgrid':MICROGRIDS}, #TODO: Make the inputs clearer and maybe at the bottom, showing only the appropriate keys from MICROGRIDS as necessary
+		inputs=inputs, #TODO: Make the inputs clearer and maybe at the bottom, showing only the appropriate keys from MICROGRIDS as necessary
 		reopt_folders=reopt_folders,
 		warnings = warnings
 	)

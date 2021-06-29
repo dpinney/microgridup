@@ -31,7 +31,7 @@
 	</div>
 	<div id="overview" class="tab" style="margin:5px; overflow:scroll; visibility:visible">
 		<pre style="width:95%; white-space:pre-wrap">Report Generated on </pre>
-		<pre style="width:95%; white-space:pre-wrap">INPUTS: {'circuit': 'circuit.dss', 'loads': 'loads.csv', 'Maximum Proportion of critical load to be served by fossil generation': 1, 'REopt inputs': {'solar': 'on', 'wind': 'off', 'battery': 'on', 'year': '2017', 'energyCost': '0.12', 'demandCost': '20', 'wholesaleCost': '0.034', 'solarCost': '1600', 'windCost': '4989', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'dieselGenCost': '500', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '100000', 'windMax': '100000', 'batteryPowerMax': '1000000', 'batteryCapacityMax': '1000000', 'dieselMax': '1000000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outageDuration': '48', 'fuelAvailable': '50000', 'genExisting': 0, 'minGenLoading': '0.3', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True}, 'microgrid': {'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'switch': '632633', 'gen_bus': '634', 'gen_obs_existing': ['solar_634_existing', 'battery_634_existing'], 'critical_load_kws': [70, 90, 10], 'max_potential_battery': '700', 'max_potential_diesel': '1000000', 'battery_capacity': '10000'}}</pre>
+		<pre style="width:95%; white-space:pre-wrap">INPUTS: {'circuit': 'circuit.dss', 'loads': 'loads.csv', 'Maximum Proportion of critical load to be served by fossil generation': 0.5, 'REopt inputs': {'solar': 'on', 'wind': 'off', 'battery': 'on', 'year': '2017', 'energyCost': '0.12', 'demandCost': '20', 'wholesaleCost': '0.034', 'solarCost': '1600', 'windCost': '4989', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'dieselGenCost': '500', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '100000', 'windMax': '100000', 'batteryPowerMax': '1000000', 'batteryCapacityMax': '1000000', 'dieselMax': '1000000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outageDuration': '48', 'fuelAvailable': '50000', 'genExisting': 0, 'minGenLoading': '0.3', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True}, 'microgrid': {'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'switch': '632633', 'gen_bus': '634', 'gen_obs_existing': ['solar_634_existing', 'battery_634_existing'], 'critical_load_kws': [70, 90, 10], 'max_potential_battery': '700', 'max_potential_diesel': '1000000', 'battery_capacity': '10000'}}</pre>
 		<pre style="width:95%; white-space:pre-wrap">User Warnings:</pre>
 		<pre style="width:95%; white-space:pre-wrap"></pre>
 		<!-- formatted below for a dict of lists -->
@@ -120,15 +120,6 @@
 				</tr>
 			
 				<tr>
-					<td>Diesel Fuel Used During Outage (gal)</td>
-					
-						
-							<td style="text-align:right">156</td>
-						
-					
-				</tr>
-			
-				<tr>
 					<td>Existing Solar (kW)</td>
 					
 						
@@ -210,6 +201,33 @@
 				</tr>
 			
 				<tr>
+					<td>Renewable Generation (% of Yr 1 kWh)</td>
+					
+						
+							<td style="text-align:right">52</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Emissions (Yr 1 Tons CO2)</td>
+					
+						
+							<td style="text-align:right">608</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Emissions Reduced from BAU (Yr 1 Tons CO2)</td>
+					
+						
+							<td style="text-align:right">139</td>
+						
+					
+				</tr>
+			
+				<tr>
 					<td>NPV over 25 years ($)</td>
 					
 						
@@ -232,6 +250,15 @@
 					
 						
 							<td style="text-align:right">341,911</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>O+M Costs (Yr 1 $ before tax)</td>
+					
+						
+							<td style="text-align:right">10,715</td>
 						
 					
 				</tr>

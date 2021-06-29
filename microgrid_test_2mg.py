@@ -1,5 +1,7 @@
 from microgridup import *
 
+'''Test to confirm full renewable backup with no fossil generation, including wind'''
+
 if __name__ == '__main__':
 	# Input data.
 	MODEL_DIR = 'lehigh_doug'
@@ -11,7 +13,7 @@ if __name__ == '__main__':
 	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth
 	REOPT_INPUTS = {
 		"solar" : "on",
-		"wind" : "off",
+		"wind" : "on",
 		"battery" : "on",
 		"year" : '2017',
 		"energyCost" : "0.12",

@@ -1,5 +1,7 @@
 from microgridup import *
 
+'''Test to confirm diesel backup and existing wind with FOSSIL_BACKUP_PERCENT = 1'''
+
 if __name__ == '__main__':
 	# Input data.
 	MODEL_DIR = '4mgs'
@@ -7,7 +9,7 @@ if __name__ == '__main__':
 	LOAD_CSV = 'lehigh_load.csv'
 	FAULTED_LINE = '670671'
 	QSTS_STEPS = 24*20
-	FOSSIL_BACKUP_PERCENT = 1
+	FOSSIL_BACKUP_PERCENT = .5
 	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth
 	REOPT_INPUTS = {
 		"solar" : "on",

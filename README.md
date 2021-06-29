@@ -2,18 +2,16 @@
 
 MicrogridUp Design Tool - for a given circuit, determine an optimal set of microgrids that will provide cost savings and resilience.
 
-## Installation
+## Installation (for Users)
 
-install the omf https://github.com/dpinney/omf/wiki/Dev-~-Installation-Instructions
+1. Install [Docker](https://docs.docker.com/get-docker/)
+1. Get the app `docker pull dpinney/microgridup`
+1. Start the app with `docker run -d -p 5000:5000 --name mgucont mguim`
+1. The web app will then be running at http://127.0.0.1:5000
 
-Then, clone the microgripUp Github repo and run the setup file: 'python setup.py develop'
+## Installation (for Developers)
 
-## Running the Model
-
-Test the code:
-
-`python microgrid_test_3mg.py`
-
-Start the gui with:
-
-`python microgridup_gui.py`
+1. You'll need python v3.6 or later.
+1. `pip install -e git+https://github.com/dpinney/microgridup`
+1. Test the code by running `python microgrid_test_3mg.py`
+1. Start the GUI with `python microgridup_gui.py`

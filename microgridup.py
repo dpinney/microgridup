@@ -1025,7 +1025,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 							"Existing Battery Power (kW)", "Existing Battery Energy Storage (kWh)", "New Battery Power (kW)",
 							"New Battery Energy Storage (kWh)", "Existing Wind (kW)", "New Wind (kW)", 
 							"Total Generation on Microgrid (kW)", "Renewable Generation (% of Yr 1 kWh)", "Emissions (Yr 1 Tons CO2)", 
-							"Emissions Reduced from BAU (Yr 1 Tons CO2)", "NPV over 25 years ($)", "CapEx ($)", "CapEx after Incentives ($)", 
+							"Emissions Reduction (Yr 1 % CO2)", "NPV over 25 years ($)", "CapEx ($)", "CapEx after Incentives ($)", 
 							"O+M Costs (Yr 1 $ before tax)", "Average Outage Survived (h)"])
 		mg_num = 1 # mg_num refers to the key suffix in allOutputData.json from reopt folder
 		mg_ob = microgrid
@@ -1049,7 +1049,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		total_gen = diesel_size_total + solar_size_total + battery_pow_total + wind_size_total
 		renewable_gen = reopt_out.get(f'yearOnePercentRenewable{mg_num}', 0.0)
 		year_one_emissions = reopt_out.get(f'yearOneEmissionsTons{mg_num}', 0.0)
-		year_one_emissions_reduced = reopt_out.get(f'yearOneEmissionsReducedTons{mg_num}', 0.0)
+		year_one_emissions_reduced = reopt_out.get(f'yearOneEmissionsReducedPercent{mg_num}', 0.0)
 
 		#TODO: Redo post-REopt economic calculations to match updated discounts, taxations, etc
 		npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
@@ -1150,7 +1150,7 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	mg_dict["Total Generation on Microgrid (kW)"] = round(total_gen)
 	mg_dict["Renewable Generation (% of Yr 1 kWh)"] = round(reopt_out.get(f'yearOnePercentRenewable{mg_num}', 0.0))	
 	mg_dict["Emissions (Yr 1 Tons CO2)"] = round(reopt_out.get(f'yearOneEmissionsTons{mg_num}', 0.0))
-	mg_dict["Emissions Reduced from BAU (Yr 1 Tons CO2)"] = round(reopt_out.get(f'yearOneEmissionsReducedTons{mg_num}', 0.0))
+	mg_dict["Emissions Reduction (Yr 1 % CO2)"] = round(reopt_out.get(f'yearOneEmissionsReducedPercent{mg_num}', 0.0))
 
 	npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
 	if diesel_output_one_kw == True:
@@ -1215,9 +1215,14 @@ def summary_stats(reps):
 	reps['Existing Wind (kW)'].append(round(sum(reps['Existing Wind (kW)'])))
 	reps['New Wind (kW)'].append(round(sum(reps['New Wind (kW)'])))
 	reps['Total Generation on Microgrid (kW)'].append(round(sum(reps['Total Generation on Microgrid (kW)'])))
-	reps['Renewable Generation (% of Yr 1 kWh)'].append(round(sum(reps['Renewable Generation (% of Yr 1 kWh)'])))
+	# calculate weighted average % renewables across all microgrids
+	renewables_perc_list = reps['Renewable Generation (% of Yr 1 kWh)']
+	avg_load = reps['Average 1 hr Load (kW)']
+	wgtd_avg_renewables_perc = sum([renewables_perc_list[i]/100 * avg_load[i] for i in range(len(renewables_perc_list))])/sum(avg_load)*100
+	print("wgtd_avg_renewables_perc:", wgtd_avg_renewables_perc)
+	reps['Renewable Generation (% of Yr 1 kWh)'].append(round(wgtd_avg_renewables_perc))
 	reps['Emissions (Yr 1 Tons CO2)'].append(round(sum(reps['Emissions (Yr 1 Tons CO2)'])))
-	reps['Emissions Reduced from BAU (Yr 1 Tons CO2)'].append(round(sum(reps['Emissions Reduced from BAU (Yr 1 Tons CO2)'])))
+	reps['Emissions Reduction (Yr 1 % CO2)'].append(round(sum(reps['Emissions Reduction (Yr 1 % CO2)'])))
 	reps['NPV over 25 years ($)'].append(sum(reps['NPV over 25 years ($)']))
 	reps['CapEx ($)'].append(sum(reps['CapEx ($)']))
 	reps['CapEx after Incentives ($)'].append(sum(reps['CapEx after Incentives ($)']))
@@ -1344,6 +1349,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 	reopt_folders = [x for x in os.listdir('.') if x.startswith('reopt_final_')]
 	reopt_folders.sort()
 	reps = pd.concat([pd.read_csv(x) for x in reports]).to_dict(orient='list')
+	print("reps:",reps)
 	stats = summary_stats(reps)
 	current_time = datetime.datetime.now() 
 	warnings = "None"

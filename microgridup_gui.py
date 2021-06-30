@@ -27,9 +27,20 @@ def load(analysis):
 	else:
 		return 'Model Running. Please reload to check for completion.'
 
+@app.route('/edit/<analysis>')
+def edit(analysis):
+	try:
+		with open(f'{_myDir}/{analysis}/allInputData.json') as in_data_file:
+			in_data = json.load(in_data_file)
+	except:
+		in_data = None
+	return flask.render_template('template_new.html', in_data=in_data)
+
 @app.route('/new')
 def new():
-	return flask.render_template('template_new.html')
+	with open(f'{_myDir}/lehigh_3mg_inputs.json') as default_in_file:
+		default_in = json.load(default_in_file)
+	return flask.render_template('template_new.html', in_data=default_in)
 
 @app.route('/duplicate/', methods=["POST"])
 def duplicate():
@@ -44,20 +55,29 @@ def duplicate():
 
 @app.route('/run', methods=["POST"])
 def run():
-	all_files = flask.request.files
 	model_dir = flask.request.form['MODEL_DIR']
-	# Save the files.
-	if not os.path.isdir(f'{_myDir}/uploads'):
-		os.mkdir(f'{_myDir}/uploads')
-	dss_file = all_files['BASE_DSS']
-	dss_file.save(f'{_myDir}/uploads/BASE_DSS_{model_dir}')
-	csv_file = all_files['LOAD_CSV']
-	csv_file.save(f'{_myDir}/uploads/LOAD_CSV_{model_dir}')
+	if 'BASE_DSS_NAME' in flask.request.form and 'LOAD_CSV_NAME' in flask.request.form:
+		# editing an existing model
+		dss_path = f'{_myDir}/{model_dir}/circuit.dss'
+		csv_path = f'{_myDir}/{model_dir}/loads.csv'
+		all_files = 'Using Existing Files'
+	else:
+		# new files uploaded
+		all_files = flask.request.files
+		# Save the files.
+		if not os.path.isdir(f'{_myDir}/uploads'):
+			os.mkdir(f'{_myDir}/uploads')
+		dss_file = all_files['BASE_DSS']
+		dss_file.save(f'{_myDir}/uploads/BASE_DSS_{model_dir}')
+		csv_file = all_files['LOAD_CSV']
+		csv_file.save(f'{_myDir}/uploads/LOAD_CSV_{model_dir}')
+		dss_path = f'{_myDir}/uploads/BASE_DSS_{model_dir}'
+		csv_path = f'{_myDir}/uploads/LOAD_CSV_{model_dir}'
 	# ARGS
 	mgu_args = [
 		flask.request.form['MODEL_DIR'],
-		f'{_myDir}/uploads/BASE_DSS_{model_dir}',
-		f'{_myDir}/uploads/LOAD_CSV_{model_dir}',
+		dss_path,
+		csv_path,
 		float(flask.request.form['QSTS_STEPS']),
 		float(flask.request.form['FOSSIL_BACKUP_PERCENT']),
 		json.loads(flask.request.form['REOPT_INPUTS']),

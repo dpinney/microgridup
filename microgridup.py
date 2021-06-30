@@ -1304,8 +1304,11 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 	# Create initial files.
 	if not os.path.isdir(MODEL_DIR):
 		os.mkdir(MODEL_DIR)
-	shutil.copyfile(BASE_DSS, f'{MODEL_DIR}/{MODEL_DSS}')
-	shutil.copyfile(LOAD_CSV, f'{MODEL_DIR}/{MODEL_LOAD_CSV}')
+	try:
+		shutil.copyfile(BASE_DSS, f'{MODEL_DIR}/{MODEL_DSS}')
+		shutil.copyfile(LOAD_CSV, f'{MODEL_DIR}/{MODEL_LOAD_CSV}')
+	except:
+		print('Rerunning existing analysis. DSS and CSV files not moved.')
 	if DELETE_FILES:
 		for fname in [BASE_DSS, LOAD_CSV]:
 			try:

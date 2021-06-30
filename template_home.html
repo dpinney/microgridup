@@ -2,12 +2,41 @@
 <html>
 <head>
 	<title>MicrogridUP</title>
+	<script type="text/javascript">
+	function duplicate(analysis) {
+		var new_name = prompt('Name for the duplicate?', '');
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState == XMLHttpRequest.DONE) {
+				alert(xhr.responseText);
+				location.reload();
+			};
+		};
+		xhr.open('POST', '/duplicate', true);
+		xhr.setRequestHeader('Content-Type', 'application/json');
+		var contents = JSON.stringify({
+			'analysis':analysis,
+			'new_name':new_name
+		});
+		xhr.send(contents);
+		alert(contents);
+	}
+	// function duplicate_new(analysis) {
+	// 	let data = {'analysis':analysis: 'new_name':new_name};
+	// 	fetch("/post/data/here", {
+	// 		method: "POST", 
+	// 		body: JSON.stringify(data)
+	// 	}).then(res => {
+	// 		console.log("Request complete! response:", res);
+	// 	});
+	// }
+	</script>
 </head>
 <body style="margin:0px; height:30px">
 	<h1>MicrogridUP Design Tool</h1>
 	<h2>Load an Existing Analysis</h2>
 	{% for analysis in analyses %}
-		<p><a href='load/{{analysis}}'>{{analysis}}</a></p>
+		<p><a href='load/{{analysis}}'>{{analysis}}</a> <a href='javascript:duplicate("{{analysis}}")'>[dup]</a> <a href='edit/{{analysis}}'>[edit]</a></p>
 	{% endfor %}
 	<h2>Create a New Analysis</h2>
 	<a href='/new'>New</a>

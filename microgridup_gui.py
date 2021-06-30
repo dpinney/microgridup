@@ -42,16 +42,16 @@ def new():
 		default_in = json.load(default_in_file)
 	return flask.render_template('template_new.html', in_data=default_in)
 
-@app.route('/duplicate/', methods=["POST"])
+@app.route('/duplicate', methods=["POST"])
 def duplicate():
-	analysis = flask.request.form.get('analysis')
-	new_name = flask.request.form.get('new_name')
+	analysis = flask.request.json.get('analysis', None)
+	new_name = flask.request.json.get('new_name', None)
 	analyses = list_analyses()
 	if (analysis not in analyses) or (new_name in analyses):
 		return 'Duplication failed. Analysis does not exist or the new name is invalid.'
 	else:
 		shutil.copytree(analysis, new_name)
-		return f'Successfully duplicate {analysis} as {new_name}.'
+		return f'Successfully duplicated {analysis} as {new_name}.'
 
 @app.route('/run', methods=["POST"])
 def run():

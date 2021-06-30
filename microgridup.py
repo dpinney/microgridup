@@ -28,6 +28,12 @@ def _getByName(tree, name):
                 matches.append(x)
     return matches[0]
 
+def _walkTree(dirName):
+	listOfFiles = []
+	for (dirpath, dirnames, filenames) in os.walk(dirName):
+		listOfFiles += [os.path.join(dirpath, file) for file in filenames]
+	return listOfFiles
+
 def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
 	''' Set the critical load percent input for REopt 
 	by finding the ratio of max critical load kws 
@@ -1357,6 +1363,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		with open("user_warnings.txt") as myfile:
 			warnings = myfile.read()
 	template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
+	# generate file map
 	out = template.render(
 		x='Daniel, David',
 		y='Matt',
@@ -1364,7 +1371,9 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		summary=stats,
 		inputs=inputs, #TODO: Make the inputs clearer and maybe at the bottom, showing only the appropriate keys from MICROGRIDS as necessary
 		reopt_folders=reopt_folders,
-		warnings = warnings
+		warnings = warnings,
+		raw_files = _walkTree('.'),
+		model_name = MODEL_DIR
 	)
 	FINAL_REPORT = 'output_final.html'
 	with open(FINAL_REPORT,'w') as outFile:

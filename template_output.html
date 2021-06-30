@@ -28,6 +28,7 @@
 		{% for reopt_folder in reopt_folders %}
 			<button onclick="openTab('{{reopt_folder}}')">{{reopt_folder}}</button>
 		{% endfor %}
+		<button onclick="openTab('files')">Files</button>
 	</div>
 	<div id="overview" class="tab" style="margin:5px; overflow:scroll; visibility:visible">
 		<pre style="width:95%; white-space:pre-wrap">Report Generated on {{ now }}</pre>
@@ -80,5 +81,14 @@
 		<iframe src="{{reopt_folder}}/inlineTemplate.html" style="height:100vh"></iframe>
 	</div>
 	{% endfor %}
+	<div id="files" class="tab" style="visibility:hidden">
+		<div style="height:100vh; overflow:scroll">
+			<ul>
+			{% for file_name in raw_files %}
+			<li><a href='/{{model_name}}/{{file_name}}'>{{file_name}}</a></li>
+			{% endfor %}
+			</ul>
+		</div>
+	</div>
 </body>
 </html>

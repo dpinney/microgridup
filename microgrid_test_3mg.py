@@ -1,6 +1,6 @@
 from microgridup import *
 
-'''Test to confirm FOSSIL_BACKUP_PERCENT sets criticalLoadFactor; '''
+'''Test to confirm FOSSIL_BACKUP_PERCENT sets criticalLoadFactor '''
 
 if __name__ == '__main__':
 	# Input data.
@@ -37,7 +37,7 @@ if __name__ == '__main__':
 		"criticalLoadFactor": "1",
 		# "outage_start_hour": "200",
 		"outageDuration": "48",
-		"fuelAvailable": "50000",
+		"fuelAvailable": "20000",
 		"genExisting": 0,
 		"minGenLoading": "0.3",
 		"batteryKwExisting": 0,

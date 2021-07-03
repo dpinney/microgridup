@@ -1240,8 +1240,25 @@ def summary_stats(reps):
 	wgtd_avg_renewables_perc = sum([renewables_perc_list[i]/100 * avg_load[i] for i in range(len(renewables_perc_list))])/sum(avg_load)*100
 	#print("wgtd_avg_renewables_perc:", wgtd_avg_renewables_perc)
 	reps['Renewable Generation (% of Yr 1 kWh)'].append(round(wgtd_avg_renewables_perc))
+	# using yr 1 emissions and percent reductions, calculate a weighted average of % reduction in emissions for yr 1
+	yr1_emis = reps['Emissions (Yr 1 Tons CO2)']
 	reps['Emissions (Yr 1 Tons CO2)'].append(round(sum(reps['Emissions (Yr 1 Tons CO2)'])))
-	reps['Emissions Reduction (Yr 1 % CO2)'].append(round(sum(reps['Emissions Reduction (Yr 1 % CO2)'])))
+	print("yr1_emis:", yr1_emis)
+	emis_reduc_perc = reps['Emissions Reduction (Yr 1 % CO2)']
+	total_tons_list = [yr1_emis[i]/(1-emis_reduc_perc[i]/100) for i in range(len(emis_reduc_perc))]
+	reduc_tons_list = [a*b/100 for a,b in zip(total_tons_list,emis_reduc_perc)]
+	reduc_percent_yr1 = sum(reduc_tons_list)/sum(total_tons_list)*100
+	reps['Emissions Reduction (Yr 1 % CO2)'].append(round(reduc_percent_yr1))
+	# yr1_emis = reps['Emissions (Yr 1 Tons CO2)']
+	# print("yr1_emis:",yr1_emis)
+	# print("range(len(yr1_emis))", range(len(yr1_emis)))
+	# reps['Emissions (Yr 1 Tons CO2)'].append(round(sum(reps['Emissions (Yr 1 Tons CO2)'])))
+	# emis_reduc_perc = reps['Emissions Reduction (Yr 1 % CO2)']
+	# print("emis_reduc_perc:",emis_reduc_perc)
+	# total_emis = sum([yr1_emis[i]/(yr1_emis[i]+yr1_emis[i]*emis_reduc_perc[i]/100)*(1+emis_reduc_perc[i]/100) for i in range(len(yr1_emis))])
+	# wgtd_avg_emis_reduc_perc = (total_emis - sum(yr1_emis))/total_emis*100
+	# reps['Emissions Reduction (Yr 1 % CO2)'].append(round(wgtd_avg_emis_reduc_perc))
+	# reps['Emissions Reduction (Yr 1 % CO2)'].append(round(sum(reps['Emissions Reduction (Yr 1 % CO2)'])))
 	reps['NPV over 25 years ($)'].append(sum(reps['NPV over 25 years ($)']))
 	reps['CapEx ($)'].append(sum(reps['CapEx ($)']))
 	reps['CapEx after Tax Incentives ($)'].append(sum(reps['CapEx after Tax Incentives ($)']))

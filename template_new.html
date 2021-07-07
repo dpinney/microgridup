@@ -32,6 +32,12 @@
 		<h2>REOpt Inputs</h2>
 		<textarea name="REOPT_INPUTS" rows="20" cols="100">{{in_data.REOPT_INPUTS | tojson}}</textarea>
 		<h2>Microgrid Definitions</h2>
+		<label for="MG_DEF_METHOD">MG_DEF_METHOD</label>
+		<select name="MG_DEF_METHOD">
+			<option value="manual" {% if in_data.MG_DEF_METHOD == 'manual' %}selected{% endif %}>Manual</option>
+			<option value="lukes" {% if in_data.MG_DEF_METHOD == 'lukes' %}selected{% endif %}>Lukes</option>
+			<option value="branch" {% if in_data.MG_DEF_METHOD == 'branch' %}selected{% endif %}>Branch</option>
+		</select></br>
 		<textarea name="MICROGRIDS" rows="20" cols="100">{{in_data.MICROGRIDS | tojson}}</textarea>
 		<input type="submit" value="Submit">
 	</form>

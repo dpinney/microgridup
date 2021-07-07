@@ -2,7 +2,6 @@ from omf.solvers import opendss
 import networkx as nx
 from pprint import pprint as pp
 
-
 # Auto gen some microgrid descriptions.
 # See experiments with networkx here: https://colab.research.google.com/drive/1RZyD6pRIdRAT-V2sBB0nPKVIvZP_RGHw
 
@@ -48,10 +47,15 @@ def nx_out_edges(G, sub_nodes):
 	return out_edges
 
 def get_edge_name(fr, to, omd_list):
+	'Get an edge name using (fr,to) in the omd_list'
 	edges = [ob.get('name') for ob in omd_list if ob.get('from') == fr and ob.get('to') == to]
 	return None if len(edges) == 0 else edges[0]
 
 def mg_group(circ_path, crit_loads, algo, algo_params={}):
+	'''Generate a group of mgs from circ_path with crit_loads
+	algo must be one of ["lukes", "branch"]
+	lukes algo params is 'size':int giving size of each mg.
+	branch algo params is 'i_branch': giving which branch in the tree to split on.'''
 	# Load data
 	G = opendss.dssConvert.dss_to_networkx(CIRC_FILE)
 	# print(list(G.edges()))

@@ -25,6 +25,8 @@
 		<input type="text" name="FAULTED_LINE" value="{{in_data.FAULTED_LINE}}">
 		<label for="QSTS_STEPS">QSTS_STEPS</label>
 		<input type="text" name="QSTS_STEPS" value="{{in_data.QSTS_STEPS}}">
+		<label for="CRITICAL_LOADS">CRITICAL_LOADS</label>
+		<input type="text" name="CRITICAL_LOADS" value="{{in_data.CRITICAL_LOADS}}">
 		<label for="DIESEL_SAFETY_FACTOR">DIESEL_SAFETY_FACTOR</label>
 		<input type="text" name="DIESEL_SAFETY_FACTOR" value="{{in_data.DIESEL_SAFETY_FACTOR}}">
 		<label for="FOSSIL_BACKUP_PERCENT">FOSSIL_BACKUP_PERCENT</label>
@@ -32,6 +34,12 @@
 		<h2>REOpt Inputs</h2>
 		<textarea name="REOPT_INPUTS" rows="20" cols="100">{{in_data.REOPT_INPUTS | tojson}}</textarea>
 		<h2>Microgrid Definitions</h2>
+		<label for="MG_DEF_METHOD">MG_DEF_METHOD</label>
+		<select name="MG_DEF_METHOD">
+			<option value="manual" {% if in_data.MG_DEF_METHOD == 'manual' %}selected{% endif %}>Manual</option>
+			<option value="lukes" {% if in_data.MG_DEF_METHOD == 'lukes' %}selected{% endif %}>Lukes</option>
+			<option value="branch" {% if in_data.MG_DEF_METHOD == 'branch' %}selected{% endif %}>Branch</option>
+		</select></br>
 		<textarea name="MICROGRIDS" rows="20" cols="100">{{in_data.MICROGRIDS | tojson}}</textarea>
 		<input type="submit" value="Submit">
 	</form>

@@ -2,7 +2,16 @@ from omf.solvers import opendss
 import networkx as nx
 from pprint import pprint as pp
 
+
+# Auto gen some microgrid descriptions.
+# See experiments with networkx here: https://colab.research.google.com/drive/1RZyD6pRIdRAT-V2sBB0nPKVIvZP_RGHw
+'''
+def mg_group(circ_path, crit_loads, algo, algo_params={size,i_branch))-> MICROGRIDS
+'''
+
 CIRC_FILE = '../lehigh_base_phased.dss'
+CRITICAL_LOADS = ['645_hangar','684_command_center', '611_runway','675a_hospital','634a_data_center', '634b_radar', '634c_atc_tower']
+
 G = opendss.dssConvert.dss_to_networkx(CIRC_FILE)
 print(list(G.edges()))
 
@@ -46,41 +55,51 @@ def nx_group_branch(G, i_branch=0):
 	return parts
 
 def nx_group_lukes(G, size, node_weight=None, edge_weight=None):
-    ''' Partition the graph using Lukes algorithm into pieces of [size] nodes.'''
+    'Partition the graph using Lukes algorithm into pieces of [size] nodes.'
     tree_root = list(nx.topological_sort(G))[0]
     G_topo_order = nx.DiGraph(nx.algorithms.traversal.breadth_first_search.bfs_edges(G, tree_root))
     return nx.algorithms.community.lukes.lukes_partitioning(G_topo_order, size, node_weight=node_weight, edge_weight=edge_weight)
 
-# Auto gen some microgrid descriptions.
-'''
-def mg_group_lukes(omd, size) -> MICROGRIDS
-def mg_group_branch(omd, b_index) - > MICROGRIDS
-'''
+def nx_get_parent(G, n):
+	preds = G.predecessors(n)
+	return list(preds)[0]
+
+def nx_out_edges(G, sub_nodes):
+    'Find edges connect sub_nodes to rest of graph.'
+    mg1 = G.subgraph(sub_nodes)
+    out_edges = []
+    for n in mg1.nodes():
+        out_preds = [(x,n) for x in G.predecessors(n) if x not in mg1]
+        out_succ = [(n,x) for x in G.successors(n) if x not in mg1]
+        out_edges.extend(out_succ)
+        out_edges.extend(out_preds)
+    return out_edges
+
+def get_edge_name(fr, to, omd_list):
+	edges = [ob.get('name') for ob in omd_list if ob.get('from') == fr and ob.get('to') == to]
+	return None if len(edges) == 0 else edges[0]
 
 omd = opendss.dssConvert.dssToOmd(CIRC_FILE, None, write_out=False)
 omd_list = list(omd.values())
 MG_GROUPS = nx_group_lukes(G, 12)
 
-def get_parent(G, n):
-	preds = G.predecessors(n)
-	return list(preds)[0]
-
-all_mgs = [(M_ID, MG_GROUP, MG_GROUP[0], get_parent(G, MG_GROUP[0])) for (M_ID, MG_GROUP) in enumerate([list(x) for x in MG_GROUPS])]
+all_mgs = [
+	(M_ID, MG_GROUP, MG_GROUP[0], nx_out_edges(G, MG_GROUP))
+	for (M_ID, MG_GROUP) in enumerate([list(x) for x in MG_GROUPS])
+]
 print(all_mgs)
 
-CRITICAL_LOADS = ['645_hangar','684_command_center', '611_runway','675a_hospital','634a_data_center', '634b_radar', '634c_atc_tower']
-
 MG_MINES = {
-	f'm{M_ID}': {
+	f'mg{M_ID}': {
 		'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
-		'switch': [ob.get('name') for ob in omd_list if ob.get('from') == UP_1_NODE and ob.get('to') == TREE_ROOT], #TODO: handle multiple switches.
+		'switch': [get_edge_name(swedge[0], swedge[1], omd_list) for swedge in BORDERS], #TODO: get daniel's code to handle multiple switches.
 		'gen_bus': TREE_ROOT,
 		'gen_obs_existing': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') in ('generator','pvsystem')],
 		'critical_load_kws': [0.0 if ob.get('name') not in CRITICAL_LOADS else float(ob.get('kw','0')) for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
 		'max_potential': '700', #TODO: this and other vars, how to set? Ask Matt.
 		'max_potential_diesel': '1000000',
 		'battery_capacity': '10000'
-	} for (M_ID, MG_GROUP, TREE_ROOT, UP_1_NODE) in all_mgs
+	} for (M_ID, MG_GROUP, TREE_ROOT, BORDERS) in all_mgs
 }
 
 pp(MG_MINES)

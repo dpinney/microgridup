@@ -16,6 +16,7 @@ if __name__ == '__main__':
 		"wind" : "off",
 		"battery" : "on",
 		"year" : '2017',
+		"analysisYears": "25",
 		"energyCost" : "0.12",
 		"demandCost" : '20',
 		"wholesaleCost" : "0.034",

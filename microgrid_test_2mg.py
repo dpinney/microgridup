@@ -4,7 +4,7 @@ from microgridup import *
 
 if __name__ == '__main__':
 	# Input data.
-	MODEL_DIR = 'lehigh_doug'
+	MODEL_DIR = '2mgs'
 	BASE_DSS = 'lehigh_base_phased.dss'
 	LOAD_CSV = 'lehigh_load.csv'
 	FAULTED_LINE = '670671'
@@ -16,6 +16,7 @@ if __name__ == '__main__':
 		"wind" : "on",
 		"battery" : "on",
 		"year" : '2017',
+		"analysisYears": "25",
 		"energyCost" : "0.12",
 		"demandCost" : '20',
 		"wholesaleCost" : "0.034",

@@ -1,6 +1,6 @@
 from microgridup import *
 
-'''Test to confirm diesel backup and existing wind with FOSSIL_BACKUP_PERCENT = 1'''
+'''Test to confirm existing and new diesel backup with natural gas , and existing wind with FOSSIL_BACKUP_PERCENT = 1'''
 
 if __name__ == '__main__':
 	# Input data.
@@ -9,7 +9,7 @@ if __name__ == '__main__':
 	LOAD_CSV = 'lehigh_load.csv'
 	FAULTED_LINE = '670671'
 	QSTS_STEPS = 24*20
-	FOSSIL_BACKUP_PERCENT = .5
+	FOSSIL_BACKUP_PERCENT = 1
 	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth
 	REOPT_INPUTS = {
 		"solar" : "on",
@@ -38,15 +38,16 @@ if __name__ == '__main__':
 		"criticalLoadFactor": "1",
 		#"outage_start_hour": "200",
 		"outageDuration": "48",
-		"fuelAvailable": "50000",
+		"fuelAvailable": "100000",
 		"genExisting": 0,
-		"minGenLoading": "0.3",
+		"minGenLoading": "0",
 		"batteryKwExisting": 0,
 		"batteryKwhExisting": 0,
 		"windExisting": 0,
 		"value_of_lost_load": "100",
 		"solarCanCurtail": True,
-		"solarCanExport": True
+		"solarCanExport": True,
+		"dieselOnlyRunsDuringOutage": False
 	}
 	MICROGRIDS = {
 		'mg0': {

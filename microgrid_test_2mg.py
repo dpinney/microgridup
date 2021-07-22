@@ -46,7 +46,8 @@ if __name__ == '__main__':
 		"windExisting": 0,
 		"value_of_lost_load": "100",
 		"solarCanCurtail": True,
-		"solarCanExport": True
+		"solarCanExport": True,
+		"dieselOnlyRunsDuringOutage": True
 	}
 	MICROGRIDS = {
 		'm0': {

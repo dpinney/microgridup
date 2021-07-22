@@ -303,6 +303,7 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 		'diesel_size_total':diesel_size_total, 'diesel_size_existing':diesel_size_existing, 'diesel_size_new':diesel_size_new, \
 		'battery_cap_total':battery_cap_total, 'battery_cap_existing':battery_cap_existing, 'battery_cap_new':battery_cap_new, \
 		'battery_pow_total':battery_pow_total, 'battery_pow_existing':battery_pow_existing, 'battery_pow_new':battery_pow_new})
+	#print("gen_sizes:",gen_sizes)
 	return gen_sizes #dictionary of all gen sizes
 
 def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, microgrid, critical_load_percent, diesel_total_calc=False):
@@ -437,8 +438,8 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			allInputData['batteryPowerMin'] = battery_pow_existing
 			allInputData['batteryPowerMax'] = battery_pow_existing
 			allInputData['batteryKwExisting'] = battery_pow_existing
-			allInputData['batteryCapacityMin'] = battery_pow_existing
-			allInputData['batteryCapacityMax'] = battery_pow_existing
+			allInputData['batteryCapacityMin'] = battery_cap_existing
+			allInputData['batteryCapacityMax'] = battery_cap_existing
 			allInputData['batteryKwhExisting'] = battery_cap_existing
 			allInputData['battery'] = 'on'
 
@@ -553,16 +554,16 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 			'h':'2'
 		})
 		# 0-1 scale the power output loadshape to the total generation kw of that type of generator
-		# gen_df_builder[f'diesel_{gen_bus_name}'] = pd.Series(reopt_out.get(f'powerDiesel{mg_num}'))/diesel_size_total # insert the 0-1 diesel generation shape provided by REopt to simulate the outage specified in REopt
+		gen_df_builder[f'diesel_{gen_bus_name}'] = pd.Series(reopt_out.get(f'powerDiesel{mg_num}'))/diesel_size_total*diesel_size_new # insert the 0-1 diesel generation shape provided by REopt to simulate the outage specified in REopt
 		# TODO: if using real loadshapes for diesel, need to scale them based on rated kw of the new diesel
-		gen_df_builder[f'diesel_{gen_bus_name}'] = pd.Series(np.zeros(8760)) # insert an array of zeros for the diesel generation shape to simulate no outage
+		# gen_df_builder[f'diesel_{gen_bus_name}'] = pd.Series(np.zeros(8760)) # insert an array of zeros for the diesel generation shape to simulate no outage
 	# build loadshapes for existing generation from BASE_NAME, inputting the 0-1 diesel generation loadshape 
 	if diesel_size_existing > 0:	
 		for gen_ob_existing in gen_obs_existing:
 			if gen_ob_existing.startswith('diesel_'):
-				# gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerDiesel{mg_num}'))/diesel_size_total # insert the 0-1 diesel generation shape provided by REopt to simulate the outage specified in REopt
+				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerDiesel{mg_num}'))/diesel_size_total*diesel_size_existing # insert the 0-1 diesel generation shape provided by REopt to simulate the outage specified in REopt
 				# TODO: if using real loadshapes for diesel, need to scale them based on rated kw of that individual generator object
-				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(np.zeros(8760)) # insert an array of zeros for the diesel generation shape to simulate no outage
+				# gen_df_builder[f'{gen_ob_existing}'] = pd.Series(np.zeros(8760)) # insert an array of zeros for the diesel generation shape to simulate no outage
 	
 	# Build new wind gen objects and loadshapes
 	wind_size_total = gen_sizes.get('wind_size_total')

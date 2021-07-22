@@ -8,7 +8,7 @@ if __name__ == '__main__':
 	BASE_DSS = 'lehigh_base_phased.dss'
 	LOAD_CSV = 'lehigh_load.csv'
 	FAULTED_LINE = '670671'
-	QSTS_STEPS = 24*20
+	QSTS_STEPS = 24*400
 	FOSSIL_BACKUP_PERCENT = .5
 	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth 
 	REOPT_INPUTS = {
@@ -50,7 +50,8 @@ if __name__ == '__main__':
 		"dieselOMCostKwh": 0,
 		"value_of_lost_load": "1",
 		"solarCanCurtail": True,
-		"solarCanExport": True
+		"solarCanExport": True,
+		"dieselOnlyRunsDuringOutage": False
 	}
 	MICROGRIDS = {
 		'mg0': {

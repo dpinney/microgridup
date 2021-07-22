@@ -504,7 +504,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	will need to implement searching the tree of FULL_NAME to find kw ratings of existing gens'''
 
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER)
-	# print("gen_sizes:", gen_sizes)
+	print("gen_sizes into OpenDSS:", gen_sizes)
 	reopt_out = json.load(open(REOPT_FOLDER + '/allOutputData.json'))
 	gen_df_builder = pd.DataFrame()
 	gen_obs = []
@@ -541,6 +541,10 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	diesel_size_total = gen_sizes.get('diesel_size_total')
 	diesel_size_new = gen_sizes.get('diesel_size_new')
 	diesel_size_existing = gen_sizes.get('diesel_size_existing')
+	# remove 1 kw new diesel if built as an artifact of feedback_reopt_gen_values()
+	if diesel_size_new == 1:
+		diesel_size_new = 0
+		diesel_size_total -= 1
 	if diesel_size_new > 0:
 		gen_obs.append({
 			'!CMD': 'new',

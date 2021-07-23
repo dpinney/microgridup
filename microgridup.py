@@ -414,6 +414,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			allInputData['solarExisting'] = solar_size_existing
 			allInputData['solar'] = 'on'
 		# if additional battery power is recommended by REopt, remove existing batteries and add in new battery
+		# ignore tiny battery recommendations (<1 kw) from REopt
 		if battery_pow_new > 0:
 			allInputData['batteryPowerMin'] = battery_pow_total
 			allInputData['batteryPowerMax'] = battery_pow_total
@@ -424,6 +425,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			allInputData['batteryKwhExisting'] = 0
 			allInputData['battery'] = 'on'
 		# if only additional energy storage (kWh) is recommended, add a battery of same power as existing battery with the recommended additional kWh
+		# ignore tiny battery recommendations (<1 kw) from REopt
 		elif battery_cap_new > 0:
 			allInputData['batteryPowerMin'] = battery_pow_existing
 			allInputData['batteryPowerMax'] = battery_pow_existing
@@ -442,8 +444,17 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			allInputData['batteryCapacityMax'] = battery_cap_existing
 			allInputData['batteryKwhExisting'] = battery_cap_existing
 			allInputData['battery'] = 'on'
+		# handle tiny battery recommendations from REopt that can cause mgUp to fail
+		# elif battery_pow_new < 1 or battery_cap_new < 1:
+		# 	allInputData['batteryPowerMin'] = 0
+		# 	allInputData['batteryPowerMax'] = 0
+		# 	allInputData['batteryKwExisting'] = 0
+		# 	allInputData['batteryCapacityMin'] = 0
+		# 	allInputData['batteryCapacityMax'] = 0
+		# 	allInputData['batteryKwhExisting'] = 0
+		# 	allInputData['battery'] = 'off'
 
-		if wind_size_total > 0 and wind_size_total != 1: # enable the dual condition when using gen_existing_ref_shapes()
+		if wind_size_total > 0 and wind_size_total != 1: # enable this dual condition when using gen_existing_ref_shapes()
 			allInputData['windMin'] = wind_size_total
 			allInputData['windMax'] = wind_size_total
 			allInputData['windExisting'] = wind_size_existing
@@ -599,7 +610,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	battery_pow_total = gen_sizes.get('battery_pow_total')
 	battery_pow_new = gen_sizes.get('battery_pow_new')
 	battery_pow_existing = gen_sizes.get('battery_pow_existing')
-	if battery_cap_total > 0:	
+	if battery_pow_total > 0:	
 		batToLoad = pd.Series(reopt_out.get(f'powerBatteryToLoad{mg_num}'))
 		gridToBat = np.zeros(8760)
 		# TO DO: add logic to update insertion of grid charging when Daniel's islanding framework is complete 	
@@ -615,7 +626,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 			windToBat = pd.Series(reopt_out.get(f'powerWindToBattery{mg_num}'))
 		battery_load = batToLoad - gridToBat - pVToBat - dieselToBat - windToBat
 	# get DSS objects and loadshapes for new battery
-	# if additional battery power is recommended by REopt, give existing batteries loadshape of zeros and add in full sized new battery
+	# if additional battery power of more than 5 kw is recommended by REopt, give existing batteries loadshape of zeros and add in full sized new battery
 	if battery_pow_new > 0:
 		# print("build_new_gen() 1a")
 		gen_obs.append({

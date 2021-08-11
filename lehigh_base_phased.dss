@@ -119,3 +119,5 @@ setbusxy bus=680 y=30.285013 x=-84.075493
 ! set voltages
 set voltagebases=[115,4.16,0.48]
 calcvoltagebases
+! solve
+! show quantity=voltages

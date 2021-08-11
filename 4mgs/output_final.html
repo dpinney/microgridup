@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>This report was made by Daniel, David and Matt.</title>
+	<style type="text/css">iframe {width:100%;height:600px}</style>
+	<script>
+		function openTab(tabName) {
+			for (tag of document.getElementsByClassName("tab")) {
+				tag.style.visibility = "hidden";
+			}
+			document.getElementById(tabName).style.visibility = "visible";  
+		}
+		window.onload = function(){ document.getElementById("loading").style.display = "none" }
+	</script>
+	<style type="text/css">
+		.tab {position:fixed; top:30px; left:0px; width:100%; height:100vh; visibility:hidden}
+		#loading {width:100%; height:100%; top:0px; left:0px; position:fixed; display:block; z-index:99; background-color:rgba(0,0,0,0.5); text-align:center; line-height:60vh; font-size:80pt; font-family:Helvetica,Arial,Sans-Serif; text-shadow:0px 0px 5px white}
+	</style>
+</head>
+<body style="margin:0px; height:30px">
+	<div id="loading">Loading</div>
+	<div>
+		<button onclick="openTab('overview')">Overview</button>
+		<button onclick="openTab('oneline')">Oneline</button>
+		<button onclick="openTab('map')">Map</button>
+		<button onclick="openTab('interconnection')">Interconnection</button>
+		<button onclick="openTab('control')">Control</button>
+		
+			<button onclick="openTab('reopt_final_0')">reopt_final_0</button>
+		
+			<button onclick="openTab('reopt_final_1')">reopt_final_1</button>
+		
+			<button onclick="openTab('reopt_final_2')">reopt_final_2</button>
+		
+			<button onclick="openTab('reopt_final_3')">reopt_final_3</button>
+		
+		<button onclick="openTab('files')">Files</button>
+	</div>
+	<div id="overview" class="tab" style="margin:5px; overflow:scroll; visibility:visible">
+		<pre style="width:95%; white-space:pre-wrap">Report Generated on 2021-08-11 14:43:42.261165</pre>
+		<pre style="width:95%; white-space:pre-wrap">INPUTS: {'MODEL_DIR': '4mgs', 'BASE_DSS': 'lehigh_base_phased.dss', 'LOAD_CSV': 'lehigh_load.csv', 'QSTS_STEPS': 480, 'FOSSIL_BACKUP_PERCENT': 1, 'REOPT_INPUTS': {'solar': 'on', 'wind': 'off', 'battery': 'on', 'year': '2017', 'analysisYears': '25', 'energyCost': '0.12', 'demandCost': '20', 'urdbLabelSwitch': 'off', 'wholesaleCost': '0.034', 'solarCost': '1600', 'windCost': '4989', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'dieselGenCost': '500', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '100000', 'windMax': '100000', 'batteryPowerMax': '1000000', 'batteryCapacityMax': '1000000', 'dieselMax': '1000000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outageDuration': '48', 'fuelAvailable': '1000000', 'genExisting': 0, 'minGenLoading': '0', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'dieselFuelCostGal': 1.44, 'dieselCO2Factor': 24.1, 'dieselOMCostKw': 35, 'dieselOMCostKwh': 0.02, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True, 'dieselOnlyRunsDuringOutage': False}, 'MICROGRIDS': {'mg0': {'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'switch': '632633', 'gen_bus': '634', 'gen_obs_existing': ['solar_634_existing', 'battery_634_existing'], 'critical_load_kws': [70, 90, 10], 'max_potential_battery': '700', 'max_potential_diesel': '1000000', 'battery_capacity': '10000'}, 'mg1': {'loads': ['675a_hospital', '675b_residential1', '675c_residential1'], 'switch': '671692', 'gen_bus': '675', 'gen_obs_existing': ['solar_675_existing'], 'critical_load_kws': [150, 200, 200], 'max_potential_battery': '900', 'max_potential_diesel': '300', 'battery_capacity': '20000'}, 'mg2': {'loads': ['684_command_center', '652_residential'], 'switch': '671684', 'gen_bus': '684', 'gen_obs_existing': ['diesel_684_existing', 'battery_684_existing'], 'critical_load_kws': [400, 20], 'max_potential': '1300', 'max_potential_diesel': '1000000', 'battery_capacity': '10000'}, 'mg3': {'loads': ['645_hangar', '646_office'], 'switch': '632645', 'gen_bus': '646', 'gen_obs_existing': [], 'critical_load_kws': [30, 70], 'max_potential_battery': '800', 'max_potential_diesel': '1000000', 'battery_capacity': '10000'}}, 'FAULTED_LINE': '670671', 'DIESEL_SAFETY_FACTOR': False}</pre>
+		<pre style="width:95%; white-space:pre-wrap">User Warnings:</pre>
+		<pre style="width:95%; white-space:pre-wrap">Pre-existing battery battery_684_existing will not be utilized to support loads in microgrid mg2.
+</pre>
+		<!-- formatted below for a dict of lists -->
+		<pre>Overview of Microgrids</pre>
+		<table style="margin-bottom:40px">
+			
+				<tr>
+					<td>Microgrid Name</td>
+					
+						
+							<td style="text-align:right">mg0</td>
+						
+					
+						
+							<td style="text-align:right">mg1</td>
+						
+					
+						
+							<td style="text-align:right">mg2</td>
+						
+					
+						
+							<td style="text-align:right">mg3</td>
+						
+					
+						
+							<td style="text-align:right">Summary</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Generation Bus</td>
+					
+						
+							<td style="text-align:right">634</td>
+						
+					
+						
+							<td style="text-align:right">675</td>
+						
+					
+						
+							<td style="text-align:right">684</td>
+						
+					
+						
+							<td style="text-align:right">646</td>
+						
+					
+						
+							<td style="text-align:right">None</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Minimum 1 hr Load (kW)</td>
+					
+						
+							<td style="text-align:right">56</td>
+						
+					
+						
+							<td style="text-align:right">211</td>
+						
+					
+						
+							<td style="text-align:right">213</td>
+						
+					
+						
+							<td style="text-align:right">17</td>
+						
+					
+						
+							<td style="text-align:right">497</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Average 1 hr Load (kW)</td>
+					
+						
+							<td style="text-align:right">178.0</td>
+						
+					
+						
+							<td style="text-align:right">402.0</td>
+						
+					
+						
+							<td style="text-align:right">549.0</td>
+						
+					
+						
+							<td style="text-align:right">138.0</td>
+						
+					
+						
+							<td style="text-align:right">1,267</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Average Daytime 1 hr Load (kW)</td>
+					
+						
+							<td style="text-align:right">247.0</td>
+						
+					
+						
+							<td style="text-align:right">497.0</td>
+						
+					
+						
+							<td style="text-align:right">682.0</td>
+						
+					
+						
+							<td style="text-align:right">214.0</td>
+						
+					
+						
+							<td style="text-align:right">1,640</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Maximum 1 hr Load (kW)</td>
+					
+						
+							<td style="text-align:right">306</td>
+						
+					
+						
+							<td style="text-align:right">708</td>
+						
+					
+						
+							<td style="text-align:right">893</td>
+						
+					
+						
+							<td style="text-align:right">379</td>
+						
+					
+						
+							<td style="text-align:right">2,286</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Maximum 1 hr Critical Load (kW)</td>
+					
+						
+							<td style="text-align:right">170</td>
+						
+					
+						
+							<td style="text-align:right">550</td>
+						
+					
+						
+							<td style="text-align:right">420</td>
+						
+					
+						
+							<td style="text-align:right">100</td>
+						
+					
+						
+							<td style="text-align:right">1,240</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Existing Fossil Generation (kW)</td>
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">81</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">81</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>New Fossil Generation (kW)</td>
+					
+						
+							<td style="text-align:right">182</td>
+						
+					
+						
+							<td style="text-align:right">538</td>
+						
+					
+						
+							<td style="text-align:right">593</td>
+						
+					
+						
+							<td style="text-align:right">262</td>
+						
+					
+						
+							<td style="text-align:right">1,575</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Existing Solar (kW)</td>
+					
+						
+							<td style="text-align:right">440</td>
+						
+					
+						
+							<td style="text-align:right">800</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">1,240</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>New Solar (kW)</td>
+					
+						
+							<td style="text-align:right">193</td>
+						
+					
+						
+							<td style="text-align:right">331</td>
+						
+					
+						
+							<td style="text-align:right">1,550</td>
+						
+					
+						
+							<td style="text-align:right">559</td>
+						
+					
+						
+							<td style="text-align:right">2,633</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Existing Battery Power (kW)</td>
+					
+						
+							<td style="text-align:right">79</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">79</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Existing Battery Energy Storage (kWh)</td>
+					
+						
+							<td style="text-align:right">307</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">307</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>New Battery Power (kW)</td>
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">50</td>
+						
+					
+						
+							<td style="text-align:right">4</td>
+						
+					
+						
+							<td style="text-align:right">54</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>New Battery Energy Storage (kWh)</td>
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">66</td>
+						
+					
+						
+							<td style="text-align:right">6</td>
+						
+					
+						
+							<td style="text-align:right">72</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Existing Wind (kW)</td>
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>New Wind (kW)</td>
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Total Generation on Microgrid (kW)</td>
+					
+						
+							<td style="text-align:right">894</td>
+						
+					
+						
+							<td style="text-align:right">1,669</td>
+						
+					
+						
+							<td style="text-align:right">2,274</td>
+						
+					
+						
+							<td style="text-align:right">825</td>
+						
+					
+						
+							<td style="text-align:right">5,662</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Renewable Generation (% of Yr 1 kWh)</td>
+					
+						
+							<td style="text-align:right">52</td>
+						
+					
+						
+							<td style="text-align:right">41</td>
+						
+					
+						
+							<td style="text-align:right">41</td>
+						
+					
+						
+							<td style="text-align:right">59</td>
+						
+					
+						
+							<td style="text-align:right">22</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Emissions (Yr 1 Tons CO2)</td>
+					
+						
+							<td style="text-align:right">667</td>
+						
+					
+						
+							<td style="text-align:right">1,832</td>
+						
+					
+						
+							<td style="text-align:right">2,494</td>
+						
+					
+						
+							<td style="text-align:right">519</td>
+						
+					
+						
+							<td style="text-align:right">5,512</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Emissions Reduction (Yr 1 % CO2)</td>
+					
+						
+							<td style="text-align:right">2</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">23</td>
+						
+					
+						
+							<td style="text-align:right">36</td>
+						
+					
+						
+							<td style="text-align:right">16</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>NPV over 25 years ($)</td>
+					
+						
+							<td style="text-align:right">201,435</td>
+						
+					
+						
+							<td style="text-align:right">582,553</td>
+						
+					
+						
+							<td style="text-align:right">1,298,890</td>
+						
+					
+						
+							<td style="text-align:right">531,826</td>
+						
+					
+						
+							<td style="text-align:right">2,614,704</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>CapEx ($)</td>
+					
+						
+							<td style="text-align:right">399,309</td>
+						
+					
+						
+							<td style="text-align:right">798,368</td>
+						
+					
+						
+							<td style="text-align:right">2,845,545</td>
+						
+					
+						
+							<td style="text-align:right">1,030,664</td>
+						
+					
+						
+							<td style="text-align:right">5,073,886</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>CapEx after Tax Incentives ($)</td>
+					
+						
+							<td style="text-align:right">409,390</td>
+						
+					
+						
+							<td style="text-align:right">560,718</td>
+						
+					
+						
+							<td style="text-align:right">1,715,792</td>
+						
+					
+						
+							<td style="text-align:right">627,950</td>
+						
+					
+						
+							<td style="text-align:right">3,313,850</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>O+M Costs (Yr 1 $ before tax)</td>
+					
+						
+							<td style="text-align:right">31,920</td>
+						
+					
+						
+							<td style="text-align:right">79,066</td>
+						
+					
+						
+							<td style="text-align:right">106,549</td>
+						
+					
+						
+							<td style="text-align:right">28,516</td>
+						
+					
+						
+							<td style="text-align:right">246,051</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Average Outage Survived (h)</td>
+					
+						
+							<td style="text-align:right">nan</td>
+						
+					
+						
+							<td style="text-align:right">nan</td>
+						
+					
+						
+							<td style="text-align:right">nan</td>
+						
+					
+						
+							<td style="text-align:right">nan</td>
+						
+					
+						
+							<td style="text-align:right">nan</td>
+						
+					
+				</tr>
+			
+		</table>
+	</div>
+	<div id="oneline" class="tab" style="visibility:hidden">
+		<iframe src="circuit_oneline.html" style="height:100vh"></iframe>
+	</div>
+	<div id="map" class="tab" style="visibility:hidden">
+		<iframe src="circuit_map/geoJsonMap_offline.html" style="height:100vh"></iframe>
+	</div>
+	<div id="interconnection" class="tab" style="visibility:hidden">
+		<div style="height:100vh; overflow:scroll">
+			<iframe src="timeseries_gen.csv.plot.html"></iframe>
+			<iframe src="timeseries_load.csv.plot.html"></iframe>
+			<iframe src="timeseries_source.csv.plot.html"></iframe>
+			<iframe src="timeseries_control.csv.plot.html"></iframe>
+		</div>
+	</div>
+	<div id="control" class="tab" style="visibility:hidden">
+		<div style="height:100vh; overflow:scroll">
+			<!-- <iframe src="timezcontrol_gen.csv.plot.html"></iframe> -->
+			<iframe src="timezcontrol_load.csv.plot.html"></iframe>
+			<iframe src="timezcontrol_source.csv.plot.html"></iframe>
+			<iframe src="timezcontrol_control.csv.plot.html"></iframe>
+		</div>
+	</div>
+	
+	<div id="reopt_final_0" class="tab" style="visibility:hidden">
+		<iframe src="reopt_final_0/inlineTemplate.html" style="height:100vh"></iframe>
+	</div>
+	
+	<div id="reopt_final_1" class="tab" style="visibility:hidden">
+		<iframe src="reopt_final_1/inlineTemplate.html" style="height:100vh"></iframe>
+	</div>
+	
+	<div id="reopt_final_2" class="tab" style="visibility:hidden">
+		<iframe src="reopt_final_2/inlineTemplate.html" style="height:100vh"></iframe>
+	</div>
+	
+	<div id="reopt_final_3" class="tab" style="visibility:hidden">
+		<iframe src="reopt_final_3/inlineTemplate.html" style="height:100vh"></iframe>
+	</div>
+	
+	<div id="files" class="tab" style="visibility:hidden">
+		<div style="height:100vh; overflow:scroll">
+			<ul>
+			
+			<li><a href='/4mgs/./output_full_3.html'>./output_full_3.html</a></li>
+			
+			<li><a href='/4mgs/./ultimate_rep_circuit_plusmg_3.dss.csv'>./ultimate_rep_circuit_plusmg_3.dss.csv</a></li>
+			
+			<li><a href='/4mgs/./timeseries_control.csv.plot.html'>./timeseries_control.csv.plot.html</a></li>
+			
+			<li><a href='/4mgs/./loads.csv'>./loads.csv</a></li>
+			
+			<li><a href='/4mgs/./ref_gen_loads.csv'>./ref_gen_loads.csv</a></li>
+			
+			<li><a href='/4mgs/./timeseries_control.csv'>./timeseries_control.csv</a></li>
+			
+			<li><a href='/4mgs/./ultimate_rep_circuit_plusmg_2.dss.csv'>./ultimate_rep_circuit_plusmg_2.dss.csv</a></li>
+			
+			<li><a href='/4mgs/./output_full_2.html'>./output_full_2.html</a></li>
+			
+			<li><a href='/4mgs/./circuit_plusmg_0.dss'>./circuit_plusmg_0.dss</a></li>
+			
+			<li><a href='/4mgs/./circuit_plusmg_1.dss'>./circuit_plusmg_1.dss</a></li>
+			
+			<li><a href='/4mgs/./circuit.dss'>./circuit.dss</a></li>
+			
+			<li><a href='/4mgs/./ultimate_rep_circuit_plusmg_0.dss.csv'>./ultimate_rep_circuit_plusmg_0.dss.csv</a></li>
+			
+			<li><a href='/4mgs/./circuit_plusmg_3.dss'>./circuit_plusmg_3.dss</a></li>
+			
+			<li><a href='/4mgs/./circuit_plusmg_2.dss'>./circuit_plusmg_2.dss</a></li>
+			
+			<li><a href='/4mgs/./timeseries_gen.csv'>./timeseries_gen.csv</a></li>
+			
+			<li><a href='/4mgs/./timeseries_gen.csv.plot.html'>./timeseries_gen.csv.plot.html</a></li>
+			
+			<li><a href='/4mgs/./ultimate_rep_circuit_plusmg_1.dss.csv'>./ultimate_rep_circuit_plusmg_1.dss.csv</a></li>
+			
+			<li><a href='/4mgs/./circuit.dss.omd'>./circuit.dss.omd</a></li>
+			
+			<li><a href='/4mgs/./timeseries_load.csv.plot.html'>./timeseries_load.csv.plot.html</a></li>
+			
+			<li><a href='/4mgs/./coords.csv'>./coords.csv</a></li>
+			
+			<li><a href='/4mgs/./timeseries_source.csv'>./timeseries_source.csv</a></li>
+			
+			<li><a href='/4mgs/./generation.csv'>./generation.csv</a></li>
+			
+			<li><a href='/4mgs/./circuit_oneline.html'>./circuit_oneline.html</a></li>
+			
+			<li><a href='/4mgs/./output_full_1.html'>./output_full_1.html</a></li>
+			
+			<li><a href='/4mgs/./timeseries_load.csv'>./timeseries_load.csv</a></li>
+			
+			<li><a href='/4mgs/./timeseries_source.csv.plot.html'>./timeseries_source.csv.plot.html</a></li>
+			
+			<li><a href='/4mgs/./user_warnings.txt'>./user_warnings.txt</a></li>
+			
+			<li><a href='/4mgs/./output_full_0.html'>./output_full_0.html</a></li>
+			
+			<li><a href='/4mgs/./allInputData.json'>./allInputData.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_1/inlineTemplate.html'>./reopt_base_1/inlineTemplate.html</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_1/resultsResilience.json'>./reopt_base_1/resultsResilience.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_1/Scenario_test_POST.json'>./reopt_base_1/Scenario_test_POST.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_1/loadShape.csv'>./reopt_base_1/loadShape.csv</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_1/results.json'>./reopt_base_1/results.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_1/allOutputData.json'>./reopt_base_1/allOutputData.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_1/criticalLoadShape.csv'>./reopt_base_1/criticalLoadShape.csv</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_1/allInputData.json'>./reopt_base_1/allInputData.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_0/inlineTemplate.html'>./reopt_base_0/inlineTemplate.html</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_0/resultsResilience.json'>./reopt_base_0/resultsResilience.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_0/Scenario_test_POST.json'>./reopt_base_0/Scenario_test_POST.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_0/loadShape.csv'>./reopt_base_0/loadShape.csv</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_0/results.json'>./reopt_base_0/results.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_0/allOutputData.json'>./reopt_base_0/allOutputData.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_0/criticalLoadShape.csv'>./reopt_base_0/criticalLoadShape.csv</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_0/allInputData.json'>./reopt_base_0/allInputData.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_1/inlineTemplate.html'>./reopt_final_1/inlineTemplate.html</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_1/resultsResilience.json'>./reopt_final_1/resultsResilience.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_1/Scenario_test_POST.json'>./reopt_final_1/Scenario_test_POST.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_1/loadShape.csv'>./reopt_final_1/loadShape.csv</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_1/results.json'>./reopt_final_1/results.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_1/allOutputData.json'>./reopt_final_1/allOutputData.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_1/criticalLoadShape.csv'>./reopt_final_1/criticalLoadShape.csv</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_1/allInputData.json'>./reopt_final_1/allInputData.json</a></li>
+			
+			<li><a href='/4mgs/./circuit_map/geoJsonMap_offline.html'>./circuit_map/geoJsonMap_offline.html</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_0/inlineTemplate.html'>./reopt_final_0/inlineTemplate.html</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_0/resultsResilience.json'>./reopt_final_0/resultsResilience.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_0/Scenario_test_POST.json'>./reopt_final_0/Scenario_test_POST.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_0/loadShape.csv'>./reopt_final_0/loadShape.csv</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_0/results.json'>./reopt_final_0/results.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_0/allOutputData.json'>./reopt_final_0/allOutputData.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_0/criticalLoadShape.csv'>./reopt_final_0/criticalLoadShape.csv</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_0/allInputData.json'>./reopt_final_0/allInputData.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_2/inlineTemplate.html'>./reopt_base_2/inlineTemplate.html</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_2/resultsResilience.json'>./reopt_base_2/resultsResilience.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_2/Scenario_test_POST.json'>./reopt_base_2/Scenario_test_POST.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_2/loadShape.csv'>./reopt_base_2/loadShape.csv</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_2/results.json'>./reopt_base_2/results.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_2/allOutputData.json'>./reopt_base_2/allOutputData.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_2/criticalLoadShape.csv'>./reopt_base_2/criticalLoadShape.csv</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_2/allInputData.json'>./reopt_base_2/allInputData.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_3/inlineTemplate.html'>./reopt_base_3/inlineTemplate.html</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_3/resultsResilience.json'>./reopt_base_3/resultsResilience.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_3/Scenario_test_POST.json'>./reopt_base_3/Scenario_test_POST.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_3/loadShape.csv'>./reopt_base_3/loadShape.csv</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_3/results.json'>./reopt_base_3/results.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_3/allOutputData.json'>./reopt_base_3/allOutputData.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_3/criticalLoadShape.csv'>./reopt_base_3/criticalLoadShape.csv</a></li>
+			
+			<li><a href='/4mgs/./reopt_base_3/allInputData.json'>./reopt_base_3/allInputData.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_2/inlineTemplate.html'>./reopt_final_2/inlineTemplate.html</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_2/resultsResilience.json'>./reopt_final_2/resultsResilience.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_2/Scenario_test_POST.json'>./reopt_final_2/Scenario_test_POST.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_2/loadShape.csv'>./reopt_final_2/loadShape.csv</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_2/results.json'>./reopt_final_2/results.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_2/allOutputData.json'>./reopt_final_2/allOutputData.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_2/criticalLoadShape.csv'>./reopt_final_2/criticalLoadShape.csv</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_2/allInputData.json'>./reopt_final_2/allInputData.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_3/inlineTemplate.html'>./reopt_final_3/inlineTemplate.html</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_3/resultsResilience.json'>./reopt_final_3/resultsResilience.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_3/Scenario_test_POST.json'>./reopt_final_3/Scenario_test_POST.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_3/loadShape.csv'>./reopt_final_3/loadShape.csv</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_3/results.json'>./reopt_final_3/results.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_3/allOutputData.json'>./reopt_final_3/allOutputData.json</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_3/criticalLoadShape.csv'>./reopt_final_3/criticalLoadShape.csv</a></li>
+			
+			<li><a href='/4mgs/./reopt_final_3/allInputData.json'>./reopt_final_3/allInputData.json</a></li>
+			
+			</ul>
+		</div>
+	</div>
+</body>
+</html>

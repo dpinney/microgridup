@@ -1106,7 +1106,11 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 			cap_ex_after_incentives = cap_ex_after_incentives - 1*reopt_out.get(f'dieselGenCost{mg_num}', 0.0)
 			#TODO: Calculate NPV with O+M costs properly depreciated over time if needed; Need to pull in the discount rate; it seems negligible (in the 500-1000$ range at most)
 			npv = npv - 1*reopt_out.get(f'dieselGenCost{mg_num}', 0.0) # - years_of_analysis*reopt_out.get(f'dieselOMCostKw{mg_num}', 0.0)- years_of_analysis*1/diesel_size_total*sum(reopt_out.get(f'powerDiesel{mg_num}', 0.0))*reopt_out.get(f'dieselOMCostKwh{mg_num}', 0.0)
-			year_one_OM = year_one_OM - 1*reopt_out.get(f'dieselOMCostKw{mg_num}', 0.0)- 1/diesel_size_total*sum(reopt_out.get(f'powerDiesel{mg_num}', 0.0))*reopt_out.get(f'dieselOMCostKwh{mg_num}', 0.0)
+			# subtract the added O+M cost of the 1 kw diesel; diesel_size_total already has the 1kw subtracted in this function
+			if diesel_size_total == 0:
+				year_one_OM = year_one_OM - 1*reopt_out.get(f'dieselOMCostKw{mg_num}', 0.0)-sum(reopt_out.get(f'powerDiesel{mg_num}', 0.0))*reopt_out.get(f'dieselOMCostKwh{mg_num}', 0.0)			
+			elif diesel_size_total != 0:
+				year_one_OM = year_one_OM - 1*reopt_out.get(f'dieselOMCostKw{mg_num}', 0.0)-1/diesel_size_total*sum(reopt_out.get(f'powerDiesel{mg_num}', 0.0))*reopt_out.get(f'dieselOMCostKwh{mg_num}', 0.0)		
 		ave_outage = reopt_out.get(f'avgOutage{mg_num}')
 		if ave_outage is not None:
 			ave_outage = int(round(ave_outage))
@@ -1153,7 +1157,9 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	# mg_dict["Microgrid Name"] = str(REOPT_FOLDER[-1]) # previously used sequential numerical naming
 	mg_dict["Microgrid Name"] = str(mg_name)
 	mg_dict["Generation Bus"] = mg_ob['gen_bus']
+	# pulling in load outputted by REopt
 	load = reopt_out.get(f'load1', 0.0)
+	# Fix: pull in load inputted to REopt and unaltered by critical loadshape from "loadShape.csv"
 	mg_dict["Minimum 1 hr Load (kW)"] = round(min(load))
 	mg_dict["Average 1 hr Load (kW)"] = round(sum(load)/len(load))
 	# build the average daytime load
@@ -1213,7 +1219,11 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 		cap_ex_after_incentives = cap_ex_after_incentives - 1*reopt_out.get(f'dieselGenCost{mg_num}', 0.0)
 		#TODO: Calculate NPV with O+M costs properly depreciated over time if needed; Need to pull in the discount rate; it seems negligible (in the 500-1000$ range at most)
 		npv = npv - 1*reopt_out.get(f'dieselGenCost{mg_num}', 0.0) # - years_of_analysis*reopt_out.get(f'dieselOMCostKw{mg_num}', 0.0)- years_of_analysis*1/diesel_size_total*sum(reopt_out.get(f'powerDiesel{mg_num}', 0.0))*reopt_out.get(f'dieselOMCostKwh{mg_num}', 0.0)
-		year_one_OM = year_one_OM - 1*reopt_out.get(f'dieselOMCostKw{mg_num}', 0.0)- 1/diesel_size_total*sum(reopt_out.get(f'powerDiesel{mg_num}', 0.0))*reopt_out.get(f'dieselOMCostKwh{mg_num}', 0.0)
+		# subtract the added O+M cost of the 1 kw diesel; diesel_size_total already has the 1kw subtracted in this function
+		if diesel_size_total == 0:
+			year_one_OM = year_one_OM - 1*reopt_out.get(f'dieselOMCostKw{mg_num}', 0.0)-sum(reopt_out.get(f'powerDiesel{mg_num}', 0.0))*reopt_out.get(f'dieselOMCostKwh{mg_num}', 0.0)			
+		elif diesel_size_total != 0:
+			year_one_OM = year_one_OM - 1*reopt_out.get(f'dieselOMCostKw{mg_num}', 0.0)-1/diesel_size_total*sum(reopt_out.get(f'powerDiesel{mg_num}', 0.0))*reopt_out.get(f'dieselOMCostKwh{mg_num}', 0.0)
 	mg_dict["NPV over 25 years ($)"] = f'{round(npv):,}'
 	mg_dict["CapEx ($)"] = f'{round(cap_ex_existing_gen_adj):,}'
 	mg_dict["CapEx after Tax Incentives ($)"] = f'{round(cap_ex_after_incentives):,}'
@@ -1259,7 +1269,7 @@ def summary_stats(reps):
 	# using yr 1 emissions and percent reductions, calculate a weighted average of % reduction in emissions for yr 1
 	yr1_emis = reps['Emissions (Yr 1 Tons CO2)']
 	reps['Emissions (Yr 1 Tons CO2)'].append(round(sum(reps['Emissions (Yr 1 Tons CO2)'])))
-	print("yr1_emis:", yr1_emis)
+	# print("yr1_emis:", yr1_emis)
 	emis_reduc_perc = reps['Emissions Reduction (Yr 1 % CO2)']
 	total_tons_list = [yr1_emis[i]/(1-emis_reduc_perc[i]/100) for i in range(len(emis_reduc_perc))]
 	reduc_tons_list = [a*b/100 for a,b in zip(total_tons_list,emis_reduc_perc)]
@@ -1303,7 +1313,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	# Draw the circuit oneline.
 	distNetViz.viz(OMD_NAME, forceLayout=False, outputPath='.', outputName=ONELINE_NAME, open_file=False)
 	# Draw the map.
-	geo.mapOmd(OMD_NAME, MAP_NAME, 'html', openBrowser=False, conversion=False, offline=True)
+	geo.mapOmd(OMD_NAME, MAP_NAME, 'html', openBrowser=False, conversion=False)
 	# Powerflow outputs.
 	print('QSTS with ', FULL_NAME, 'AND CWD IS ', os.getcwd())
 	opendss.newQstsPlot(FULL_NAME,

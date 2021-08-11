@@ -1,6 +1,6 @@
 from microgridup import *
 
-'''Test to confirm existing and new diesel backup with natural gas , and existing wind with FOSSIL_BACKUP_PERCENT = 1'''
+'''Test to confirm existing and new natural gas backup, and existing wind with FOSSIL_BACKUP_PERCENT = 1'''
 
 if __name__ == '__main__':
 	# Input data.
@@ -19,6 +19,8 @@ if __name__ == '__main__':
 		"analysisYears": "25",
 		"energyCost" : "0.12",
 		"demandCost" : '20',
+		"urdbLabelSwitch": "off",
+		# "urdbLabel" : '5b75cfe95457a3454faf0aea', # EPEC General Service TOU Rate https://openei.org/apps/IURDB/rate/view/5b75cfe95457a3454faf0aea#1__Basic_Information
 		"wholesaleCost" : "0.034",
 		"solarCost" : "1600",
 		"windCost" : "4989",
@@ -38,12 +40,16 @@ if __name__ == '__main__':
 		"criticalLoadFactor": "1",
 		#"outage_start_hour": "200",
 		"outageDuration": "48",
-		"fuelAvailable": "100000",
+		"fuelAvailable": "1000000",
 		"genExisting": 0,
 		"minGenLoading": "0",
 		"batteryKwExisting": 0,
 		"batteryKwhExisting": 0,
 		"windExisting": 0,
+		"dieselFuelCostGal": 1.44, # assuming 4.5 $/MMBtu = 1 $/gal diesel
+		"dieselCO2Factor": 24.1,
+		"dieselOMCostKw": 35,
+		"dieselOMCostKwh": .02,
 		"value_of_lost_load": "100",
 		"solarCanCurtail": True,
 		"solarCanExport": True,

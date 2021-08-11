@@ -19,6 +19,8 @@ if __name__ == '__main__':
 		"analysisYears": "25",
 		"energyCost" : "0.12",
 		"demandCost" : '20',
+		"urdbLabelSwitch": "off",
+		# "urdbLabel" : '5b75cfe95457a3454faf0aea', # EPEC General Service TOU Rate https://openei.org/apps/IURDB/rate/view/5b75cfe95457a3454faf0aea#1__Basic_Information		
 		"wholesaleCost" : "0.034",
 		"solarCost" : "1600",
 		"windCost" : "4989",

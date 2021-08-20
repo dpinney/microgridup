@@ -1041,7 +1041,7 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 			yaxis = dict(title = str(y_list))
 		)
 		fig = py.graph_objs.Figure(data, layout)
-		py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=True)
+		py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 	
 	make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
 	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'])

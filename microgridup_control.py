@@ -105,17 +105,19 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 		chargeTimes = {}
 		# make sure we re-run a single step of the simulation as many times as necessary to ensure all loads not shed can be supported
 		# first, populate the battery loadshapes
-		totalTime, timePassed, busShapesBatteryDischarging, leftOverBusShapesDischarging, leftOverLoadDischarging, totalLoadDischarging, excessPowerTemp = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, None, None, 0, True, False, None, None, False, microgrids)
+		totalTime, timePassed, busShapesBatteryDischarging, leftOverBusShapesDischarging, leftOverLoadDischarging, totalLoadDischarging, excessPowerTemp, existsLoad = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, None, None, 0, True, False, None, None, False, None, microgrids)
+		
 		# next, populate the solar loadshapes
-		totalTime, timePassed, busShapesSolarDischarging, leftOverBusShapesDischarging, leftOverLoadDischarging, totalLoadTemp, excessPowerTemp = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, leftOverBusShapesDischarging, leftOverLoadDischarging, 0, False, True, totalLoadDischarging, None, False, microgrids)
+		totalTime, timePassed, busShapesSolarDischarging, leftOverBusShapesDischarging, leftOverLoadDischarging, totalLoadTemp, excessPowerTemp, existsLoadTemp = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, leftOverBusShapesDischarging, leftOverLoadDischarging, 0, False, True, totalLoadDischarging, None, False, None, microgrids)
 		# next, populate the diesel loadshapes, assuming the battery is discharging.
-		totalTimeTemp, timePassed, busShapesDieselDischarging, leftOverBusShapesDischarging, leftOverLoadDischarging, totalLoadTemp, excessPowerTemp = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, leftOverBusShapesDischarging, leftOverLoadDischarging, 0, False, False, totalLoadDischarging, None, False, microgrids)
+		totalTimeTemp, timePassed, busShapesDieselDischarging, leftOverBusShapesDischarging, leftOverLoadDischarging, totalLoadTemp, excessPowerTemp, existsLoadTemp = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, leftOverBusShapesDischarging, leftOverLoadDischarging, 0, False, False, totalLoadDischarging, None, False, None, microgrids)
 		# in addition, populate the solar loadshapes, assuming the battery is charging.
-		totalTimeTemp, timePassed, busShapesSolarCharging, leftOverBusShapesCharging, leftOverLoadCharging, totalLoadTemp, excessPowerSolar = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, None, None, 0, False, True, None, None, True, microgrids)
+		totalTimeTemp, timePassed, busShapesSolarCharging, leftOverBusShapesCharging, leftOverLoadCharging, totalLoadTemp, excessPowerSolar, existsLoadTemp = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, None, None, 0, False, True, None, None, True, None, microgrids)
 		# and, populate the diesel loadshapes, assuming the battery is charging.
-		totalTimeTemp, timePassed, busShapesDieselCharging, leftOverBusShapesCharging, leftOverLoadCharging, totalLoadTemp, excessPowerDiesel = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, leftOverBusShapesCharging, leftOverLoadCharging, 0, False, False, None, None, True, microgrids)
+		totalTimeTemp, timePassed, busShapesDieselCharging, leftOverBusShapesCharging, leftOverLoadCharging, totalLoadTemp, excessPowerDiesel, existsLoadTemp = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, leftOverBusShapesCharging, leftOverLoadCharging, 0, False, False, None, None, True, None, microgrids)
 		# create an array of zeroes, representing the amount of load supported by the battery when it's charging
 		busShapesBatteryCharging = [-10.000] * (totalTime)
+		print(existsLoad)
 
 		# initialize totalLoad loadshape
 		totalLoad = totalLoadDischarging
@@ -369,9 +371,9 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 		busShapes = {}
 
 	# print(busShapesBattery)
-	tree = solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, microgrids, tree, pathToDss, badBuses, bestReclosers, bestTies, lengthOfOutage, outageStart, loadsShed)
+	tree = solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, microgrids, tree, pathToDss, badBuses, bestReclosers, bestTies, lengthOfOutage, outageStart, loadsShed, existsLoad)
 
-def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePassed, outageStart, busShapes, leftOverBusShapes, leftOverLoad, totalTime, isBattery, isSolar, totalLoad, excessPower, isCharging, microgrids):
+def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePassed, outageStart, busShapes, leftOverBusShapes, leftOverLoad, totalTime, isBattery, isSolar, totalLoad, excessPower, isCharging, existsLoad, microgrids):
 	'function that prepares a single timestep of the simulation to be solved'
 	
 	# create a list of the diesel generators
@@ -396,6 +398,8 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 		totalLoad = {}
 	if excessPower == None:
 		excessPower = {}
+	if existsLoad == None:
+		existsLoad = {}
 
 	# initialize the array keeping track of all connected subtrees
 	subtrees = {}
@@ -407,6 +411,7 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 		bus = buses[0]
 		# initialize a dictionary to store the loadshapes
 		loadShapes = {}
+		isLoad = {}
 		# keep track of whether a bus has been seen already
 		alreadySeen = False
 		# check to see if there is a path between the power source and the fault 
@@ -521,32 +526,41 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 										if '.1' in tree[key].get('!CONNCODE',''):
 											if '.1' in loadShapes:
 												loadShapes['.1'] = [a + b for a, b in zip(loadShapes.get('.1',''), loadshape)]
-											else: loadShapes['.1'] = [i for i in loadshape]
+											else:
+												loadShapes['.1'] = [i for i in loadshape]
+												isLoad['.1'] = True
 										if '.2' in tree[key].get('!CONNCODE',''):
 											if '.2' in loadShapes:
 												loadShapes['.2'] = [a + b for a, b in zip(loadShapes.get('.2',''), loadshape)]
-											else: loadShapes['.2'] = [i for i in loadshape]
+											else:
+												loadShapes['.2'] = [i for i in loadshape]
+												isLoad['.2'] = True
 										if '.3' in tree[key].get('!CONNCODE',''):
 											if '.3' in loadShapes:
-													loadShapes['.3'] = [a + b for a, b in zip(loadShapes.get('.3',''), loadshape)]
-											else: loadShapes['.3'] = [i for i in loadshape]
-				# loadShapes['.1'] = [i/2 for i in loadShapes['.1']]
-				# loadShapes['.2'] = [i/2 for i in loadShapes['.2']]
-				# loadShapes['.3'] = [i/2 for i in loadShapes['.3']]
+												loadShapes['.3'] = [a + b for a, b in zip(loadShapes.get('.3',''), loadshape)]
+											else:
+												loadShapes['.3'] = [i for i in loadshape]
+												isLoad['.3'] = True
 
 			else:
 				if leftOverBusShapes:
 					# print(leftOverBusShapes)
 					loadShapes['.1'] = leftOverBusShapes[buses[0]][0]
+					isLoad['.1'] = True
 					loadShapes['.2'] = leftOverBusShapes[buses[0]][1]
+					isLoad['.2'] = True
 					loadShapes['.3'] = leftOverBusShapes[buses[0]][2]
+					isLoad['.3'] = True
 
 			if not '.1' in loadShapes:
 				loadShapes['.1'] = [0.00] * (totalTime)
+				isLoad['.1'] = False
 			if not '.2' in loadShapes:
 				loadShapes['.2'] = [0.00] * (totalTime)
+				isLoad['.2'] = False
 			if not '.3' in loadShapes:
 				loadShapes['.3'] = [0.00] * (totalTime)
+				isLoad['.3'] = False
 
 			# Obtain the loadshape by subtracting off solar from load and populate the loadshape dictionaries
 			shapes = {}
@@ -596,9 +610,7 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 					if '.3' in loadShapes:
 						if len(loadShapes.get('.3','')) > totalTime:
 							totalTime = len(loadShapes.get('.3',''))
-						shapes['.3'] = loadShapes.get('.3','')
-			
-					
+						shapes['.3'] = loadShapes.get('.3','')					
 
 			def supportedLoad(maximum, entry, shapesNewEntry, leftOverShapesEntry, leftOverHereEntry, totalLoadHereEntry, excessHereEntry):
 				# if the needed power does not exceed the max, it is fully supported by the generator
@@ -664,6 +676,8 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 				totalLoad[buses[0]] = [listOfZeroes, listOfZeroes, listOfZeroes]
 			else:
 				excessPower[buses[0]] = [listOfZeroes, listOfZeroes, listOfZeroes]
+			existsLoad[buses[0]] = [isLoad['.1'], isLoad['.2'], isLoad['.3']]
+			# print(existsLoad)
 
 		phase = 0
 		while phase < 3:
@@ -769,9 +783,9 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 	# 			else:
 	# 				thisTotalLoad.append(key + thisTotalLoad[len(thisTotalLoad) - 1])
 	# 		totalLoad[key].append(thisTotalLoad)
-	return totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad, totalLoad, excessPower
+	return totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad, totalLoad, excessPower, existsLoad
 
-def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, microgrids, tree, pathToDss, badBuses, bestReclosers, bestTies, lengthOfOutage, outageStart, loadsShed):
+def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, microgrids, tree, pathToDss, badBuses, bestReclosers, bestTies, lengthOfOutage, outageStart, loadsShed, existsLoad):
 	'Add diesel generation to the opendss formatted system and solve using OpenDSS'
 	# get a sorted list of the buses
 	buses = createListOfBuses(microgrids, badBuses)
@@ -796,6 +810,16 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 		# get the connected subtree
 		adjacList, reclosers, vertices = flisr.adjacencyList(tree)
 		bus = buses[0]
+		phaseCoefficient = 0
+		if bus in existsLoad.keys():
+			# print(existsLoad[bus])
+			for entry in existsLoad[bus]:
+				if entry == True:
+					phaseCoefficient += 1
+		else:
+			phaseCoefficient = 1
+		# print(bus)
+		# print(phaseCoefficient)
 		subtree = flisr.getMaxSubtree(adjacList, bus)
 		# if the source is in the subtree, do not consider the specified bus
 		if 'sourcebus' in subtree:
@@ -812,15 +836,10 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 				kw = float(thing.get('kw',''))
 				xdp = float(thing.get('xdp',''))
 				xdpp = float(thing.get('xdpp',''))
-				ampsDiesel = float(thing.get('kw', '')) / float(thing.get('kv', '')) / 1.7
-				# ampsDiesel = 1
 			if thing.get('object','').startswith('storage.battery_' + str(bus)):
-				ampsBattery = float(thing.get('kwrated', '')) / float(thing.get('kv', '')) / 1.7
 				kv = float(thing.get('kv', ''))
 				kw = float(thing.get('kwrated', ''))
-				# ampsBattery = 1
 			if thing.get('object','').startswith('generator.solar_' + str(bus)):
-				ampsSolar = float(thing.get('kw', '')) / float(thing.get('kv', '')) / 1.7
 				kv = float(thing.get('kv', ''))
 				kw = float(thing.get('kw', ''))
 		phase = 1
@@ -837,6 +856,9 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 					# add the battery loadshapes to the dictionary of all shapes to be added
 					shape_name = 'newbattery_' + str(buses[0]) + '_' + str(phase) + '_shape'
 					shape_data = busShapesBattery[bus][phase - 1]
+					if not any(shape_data):
+						emptyLoads.append('generator.generator_' + shape_name)
+						# print(shape_name)
 					shape_insert_list[i] = {
 							'!CMD': 'new',
 							'object': f'loadshape.{shape_name}',
@@ -849,6 +871,9 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 					# add the solar loadshapes to the dictionary of all shapes to be added
 					shape_name = 'newsolar_' + str(buses[0]) + '_' + str(phase) + '_shape'
 					shape_data = busShapesSolar[bus][phase - 1]
+					if not any(shape_data):
+						emptyLoads.append('generator.generator_' + shape_name)
+						# print(shape_name)
 					shape_insert_list[i] = {
 							'!CMD': 'new',
 							'object': f'loadshape.{shape_name}',
@@ -862,12 +887,12 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 					shape_name = 'newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape'
 					shape_data = busShapesDiesel[bus][phase - 1]
 					if not any(shape_data):
-						emptyLoads.append('vsource.vsource_' + shape_name)
-						print(shape_name)
+						emptyLoads.append(shape_name)
+						# print(shape_name)
 					l = 0
 					while l < len(shape_data):
 						if shape_data[l] != 0.0:
-							shape_data[l] = float(basekv) / math.sqrt(3)
+							shape_data[l] = float(basekv) / math.sqrt(phaseCoefficient)
 						l += 1
 					shape_insert_list[i] = {
 							'!CMD': 'new',
@@ -880,45 +905,48 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 					i+=1
 					# add an isource representation for the batteries to the dictionary of all generators to be added
 					gen_name = 'generator.generator_newbattery_' + str(buses[0]) + '_' + str(phase) + '_shape'
-					gen_insert_list[j] = {
-							'!CMD': 'new',
-							'object': f'{gen_name}',
-							'bus1': str(buses[0]) + '.' + str(phase),
-							'phases': '1',
-							'kv': str(kv),
-							'kw': str(kw),
-							'yearly': 'newbattery_' + str(buses[0]) + '_' + str(phase) + '_shape'
-						}
-					j+=1
+					if 'newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape' not in emptyLoads:
+						gen_insert_list[j] = {
+								'!CMD': 'new',
+								'object': f'{gen_name}',
+								'bus1': str(buses[0]) + '.' + str(phase),
+								'phases': '1',
+								'kv': str(kv),
+								'kw': str(kw),
+								'yearly': 'newbattery_' + str(buses[0]) + '_' + str(phase) + '_shape'
+							}
+						j+=1
 					# add an isource representation for the diesel generators to the dictionary of all generators to be added
 					
 					gen_name = 'vsource.vsource_newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape'
-					dieselList.append(gen_name)
-					gen_insert_list[j] = {
-							'!CMD': 'new',
-							'object': f'{gen_name}',
-							'bus1': str(buses[0]) + '.' + str(phase),
-							'angle': str(angle),
-							'phases': '1',
-							'R1': str(float(xdp) * 3),
-							'X1': str(float(xdpp) * 3),
-							'yearly': 'newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape'
-						}
-					j+=1
+					if 'newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape' not in emptyLoads:
+						dieselList.append(gen_name)
+						gen_insert_list[j] = {
+								'!CMD': 'new',
+								'object': f'{gen_name}',
+								'bus1': str(buses[0]) + '.' + str(phase),
+								'angle': str(angle),
+								'phases': '1',
+								'R1': str(float(xdp) * phaseCoefficient),
+								'X1': str(float(xdpp) * phaseCoefficient),
+								'yearly': 'newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape'
+							}
+						j+=1
 					# add an isource representation for the solar generation to the dictionary of all generators to be added
 					gen_name = 'generator.generator_solar_' + str(buses[0]) + '_' + str(phase) + '_shape'
-					gen_insert_list[j] = {
-							'!CMD': 'new',
-							'object': f'{gen_name}',
-							'bus1': str(buses[0]) + '.' + str(phase),
-							'phases': '1',
-							# 'angle': str(angle),
-							# 'amps': str(ampsSolar),
-							'kv': str(kv),
-							'kw': str(kw),
-							'yearly': 'newsolar_' + str(buses[0]) + '_' + str(phase) + '_shape'
-						}
-					j+=1
+					if 'newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape' not in emptyLoads:
+						gen_insert_list[j] = {
+								'!CMD': 'new',
+								'object': f'{gen_name}',
+								'bus1': str(buses[0]) + '.' + str(phase),
+								'phases': '1',
+								# 'angle': str(angle),
+								# 'amps': str(ampsSolar),
+								'kv': str(kv),
+								'kw': str(kw),
+								'yearly': 'newsolar_' + str(buses[0]) + '_' + str(phase) + '_shape'
+							}
+						j+=1
 			phase += 1
 		# remove the bus so we can move on...
 		del (buses[0])
@@ -948,9 +976,7 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 		convertedKey = collections.OrderedDict(gen_insert_list[key])
 		treeDSS.insert(max_pos, convertedKey)
 		max_pos+=1
-	for thing in treeDSS:
-		if (thing.get('object','').startswith('vsource') or thing.get('object','').startswith('generator')):
-			print(thing)
+
 	# insert a line telling the file to solve when run by OpenDSS
 	# treeDSS.insert(max_pos, {'!CMD': 'solve'})
 
@@ -962,8 +988,8 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 	actions = {}
 	line = ''
 	for entry in dieselList:
-		print(entry)
-		print(emptyLoads)
+		# print(entry)
+		# print(emptyLoads)
 		if str(entry) not in emptyLoads:
 			line = line + 'disable ' + str(entry) + '\n'
 	actions[0] = line
@@ -1067,7 +1093,7 @@ microgrids = {
 		'kw_rating_diesel': '2000',
 		'kwh_rating_battery': '200'
 	},
-	'mg3': {
+	'm3': {
 		'loads': ['684_command_center','652_residential'],
 		'switch': '671684',
 		'gen_bus': '684',

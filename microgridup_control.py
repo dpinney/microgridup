@@ -106,7 +106,6 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 		# make sure we re-run a single step of the simulation as many times as necessary to ensure all loads not shed can be supported
 		# first, populate the battery loadshapes
 		totalTime, timePassed, busShapesBatteryDischarging, leftOverBusShapesDischarging, leftOverLoadDischarging, totalLoadDischarging, excessPowerTemp, existsLoad = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, None, None, 0, True, False, None, None, False, None, microgrids)
-		
 		# next, populate the solar loadshapes
 		totalTime, timePassed, busShapesSolarDischarging, leftOverBusShapesDischarging, leftOverLoadDischarging, totalLoadTemp, excessPowerTemp, existsLoadTemp = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, leftOverBusShapesDischarging, leftOverLoadDischarging, 0, False, True, totalLoadDischarging, None, False, None, microgrids)
 		# next, populate the diesel loadshapes, assuming the battery is discharging.
@@ -116,8 +115,13 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 		# and, populate the diesel loadshapes, assuming the battery is charging.
 		totalTimeTemp, timePassed, busShapesDieselCharging, leftOverBusShapesCharging, leftOverLoadCharging, totalLoadTemp, excessPowerDiesel, existsLoadTemp = playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, outageStart, outageStart, None, leftOverBusShapesCharging, leftOverLoadCharging, 0, False, False, None, None, True, None, microgrids)
 		# create an array of zeroes, representing the amount of load supported by the battery when it's charging
-		busShapesBatteryCharging = [-10.000] * (totalTime)
-		print(existsLoad)
+		busShapesBatteryCharging = {}
+		for bus in busShapesBatteryDischarging:
+			for entry in microgrids:
+				if bus == microgrids[entry].get('gen_bus', ''):
+					chargeRate = float(microgrids[entry].get('kw_rating_battery', ''))
+					busShapesBatteryCharging[bus] = [-chargeRate] * (totalTime)
+		# print(existsLoad)
 
 		# initialize totalLoad loadshape
 		totalLoad = totalLoadDischarging
@@ -237,8 +241,8 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 					while phase < 3:
 						if buses[0] in busShapesBattery.keys():
 							if busShapesBattery[buses[0]][phase]:
-								busShapesBatteryExtra = busShapesBatteryCharging[batteryTime[buses[0]] : minimumChargeTime-1]
-								busShapesSolarExtra = busShapesBatteryCharging[batteryTime[buses[0]] : minimumChargeTime-1]
+								busShapesBatteryExtra = busShapesBatteryCharging[buses[0]][batteryTime[buses[0]] : minimumChargeTime-1]
+								busShapesSolarExtra = busShapesSolarCharging[buses[0]][batteryTime[buses[0]] : minimumChargeTime-1]
 								busShapesDieselExtra = busShapesDieselCharging[buses[0]][phase][batteryTime[buses[0]] : minimumChargeTime-1]
 								busShapesBattery[buses[0]][phase] = list(busShapesBattery[buses[0]][phase]) + list(busShapesBatteryExtra)
 								busShapesSolar[buses[0]][phase] = list(busShapesSolar[buses[0]][phase]) + list(busShapesSolarExtra)
@@ -509,6 +513,7 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 		# if the subtree associated with a specific generator hasn't yet been supported by a different generator, add the biggest
 		if alreadySeen == False:
 			if startFromBeginning == True:
+				loadShapes = {}
 				# only consider loads in the subtree connected to the generator
 				for node in subtree:
 					for key in tree.keys():
@@ -521,6 +526,8 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 								kwRating = eval(tree[key].get('kw',''))
 								for key1 in tree.keys():
 									if tree[key1].get('name','') == loadshapeName:
+										if bus == '684':
+											print(loadshapeName)
 										# print(loadshapeName)
 										loadshape = eval(tree[key1].get('mult',''))
 										if '.1' in tree[key].get('!CONNCODE',''):
@@ -541,7 +548,7 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 											else:
 												loadShapes['.3'] = [i for i in loadshape]
 												isLoad['.3'] = True
-
+				# print(loadShapes['.3'])
 			else:
 				if leftOverBusShapes:
 					# print(leftOverBusShapes)
@@ -561,7 +568,7 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 			if not '.3' in loadShapes:
 				loadShapes['.3'] = [0.00] * (totalTime)
 				isLoad['.3'] = False
-
+			# print(loadShapes['.3'])
 			# Obtain the loadshape by subtracting off solar from load and populate the loadshape dictionaries
 			shapes = {}
 			leftOverShapes = {}
@@ -596,9 +603,12 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 						maximum = float(microgrids[entry].get('kw_rating_diesel', ''))
 					if isCharging == True:
 						maximumBattery = float(microgrids[entry].get('kw_rating_battery', ''))
-						# loadShapes['.1'] = [i + maximumBattery for i in loadShapes['.1']]
-						# loadShapes['.2'] = [i + maximumBattery for i in loadShapes['.2']]
-						# loadShapes['.3'] = [i + maximumBattery for i in loadShapes['.3']]
+						# if isLoad['.1'] == True:
+						# 	loadShapes['.1'] = [i + maximumBattery for i in loadShapes['.1']]
+						# if isLoad['.2'] == True:
+						# 	loadShapes['.2'] = [i + maximumBattery for i in loadShapes['.2']]
+						# if isLoad['.1'] == True:
+						# 	loadShapes['.3'] = [i + maximumBattery for i in loadShapes['.3']]
 					if '.1' in loadShapes:
 						if len(loadShapes.get('.1','')) > totalTime:
 							totalTime = len(loadShapes.get('.1',''))
@@ -658,7 +668,7 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 				entry = 0
 				while entry < totalTime:
 					if (isSolar == True) and (solarExists == True):
-						shapesNew[shape], leftOverShapes[shape], leftOverHere[shape], totalLoadHere[shape], excessHere[shape] = supportedLoad(solarshape[entry], shapes[shape][entry], shapesNew[shape], leftOverShapes[shape], leftOverHere[shape], totalLoadHere[shape], excessHere[shape])
+						shapesNew[shape], leftOverShapes[shape], leftOverHere[shape], totalLoadHere[shape], excessHere[shape] = supportedLoad(float(solarshape[entry])/500, shapes[shape][entry], shapesNew[shape], leftOverShapes[shape], leftOverHere[shape], totalLoadHere[shape], excessHere[shape])
 					elif (isSolar == True) and (solarExists == False):
 						print('uh oh solar')
 					else:	
@@ -859,6 +869,11 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 					if not any(shape_data):
 						emptyLoads.append('generator.generator_' + shape_name)
 						# print(shape_name)
+					# l = 0
+					# while l < len(shape_data):
+					# 	if shape_data[l] != 0.0:
+					# 		shape_data[l] = float(shape_data[l]) * math.sqrt(phaseCoefficient)
+					# 	l += 1
 					shape_insert_list[i] = {
 							'!CMD': 'new',
 							'object': f'loadshape.{shape_name}',
@@ -874,6 +889,11 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 					if not any(shape_data):
 						emptyLoads.append('generator.generator_' + shape_name)
 						# print(shape_name)
+					# l = 0
+					# while l < len(shape_data):
+					# 	if shape_data[l] != 0.0:
+					# 		shape_data[l] = shape_data[l] * math.sqrt(phaseCoefficient)
+					# 	l += 1
 					shape_insert_list[i] = {
 							'!CMD': 'new',
 							'object': f'loadshape.{shape_name}',
@@ -1067,7 +1087,7 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 			yaxis = dict(title = str(y_list))
 		)
 		fig = py.graph_objs.Figure(data, layout)
-		py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
+		py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=True)
 	
 	make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
 	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'])
@@ -1089,9 +1109,9 @@ microgrids = {
 		'loads': ['675a_hospital','675b_residential1','675c_residential1'],
 		'switch': '671692',
 		'gen_bus': '675',
-		'kw_rating_battery': '10',
-		'kw_rating_diesel': '2000',
-		'kwh_rating_battery': '200'
+		'kw_rating_battery': '128',
+		'kw_rating_diesel': '538.0170262240325',
+		'kwh_rating_battery': '553'
 	},
 	'm3': {
 		'loads': ['684_command_center','652_residential'],
@@ -1099,9 +1119,9 @@ microgrids = {
 		'gen_bus': '684',
 		'gen_obs_existing': ['diesel_684_existing','battery_684_existing'],
 		'critical_load_kws': [400,20],
-		'kw_rating_battery': '13', # total kW rating on 684 and 652 is 1283 kW
-		'kw_rating_diesel': '1000',
-		'kwh_rating_battery': '230'
+		'kw_rating_battery': '20', # total kW rating on 684 and 652 is 1283 kW
+		'kw_rating_diesel': '593.2050653749545',
+		'kwh_rating_battery': '65.97158243892608'
 		},
 	'm4': {
 		'loads': ['645_warehouse1','646_med_office'],

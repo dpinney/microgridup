@@ -1263,8 +1263,8 @@ def summary_stats(reps):
 	# calculate weighted average % renewables across all microgrids
 	renewables_perc_list = reps['Renewable Generation (% of Yr 1 kWh)']
 	avg_load = reps['Average 1 hr Load (kW)']
-	wgtd_avg_renewables_perc = sum([renewables_perc_list[i]/100 * avg_load[i] for i in range(len(renewables_perc_list))])/sum(avg_load)*100
-	#print("wgtd_avg_renewables_perc:", wgtd_avg_renewables_perc)
+	wgtd_avg_renewables_perc = sum([renewables_perc_list[i]/100 * avg_load[i] for i in range(len(renewables_perc_list))])/sum(avg_load[:-1])*100 # remove the final item of avg_load, which is the sum of the list entries from 'Average 1 hr Load (kW)' above
+	# print("wgtd_avg_renewables_perc:", wgtd_avg_renewables_perc)
 	reps['Renewable Generation (% of Yr 1 kWh)'].append(round(wgtd_avg_renewables_perc))
 	# using yr 1 emissions and percent reductions, calculate a weighted average of % reduction in emissions for yr 1
 	yr1_emis = reps['Emissions (Yr 1 Tons CO2)']

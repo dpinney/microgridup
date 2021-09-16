@@ -670,7 +670,9 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 					if (isSolar == True) and (solarExists == True):
 						shapesNew[shape], leftOverShapes[shape], leftOverHere[shape], totalLoadHere[shape], excessHere[shape] = supportedLoad(float(solarshape[entry])/500, shapes[shape][entry], shapesNew[shape], leftOverShapes[shape], leftOverHere[shape], totalLoadHere[shape], excessHere[shape])
 					elif (isSolar == True) and (solarExists == False):
-						print('uh oh solar')
+						pass
+						# Check this loop, as it seems to pass MANY times and eat up processing power/cause delays
+						# print('uh oh solar')
 					else:	
 						shapesNew[shape], leftOverShapes[shape], leftOverHere[shape], totalLoadHere[shape], excessHere[shape] = supportedLoad(float(maximum), shapes[shape][entry], shapesNew[shape], leftOverShapes[shape], leftOverHere[shape], totalLoadHere[shape], excessHere[shape])
 					entry += 1
@@ -1133,4 +1135,4 @@ microgrids = {
 	}
 }
 
-play('./4mgs/circuit.dss.omd', './4mgs/circuit_plusmg_3.dss', None, None, microgrids, '670671', False, 60, 120, 30) 
+# play('./4mgs/circuit.dss.omd', './4mgs/circuit_plusmg_3.dss', None, None, microgrids, '670671', False, 60, 120, 30) 

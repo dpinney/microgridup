@@ -1039,11 +1039,18 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 	battery_pow_total = gen_sizes.get('battery_pow_total')
 	battery_pow_new = gen_sizes.get('battery_pow_new')
 	battery_pow_existing = gen_sizes.get('battery_pow_existing')
+	# load = pd.read_csv(REOPT_FOLDER + '/loadShape.csv',header = None)
+	load = []
+	with open(REOPT_FOLDER + '/loadShape.csv', newline = '') as csvfile:
+		load_reader = csv.reader(csvfile, delimiter = ' ')
+		for row in load_reader:
+			load.append(float(row[0]))
 
 	with open(outputCsvName, 'w', newline='') as outcsv:
 		writer = csv.writer(outcsv)
 		writer.writerow(["Microgrid Name", "Generation Bus", "Minimum 1 hr Load (kW)", "Average 1 hr Load (kW)",
-							"Average Daytime 1 hr Load (kW)", "Maximum 1 hr Load (kW)", "Maximum 1 hr Critical Load (kW)", 
+							"Average Daytime 1 hr Load (kW)", 
+							"Maximum 1 hr Load (kW)", "Maximum 1 hr Critical Load (kW)", 
 							"Existing Fossil Generation (kW)", "New Fossil Generation (kW)",
 							# "Diesel Fuel Used During Outage (gal)", 
 							"Existing Solar (kW)", "New Solar (kW)", 
@@ -1055,14 +1062,14 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		mg_num = 1 # mg_num refers to the key suffix in allOutputData.json from reopt folder
 		mg_ob = microgrid
 		gen_bus_name = mg_ob['gen_bus']
-		load = reopt_out.get(f'load{mg_num}', 0.0)
-		min_load = min(load)
-		ave_load = sum(load)/len(load)
+		#load = reopt_out.get(f'load{mg_num}', 0.0)
+		min_load = round(min(load))
+		ave_load = round(sum(load)/len(load))
 		np_load = np.array_split(load, 365)
 		np_load = np.array(np_load) #a flattened array of 365 arrays of 24 hours each
 		daytime_kwh = np_load[:,9:17] #365 8-hour daytime arrays
 		avg_daytime_load = round(np.average(np.average(daytime_kwh, axis=1)))
-		max_load = max(load)
+		max_load = round(max(load))
 		max_crit_load = max_crit_load
 		# do not show the 1kw diesel that is a necessary artifact of final run of REopt
 		diesel_used_gal =reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0)
@@ -1119,7 +1126,8 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 			ave_outage = int(round(ave_outage))
 		# print(f'Average Outage Survived (h) for {mg_name}:', ave_outage)
 
-		row =[str(mg_name), gen_bus_name, round(min_load), round(ave_load,0), round(avg_daytime_load), round(max_load), round(max_crit_load),
+		row =[str(mg_name), gen_bus_name, min_load, ave_load, round(avg_daytime_load), 
+		max_load, round(max_crit_load),
 		round(diesel_size_existing), round(diesel_size_new), # round(diesel_used_gal), 
 		round(solar_size_existing), 
 		round(solar_size_new), round(battery_pow_existing), round(battery_cap_existing), round(battery_pow_new),
@@ -1127,6 +1135,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		round(year_one_emissions), round(year_one_emissions_reduced),
 		int(round(npv)), int(round(cap_ex_existing_gen_adj)), int(round(cap_ex_after_incentives)), int(round(year_one_OM)), ave_outage]
 		writer.writerow(row)
+		# print("row:", row)
 
 def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, diesel_total_calc=False):
 	''' Generate a dictionary reports fr each key for all microgrids. '''
@@ -1160,9 +1169,24 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	# mg_dict["Microgrid Name"] = str(REOPT_FOLDER[-1]) # previously used sequential numerical naming
 	mg_dict["Microgrid Name"] = str(mg_name)
 	mg_dict["Generation Bus"] = mg_ob['gen_bus']
-	# pulling in load outputted by REopt
-	load = reopt_out.get(f'load1', 0.0)
-	# Fix: pull in load inputted to REopt and unaltered by critical loadshape from "loadShape.csv"
+	
+	# Old Version: pulling in load outputted by REopt
+	# load = reopt_out.get(f'load1', 0.0)
+	# mg_dict["Minimum 1 hr Load (kW)"] = round(min(load))
+	# mg_dict["Average 1 hr Load (kW)"] = round(sum(load)/len(load))
+	# # build the average daytime load
+	# np_load = np.array_split(load, 365)
+	# np_load = np.array(np_load) #a flattened array of 365 arrays of 24 hours each
+	# daytime_kwh = np_load[:,9:17] #365 8-hour daytime arrays
+	# mg_dict["Average Daytime 1 hr Load (kW)"] = round(np.average(np.average(daytime_kwh, axis=1)))
+	# mg_dict["Maximum 1 hr Load (kW)"] = round(max(load))
+
+	# Use loadshape supplied to REopt with no alterations
+	load = []
+	with open(REOPT_FOLDER + '/loadShape.csv', newline = '') as csvfile:
+		load_reader = csv.reader(csvfile, delimiter = ' ')
+		for row in load_reader:
+			load.append(float(row[0]))
 	mg_dict["Minimum 1 hr Load (kW)"] = round(min(load))
 	mg_dict["Average 1 hr Load (kW)"] = round(sum(load)/len(load))
 	# build the average daytime load
@@ -1170,6 +1194,7 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	np_load = np.array(np_load) #a flattened array of 365 arrays of 24 hours each
 	daytime_kwh = np_load[:,9:17] #365 8-hour daytime arrays
 	mg_dict["Average Daytime 1 hr Load (kW)"] = round(np.average(np.average(daytime_kwh, axis=1)))
+	# print("Average Daytime 1 hr Load (kW):", round(np.average(np.average(daytime_kwh, axis=1))))
 	mg_dict["Maximum 1 hr Load (kW)"] = round(max(load))
 	mg_dict["Maximum 1 hr Critical Load (kW)"] = round(max_crit_load)
 	mg_dict["Existing Fossil Generation (kW)"] = round(diesel_size_existing)
@@ -1237,13 +1262,13 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	mg_dict["Average Outage Survived (h)"] = ave_outage
 
 	list_of_mg_dict.append(mg_dict)
-	# print(list_of_mg_dict)
+	# print("list_of_mg_dict:", list_of_mg_dict)
 	return(list_of_mg_dict)
 
 def summary_stats(reps):
 	'''Helper function within full() to take in a dict of lists of the microgrid
 	attributes and append a summary value for each attribute'''
-
+	# print("reps['Maximum 1 hr Load (kW)']",reps['Maximum 1 hr Load (kW)'])
 	reps['Microgrid Name'].append('Summary')
 	reps['Generation Bus'].append('None')
 	reps['Minimum 1 hr Load (kW)'].append(round(sum(reps['Minimum 1 hr Load (kW)'])))

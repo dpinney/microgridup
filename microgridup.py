@@ -81,7 +81,6 @@ def set_fossil_max_kw(FOSSIL_BACKUP_PERCENT, max_crit_load):
 	print("fossil_max_kw:", fossil_max_kw)
 	return fossil_max_kw
 
-
 def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load):
 	''' Generate the microgrid specs with REOpt.
 	SIDE-EFFECTS: generates REOPT_FOLDER'''
@@ -518,7 +517,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	will need to implement searching the tree of FULL_NAME to find kw ratings of existing gens'''
 
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER)
-	print("gen_sizes into OpenDSS:", gen_sizes)
+	# print("gen_sizes into OpenDSS:", gen_sizes)
 	reopt_out = json.load(open(REOPT_FOLDER + '/allOutputData.json'))
 	gen_df_builder = pd.DataFrame()
 	gen_obs = []
@@ -706,7 +705,6 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	gen_df_builder.to_csv(GEN_NAME, index=False)
 	return gen_obs
 
-
 def gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL):
 	'''Create new generator 1kw reference loadshapes for existing gen located outside of the microgrid in analysis. 
 	To run this effectively when not running feedback_reopt_gen_values(), specify REOPT_FOLDER_BASE for both of the final arguments
@@ -741,6 +739,39 @@ def gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL):
 	# print('wind_ref_shape', ref_df_builder['wind_ref_shape'].head(20))
 
 	ref_df_builder.to_csv(REF_NAME, index=False)
+
+def mg_add_cost(outputCsvName, microgrid, mg_name):
+	'''Returns a costed csv of all switches and other upgrades needed to allow the microgrid 
+	to operate in islanded mode to support critical loads
+	TO DO: When critical load list references actual load buses instead of kw ratings,
+	use the DSS tree structure to find the location of the load buses and the SCADA disconnect switches'''
+
+	AMI_COST = 2000
+	SCADA_COST = 50000
+	MG_CONTROL_COST = 100000
+	MG_DESIGN_COST = 100000
+
+	mg_ob = microgrid
+	gen_bus_name = mg_ob['gen_bus']
+	mg_loads = mg_ob['loads']
+	switch_name = mg_ob['switch']
+
+	# print out a csv of the 
+	with open(outputCsvName, 'w', newline='') as outcsv:
+		writer = csv.writer(outcsv)
+		writer.writerow(["Location", "Recommended Upgrade", "Cost Estimate ($)"])
+		writer.writerow([mg_name, "Microgrid Design", MG_DESIGN_COST])
+		writer.writerow([mg_name, "Microgrid Controls", MG_CONTROL_COST])
+		# for switch in switch_name: # TO DO: iterate through all disconnect points for the mg by going through the DSS file
+		writer.writerow([switch_name, "SCADA disconnect switch", SCADA_COST])
+		for load in mg_loads:
+			writer.writerow([load, "AMI disconnect meter", AMI_COST])
+		print("outcsv:", outcsv)
+
+	# make a dict of lists of the info in the csv:
+	#pd_dict = pd.read_csv(outputCsvName).to_dict(orient='list')
+	#print("pd_dict:", pd_dict)
+
 
 
 def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, microgrid):
@@ -1138,7 +1169,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		# print("row:", row)
 
 def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, diesel_total_calc=False):
-	''' Generate a dictionary reports fr each key for all microgrids. '''
+	''' Generate a dictionary report for each key for all microgrids. '''
 	reopt_out = json.load(open(REOPT_FOLDER + inputName))
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False)
 	solar_size_total = gen_sizes.get('solar_size_total')
@@ -1170,7 +1201,7 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	mg_dict["Microgrid Name"] = str(mg_name)
 	mg_dict["Generation Bus"] = mg_ob['gen_bus']
 	
-	# Old Version: pulling in load outputted by REopt
+	# Previous to 9/2021 Version: pulling in load outputted by REopt
 	# load = reopt_out.get(f'load1', 0.0)
 	# mg_dict["Minimum 1 hr Load (kW)"] = round(min(load))
 	# mg_dict["Average 1 hr Load (kW)"] = round(sum(load)/len(load))
@@ -1368,6 +1399,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 		microgridup_control.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, FAULTED_LINE, False, 60, 120, 30) #TODO: calculate 'max_potential_battery' and other mg parameters specific to microgrid_control.py on the fly from the outputs of REopt
 	except:
 		print("microgridup_control.play() did not process")
+	mg_add_cost(f'mg_add_cost_{mg_name}.csv', microgrid, mg_name)	
 	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, diesel_total_calc=False)
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, diesel_total_calc=False)
 	# convert mg_list_of_dicts_full to dict of lists for columnar output in output_template.html
@@ -1440,6 +1472,9 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 	reopt_folders.sort()
 	reps = pd.concat([pd.read_csv(x) for x in reports]).to_dict(orient='list')
 	stats = summary_stats(reps)
+	# mg_add_costs = [x for x in os.listdir('.') if x.startswith('mg_add_cost_')]
+	# create an orderedDict of the mg_add_costs_{mg_name}.csv:
+	# pd_dict = pd.read_csv(outputCsvName).to_dict(orient='list')
 	current_time = datetime.datetime.now() 
 	warnings = "None"
 	if os.path.exists("user_warnings.txt"):

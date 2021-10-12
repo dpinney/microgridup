@@ -5,6 +5,7 @@ from omf import geo
 import microgridup_control
 import shutil
 import os
+from os import path
 from pprint import pprint as pp
 import json
 import pandas as pd
@@ -746,7 +747,7 @@ def mg_add_cost(outputCsvName, microgrid, mg_name):
 	TO DO: When critical load list references actual load buses instead of kw ratings,
 	use the DSS tree structure to find the location of the load buses and the SCADA disconnect switches'''
 
-	AMI_COST = 2000
+	AMI_COST = 5000
 	SCADA_COST = 50000
 	MG_CONTROL_COST = 100000
 	MG_DESIGN_COST = 100000
@@ -764,9 +765,19 @@ def mg_add_cost(outputCsvName, microgrid, mg_name):
 		writer.writerow([mg_name, "Microgrid Controls", MG_CONTROL_COST])
 		# for switch in switch_name: # TO DO: iterate through all disconnect points for the mg by going through the DSS file
 		writer.writerow([switch_name, "SCADA disconnect switch", SCADA_COST])
-		for load in mg_loads:
-			writer.writerow([load, "AMI disconnect meter", AMI_COST])
-		print("outcsv:", outcsv)
+		if len(mg_loads) > 1: # if the entire microgrid is a single load (100% critical load), there is no need for metering past SCADA
+			for load in mg_loads:
+				writer.writerow([load, "AMI disconnect meter", AMI_COST])
+
+			ami_message = 'Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.\n'
+			print(ami_message)
+			if path.exists("user_warnings.txt"):
+				with open("user_warnings.txt") as f:
+					if ami_message not in f.read():
+						f.write(ami_message)
+			else:
+				with open("user_warnings.txt", "a") as myfile:
+					myfile.write(ami_message)
 
 	# make a dict of lists of the info in the csv:
 	#pd_dict = pd.read_csv(outputCsvName).to_dict(orient='list')
@@ -1395,10 +1406,10 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	make_chart('timeseries_source.csv', FULL_NAME, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Voltage Source Output", "kW per hour")
 	make_chart('timeseries_control.csv', FULL_NAME, 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS, "Tap Position", "PU")
 	# Perform control sim.
-	try:
-		microgridup_control.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, FAULTED_LINE, False, 60, 120, 30) #TODO: calculate 'max_potential_battery' and other mg parameters specific to microgrid_control.py on the fly from the outputs of REopt
-	except:
-		print("microgridup_control.play() did not process")
+	# try:
+	# 	microgridup_control.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, FAULTED_LINE, False, 60, 120, 30) #TODO: calculate 'max_potential_battery' and other mg parameters specific to microgrid_control.py on the fly from the outputs of REopt
+	# except:
+	# 	print("microgridup_control.play() did not process")
 	mg_add_cost(f'mg_add_cost_{mg_name}.csv', microgrid, mg_name)	
 	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, diesel_total_calc=False)
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, diesel_total_calc=False)

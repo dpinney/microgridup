@@ -783,8 +783,6 @@ def mg_add_cost(outputCsvName, microgrid, mg_name):
 	#pd_dict = pd.read_csv(outputCsvName).to_dict(orient='list')
 	#print("pd_dict:", pd_dict)
 
-
-
 def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, microgrid):
 	''' insert generation objects into dss.
 	ASSUMPTIONS: 
@@ -1128,10 +1126,19 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		if year_one_emissions_reduced < 0:
 			year_one_emissions_reduced = 0
 		# print("year_one_emissions_reduced after 0 condition:", year_one_emissions_reduced)
+		# calculate added year 0 costs from mg_add_cost()
+		mg_add_cost_df = pd.read_csv(f'mg_add_cost_{mg_name}.csv')
+		mg_add_cost = mg_add_cost_df['Cost Estimate ($)'].sum()
+		# print('mg_add_cost:',mg_add_cost)
+		# following three lines add up all the added cost csvs
+		# mg_add_cost_names = [x for x in os.listdir('.') if x.startswith('mg_add_cost')]
+		# mg_add_costs = pd.concat([pd.read_csv(x) for x in mg_add_cost_names]).to_dict(orient='list')
+		# print("mg_add_costs:", mg_add_costs)
+
 		#TODO: Redo post-REopt economic calculations to match updated discounts, taxations, etc
-		npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
-		cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
-		cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
+		npv = reopt_out.get(f'savings{mg_num}', 0.0) - mg_add_cost # overall npv against the business as usual case from REopt
+		cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) + mg_add_cost# description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
+		cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) + mg_add_cost # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
 		
 		# TODO: Once incentive structure is finalized, update NPV and cap_ex_after_incentives calculation to include depreciation over time if appropriate
 		# TODO: update logic to remove existing batteries if battery_pow_new > 0
@@ -1257,9 +1264,13 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	mg_dict["Emissions (Yr 1 Tons CO2)"] = round(reopt_out.get(f'yearOneEmissionsTons{mg_num}', 0.0))
 	mg_dict["Emissions Reduction (Yr 1 % CO2)"] = round(reopt_out.get(f'yearOneEmissionsReducedPercent{mg_num}', 0.0))
 
-	npv = reopt_out.get(f'savings{mg_num}', 0.0) # overall npv against the business as usual case from REopt
-	cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
-	cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
+	# calculate added year 0 costs from mg_add_cost()
+	mg_add_cost_df = pd.read_csv(f'mg_add_cost_{mg_name}.csv')
+	mg_add_cost = mg_add_cost_df['Cost Estimate ($)'].sum()
+
+	npv = reopt_out.get(f'savings{mg_num}', 0.0) - mg_add_cost # overall npv against the business as usual case from REopt
+	cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) + mg_add_cost # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
+	cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) + mg_add_cost # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
 	
 	#TODO: Once incentive structure is finalized, update NPV and cap_ex_after_incentives calculation to include depreciation over time if appropriate
 	# TODO: update logic to remove existing batteries if battery_pow_new > 0

@@ -43,7 +43,7 @@
         "dieselOnlyRunsDuringOutage": true
     },
     "MICROGRIDS": {
-        "m0": {
+        "mg0": {
             "loads": [
                 "634a_data_center",
                 "634b_radar",
@@ -60,7 +60,7 @@
             "kw_rating_diesel": "1000000",
             "kwh_rating_battery": "10000"
         },
-        "m1": {
+        "mg1": {
             "loads": [
                 "675a_hospital",
                 "675b_residential1",

@@ -52,7 +52,7 @@ if __name__ == '__main__':
 		"dieselOnlyRunsDuringOutage": True
 	}
 	MICROGRIDS = {
-		'm0': {
+		'mg0': {
 			'loads': ['634a_data_center','634b_radar','634c_atc_tower'],
 			'switch': '632633',
 			'gen_bus': '634',
@@ -62,7 +62,7 @@ if __name__ == '__main__':
 			'kw_rating_diesel': '1000000',
 			'kwh_rating_battery': '10000'
 		},
-		'm1': {
+		'mg1': {
 			'loads': ['675a_hospital','675b_residential1','675c_residential1'],
 			'switch': '671692',
 			'gen_bus': '675',

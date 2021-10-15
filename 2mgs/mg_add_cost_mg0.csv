@@ -1,6 +1,6 @@
 Location,Recommended Upgrade,Cost Estimate ($)
-m0,Microgrid Design,100000
-m0,Microgrid Controls,100000
+mg0,Microgrid Design,100000
+mg0,Microgrid Controls,100000
 632633,SCADA disconnect switch,50000
 634a_data_center,AMI disconnect meter,5000
 634b_radar,AMI disconnect meter,5000

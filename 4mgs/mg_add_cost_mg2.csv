@@ -4,3 +4,4 @@ mg2,Microgrid Controls,100000
 671684,SCADA disconnect switch,50000
 684_command_center,AMI disconnect meter,5000
 652_residential,AMI disconnect meter,5000
+611_runway,AMI disconnect meter,5000

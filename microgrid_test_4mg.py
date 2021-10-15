@@ -67,7 +67,7 @@ if __name__ == '__main__':
 			'kwh_rating_battery': '100'
 		},
 		'mg1': {
-			'loads': ['675a_hospital','675b_residential1','675c_residential1'],
+			'loads': ['675a_hospital','675b_residential1','675c_residential1','692_warehouse2'],
 			'switch': '671692',
 			'gen_bus': '675',
 			'gen_obs_existing': ['solar_675_existing'],
@@ -77,7 +77,7 @@ if __name__ == '__main__':
 			'kwh_rating_battery': '553'
 		},
 		'mg2': {
-			'loads': ['684_command_center','652_residential'],
+			'loads': ['684_command_center','652_residential','611_runway'],
 			'switch': '671684',
 			'gen_bus': '684',
 			'gen_obs_existing': ['diesel_684_existing','battery_684_existing'],

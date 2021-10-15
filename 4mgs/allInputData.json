@@ -64,9 +64,9 @@
                 90,
                 10
             ],
-            "max_potential_battery": "700",
-            "max_potential_diesel": "1000000",
-            "battery_capacity": "10000"
+            "kw_rating_battery": "7",
+            "kw_rating_diesel": "100",
+            "kwh_rating_battery": "100"
         },
         "mg1": {
             "loads": [
@@ -84,9 +84,9 @@
                 200,
                 200
             ],
-            "max_potential_battery": "900",
-            "max_potential_diesel": "300",
-            "battery_capacity": "20000"
+            "kw_rating_battery": "128",
+            "kw_rating_diesel": "538.0170262240325",
+            "kwh_rating_battery": "553"
         },
         "mg2": {
             "loads": [
@@ -103,9 +103,9 @@
                 400,
                 20
             ],
-            "max_potential": "1300",
-            "max_potential_diesel": "1000000",
-            "battery_capacity": "10000"
+            "kw_rating_battery": "20",
+            "kw_rating_diesel": "593.2050653749545",
+            "kwh_rating_battery": "65.97158243892608"
         },
         "mg3": {
             "loads": [
@@ -119,9 +119,9 @@
                 30,
                 70
             ],
-            "max_potential_battery": "800",
-            "max_potential_diesel": "1000000",
-            "battery_capacity": "10000"
+            "kw_rating_battery": "8",
+            "kw_rating_diesel": "1000",
+            "kwh_rating_battery": "100"
         }
     },
     "FAULTED_LINE": "670671",

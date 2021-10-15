@@ -58,9 +58,9 @@ if __name__ == '__main__':
 			'gen_bus': '634',
 			'gen_obs_existing': ['solar_634_existing', 'battery_634_existing'],
 			'critical_load_kws': [], #[70,90,10],
-			'max_potential': '700',
-			'max_potential_diesel': '1000000',
-			'battery_capacity': '10000'
+			'kw_rating_battery': '700',
+			'kw_rating_diesel': '1000000',
+			'kwh_rating_battery': '10000'
 		},
 		'm1': {
 			'loads': ['675a_hospital','675b_residential1','675c_residential1'],
@@ -68,9 +68,9 @@ if __name__ == '__main__':
 			'gen_bus': '675',
 			'gen_obs_existing': [],
 			'critical_load_kws': [150,200,200],
-			'max_potential': '900',
-			'max_potential_diesel': '1000000',
-			'battery_capacity': '10000'
+			'kw_rating_battery': '900',
+			'kw_rating_diesel': '1000000',
+			'kwh_rating_battery': '10000'
 		}
 	}
 	# Run model.

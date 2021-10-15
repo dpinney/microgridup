@@ -2,7 +2,7 @@
     "MODEL_DIR": "3mgs",
     "BASE_DSS": "lehigh_base_phased.dss",
     "LOAD_CSV": "lehigh_load.csv",
-    "QSTS_STEPS": 9600,
+    "QSTS_STEPS": 480,
     "FOSSIL_BACKUP_PERCENT": 0.5,
     "REOPT_INPUTS": {
         "solar": "on",
@@ -64,9 +64,9 @@
                 90,
                 10
             ],
-            "max_potential_battery": "700",
-            "max_potential_diesel": "1000000",
-            "battery_capacity": "10000"
+            "kw_rating_battery": "700",
+            "kw_rating_diesel": "1000000",
+            "kwh_rating_battery": "10000"
         },
         "mg1": {
             "loads": [
@@ -84,9 +84,9 @@
                 200,
                 200
             ],
-            "max_potential_battery": "100",
-            "max_potential_diesel": "900",
-            "battery_capacity": "2000"
+            "kw_rating_battery": "100",
+            "kw_rating_diesel": "900",
+            "kwh_rating_battery": "2000"
         },
         "mg2": {
             "loads": [
@@ -100,9 +100,9 @@
                 30,
                 70
             ],
-            "max_potential_battery": "800",
-            "max_potential_diesel": "1000000",
-            "battery_capacity": "10000"
+            "kw_rating_battery": "800",
+            "kw_rating_diesel": "1000000",
+            "kwh_rating_battery": "10000"
         }
     },
     "FAULTED_LINE": "670671",

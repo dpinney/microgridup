@@ -912,10 +912,10 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 						emptyLoads.append(shape_name)
 						# print(shape_name)
 					l = 0
-					while l < len(shape_data):
-						if shape_data[l] != 0.0:
-							shape_data[l] = float(basekv) / math.sqrt(phaseCoefficient)
-						l += 1
+					# while l < len(shape_data):
+					# 	if shape_data[l] != 0.0:
+					# 		shape_data[l] = float(basekv) / math.sqrt(phaseCoefficient)
+					# 	l += 1
 					shape_insert_list[i] = {
 							'!CMD': 'new',
 							'object': f'loadshape.{shape_name}',
@@ -949,8 +949,8 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 								'bus1': str(buses[0]) + '.' + str(phase),
 								'angle': str(angle),
 								'phases': '1',
-								'R1': str(float(xdp) * phaseCoefficient),
-								'X1': str(float(xdpp) * phaseCoefficient),
+								# 'R1': str(float(xdp) * phaseCoefficient),
+								# 'X1': str(float(xdpp) * phaseCoefficient),
 								'yearly': 'newdiesel_' + str(buses[0]) + '_' + str(phase) + '_shape'
 							}
 						j+=1
@@ -1135,4 +1135,4 @@ microgrids = {
 	}
 }
 
-# play('./4mgs/circuit.dss.omd', './4mgs/circuit_plusmg_3.dss', None, None, microgrids, '670671', False, 60, 120, 30) 
+play('./4mgs/circuit.dss.omd', './4mgs/circuit_plusmg_3.dss', None, None, microgrids, '670671', False, 60, 120, 30) 

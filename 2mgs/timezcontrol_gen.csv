@@ -1,0 +1,1801 @@
+hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name
+1,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+2,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+3,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+4,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+5,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+6,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+7,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+8,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+9,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+10,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+11,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+12,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+13,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+14,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+15,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+16,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+17,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+18,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+19,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+20,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+21,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+22,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+23,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+24,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+25,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+26,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+27,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+28,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+29,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+30,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+31,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+32,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+33,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+34,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+35,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+36,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+37,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+38,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+39,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+40,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+41,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+42,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+43,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+44,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+45,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+46,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+47,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+48,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+49,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+50,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+51,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+52,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+53,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+54,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+55,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+56,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+57,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+58,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+59,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+60,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+61,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+62,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+63,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+64,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+65,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+66,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+67,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+68,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+69,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+70,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+71,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+72,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+73,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+74,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+75,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+76,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+77,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+78,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+79,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+80,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+81,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+82,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+83,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+84,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+85,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+86,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+87,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+88,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+89,0.0, -5.89217E9, -1.81461E11,,0,,mongenerator-generator_newbattery_675_1_shape
+90,0.0, -4.12183E14, -1.23673E16,,0,,mongenerator-generator_newbattery_675_1_shape
+91,0.0, -2.82025E19, -8.45604E20,,0,,mongenerator-generator_newbattery_675_1_shape
+92,0.0, -1.92838E24, -5.78189E25,,0,,mongenerator-generator_newbattery_675_1_shape
+93,0.0, -1.31855E29, -3.95343E30,,0,,mongenerator-generator_newbattery_675_1_shape
+94,0.0, -9.01568E33, -2.7032E35,,0,,mongenerator-generator_newbattery_675_1_shape
+95,0.0, -Inf, -Inf,,0,,mongenerator-generator_newbattery_675_1_shape
+96,0.0, -Inf, -Inf,,0,,mongenerator-generator_newbattery_675_1_shape
+97,0.0, -Inf, -Inf,,0,,mongenerator-generator_newbattery_675_1_shape
+98,0.0, -Inf, -Inf,,0,,mongenerator-generator_newbattery_675_1_shape
+99,0.0, -4.78273E29, 1.89687E31,,0,,mongenerator-generator_newbattery_675_1_shape
+100,0.0, -12.2786, 215.094,,0,,mongenerator-generator_newbattery_675_1_shape
+101,0.0, -5.41607E-7, -0.0000133895,,0,,mongenerator-generator_newbattery_675_1_shape
+102,0.0, -2.84859E-10, -7.0516E-9,,0,,mongenerator-generator_newbattery_675_1_shape
+103,0.0, -2.1125E-13, -5.23775E-12,,0,,mongenerator-generator_newbattery_675_1_shape
+104,0.0, -1.51282E-16, -3.75784E-15,,0,,mongenerator-generator_newbattery_675_1_shape
+105,0.0, -4.7257E-20, -1.17635E-18,,0,,mongenerator-generator_newbattery_675_1_shape
+106,0.0, -2.15523E-23, -5.37767E-22,,0,,mongenerator-generator_newbattery_675_1_shape
+107,0.0, -1.14196E-26, -2.85679E-25,,0,,mongenerator-generator_newbattery_675_1_shape
+108,0.0, -5.90783E-30, -1.48204E-28,,0,,mongenerator-generator_newbattery_675_1_shape
+109,0.0, -2.26537E-33, -5.6994E-32,,0,,mongenerator-generator_newbattery_675_1_shape
+110,0.0, -4.94797E-38, -1.2485E-36,,0,,mongenerator-generator_newbattery_675_1_shape
+111,0.0, 1.37608E-42, 3.48237E-41,,0,,mongenerator-generator_newbattery_675_1_shape
+112,0.0, 0, 2.8026E-45,,0,,mongenerator-generator_newbattery_675_1_shape
+113,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+114,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+115,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+116,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+117,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+118,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+119,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+120,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+121,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+122,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+123,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+124,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+125,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+126,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+127,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+128,0.0, -1.52073E10, -4.68337E11,,0,,mongenerator-generator_newbattery_675_1_shape
+129,0.0, -1.06393E15, -3.19235E16,,0,,mongenerator-generator_newbattery_675_1_shape
+130,0.0, -7.27987E19, -2.18274E21,,0,,mongenerator-generator_newbattery_675_1_shape
+131,0.0, -4.97769E24, -1.49247E26,,0,,mongenerator-generator_newbattery_675_1_shape
+132,0.0, -3.40355E29, -1.02049E31,,0,,mongenerator-generator_newbattery_675_1_shape
+133,0.0, -2.3272E34, -6.97774E35,,0,,mongenerator-generator_newbattery_675_1_shape
+134,0.0, -Inf, -Inf,,0,,mongenerator-generator_newbattery_675_1_shape
+135,0.0, -Inf, -Inf,,0,,mongenerator-generator_newbattery_675_1_shape
+136,0.0, -Inf, -Inf,,0,,mongenerator-generator_newbattery_675_1_shape
+137,0.0, -Inf, -Inf,,0,,mongenerator-generator_newbattery_675_1_shape
+138,0.0, 2.12028E37, +Inf,,0,,mongenerator-generator_newbattery_675_1_shape
+139,0.0, 5.93526E21, 9.60969E23,,0,,mongenerator-generator_newbattery_675_1_shape
+140,0.0, 1.24942E6, 2.23628E8,,0,,mongenerator-generator_newbattery_675_1_shape
+141,0.0, 2.23288E-6, 0.0000562598,,0,,mongenerator-generator_newbattery_675_1_shape
+142,0.0, 4.88898E-9, 1.23266E-7,,0,,mongenerator-generator_newbattery_675_1_shape
+143,0.0, 9.3821E-12, 2.36534E-10,,0,,mongenerator-generator_newbattery_675_1_shape
+144,0.0, 1.65665E-14, 4.1723E-13,,0,,mongenerator-generator_newbattery_675_1_shape
+145,0.0, 1.7897E-17, 4.49724E-16,,0,,mongenerator-generator_newbattery_675_1_shape
+146,0.0, 6.90541E-21, 1.72874E-19,,0,,mongenerator-generator_newbattery_675_1_shape
+147,0.0, 2.05188E-24, 5.10842E-23,,0,,mongenerator-generator_newbattery_675_1_shape
+148,0.0, 8.4278E-29, 2.08224E-27,,0,,mongenerator-generator_newbattery_675_1_shape
+149,0.0, 1.25775E-33, 3.07645E-32,,0,,mongenerator-generator_newbattery_675_1_shape
+150,0.0, 1.76964E-38, 4.27378E-37,,0,,mongenerator-generator_newbattery_675_1_shape
+151,0.0, 9.78106E-43, 2.32405E-41,,0,,mongenerator-generator_newbattery_675_1_shape
+152,0.0, 0, 2.8026E-45,,0,,mongenerator-generator_newbattery_675_1_shape
+153,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+154,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+155,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+156,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+157,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+158,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+159,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+160,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+161,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+162,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+163,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+164,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+165,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+166,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+167,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+168,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+169,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+170,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+171,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+172,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+173,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+174,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+175,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+176,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+177,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+178,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+179,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+180,0.0, -224.697, -3.50591E-6,,0,,mongenerator-generator_newbattery_675_1_shape
+181,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+182,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+183,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+184,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+185,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+186,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+187,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+188,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+189,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+190,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+191,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+192,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+193,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+194,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+195,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+196,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+197,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+198,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+199,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+200,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+201,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+202,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+203,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+204,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+205,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+206,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+207,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+208,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+209,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+210,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+211,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+212,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+213,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+214,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+215,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+216,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+217,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+218,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+219,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+220,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+221,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+222,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+223,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+224,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+225,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+226,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+227,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+228,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+229,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+230,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+231,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+232,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+233,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+234,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+235,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+236,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+237,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+238,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+239,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+240,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+241,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+242,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+243,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+244,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+245,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+246,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+247,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+248,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+249,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+250,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+251,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+252,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+253,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+254,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+255,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+256,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+257,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+258,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+259,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+260,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+261,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+262,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+263,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+264,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+265,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+266,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+267,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+268,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+269,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+270,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+271,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+272,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+273,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+274,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+275,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+276,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+277,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+278,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+279,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+280,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+281,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+282,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+283,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+284,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+285,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+286,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+287,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+288,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+289,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+290,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+291,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+292,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+293,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+294,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+295,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+296,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+297,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+298,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+299,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+300,0.0, 0, 0,,0,,mongenerator-generator_newbattery_675_1_shape
+1,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+2,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+3,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+4,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+5,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+6,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+7,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+8,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+9,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+10,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+11,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+12,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+13,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+14,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+15,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+16,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+17,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+18,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+19,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+20,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+21,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+22,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+23,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+24,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+25,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+26,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+27,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+28,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+29,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+30,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+31,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+32,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+33,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+34,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+35,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+36,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+37,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+38,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+39,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+40,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+41,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+42,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+43,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+44,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+45,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+46,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+47,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+48,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+49,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+50,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+51,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+52,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+53,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+54,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+55,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+56,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+57,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+58,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+59,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+60,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+61,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+62,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+63,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+64,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+65,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+66,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+67,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+68,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+69,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+70,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+71,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+72,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+73,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+74,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+75,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+76,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+77,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+78,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+79,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+80,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+81,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+82,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+83,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+84,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+85,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+86,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+87,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+88,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+89,0.0,, -1.8141E11, -5.89156E9,0,,mongenerator-generator_newbattery_675_2_shape
+90,0.0,, -1.23604E16, -4.12019E14,0,,mongenerator-generator_newbattery_675_2_shape
+91,0.0,, -8.449E20, -2.81835E19,0,,mongenerator-generator_newbattery_675_2_shape
+92,0.0,, -5.77548E25, -1.92654E24,0,,mongenerator-generator_newbattery_675_2_shape
+93,0.0,, -3.94795E30, -1.31692E29,0,,mongenerator-generator_newbattery_675_2_shape
+94,0.0,, -2.69869E35, -9.00206E33,0,,mongenerator-generator_newbattery_675_2_shape
+95,0.0,, -Inf, -Inf,0,,mongenerator-generator_newbattery_675_2_shape
+96,0.0,, -Inf, -Inf,0,,mongenerator-generator_newbattery_675_2_shape
+97,0.0,, -Inf, -Inf,0,,mongenerator-generator_newbattery_675_2_shape
+98,0.0,, -Inf, -Inf,0,,mongenerator-generator_newbattery_675_2_shape
+99,0.0,, 1.89242E31, -4.78866E29,0,,mongenerator-generator_newbattery_675_2_shape
+100,0.0,, 214.018, -12.2843,0,,mongenerator-generator_newbattery_675_2_shape
+101,0.0,, -0.0000132816, -5.35761E-7,0,,mongenerator-generator_newbattery_675_2_shape
+102,0.0,, -6.98045E-9, -2.81637E-10,0,,mongenerator-generator_newbattery_675_2_shape
+103,0.0,, -5.17264E-12, -2.08795E-13,0,,mongenerator-generator_newbattery_675_2_shape
+104,0.0,, -3.70121E-15, -1.49518E-16,0,,mongenerator-generator_newbattery_675_2_shape
+105,0.0,, -1.15519E-18, -4.67208E-20,0,,mongenerator-generator_newbattery_675_2_shape
+106,0.0,, -5.26402E-22, -2.13243E-23,0,,mongenerator-generator_newbattery_675_2_shape
+107,0.0,, -2.78695E-25, -1.13138E-26,0,,mongenerator-generator_newbattery_675_2_shape
+108,0.0,, -1.44079E-28, -5.86477E-30,0,,mongenerator-generator_newbattery_675_2_shape
+109,0.0,, -5.52168E-32, -2.25509E-33,0,,mongenerator-generator_newbattery_675_2_shape
+110,0.0,, -1.20563E-36, -4.94353E-38,0,,mongenerator-generator_newbattery_675_2_shape
+111,0.0,, 3.35317E-41, 1.38168E-42,0,,mongenerator-generator_newbattery_675_2_shape
+112,0.0,, 1.4013E-45, 0,0,,mongenerator-generator_newbattery_675_2_shape
+113,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+114,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+115,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+116,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+117,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+118,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+119,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+120,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+121,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+122,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+123,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+124,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+125,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+126,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+127,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+128,0.0,, -4.68206E11, -1.52057E10,0,,mongenerator-generator_newbattery_675_2_shape
+129,0.0,, -3.19058E16, -1.06351E15,0,,mongenerator-generator_newbattery_675_2_shape
+130,0.0,, -2.18093E21, -7.27497E19,0,,mongenerator-generator_newbattery_675_2_shape
+131,0.0,, -1.49082E26, -4.97296E24,0,,mongenerator-generator_newbattery_675_2_shape
+132,0.0,, -1.01908E31, -3.39936E29,0,,mongenerator-generator_newbattery_675_2_shape
+133,0.0,, -6.96608E35, -2.32369E34,0,,mongenerator-generator_newbattery_675_2_shape
+134,0.0,, -Inf, -Inf,0,,mongenerator-generator_newbattery_675_2_shape
+135,0.0,, -Inf, -Inf,0,,mongenerator-generator_newbattery_675_2_shape
+136,0.0,, -Inf, -Inf,0,,mongenerator-generator_newbattery_675_2_shape
+137,0.0,, -Inf, -Inf,0,,mongenerator-generator_newbattery_675_2_shape
+138,0.0,, +Inf, 2.08998E37,0,,mongenerator-generator_newbattery_675_2_shape
+139,0.0,, 9.54851E23, 5.84486E21,0,,mongenerator-generator_newbattery_675_2_shape
+140,0.0,, 2.19341E8, 1.33529E6,0,,mongenerator-generator_newbattery_675_2_shape
+141,0.0,, 0.0000546341, 2.26189E-6,0,,mongenerator-generator_newbattery_675_2_shape
+142,0.0,, 1.19777E-7, 4.98175E-9,0,,mongenerator-generator_newbattery_675_2_shape
+143,0.0,, 2.30279E-10, 9.62403E-12,0,,mongenerator-generator_newbattery_675_2_shape
+144,0.0,, 4.07629E-13, 1.71194E-14,0,,mongenerator-generator_newbattery_675_2_shape
+145,0.0,, 4.41782E-16, 1.86419E-17,0,,mongenerator-generator_newbattery_675_2_shape
+146,0.0,, 1.71144E-19, 7.25313E-21,0,,mongenerator-generator_newbattery_675_2_shape
+147,0.0,, 5.11029E-23, 2.17358E-24,0,,mongenerator-generator_newbattery_675_2_shape
+148,0.0,, 2.11114E-27, 9.002E-29,0,,mongenerator-generator_newbattery_675_2_shape
+149,0.0,, 3.17174E-32, 1.35378E-33,0,,mongenerator-generator_newbattery_675_2_shape
+150,0.0,, 4.49632E-37, 1.91721E-38,0,,mongenerator-generator_newbattery_675_2_shape
+151,0.0,, 2.5044E-41, 1.06359E-42,0,,mongenerator-generator_newbattery_675_2_shape
+152,0.0,, 2.8026E-45, 0,0,,mongenerator-generator_newbattery_675_2_shape
+153,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+154,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+155,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+156,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+157,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+158,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+159,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+160,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+161,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+162,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+163,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+164,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+165,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+166,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+167,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+168,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+169,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+170,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+171,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+172,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+173,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+174,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+175,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+176,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+177,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+178,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+179,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+180,0.0,, 0.000543301, -224.697,0,,mongenerator-generator_newbattery_675_2_shape
+181,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+182,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+183,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+184,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+185,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+186,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+187,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+188,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+189,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+190,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+191,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+192,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+193,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+194,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+195,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+196,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+197,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+198,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+199,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+200,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+201,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+202,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+203,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+204,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+205,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+206,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+207,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+208,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+209,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+210,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+211,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+212,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+213,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+214,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+215,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+216,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+217,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+218,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+219,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+220,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+221,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+222,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+223,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+224,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+225,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+226,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+227,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+228,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+229,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+230,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+231,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+232,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+233,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+234,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+235,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+236,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+237,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+238,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+239,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+240,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+241,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+242,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+243,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+244,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+245,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+246,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+247,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+248,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+249,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+250,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+251,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+252,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+253,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+254,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+255,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+256,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+257,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+258,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+259,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+260,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+261,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+262,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+263,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+264,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+265,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+266,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+267,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+268,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+269,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+270,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+271,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+272,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+273,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+274,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+275,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+276,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+277,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+278,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+279,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+280,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+281,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+282,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+283,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+284,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+285,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+286,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+287,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+288,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+289,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+290,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+291,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+292,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+293,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+294,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+295,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+296,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+297,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+298,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+299,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+300,0.0,, 0, 0,0,,mongenerator-generator_newbattery_675_2_shape
+1,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+2,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+3,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+4,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+5,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+6,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+7,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+8,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+9,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+10,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+11,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+12,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+13,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+14,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+15,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+16,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+17,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+18,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+19,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+20,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+21,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+22,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+23,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+24,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+25,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+26,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+27,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+28,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+29,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+30,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+31,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+32,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+33,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+34,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+35,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+36,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+37,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+38,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+39,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+40,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+41,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+42,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+43,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+44,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+45,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+46,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+47,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+48,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+49,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+50,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+51,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+52,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+53,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+54,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+55,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+56,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+57,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+58,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+59,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+60,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+61,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+62,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+63,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+64,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+65,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+66,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+67,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+68,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+69,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+70,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+71,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+72,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+73,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+74,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+75,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+76,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+77,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+78,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+79,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+80,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+81,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+82,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+83,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+84,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+85,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+86,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+87,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+88,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+89,0.0,, -1.81412E11,,0, -5.8895E9,mongenerator-generator_newbattery_675_3_shape
+90,0.0,, -1.23605E16,,0, -4.11892E14,mongenerator-generator_newbattery_675_3_shape
+91,0.0,, -8.44909E20,,0, -2.81748E19,mongenerator-generator_newbattery_675_3_shape
+92,0.0,, -5.77555E25,,0, -1.92595E24,mongenerator-generator_newbattery_675_3_shape
+93,0.0,, -3.94798E30,,0, -1.31652E29,mongenerator-generator_newbattery_675_3_shape
+94,0.0,, -2.69872E35,,0, -8.99938E33,mongenerator-generator_newbattery_675_3_shape
+95,0.0,, -Inf,,0, -Inf,mongenerator-generator_newbattery_675_3_shape
+96,0.0,, -Inf,,0, -Inf,mongenerator-generator_newbattery_675_3_shape
+97,0.0,, -Inf,,0, -Inf,mongenerator-generator_newbattery_675_3_shape
+98,0.0,, -Inf,,0, -Inf,mongenerator-generator_newbattery_675_3_shape
+99,0.0,, 1.88936E31,,0, -4.77251E29,mongenerator-generator_newbattery_675_3_shape
+100,0.0,, 212.935,,0, -12.1487,mongenerator-generator_newbattery_675_3_shape
+101,0.0,, -0.0000132181,,0, -5.39186E-7,mongenerator-generator_newbattery_675_3_shape
+102,0.0,, -6.95194E-9,,0, -2.83899E-10,mongenerator-generator_newbattery_675_3_shape
+103,0.0,, -5.15726E-12,,0, -2.10844E-13,mongenerator-generator_newbattery_675_3_shape
+104,0.0,, -3.69613E-15,,0, -1.51268E-16,mongenerator-generator_newbattery_675_3_shape
+105,0.0,, -1.15611E-18,,0, -4.73592E-20,mongenerator-generator_newbattery_675_3_shape
+106,0.0,, -5.28298E-22,,0, -2.16572E-23,mongenerator-generator_newbattery_675_3_shape
+107,0.0,, -2.80682E-25,,0, -1.15114E-26,mongenerator-generator_newbattery_675_3_shape
+108,0.0,, -1.45726E-28,,0, -5.97683E-30,mongenerator-generator_newbattery_675_3_shape
+109,0.0,, -5.61321E-32,,0, -2.30111E-33,mongenerator-generator_newbattery_675_3_shape
+110,0.0,, -1.23285E-36,,0, -5.04832E-38,mongenerator-generator_newbattery_675_3_shape
+111,0.0,, 3.45182E-41,,0, 1.41111E-42,mongenerator-generator_newbattery_675_3_shape
+112,0.0,, 2.8026E-45,,0, 0,mongenerator-generator_newbattery_675_3_shape
+113,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+114,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+115,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+116,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+117,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+118,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+119,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+120,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+121,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+122,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+123,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+124,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+125,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+126,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+127,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+128,0.0,, -4.68211E11,,0, -1.52004E10,mongenerator-generator_newbattery_675_3_shape
+129,0.0,, -3.19061E16,,0, -1.06318E15,mongenerator-generator_newbattery_675_3_shape
+130,0.0,, -2.18095E21,,0, -7.27272E19,mongenerator-generator_newbattery_675_3_shape
+131,0.0,, -1.49083E26,,0, -4.97142E24,mongenerator-generator_newbattery_675_3_shape
+132,0.0,, -1.01909E31,,0, -3.39832E29,mongenerator-generator_newbattery_675_3_shape
+133,0.0,, -6.96617E35,,0, -2.323E34,mongenerator-generator_newbattery_675_3_shape
+134,0.0,, -Inf,,0, -Inf,mongenerator-generator_newbattery_675_3_shape
+135,0.0,, -Inf,,0, -Inf,mongenerator-generator_newbattery_675_3_shape
+136,0.0,, -Inf,,0, -Inf,mongenerator-generator_newbattery_675_3_shape
+137,0.0,, -Inf,,0, -Inf,mongenerator-generator_newbattery_675_3_shape
+138,0.0,, +Inf,,0, 2.1052E37,mongenerator-generator_newbattery_675_3_shape
+139,0.0,, 9.53155E23,,0, 6.04961E21,mongenerator-generator_newbattery_675_3_shape
+140,0.0,, 2.21174E8,,0, 1.40149E6,mongenerator-generator_newbattery_675_3_shape
+141,0.0,, 0.0000564909,,0, 2.28756E-6,mongenerator-generator_newbattery_675_3_shape
+142,0.0,, 1.24575E-7,,0, 5.02412E-9,mongenerator-generator_newbattery_675_3_shape
+143,0.0,, 2.40915E-10,,0, 9.66705E-12,mongenerator-generator_newbattery_675_3_shape
+144,0.0,, 4.28869E-13,,0, 1.71035E-14,mongenerator-generator_newbattery_675_3_shape
+145,0.0,, 4.67175E-16,,0, 1.84958E-17,mongenerator-generator_newbattery_675_3_shape
+146,0.0,, 1.81734E-19,,0, 7.13432E-21,mongenerator-generator_newbattery_675_3_shape
+147,0.0,, 5.44153E-23,,0, 2.11564E-24,mongenerator-generator_newbattery_675_3_shape
+148,0.0,, 2.24992E-27,,0, 8.65354E-29,mongenerator-generator_newbattery_675_3_shape
+149,0.0,, 3.37479E-32,,0, 1.28267E-33,mongenerator-generator_newbattery_675_3_shape
+150,0.0,, 4.76167E-37,,0, 1.78678E-38,mongenerator-generator_newbattery_675_3_shape
+151,0.0,, 2.62982E-41,,0, 9.73902E-43,mongenerator-generator_newbattery_675_3_shape
+152,0.0,, 2.8026E-45,,0, 0,mongenerator-generator_newbattery_675_3_shape
+153,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+154,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+155,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+156,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+157,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+158,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+159,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+160,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+161,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+162,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+163,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+164,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+165,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+166,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+167,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+168,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+169,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+170,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+171,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+172,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+173,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+174,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+175,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+176,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+177,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+178,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+179,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+180,0.0,, -0.00155052,,0, -196.77,mongenerator-generator_newbattery_675_3_shape
+181,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+182,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+183,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+184,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+185,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+186,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+187,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+188,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+189,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+190,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+191,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+192,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+193,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+194,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+195,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+196,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+197,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+198,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+199,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+200,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+201,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+202,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+203,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+204,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+205,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+206,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+207,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+208,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+209,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+210,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+211,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+212,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+213,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+214,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+215,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+216,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+217,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+218,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+219,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+220,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+221,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+222,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+223,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+224,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+225,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+226,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+227,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+228,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+229,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+230,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+231,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+232,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+233,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+234,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+235,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+236,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+237,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+238,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+239,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+240,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+241,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+242,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+243,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+244,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+245,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+246,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+247,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+248,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+249,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+250,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+251,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+252,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+253,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+254,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+255,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+256,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+257,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+258,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+259,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+260,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+261,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+262,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+263,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+264,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+265,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+266,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+267,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+268,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+269,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+270,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+271,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+272,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+273,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+274,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+275,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+276,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+277,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+278,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+279,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+280,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+281,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+282,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+283,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+284,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+285,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+286,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+287,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+288,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+289,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+290,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+291,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+292,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+293,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+294,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+295,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+296,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+297,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+298,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+299,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+300,0.0,, 0,,0, 0,mongenerator-generator_newbattery_675_3_shape
+1,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+2,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+3,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+4,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+5,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+6,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+7,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+8,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+9,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+10,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+11,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+12,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+13,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+14,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+15,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+16,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+17,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+18,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+19,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+20,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+21,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+22,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+23,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+24,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+25,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+26,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+27,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+28,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+29,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+30,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+31,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+32,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+33,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+34,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+35,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+36,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+37,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+38,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+39,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+40,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+41,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+42,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+43,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+44,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+45,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+46,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+47,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+48,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+49,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+50,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+51,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+52,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+53,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+54,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+55,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+56,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+57,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+58,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+59,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+60,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+61,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+62,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+63,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+64,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+65,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+66,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+67,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+68,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+69,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+70,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+71,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+72,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+73,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+74,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+75,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+76,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+77,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+78,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+79,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+80,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+81,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+82,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+83,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+84,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+85,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+86,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+87,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+88,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+89,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+90,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+91,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+92,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+93,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+94,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+95,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+96,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+97,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+98,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+99,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+100,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+101,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+102,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+103,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+104,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+105,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+106,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+107,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+108,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+109,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+110,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+111,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+112,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+113,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+114,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+115,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+116,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+117,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+118,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+119,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+120,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+121,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+122,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+123,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+124,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+125,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+126,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+127,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+128,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+129,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+130,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+131,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+132,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+133,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+134,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+135,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+136,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+137,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+138,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+139,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+140,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+141,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+142,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+143,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+144,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+145,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+146,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+147,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+148,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+149,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+150,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+151,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+152,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+153,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+154,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+155,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+156,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+157,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+158,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+159,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+160,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+161,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+162,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+163,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+164,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+165,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+166,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+167,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+168,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+169,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+170,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+171,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+172,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+173,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+174,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+175,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+176,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+177,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+178,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+179,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+180,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+181,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+182,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+183,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+184,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+185,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+186,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+187,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+188,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+189,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+190,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+191,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+192,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+193,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+194,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+195,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+196,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+197,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+198,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+199,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+200,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+201,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+202,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+203,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+204,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+205,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+206,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+207,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+208,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+209,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+210,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+211,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+212,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+213,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+214,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+215,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+216,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+217,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+218,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+219,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+220,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+221,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+222,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+223,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+224,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+225,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+226,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+227,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+228,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+229,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+230,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+231,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+232,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+233,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+234,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+235,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+236,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+237,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+238,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+239,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+240,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+241,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+242,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+243,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+244,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+245,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+246,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+247,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+248,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+249,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+250,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+251,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+252,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+253,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+254,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+255,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+256,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+257,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+258,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+259,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+260,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+261,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+262,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+263,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+264,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+265,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+266,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+267,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+268,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+269,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+270,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+271,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+272,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+273,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+274,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+275,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+276,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+277,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+278,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+279,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+280,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+281,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+282,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+283,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+284,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+285,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+286,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+287,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+288,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+289,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+290,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+291,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+292,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+293,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+294,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+295,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+296,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+297,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+298,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+299,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+300,0.0,0,0,,0,,mongenerator-generator_solar_675_1_shape
+1,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+2,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+3,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+4,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+5,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+6,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+7,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+8,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+9,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+10,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+11,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+12,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+13,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+14,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+15,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+16,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+17,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+18,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+19,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+20,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+21,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+22,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+23,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+24,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+25,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+26,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+27,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+28,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+29,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+30,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+31,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+32,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+33,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+34,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+35,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+36,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+37,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+38,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+39,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+40,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+41,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+42,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+43,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+44,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+45,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+46,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+47,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+48,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+49,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+50,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+51,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+52,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+53,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+54,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+55,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+56,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+57,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+58,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+59,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+60,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+61,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+62,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+63,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+64,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+65,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+66,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+67,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+68,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+69,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+70,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+71,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+72,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+73,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+74,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+75,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+76,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+77,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+78,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+79,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+80,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+81,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+82,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+83,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+84,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+85,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+86,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+87,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+88,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+89,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+90,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+91,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+92,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+93,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+94,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+95,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+96,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+97,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+98,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+99,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+100,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+101,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+102,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+103,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+104,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+105,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+106,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+107,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+108,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+109,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+110,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+111,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+112,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+113,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+114,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+115,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+116,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+117,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+118,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+119,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+120,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+121,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+122,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+123,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+124,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+125,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+126,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+127,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+128,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+129,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+130,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+131,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+132,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+133,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+134,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+135,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+136,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+137,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+138,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+139,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+140,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+141,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+142,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+143,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+144,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+145,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+146,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+147,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+148,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+149,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+150,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+151,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+152,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+153,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+154,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+155,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+156,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+157,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+158,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+159,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+160,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+161,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+162,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+163,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+164,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+165,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+166,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+167,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+168,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+169,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+170,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+171,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+172,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+173,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+174,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+175,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+176,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+177,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+178,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+179,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+180,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+181,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+182,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+183,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+184,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+185,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+186,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+187,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+188,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+189,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+190,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+191,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+192,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+193,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+194,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+195,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+196,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+197,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+198,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+199,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+200,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+201,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+202,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+203,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+204,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+205,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+206,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+207,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+208,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+209,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+210,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+211,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+212,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+213,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+214,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+215,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+216,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+217,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+218,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+219,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+220,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+221,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+222,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+223,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+224,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+225,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+226,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+227,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+228,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+229,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+230,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+231,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+232,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+233,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+234,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+235,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+236,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+237,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+238,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+239,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+240,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+241,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+242,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+243,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+244,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+245,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+246,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+247,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+248,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+249,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+250,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+251,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+252,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+253,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+254,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+255,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+256,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+257,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+258,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+259,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+260,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+261,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+262,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+263,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+264,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+265,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+266,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+267,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+268,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+269,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+270,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+271,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+272,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+273,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+274,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+275,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+276,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+277,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+278,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+279,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+280,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+281,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+282,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+283,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+284,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+285,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+286,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+287,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+288,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+289,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+290,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+291,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+292,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+293,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+294,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+295,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+296,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+297,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+298,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+299,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+300,0.0,,0,0,0,,mongenerator-generator_solar_675_2_shape
+1,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+2,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+3,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+4,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+5,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+6,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+7,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+8,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+9,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+10,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+11,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+12,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+13,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+14,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+15,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+16,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+17,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+18,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+19,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+20,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+21,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+22,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+23,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+24,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+25,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+26,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+27,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+28,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+29,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+30,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+31,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+32,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+33,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+34,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+35,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+36,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+37,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+38,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+39,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+40,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+41,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+42,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+43,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+44,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+45,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+46,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+47,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+48,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+49,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+50,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+51,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+52,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+53,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+54,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+55,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+56,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+57,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+58,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+59,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+60,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+61,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+62,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+63,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+64,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+65,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+66,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+67,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+68,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+69,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+70,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+71,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+72,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+73,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+74,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+75,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+76,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+77,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+78,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+79,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+80,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+81,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+82,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+83,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+84,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+85,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+86,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+87,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+88,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+89,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+90,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+91,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+92,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+93,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+94,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+95,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+96,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+97,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+98,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+99,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+100,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+101,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+102,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+103,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+104,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+105,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+106,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+107,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+108,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+109,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+110,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+111,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+112,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+113,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+114,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+115,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+116,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+117,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+118,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+119,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+120,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+121,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+122,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+123,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+124,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+125,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+126,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+127,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+128,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+129,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+130,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+131,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+132,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+133,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+134,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+135,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+136,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+137,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+138,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+139,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+140,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+141,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+142,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+143,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+144,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+145,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+146,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+147,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+148,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+149,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+150,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+151,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+152,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+153,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+154,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+155,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+156,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+157,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+158,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+159,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+160,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+161,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+162,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+163,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+164,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+165,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+166,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+167,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+168,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+169,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+170,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+171,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+172,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+173,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+174,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+175,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+176,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+177,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+178,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+179,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+180,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+181,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+182,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+183,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+184,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+185,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+186,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+187,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+188,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+189,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+190,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+191,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+192,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+193,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+194,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+195,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+196,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+197,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+198,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+199,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+200,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+201,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+202,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+203,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+204,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+205,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+206,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+207,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+208,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+209,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+210,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+211,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+212,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+213,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+214,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+215,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+216,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+217,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+218,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+219,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+220,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+221,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+222,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+223,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+224,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+225,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+226,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+227,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+228,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+229,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+230,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+231,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+232,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+233,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+234,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+235,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+236,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+237,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+238,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+239,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+240,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+241,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+242,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+243,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+244,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+245,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+246,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+247,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+248,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+249,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+250,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+251,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+252,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+253,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+254,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+255,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+256,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+257,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+258,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+259,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+260,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+261,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+262,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+263,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+264,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+265,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+266,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+267,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+268,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+269,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+270,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+271,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+272,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+273,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+274,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+275,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+276,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+277,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+278,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+279,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+280,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+281,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+282,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+283,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+284,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+285,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+286,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+287,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+288,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+289,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+290,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+291,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+292,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+293,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+294,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+295,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+296,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+297,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+298,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+299,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape
+300,0.0,,0,,0,0,mongenerator-generator_solar_675_3_shape

@@ -772,9 +772,9 @@ def mg_add_cost(outputCsvName, microgrid, mg_name):
 			ami_message = 'Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.\n'
 			print(ami_message)
 			if path.exists("user_warnings.txt"):
-				with open("user_warnings.txt") as f:
-					if ami_message not in f.read():
-						f.write(ami_message)
+				with open("user_warnings.txt", "r+") as myfile:
+					if ami_message not in myfile.read():
+						myfile.write(ami_message)
 			else:
 				with open("user_warnings.txt", "a") as myfile:
 					myfile.write(ami_message)

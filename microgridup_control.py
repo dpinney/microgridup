@@ -28,6 +28,28 @@ from omf.solvers import opendss
 # modelName, template = __neoMetaModel__.metadata(__file__)
 # hidden = True
 
+def make_chart(csvName, category_name, x, y_list):
+	'helper function to create plots from newQstsPlot'
+	gen_data = pd.read_csv(csvName)
+	data = []
+	for ob_name in set(gen_data[category_name]):
+		for y_name in y_list:
+			this_series = gen_data[gen_data[category_name] == ob_name]
+			trace = py.graph_objs.Scatter(
+				x = this_series[x],
+				y = this_series[y_name],
+				name = ob_name + '_' + y_name,
+				hoverlabel = dict(namelength = -1)
+			)
+			data.append(trace)
+	layout = py.graph_objs.Layout(
+		title = f'{csvName} Output',
+		xaxis = dict(title = 'hour'),
+		yaxis = dict(title = str(y_list))
+	)
+	fig = py.graph_objs.Figure(data, layout)
+	py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
+
 def createListOfBuses(microgrids, badBuses):
 	'helper function to get a list of microgrid diesel generators'
 	
@@ -1009,6 +1031,7 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 	# get a dictionary of all the line openings and closings to be graphed
 	actions = {}
 	line = ''
+	print('diselList -->', dieselList)
 	for entry in dieselList:
 		# print(entry)
 		# print(emptyLoads)
@@ -1069,27 +1092,27 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 		filePrefix=FPREFIX
 	)
 
-	def make_chart(csvName, category_name, x, y_list):
-		'helper function to create plots from newQstsPlot'
-		gen_data = pd.read_csv(csvName)
-		data = []
-		for ob_name in set(gen_data[category_name]):
-			for y_name in y_list:
-				this_series = gen_data[gen_data[category_name] == ob_name]
-				trace = py.graph_objs.Scatter(
-					x = this_series[x],
-					y = this_series[y_name],
-					name = ob_name + '_' + y_name,
-					hoverlabel = dict(namelength = -1)
-				)
-				data.append(trace)
-		layout = py.graph_objs.Layout(
-			title = f'{csvName} Output',
-			xaxis = dict(title = 'hour'),
-			yaxis = dict(title = str(y_list))
-		)
-		fig = py.graph_objs.Figure(data, layout)
-		py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
+	# def make_chart(csvName, category_name, x, y_list):
+	# 	'helper function to create plots from newQstsPlot'
+	# 	gen_data = pd.read_csv(csvName)
+	# 	data = []
+	# 	for ob_name in set(gen_data[category_name]):
+	# 		for y_name in y_list:
+	# 			this_series = gen_data[gen_data[category_name] == ob_name]
+	# 			trace = py.graph_objs.Scatter(
+	# 				x = this_series[x],
+	# 				y = this_series[y_name],
+	# 				name = ob_name + '_' + y_name,
+	# 				hoverlabel = dict(namelength = -1)
+	# 			)
+	# 			data.append(trace)
+	# 	layout = py.graph_objs.Layout(
+	# 		title = f'{csvName} Output',
+	# 		xaxis = dict(title = 'hour'),
+	# 		yaxis = dict(title = str(y_list))
+	# 	)
+	# 	fig = py.graph_objs.Figure(data, layout)
+	# 	py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 	
 	make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
 	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'])

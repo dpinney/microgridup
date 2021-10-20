@@ -760,14 +760,14 @@ def mg_add_cost(outputCsvName, microgrid, mg_name):
 	# print out a csv of the 
 	with open(outputCsvName, 'w', newline='') as outcsv:
 		writer = csv.writer(outcsv)
-		writer.writerow(["Location", "Recommended Upgrade", "Cost Estimate ($)"])
-		writer.writerow([mg_name, "Microgrid Design", MG_DESIGN_COST])
-		writer.writerow([mg_name, "Microgrid Controls", MG_CONTROL_COST])
+		writer.writerow(["Microgrid","Location", "Recommended Upgrade", "Cost Estimate ($)"])
+		writer.writerow([mg_name, mg_name, "Microgrid Design", MG_DESIGN_COST])
+		writer.writerow([mg_name, mg_name, "Microgrid Controls", MG_CONTROL_COST])
 		# for switch in switch_name: # TO DO: iterate through all disconnect points for the mg by going through the DSS file
-		writer.writerow([switch_name, "SCADA disconnect switch", SCADA_COST])
+		writer.writerow([mg_name, switch_name, "SCADA disconnect switch", SCADA_COST])
 		if len(mg_loads) > 1: # if the entire microgrid is a single load (100% critical load), there is no need for metering past SCADA
 			for load in mg_loads:
-				writer.writerow([load, "AMI disconnect meter", AMI_COST])
+				writer.writerow([mg_name, load, "AMI disconnect meter", AMI_COST])
 
 			ami_message = 'Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.\n'
 			print(ami_message)
@@ -778,10 +778,6 @@ def mg_add_cost(outputCsvName, microgrid, mg_name):
 			else:
 				with open("user_warnings.txt", "a") as myfile:
 					myfile.write(ami_message)
-
-	# make a dict of lists of the info in the csv:
-	#pd_dict = pd.read_csv(outputCsvName).to_dict(orient='list')
-	#print("pd_dict:", pd_dict)
 
 def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, microgrid):
 	''' insert generation objects into dss.
@@ -1060,7 +1056,7 @@ def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_st
 
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
-def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, diesel_total_calc=False):
+def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False):
 	''' Generate a report on each microgrid '''
 	reopt_out = json.load(open(REOPT_FOLDER + inputName))
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False)
@@ -1099,7 +1095,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 							"Total Generation on Microgrid (kW)", "Renewable Generation (% of Yr 1 kWh)", "Emissions (Yr 1 Tons CO2)", 
 							"Emissions Reduction (Yr 1 % CO2)", "NPV over 25 years ($)", "CapEx ($)", "CapEx after Tax Incentives ($)", 
 							"O+M Costs (Yr 1 $ before tax)", "Average Outage Survived (h)"])
-		mg_num = 1 # mg_num refers to the key suffix in allOutputData.json from reopt folder
+		mg_num = 1 # mg_num refers to the dict key suffix in allOutputData.json from reopt folder
 		mg_ob = microgrid
 		gen_bus_name = mg_ob['gen_bus']
 		#load = reopt_out.get(f'load{mg_num}', 0.0)
@@ -1127,13 +1123,9 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 			year_one_emissions_reduced = 0
 		# print("year_one_emissions_reduced after 0 condition:", year_one_emissions_reduced)
 		# calculate added year 0 costs from mg_add_cost()
-		mg_add_cost_df = pd.read_csv(f'mg_add_cost_{mg_name}.csv')
+		mg_add_cost_df = pd.read_csv(ADD_COST_NAME)
 		mg_add_cost = mg_add_cost_df['Cost Estimate ($)'].sum()
 		# print('mg_add_cost:',mg_add_cost)
-		# following three lines add up all the added cost csvs
-		# mg_add_cost_names = [x for x in os.listdir('.') if x.startswith('mg_add_cost')]
-		# mg_add_costs = pd.concat([pd.read_csv(x) for x in mg_add_cost_names]).to_dict(orient='list')
-		# print("mg_add_costs:", mg_add_costs)
 
 		#TODO: Redo post-REopt economic calculations to match updated discounts, taxations, etc
 		npv = reopt_out.get(f'savings{mg_num}', 0.0) - mg_add_cost # overall npv against the business as usual case from REopt
@@ -1186,7 +1178,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		writer.writerow(row)
 		# print("row:", row)
 
-def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, diesel_total_calc=False):
+def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False):
 	''' Generate a dictionary report for each key for all microgrids. '''
 	reopt_out = json.load(open(REOPT_FOLDER + inputName))
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False)
@@ -1265,7 +1257,7 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	mg_dict["Emissions Reduction (Yr 1 % CO2)"] = round(reopt_out.get(f'yearOneEmissionsReducedPercent{mg_num}', 0.0))
 
 	# calculate added year 0 costs from mg_add_cost()
-	mg_add_cost_df = pd.read_csv(f'mg_add_cost_{mg_name}.csv')
+	mg_add_cost_df = pd.read_csv(ADD_COST_NAME)
 	mg_add_cost = mg_add_cost_df['Cost Estimate ($)'].sum()
 
 	npv = reopt_out.get(f'savings{mg_num}', 0.0) - mg_add_cost # overall npv against the business as usual case from REopt
@@ -1376,7 +1368,7 @@ def summary_stats(reps):
 		reps['Average Outage Survived (h)'].append(None)
 	return(reps)
 
-def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, FAULTED_LINE, mg_name, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR = False, open_results=True):
+def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, FAULTED_LINE, mg_name, ADD_COST_NAME, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR = False, open_results=True):
 	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_NAME, microgrid, mg_name)
 	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load)
 	
@@ -1421,19 +1413,21 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 		microgridup_control.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, FAULTED_LINE, False, 60, 120, 30) #TODO: calculate 'max_potential_battery' and other mg parameters specific to microgrid_control.py on the fly from the outputs of REopt
 	except:
 		print("microgridup_control.play() did not process")
-	mg_add_cost(f'mg_add_cost_{mg_name}.csv', microgrid, mg_name)	
-	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, diesel_total_calc=False)
-	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, diesel_total_calc=False)
+	mg_add_cost(ADD_COST_NAME, microgrid, mg_name)	
+	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
+	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
 	# convert mg_list_of_dicts_full to dict of lists for columnar output in output_template.html
 	mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
 	# Create giant consolidated report.
+	mg_add_cost_dict_of_lists = pd.read_csv(ADD_COST_NAME).to_dict(orient='list')
 	template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
 	out = template.render(
 		x='Daniel, David',
 		y='Matt',
 		summary=mg_dict_of_lists_full,
 		inputs={'circuit':BASE_NAME,'loads':LOAD_NAME, 'Maximum Proportion of critical load to be served by fossil generation':FOSSIL_BACKUP_PERCENT, 'REopt inputs':REOPT_INPUTS,'microgrid':microgrid},
-		reopt_folders=[REOPT_FOLDER_FINAL]
+		reopt_folders=[REOPT_FOLDER_FINAL],
+		added_costs = mg_add_cost_dict_of_lists
 	)
 	#TODO: have an option where we make the template <iframe srcdoc="{{X}}"> to embed the html and create a single file.
 	with open(BIG_OUT_NAME,'w') as outFile:
@@ -1486,7 +1480,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 	mgs_name_sorted = sorted(MICROGRIDS.keys())
 	for i, mg_name in enumerate(mgs_name_sorted):
 		BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
-		main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], MICROGRIDS, GEN_NAME, REF_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, FAULTED_LINE, mg_name, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR, open_results=False)
+		main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], MICROGRIDS, GEN_NAME, REF_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, FAULTED_LINE, mg_name, f'mg_add_cost_{i}.csv', FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR, open_results=False)
 	# Build Final report
 	reports = [x for x in os.listdir('.') if x.startswith('ultimate_rep_')]
 	reports.sort()
@@ -1494,9 +1488,30 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 	reopt_folders.sort()
 	reps = pd.concat([pd.read_csv(x) for x in reports]).to_dict(orient='list')
 	stats = summary_stats(reps)
-	# mg_add_costs = [x for x in os.listdir('.') if x.startswith('mg_add_cost_')]
+	mg_add_cost_files = [x for x in os.listdir('.') if x.startswith('mg_add_cost_')]
+	mg_add_cost_files.sort()
 	# create an orderedDict of the mg_add_costs_{mg_name}.csv:
-	# pd_dict = pd.read_csv(outputCsvName).to_dict(orient='list')
+	mg_add_cost_dict_of_lists = pd.concat([pd.read_csv(x) for x in mg_add_cost_files]).to_dict(orient='list')
+	# print("mg_add_cost_dict_of_lists:",mg_add_cost_dict_of_lists)
+
+	# create a row-based list of lists of mg_add_cost_files
+
+	add_cost_rows = []
+
+	for file in mg_add_cost_files:
+		with open(file, "r") as f:
+			reader = csv.reader(f, delimiter=',') # try delimiter=' '
+			next(reader, None) #skip the header
+			for row in reader:
+				print("row[3]:", row[3])
+				print("int(row[3]):", int(row[3]))
+				add_cost_rows.append([row[0],row[1],row[2],int(row[3])])
+	# [tuple(x if i!=3 else int(x) for i, x in enumerate(row)) for row in add_cost_rows]
+
+	# for row in add_cost_rows:
+	# 	[int(item) if item.isdigit() else item for item in row]
+	print("add_cost_rows:", add_cost_rows)
+
 	current_time = datetime.datetime.now() 
 	warnings = "None"
 	if os.path.exists("user_warnings.txt"):
@@ -1513,7 +1528,8 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		reopt_folders=reopt_folders,
 		warnings = warnings,
 		raw_files = _walkTree('.'),
-		model_name = MODEL_DIR
+		model_name = MODEL_DIR,
+		add_cost_rows = add_cost_rows
 	)
 	FINAL_REPORT = 'output_final.html'
 	with open(FINAL_REPORT,'w') as outFile:

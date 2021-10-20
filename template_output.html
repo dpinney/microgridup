@@ -53,6 +53,28 @@
 				</tr>
 			{% endfor %}
 		</table>
+		<pre>Distribution Upgrades needed to create Microgrids</pre>
+		<table style="margin-bottom:40px">
+			<tr>
+				<th>Microgrid</th>
+				<th>Location</th>
+				<th>Recommended Upgrade</th>
+				<th>Cost Estimate ($)</th>
+			</tr>
+			{% for row in add_cost_rows %}
+				<tr>
+				{% for col_value in row %}
+					{% if col_value is string %}
+						<td style="text-align:right">{{ col_value }}</td>
+					{% elif col_value is not none %}
+						<td style="text-align:right">{{ '{:,}'.format(col_value) }}</td>
+					{% else %}
+						<td style="text-align:right">{{ col_value }}</td>
+					{% endif %}
+				{% endfor %}
+				</tr>
+			{% endfor %}
+		</table>
 	</div>
 	<div id="oneline" class="tab" style="visibility:hidden">
 		<iframe src="circuit_oneline.html" style="height:100vh"></iframe>

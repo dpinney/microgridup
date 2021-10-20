@@ -70,10 +70,10 @@ def set_fossil_max_kw(FOSSIL_BACKUP_PERCENT, max_crit_load):
 	in microgridDesign does not override behavior 
 	of 'genExisting' in reopt_gen_mg_specs()'''
 	
-	# to run REopt without diesel
+	# to run REopt without fossil backup
 	if FOSSIL_BACKUP_PERCENT == 0:
 		fossil_max_kw = 0
-	# to run REopt to cost optimize with diesel in the mix
+	# to run REopt to cost optimize with fossil in the mix
 	elif FOSSIL_BACKUP_PERCENT == 1:
 		fossil_max_kw = 100000
 	elif FOSSIL_BACKUP_PERCENT > 0 and FOSSIL_BACKUP_PERCENT < 1:
@@ -1409,10 +1409,10 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	make_chart('timeseries_source.csv', FULL_NAME, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Voltage Source Output", "kW per hour")
 	make_chart('timeseries_control.csv', FULL_NAME, 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS, "Tap Position", "PU")
 	# Perform control sim.
-	try:
-		microgridup_control.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, FAULTED_LINE, False, 60, 120, 30) #TODO: calculate 'max_potential_battery' and other mg parameters specific to microgrid_control.py on the fly from the outputs of REopt
-	except:
-		print("microgridup_control.play() did not process")
+	# try:
+	# 	microgridup_control.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, FAULTED_LINE, False, 60, 120, 30) #TODO: calculate 'max_potential_battery' and other mg parameters specific to microgrid_control.py on the fly from the outputs of REopt
+	# except:
+	# 	print("microgridup_control.play() did not process")
 	mg_add_cost(ADD_COST_NAME, microgrid, mg_name)	
 	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
@@ -1490,14 +1490,12 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 	stats = summary_stats(reps)
 	mg_add_cost_files = [x for x in os.listdir('.') if x.startswith('mg_add_cost_')]
 	mg_add_cost_files.sort()
-	# create an orderedDict of the mg_add_costs_{mg_name}.csv:
-	mg_add_cost_dict_of_lists = pd.concat([pd.read_csv(x) for x in mg_add_cost_files]).to_dict(orient='list')
+	# create an orderedDict of the mg_add_cost_files:
+	# mg_add_cost_dict_of_lists = pd.concat([pd.read_csv(x) for x in mg_add_cost_files]).to_dict(orient='list')
 	# print("mg_add_cost_dict_of_lists:",mg_add_cost_dict_of_lists)
 
 	# create a row-based list of lists of mg_add_cost_files
-
 	add_cost_rows = []
-
 	for file in mg_add_cost_files:
 		with open(file, "r") as f:
 			reader = csv.reader(f, delimiter=',') # try delimiter=' '
@@ -1506,12 +1504,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 				print("row[3]:", row[3])
 				print("int(row[3]):", int(row[3]))
 				add_cost_rows.append([row[0],row[1],row[2],int(row[3])])
-	# [tuple(x if i!=3 else int(x) for i, x in enumerate(row)) for row in add_cost_rows]
-
-	# for row in add_cost_rows:
-	# 	[int(item) if item.isdigit() else item for item in row]
-	print("add_cost_rows:", add_cost_rows)
-
+	
 	current_time = datetime.datetime.now() 
 	warnings = "None"
 	if os.path.exists("user_warnings.txt"):

@@ -193,5 +193,9 @@ switchingTime = [1,2,3]
 # 1mg
 # microgridup_control.play('./1mg/circuit.dss.omd', './1mg/circuit_plusmg_0.dss', None, None, test_1mg, '670671', False, 60, 120, 30)
 
+# make chart 
+# microgridup_control.make_chart('timezcontrol_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], test_4mgs)
+
+
 
 

@@ -10,7 +10,7 @@ import scipy.stats as st
 from sklearn.preprocessing import LabelEncoder
 import matplotlib.pyplot as plt
 import plotly as py
-import plotly.graph_objs as go
+import plotly.graph_objects as go
 from plotly.tools import make_subplots
 
 # OMF imports
@@ -28,26 +28,97 @@ from omf.solvers import opendss
 # modelName, template = __neoMetaModel__.metadata(__file__)
 # hidden = True
 
-def make_chart(csvName, category_name, x, y_list):
-	'helper function to create plots from newQstsPlot'
+"""
+MATT'S make_chart() function::
+
+def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_steps, chart_name, y_axis_name, ansi_bands=False):
+	''' Charting outputs.
+	y_list is a list of column headers from csvName including all possible phases
+	category_name is the column header for the names of the monitoring object in csvName
+	x is the column header of the timestep in csvName
+	chart_name is the name of the chart to be displayed'''
 	gen_data = pd.read_csv(csvName)
-	data = []
+	tree = dssConvert.dssToTree(circuitFilePath)
+	data = [] 
+
 	for ob_name in set(gen_data[category_name]):
-		for y_name in y_list:
+		# csv_column_headers = y_list
+		# search the tree of the updated circuit to find the phases associate with ob_name
+		dss_ob_name = ob_name.split('-')[1]
+		the_object = _getByName(tree, dss_ob_name)
+		# create phase list, removing neutral phases
+		phase_ids = the_object.get('bus1','').replace('.0','').split('.')[1:]
+		# when charting objects with the potential for multiple phases, if object is single phase, index out the correct column heading to match the phase
+		if len(y_list) == 3 and len(phase_ids) == 1:
+			csv_column_headers = []
+			csv_column_headers.append(y_list[int(phase_ids[0])-1])
+		else:
+			csv_column_headers = y_list
+
+		for y_name in csv_column_headers:
 			this_series = gen_data[gen_data[category_name] == ob_name]
-			trace = py.graph_objs.Scatter(
-				x = this_series[x],
-				y = this_series[y_name],
+			trace = plotly.graph_objs.Scatter(
+				x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
+				y = this_series[y_name], # ToDo: rounding to 3 decimals here would be ideal, but doing so does not accept Inf values 
 				name = ob_name + '_' + y_name,
 				hoverlabel = dict(namelength = -1)
 			)
 			data.append(trace)
-	layout = py.graph_objs.Layout(
+
+	layout = plotly.graph_objs.Layout(
+		#title = f'{csvName} Output',
+		title = chart_name,
+		xaxis = dict(title="Date"),
+		yaxis = dict(title=y_axis_name)
+		#yaxis = dict(title = str(y_list))
+	)
+	fig = plotly.graph_objs.Figure(data, layout)
+
+	if ansi_bands == True:
+		date = pd.Timestamp(f'{year}-01-01')
+		fig.add_shape(type="line",
+ 			x0=date, y0=.95, x1=date+datetime.timedelta(hours=qsts_steps), y1=.95,
+ 			line=dict(color="Red", width=3, dash="dashdot")
+		)
+		fig.add_shape(type="line",
+ 			x0=date, y0=1.05, x1=date+datetime.timedelta(hours=qsts_steps), y1=1.05,
+ 			line=dict(color="Red", width=3, dash="dashdot")
+		)
+
+	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
+"""
+
+# make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], microgrids)
+def make_chart(csvName, category_name, x, y_list, microgrids):
+	'helper function to create plots from newQstsPlot'
+	gen_bus = {}
+	for key in microgrids:
+		gen_bus[key] = microgrids[key]['gen_bus']
+	gen_data = pd.read_csv(csvName)
+	data = []
+	for ob_name in set(gen_data[category_name]): # grid instrument
+		for key in microgrids:
+			if microgrids[key]['gen_bus'] in ob_name:
+				legend_group = key
+				break
+			legend_group = "Not_in_MG"
+		for y_name in y_list: # phases
+			this_series = gen_data[gen_data[category_name] == ob_name] # slice of csv for particular object
+			trace = go.Scatter(
+				x = this_series[x],
+				y = this_series[y_name],
+				legendgroup=legend_group,
+				showlegend = True,
+				name = ob_name + '_' + y_name + '_' + legend_group,
+				hoverlabel = dict(namelength = -1)
+			)
+			data.append(trace)
+	layout = go.Layout(
 		title = f'{csvName} Output',
 		xaxis = dict(title = 'hour'),
 		yaxis = dict(title = str(y_list))
 	)
-	fig = py.graph_objs.Figure(data, layout)
+	fig = go.Figure(data, layout)
 	py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
 def createListOfBuses(microgrids, badBuses):
@@ -1114,10 +1185,10 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 	# 	fig = py.graph_objs.Figure(data, layout)
 	# 	py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 	
-	make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
-	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'])
-	make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'])
-	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'])
+	make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], microgrids)
+	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], microgrids)
+	make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], microgrids)
+	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], microgrids)
 
 	return(tree)
 

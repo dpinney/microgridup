@@ -5,7 +5,7 @@ from microgridup import *
 if __name__ == '__main__':
 	# Input data.
 	MODEL_DIR = '4mgs'
-	BASE_DSS = 'lehigh_base_phased.dss'
+	BASE_DSS = 'lehigh_base_fossil.dss'
 	LOAD_CSV = 'lehigh_load.csv'
 	FAULTED_LINE = '670671'
 	QSTS_STEPS = 24*20
@@ -26,7 +26,7 @@ if __name__ == '__main__':
 		"windCost" : "4989",
 		"batteryPowerCost" : "840",
 		"batteryCapacityCost" : "420",
-		"dieselGenCost": "500",
+		"dieselGenCost": "1000",
 		"solarMin": 0,
 		"windMin": 0,
 		"batteryPowerMin": 0,
@@ -46,7 +46,7 @@ if __name__ == '__main__':
 		"batteryKwExisting": 0,
 		"batteryKwhExisting": 0,
 		"windExisting": 0,
-		"dieselFuelCostGal": 1.44, # assuming 4.5 $/MMBtu = 1 $/gal diesel
+		"dieselFuelCostGal": 1.5, # assuming 4.5 $/MMBtu = 1 $/gal diesel
 		"dieselCO2Factor": 24.1,
 		"dieselOMCostKw": 35,
 		"dieselOMCostKwh": .02,
@@ -80,7 +80,7 @@ if __name__ == '__main__':
 			'loads': ['684_command_center','652_residential','611_runway'],
 			'switch': '671684',
 			'gen_bus': '684',
-			'gen_obs_existing': ['diesel_684_existing','battery_684_existing'],
+			'gen_obs_existing': ['fossil_684_existing','battery_684_existing'],
 			'critical_load_kws': [400,20],
 			'kw_rating_battery': '20', # total kW rating on 684 and 652 is 1283 kW
 			'kw_rating_diesel': '593.2050653749545',

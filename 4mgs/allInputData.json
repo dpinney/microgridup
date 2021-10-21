@@ -1,6 +1,6 @@
 {
     "MODEL_DIR": "4mgs",
-    "BASE_DSS": "lehigh_base_phased.dss",
+    "BASE_DSS": "lehigh_base_fossil.dss",
     "LOAD_CSV": "lehigh_load.csv",
     "QSTS_STEPS": 480,
     "FOSSIL_BACKUP_PERCENT": 1,
@@ -18,7 +18,7 @@
         "windCost": "4989",
         "batteryPowerCost": "840",
         "batteryCapacityCost": "420",
-        "dieselGenCost": "500",
+        "dieselGenCost": "1000",
         "solarMin": 0,
         "windMin": 0,
         "batteryPowerMin": 0,
@@ -37,7 +37,7 @@
         "batteryKwExisting": 0,
         "batteryKwhExisting": 0,
         "windExisting": 0,
-        "dieselFuelCostGal": 1.44,
+        "dieselFuelCostGal": 1.5,
         "dieselCO2Factor": 24.1,
         "dieselOMCostKw": 35,
         "dieselOMCostKwh": 0.02,
@@ -98,7 +98,7 @@
             "switch": "671684",
             "gen_bus": "684",
             "gen_obs_existing": [
-                "diesel_684_existing",
+                "fossil_684_existing",
                 "battery_684_existing"
             ],
             "critical_load_kws": [

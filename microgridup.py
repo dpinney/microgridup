@@ -1309,16 +1309,37 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	# print("list_of_mg_dict:", list_of_mg_dict)
 	return(list_of_mg_dict)
 
-def summary_stats(reps):
+def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
 	'''Helper function within full() to take in a dict of lists of the microgrid
 	attributes and append a summary value for each attribute'''
 	# print("reps['Maximum 1 hr Load (kW)']",reps['Maximum 1 hr Load (kW)'])
+	
+	# add up all of the loads in MICROGRIDS into one loadshape
+	# used previously to call items out of mg_name: gen_bus_name = mg_ob['gen_bus']
+
+	# grab all the load names from all of the microgrids analyzed
+	mg_load_names = []
+	for mg in MICROGRIDS:
+		for load_name in MICROGRIDS[mg]['loads']:
+			mg_load_names.append(load_name)
+
+	# add up all of the loads in MICROGRIDS into one loadshape
+	loads = pd.read_csv(MODEL_LOAD_CSV)
+	loads['full_load']= loads[mg_load_names].sum(axis=1)
+	#print('loads.head()', loads.head())
+
+	max_load = loads['full_load'].max()
+	min_load = loads['full_load'].min()
+	avg_load = loads['full_load'].mean()
+
 	reps['Microgrid Name'].append('Summary')
 	reps['Generation Bus'].append('None')
-	reps['Minimum 1 hr Load (kW)'].append(round(sum(reps['Minimum 1 hr Load (kW)'])))
-	reps['Average 1 hr Load (kW)'].append(round(sum(reps['Average 1 hr Load (kW)'])))
+	# minimum coincident load across all mgs
+	reps['Minimum 1 hr Load (kW)'].append(round(min_load))
+	reps['Average 1 hr Load (kW)'].append(round(avg_load))
 	reps['Average Daytime 1 hr Load (kW)'].append(round(sum(reps['Average Daytime 1 hr Load (kW)'])))
-	reps['Maximum 1 hr Load (kW)'].append(round(sum(reps['Maximum 1 hr Load (kW)'])))
+	# maximum coincident load acorss all mgs
+	reps['Maximum 1 hr Load (kW)'].append(round(max_load))
 	reps['Maximum 1 hr Critical Load (kW)'].append(round(sum(reps['Maximum 1 hr Critical Load (kW)'])))
 	reps['Existing Fossil Generation (kW)'].append(round(sum(reps['Existing Fossil Generation (kW)'])))
 	reps['New Fossil Generation (kW)'].append(round(sum(reps['New Fossil Generation (kW)'])))
@@ -1334,8 +1355,8 @@ def summary_stats(reps):
 	reps['Total Generation on Microgrid (kW)'].append(round(sum(reps['Total Generation on Microgrid (kW)'])))
 	# calculate weighted average % renewables across all microgrids
 	renewables_perc_list = reps['Renewable Generation (% of Yr 1 kWh)']
-	avg_load = reps['Average 1 hr Load (kW)']
-	wgtd_avg_renewables_perc = sum([renewables_perc_list[i]/100 * avg_load[i] for i in range(len(renewables_perc_list))])/sum(avg_load[:-1])*100 # remove the final item of avg_load, which is the sum of the list entries from 'Average 1 hr Load (kW)' above
+	avg_load_list = reps['Average 1 hr Load (kW)']
+	wgtd_avg_renewables_perc = sum([renewables_perc_list[i]/100 * avg_load_list[i] for i in range(len(renewables_perc_list))])/sum(avg_load_list[:-1])*100 # remove the final item of avg_load, which is the sum of the list entries from 'Average 1 hr Load (kW)' above
 	# print("wgtd_avg_renewables_perc:", wgtd_avg_renewables_perc)
 	reps['Renewable Generation (% of Yr 1 kWh)'].append(round(wgtd_avg_renewables_perc))
 	# using yr 1 emissions and percent reductions, calculate a weighted average of % reduction in emissions for yr 1
@@ -1347,16 +1368,6 @@ def summary_stats(reps):
 	reduc_tons_list = [a*b/100 for a,b in zip(total_tons_list,emis_reduc_perc)]
 	reduc_percent_yr1 = sum(reduc_tons_list)/sum(total_tons_list)*100
 	reps['Emissions Reduction (Yr 1 % CO2)'].append(round(reduc_percent_yr1))
-	# yr1_emis = reps['Emissions (Yr 1 Tons CO2)']
-	# print("yr1_emis:",yr1_emis)
-	# print("range(len(yr1_emis))", range(len(yr1_emis)))
-	# reps['Emissions (Yr 1 Tons CO2)'].append(round(sum(reps['Emissions (Yr 1 Tons CO2)'])))
-	# emis_reduc_perc = reps['Emissions Reduction (Yr 1 % CO2)']
-	# print("emis_reduc_perc:",emis_reduc_perc)
-	# total_emis = sum([yr1_emis[i]/(yr1_emis[i]+yr1_emis[i]*emis_reduc_perc[i]/100)*(1+emis_reduc_perc[i]/100) for i in range(len(yr1_emis))])
-	# wgtd_avg_emis_reduc_perc = (total_emis - sum(yr1_emis))/total_emis*100
-	# reps['Emissions Reduction (Yr 1 % CO2)'].append(round(wgtd_avg_emis_reduc_perc))
-	# reps['Emissions Reduction (Yr 1 % CO2)'].append(round(sum(reps['Emissions Reduction (Yr 1 % CO2)'])))
 	reps['NPV over 25 years ($)'].append(sum(reps['NPV over 25 years ($)']))
 	reps['CapEx ($)'].append(sum(reps['CapEx ($)']))
 	reps['CapEx after Tax Incentives ($)'].append(sum(reps['CapEx after Tax Incentives ($)']))
@@ -1365,6 +1376,7 @@ def summary_stats(reps):
 		reps['Average Outage Survived (h)'].append(round(min(reps['Average Outage Survived (h)']),0))
 	else:
 		reps['Average Outage Survived (h)'].append(None)
+	print(reps)
 	return(reps)
 
 def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, FAULTED_LINE, mg_name, ADD_COST_NAME, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR = False, open_results=True):
@@ -1408,10 +1420,10 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	make_chart('timeseries_source.csv', FULL_NAME, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Voltage Source Output", "kW per hour")
 	make_chart('timeseries_control.csv', FULL_NAME, 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS, "Tap Position", "PU")
 	# Perform control sim.
-	try:
-		microgridup_control.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, FAULTED_LINE, False, 60, 120, 30) #TODO: calculate 'max_potential_battery' and other mg parameters specific to microgrid_control.py on the fly from the outputs of REopt
-	except:
-		print("microgridup_control.play() did not process")
+	# try:
+	# 	microgridup_control.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, FAULTED_LINE, False, 60, 120, 30) #TODO: calculate 'max_potential_battery' and other mg parameters specific to microgrid_control.py on the fly from the outputs of REopt
+	# except:
+	# 	print("microgridup_control.play() did not process")
 	mg_add_cost(ADD_COST_NAME, microgrid, mg_name)	
 	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
@@ -1486,7 +1498,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 	reopt_folders = [x for x in os.listdir('.') if x.startswith('reopt_final_')]
 	reopt_folders.sort()
 	reps = pd.concat([pd.read_csv(x) for x in reports]).to_dict(orient='list')
-	stats = summary_stats(reps)
+	stats = summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV)
 	mg_add_cost_files = [x for x in os.listdir('.') if x.startswith('mg_add_cost_')]
 	mg_add_cost_files.sort()
 	# create an orderedDict of the mg_add_cost_files:

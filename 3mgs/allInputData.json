@@ -72,7 +72,8 @@
             "loads": [
                 "675a_hospital",
                 "675b_residential1",
-                "675c_residential1"
+                "675c_residential1",
+                "692_warehouse2"
             ],
             "switch": "671692",
             "gen_bus": "675",

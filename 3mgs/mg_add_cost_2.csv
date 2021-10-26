@@ -1,0 +1,6 @@
+Microgrid,Location,Recommended Upgrade,Cost Estimate ($)
+mg2,mg2,Microgrid Design,100000
+mg2,mg2,Microgrid Controls,100000
+mg2,632645,SCADA disconnect switch,50000
+mg2,645_hangar,AMI disconnect meter,5000
+mg2,646_office,AMI disconnect meter,5000

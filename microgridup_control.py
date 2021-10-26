@@ -96,7 +96,10 @@ def make_chart(csvName, category_name, x, y_list, microgrids):
 		gen_bus[key] = microgrids[key]['gen_bus']
 	gen_data = pd.read_csv(csvName)
 	data = []
+	kwh_output = 0
 	for ob_name in set(gen_data[category_name]): # grid instrument
+		if "diesel" in ob_name:
+			kwh_output = kwh_output + sum(gen_data['V1'])
 		for key in microgrids:
 			if microgrids[key]['gen_bus'] in ob_name:
 				legend_group = key
@@ -113,8 +116,10 @@ def make_chart(csvName, category_name, x, y_list, microgrids):
 				hoverlabel = dict(namelength = -1)
 			)
 			data.append(trace)
+	fuel_consumption_rate_gallons_per_kwh = 1 # <-- TO DO: is this a preset or an input?
+	diesel = fuel_consumption_rate_gallons_per_kwh * kwh_output
 	layout = go.Layout(
-		title = f'{csvName} Output',
+		title = f'{csvName} Output. Diesel consumption of gensets = {diesel}',
 		xaxis = dict(title = 'hour'),
 		yaxis = dict(title = str(y_list))
 	)
@@ -1102,7 +1107,6 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 	# get a dictionary of all the line openings and closings to be graphed
 	actions = {}
 	line = ''
-	print('diselList -->', dieselList)
 	for entry in dieselList:
 		# print(entry)
 		# print(emptyLoads)

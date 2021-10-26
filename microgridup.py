@@ -1376,7 +1376,7 @@ def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
 		reps['Average Outage Survived (h)'].append(round(min(reps['Average Outage Survived (h)']),0))
 	else:
 		reps['Average Outage Survived (h)'].append(None)
-	print(reps)
+	# print(reps)
 	return(reps)
 
 def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, FAULTED_LINE, mg_name, ADD_COST_NAME, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR = False, open_results=True):

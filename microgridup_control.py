@@ -96,35 +96,51 @@ def make_chart(csvName, category_name, x, y_list, microgrids):
 		gen_bus[key] = microgrids[key]['gen_bus']
 	gen_data = pd.read_csv(csvName)
 	data = []
-	kwh_output = 0
-	for ob_name in set(gen_data[category_name]): # grid instrument
-		if "diesel" in ob_name:
-			kwh_output = kwh_output + sum(gen_data['V1'])
+	batt_cycles = {}
+	diesel_kwh_output = 0
+	for ob_name in set(gen_data[category_name]): # grid instrument 
+		# tally up total diesel genset output
+		if "diesel" in ob_name and "_source" in csvName:
+			diesel_kwh_output = diesel_kwh_output + sum(gen_data['V1'])
+		# add grid instrument to legend group corresponding with appropriate microgrid
 		for key in microgrids:
 			if microgrids[key]['gen_bus'] in ob_name:
+				batt_kwh_rating = microgrids[key]['kwh_rating_battery']
 				legend_group = key
 				break
 			legend_group = "Not_in_MG"
 		for y_name in y_list: # phases
 			this_series = gen_data[gen_data[category_name] == ob_name] # slice of csv for particular object
+			# find total input_output of battery generators and divide by twice the kwh rating (microgrid dependent)
+			if "battery" in ob_name and not this_series[y_name].isnull().values.any():
+				batt_kwh_input_output = sum(abs(this_series[y_name]))
+				cycles = batt_kwh_input_output / (2 * float(batt_kwh_rating))
 			trace = go.Scatter(
 				x = this_series[x],
 				y = this_series[y_name],
 				legendgroup=legend_group,
+				legendgrouptitle_text=legend_group,
 				showlegend = True,
-				name = ob_name + '_' + y_name + '_' + legend_group,
+				name = ob_name + '_' + y_name,
 				hoverlabel = dict(namelength = -1)
 			)
 			data.append(trace)
+			if "battery" in ob_name and not this_series[y_name].isnull().values.any():
+				batt_cycles[f"{ob_name}_{y_name}"] = cycles
 	fuel_consumption_rate_gallons_per_kwh = 1 # <-- TO DO: is this a preset or an input?
-	diesel = fuel_consumption_rate_gallons_per_kwh * kwh_output
+	diesel = fuel_consumption_rate_gallons_per_kwh * diesel_kwh_output
+	if "_source" in csvName:
+		title = f'{csvName} Output. Diesel consumption of gensets = {diesel}'
+	else:
+		title = f'{csvName} Output'
 	layout = go.Layout(
-		title = f'{csvName} Output. Diesel consumption of gensets = {diesel}',
+		title = title,
 		xaxis = dict(title = 'hour'),
 		yaxis = dict(title = str(y_list))
 	)
 	fig = go.Figure(data, layout)
-	py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
+	py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=True)
+	print(batt_cycles)
 
 def createListOfBuses(microgrids, badBuses):
 	'helper function to get a list of microgrid diesel generators'

@@ -474,7 +474,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 		omf.models.__neoMetaModel__.runForeground(REOPT_FOLDER_FINAL)
 		omf.models.__neoMetaModel__.renderTemplateToFile(REOPT_FOLDER_FINAL)
 
-def mg_phase_and_kv(BASE_NAME, microgrid):
+def mg_phase_and_kv(BASE_NAME, microgrid, mg_name):
 	'''Returns a dict with the phases at the gen_bus and kv 
 	of the loads for a given microgrid.
 	TODO: If needing to set connection type explicitly, could use this function to check that all "conn=" are the same (wye or empty for default, or delta)'''
@@ -483,11 +483,11 @@ def mg_phase_and_kv(BASE_NAME, microgrid):
 	gen_bus_name = mg_ob['gen_bus']
 	mg_loads = mg_ob['loads']
 	load_phase_list = []
-	gen_bus_kv = []
+	gen_bus_kv_list = []
 	load_map = {x.get('object',''):i for i, x in enumerate(tree)}
 	for load_name in mg_loads:
 		ob = tree[load_map[f'load.{load_name}']]
-		# print("mg_phase_and_kv ob:", ob)
+		print("mg_phase_and_kv ob:", ob)
 		bus_name = ob.get('bus1','')
 		bus_name_list = bus_name.split('.')
 		load_phases = []
@@ -497,16 +497,34 @@ def mg_phase_and_kv(BASE_NAME, microgrid):
 				load_phase_list.append(phase)
 		# set the voltage for the gen_bus and check that all loads match in voltage
 		load_kv = ob.get('kv','')
-		if load_kv not in gen_bus_kv and len(gen_bus_kv) > 0:
-			raise Exception(f'More than one load voltage is specified on gen_bus {gen_bus_name}. Check voltage of {load_name}.')
-		elif load_kv not in gen_bus_kv and len(gen_bus_kv) == 0:
-			gen_bus_kv = load_kv
-	load_phase_list.sort()
+		# append all new load_kv's to the list
+		if load_kv not in gen_bus_kv_list:
+			gen_bus_kv_list.append(load_kv)
+		# Logic that throws an error with multiple gen_bus_kv candidates
+		# if load_kv not in gen_bus_kv and len(gen_bus_kv) > 0:
+		# 	raise Exception(f'More than one load voltage is specified on gen_bus {gen_bus_name}. Check voltage of {load_name}.')
+		# elif load_kv not in gen_bus_kv and len(gen_bus_kv) == 0:
+		# 	gen_bus_kv = load_kv
+
+	if len(gen_bus_kv_list) > 0:
+		gen_bus_kv_message = f'More than one load voltage is specified on microgrid {mg_name}. Check Oneline diagram to verify that phases and voltages of {mg_loads} are correctly supported by gen_bus {gen_bus_name}.\n'
+		print(gen_bus_kv_message)
+		if path.exists("user_warnings.txt"):
+			with open("user_warnings.txt", "r+") as myfile:
+				if gen_bus_kv_message not in myfile.read():
+					myfile.write(gen_bus_kv_message)
+		else:
+			with open("user_warnings.txt", "a") as myfile:
+				myfile.write(gen_bus_kv_message)
+	print("gen_bus_kv_list:",gen_bus_kv_list)
+
 	out_dict = {}
 	out_dict['gen_bus'] = gen_bus_name
+	load_phase_list.sort()
 	out_dict['phases'] = load_phase_list
-	out_dict['kv'] = gen_bus_kv
-	# print('out_dict', out_dict)
+	# Choose the maximum voltage based upon the phases that are supported, assuming all phases in mg can be supported from gen_bus and that existing tranformers will handle any kv change
+	out_dict['kv'] = max(gen_bus_kv_list)
+	print('mg_phase_and_kv out_dict:', out_dict)
 	return out_dict
 	
 def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_name, diesel_total_calc=False):
@@ -525,7 +543,8 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	mg_ob = microgrid
 	gen_bus_name = mg_ob['gen_bus']
 	gen_obs_existing = mg_ob['gen_obs_existing']
-	phase_and_kv = mg_phase_and_kv(BASE_NAME, microgrid)
+	#print("microgrid:", microgrid)
+	phase_and_kv = mg_phase_and_kv(BASE_NAME, microgrid, mg_name)
 	
 	# Build new solar gen objects and loadshapes
 	solar_size_total = gen_sizes.get('solar_size_total')
@@ -1420,10 +1439,10 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	make_chart('timeseries_source.csv', FULL_NAME, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Voltage Source Output", "kW per hour")
 	make_chart('timeseries_control.csv', FULL_NAME, 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS, "Tap Position", "PU")
 	# Perform control sim.
-	# try:
-	# 	microgridup_control.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, FAULTED_LINE, False, 60, 120, 30) #TODO: calculate 'max_potential_battery' and other mg parameters specific to microgrid_control.py on the fly from the outputs of REopt
-	# except:
-	# 	print("microgridup_control.play() did not process")
+	try:
+		microgridup_control.play(OMD_NAME, BASE_NAME, None, None, playground_microgrids, FAULTED_LINE, False, 60, 120, 30) #TODO: calculate 'max_potential_battery' and other mg parameters specific to microgrid_control.py on the fly from the outputs of REopt
+	except:
+		print("microgridup_control.play() did not process")
 	mg_add_cost(ADD_COST_NAME, microgrid, mg_name)	
 	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)

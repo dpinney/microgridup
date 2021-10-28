@@ -6,7 +6,7 @@ from microgridup import *
 if __name__ == '__main__':
 	# Input data.
 	MODEL_DIR = '1mg'
-	BASE_DSS = 'lehigh_base_phased.dss'
+	BASE_DSS = 'lehigh_base_fossil.dss'
 	LOAD_CSV = 'lehigh_load.csv'
 	FAULTED_LINE = '670671'
 	QSTS_STEPS = 24*20
@@ -27,7 +27,7 @@ if __name__ == '__main__':
 		"windCost" : "4989",
 		"batteryPowerCost" : "840",
 		"batteryCapacityCost" : "420",
-		"dieselGenCost": "500",
+		"dieselGenCost": "1000",
 		"solarMin": 0,
 		"windMin": 0,
 		"batteryPowerMin": 0,
@@ -41,26 +41,31 @@ if __name__ == '__main__':
 		"criticalLoadFactor": "1",
 		#"outage_start_hour": "200",
 		"outageDuration": "48",
-		"fuelAvailable": "50000",
+		"fuelAvailable": "100000",
 		"genExisting": 0,
-		"minGenLoading": "0.3",
+		"minGenLoading": 0,
 		"batteryKwExisting": 0,
 		"batteryKwhExisting": 0,
 		"windExisting": 0,
+		"dieselFuelCostGal": 1.5, # assuming 4.5 $/MMBtu = 1 $/gal diesel
+		"dieselCO2Factor": 24.1,
+		"dieselOMCostKw": 35,
+		"dieselOMCostKwh": .02,
 		"value_of_lost_load": "100",
 		"solarCanCurtail": True,
-		"solarCanExport": True
+		"solarCanExport": True,
+		"dieselOnlyRunsDuringOutage": False
 	}
 	MICROGRIDS = {
 		'mg0': {
-			'loads': ['634a_data_center','634b_radar','634c_atc_tower','675a_hospital','675b_residential1','675c_residential1','684_command_center','652_residential','645_hangar','646_office'],
+			'loads': ['634a_data_center','634b_radar','634c_atc_tower','675a_hospital','675b_residential1','675c_residential1','692_warehouse2','684_command_center','652_residential','611_runway','645_hangar','646_office'],
 			'switch': '650632',
 			'gen_bus': '670',
-			'gen_obs_existing': ['solar_634_existing','battery_634_existing','solar_675_existing','diesel_684_existing','battery_684_existing'],
+			'gen_obs_existing': ['solar_634_existing','battery_634_existing','solar_675_existing','fossil_684_existing','battery_684_existing'],
 			'critical_load_kws': [70,90,10,150,200,200,400,20,30,70],
-			'max_potential_battery': '700', # total kW rating on 634 bus is 500 kW
-			'max_potential_diesel': '1000000',
-			'battery_capacity': '10000'
+			'kw_rating_battery': '200',
+			'kw_rating_diesel': '100',
+			'kwh_rating_battery': '500'
 		}
 	}
 	# Run model.

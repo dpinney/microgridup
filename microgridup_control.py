@@ -89,19 +89,23 @@ def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_st
 """
 
 # make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], microgrids)
-def make_chart(csvName, category_name, x, y_list, microgrids):
+def make_chart(csvName, category_name, x, y_list, microgrids, pathToOmd):
 	'helper function to create plots from newQstsPlot'
+	# read in the Omd file for diesel generation kW capacities 
+	with open(pathToOmd) as inFile:
+		tree = json.load(inFile)['tree']
 	gen_bus = {}
 	for key in microgrids:
 		gen_bus[key] = microgrids[key]['gen_bus']
 	gen_data = pd.read_csv(csvName)
 	data = []
 	batt_cycles = {}
+	diesel_loading_series = {}
 	diesel_kwh_output = 0
 	for ob_name in set(gen_data[category_name]): # grid instrument 
 		# tally up total diesel genset output
-		if "diesel" in ob_name and "_source" in csvName:
-			diesel_kwh_output = diesel_kwh_output + sum(gen_data['V1'])
+		if "fossil" in ob_name and "_source" in csvName:
+			diesel_kwh_output = diesel_kwh_output + sum(gen_data[gen_data[category_name] == ob_name]['V1'])
 		# add grid instrument to legend group corresponding with appropriate microgrid
 		for key in microgrids:
 			if microgrids[key]['gen_bus'] in ob_name:
@@ -111,6 +115,14 @@ def make_chart(csvName, category_name, x, y_list, microgrids):
 			legend_group = "Not_in_MG"
 		for y_name in y_list: # phases
 			this_series = gen_data[gen_data[category_name] == ob_name] # slice of csv for particular object
+			# if fossil generation, create series representing loading percentage
+			if ("fossil" in ob_name and "_gen" in csvName) and not this_series[y_name].isnull().values.any():
+				for item in tree.keys():
+					if tree[item]['name'] in ob_name:
+						diesel_kw_rating = tree[item]['kw']
+						break
+				diesel_percent_loading = [x / float(diesel_kw_rating) for x in this_series[y_name]]
+				diesel_loading_series[f"{ob_name}_{y_name}"] = diesel_percent_loading
 			# find total input_output of battery generators and divide by twice the kwh rating (microgrid dependent)
 			if "battery" in ob_name and not this_series[y_name].isnull().values.any():
 				batt_kwh_input_output = sum(abs(this_series[y_name]))
@@ -139,8 +151,9 @@ def make_chart(csvName, category_name, x, y_list, microgrids):
 		yaxis = dict(title = str(y_list))
 	)
 	fig = go.Figure(data, layout)
-	py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=True)
-	print(batt_cycles)
+	py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
+	# print(batt_cycles)
+	# print(diesel_loading_series)
 
 def createListOfBuses(microgrids, badBuses):
 	'helper function to get a list of microgrid diesel generators'
@@ -489,7 +502,7 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 		busShapes = {}
 
 	# print(busShapesBattery)
-	tree = solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, microgrids, tree, pathToDss, badBuses, bestReclosers, bestTies, lengthOfOutage, outageStart, loadsShed, existsLoad)
+	tree = solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, microgrids, tree, pathToDss, badBuses, bestReclosers, bestTies, lengthOfOutage, outageStart, loadsShed, existsLoad, pathToOmd)
 
 def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePassed, outageStart, busShapes, leftOverBusShapes, leftOverLoad, totalTime, isBattery, isSolar, totalLoad, excessPower, isCharging, existsLoad, microgrids):
 	'function that prepares a single timestep of the simulation to be solved'
@@ -911,7 +924,7 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 	# 		totalLoad[key].append(thisTotalLoad)
 	return totalTime, timePassed, busShapes, leftOverBusShapes, leftOverLoad, totalLoad, excessPower, existsLoad
 
-def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, microgrids, tree, pathToDss, badBuses, bestReclosers, bestTies, lengthOfOutage, outageStart, loadsShed, existsLoad):
+def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, microgrids, tree, pathToDss, badBuses, bestReclosers, bestTies, lengthOfOutage, outageStart, loadsShed, existsLoad, pathToOmd):
 	'Add diesel generation to the opendss formatted system and solve using OpenDSS'
 	# get a sorted list of the buses
 	buses = createListOfBuses(microgrids, badBuses)
@@ -1205,10 +1218,10 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 	# 	fig = py.graph_objs.Figure(data, layout)
 	# 	py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 	
-	make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], microgrids)
-	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], microgrids)
-	make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], microgrids)
-	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], microgrids)
+	make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], microgrids, pathToOmd)
+	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], microgrids, pathToOmd)
+	make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], microgrids, pathToOmd)
+	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], microgrids, pathToOmd)
 
 	return(tree)
 

@@ -101,6 +101,7 @@ def make_chart(csvName, category_name, x, y_list, microgrids, pathToOmd):
 	data = []
 	batt_cycles = {}
 	diesel_loading_series = {}
+	unreasonable_voltages = {}
 	diesel_kwh_output = 0
 	for ob_name in set(gen_data[category_name]): # grid instrument 
 		# tally up total diesel genset output
@@ -115,6 +116,10 @@ def make_chart(csvName, category_name, x, y_list, microgrids, pathToOmd):
 			legend_group = "Not_in_MG"
 		for y_name in y_list: # phases
 			this_series = gen_data[gen_data[category_name] == ob_name] # slice of csv for particular object
+			# if load, flip a boolean when voltages aren't within ANSI bands
+			if "_load" in csvName:
+				if (this_series[y_name] > 1.1).any() or (this_series[y_name] < 0.9).any():
+					unreasonable_voltages[f"{ob_name}_{y_name}"] = ob_name
 			# if fossil generation, create series representing loading percentage
 			if ("fossil" in ob_name and "_gen" in csvName) and not this_series[y_name].isnull().values.any():
 				for item in tree.keys():
@@ -154,6 +159,7 @@ def make_chart(csvName, category_name, x, y_list, microgrids, pathToOmd):
 	py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 	# print(batt_cycles)
 	# print(diesel_loading_series)
+	# print(unreasonable_voltages)
 
 def createListOfBuses(microgrids, badBuses):
 	'helper function to get a list of microgrid diesel generators'

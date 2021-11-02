@@ -487,7 +487,7 @@ def mg_phase_and_kv(BASE_NAME, microgrid, mg_name):
 	load_map = {x.get('object',''):i for i, x in enumerate(tree)}
 	for load_name in mg_loads:
 		ob = tree[load_map[f'load.{load_name}']]
-		print("mg_phase_and_kv ob:", ob)
+		# print("mg_phase_and_kv ob:", ob)
 		bus_name = ob.get('bus1','')
 		bus_name_list = bus_name.split('.')
 		load_phases = []
@@ -516,7 +516,7 @@ def mg_phase_and_kv(BASE_NAME, microgrid, mg_name):
 		else:
 			with open("user_warnings.txt", "a") as myfile:
 				myfile.write(gen_bus_kv_message)
-	print("gen_bus_kv_list:",gen_bus_kv_list)
+	# print("gen_bus_kv_list:",gen_bus_kv_list)
 
 	out_dict = {}
 	out_dict['gen_bus'] = gen_bus_name
@@ -524,7 +524,7 @@ def mg_phase_and_kv(BASE_NAME, microgrid, mg_name):
 	out_dict['phases'] = load_phase_list
 	# Choose the maximum voltage based upon the phases that are supported, assuming all phases in mg can be supported from gen_bus and that existing tranformers will handle any kv change
 	out_dict['kv'] = max(gen_bus_kv_list)
-	print('mg_phase_and_kv out_dict:', out_dict)
+	# print('mg_phase_and_kv out_dict:', out_dict)
 	return out_dict
 	
 def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_name, diesel_total_calc=False):
@@ -1123,7 +1123,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		np_load = np.array_split(load, 365)
 		np_load = np.array(np_load) #a flattened array of 365 arrays of 24 hours each
 		daytime_kwh = np_load[:,9:17] #365 8-hour daytime arrays
-		avg_daytime_load = round(np.average(np.average(daytime_kwh, axis=1)))
+		avg_daytime_load = int(np.average(np.average(daytime_kwh, axis=1)))
 		max_load = round(max(load))
 		max_crit_load = max_crit_load
 		# do not show the 1kw fossil that is a necessary artifact of final run of REopt
@@ -1185,7 +1185,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		min_outage = reopt_out.get(f'minOutage{mg_num}')
 		if min_outage is not None:
 			min_outage = int(round(min_outage))
-		print(f'Minimum Outage Survived (h) for {mg_name}:', min_outage)
+		# print(f'Minimum Outage Survived (h) for {mg_name}:', min_outage)
 
 		row =[str(mg_name), gen_bus_name, min_load, ave_load, round(avg_daytime_load), 
 		max_load, round(max_crit_load),
@@ -1254,7 +1254,7 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	np_load = np.array_split(load, 365)
 	np_load = np.array(np_load) #a flattened array of 365 arrays of 24 hours each
 	daytime_kwh = np_load[:,9:17] #365 8-hour daytime arrays
-	mg_dict["Average Daytime 1 hr Load (kW)"] = round(np.average(np.average(daytime_kwh, axis=1)))
+	mg_dict["Average Daytime 1 hr Load (kW)"] = np.round(np.average(np.average(daytime_kwh, axis=1)))
 	# print("Average Daytime 1 hr Load (kW):", round(np.average(np.average(daytime_kwh, axis=1))))
 	mg_dict["Maximum 1 hr Load (kW)"] = round(max(load))
 	mg_dict["Maximum 1 hr Critical Load (kW)"] = round(max_crit_load)
@@ -1347,9 +1347,9 @@ def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
 	loads['full_load']= loads[mg_load_names].sum(axis=1)
 	#print('loads.head()', loads.head())
 
-	max_load = loads['full_load'].max()
-	min_load = loads['full_load'].min()
-	avg_load = loads['full_load'].mean()
+	max_load = int(loads['full_load'].max())
+	min_load = int(loads['full_load'].min())
+	avg_load = int(loads['full_load'].mean())
 
 	reps['Microgrid Name'].append('Summary')
 	reps['Generation Bus'].append('None')

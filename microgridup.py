@@ -1167,8 +1167,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 								- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
 								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0)
 		year_one_OM = reopt_out.get(f'yearOneOMCostsBeforeTax{mg_num}', 0.0)
-		# TODO: update years_of_analysis to pull from reopt_out once variable ['Financial']['analysis_years'] is a user input
-		years_of_analysis = 25
+		years_of_analysis = reopt_out.get(f'analysisYears{mg_num}', 0.0)
 		# TODO: update discount_rate to pull from reopt_out once variable ['Financial']['offtaker_discount_pct'] is a user input
 		discount_rate = .083
 		# take away the 1kw fossil gen cost if necessary

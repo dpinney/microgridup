@@ -18,6 +18,7 @@ if __name__ == '__main__':
 		"battery" : "on",
 		"year" : '2017',
 		"analysisYears": "25",
+		"discountRate" : '0.083',
 		"energyCost" : "0.12",
 		"demandCost" : '20',
 		"urdbLabelSwitch": "off",

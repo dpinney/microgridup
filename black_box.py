@@ -179,7 +179,8 @@ switchingTime = [1,2,3]
 # microgridup_control.play('./1mg/circuit.dss.omd', './1mg/circuit_plusmg_0.dss', None, None, test_1mg, '670671', False, 60, 120, 30)
 
 # make chart 
-# microgridup_control.make_chart('./4mgs/timezcontrol_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], test_4mgs, './4mgs/circuit.dss.omd')
+# microgridup_control.make_chart('./4mgs/timezcontrol_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, test_4mgs, './4mgs/circuit.dss.omd',)
+# microgridup_control.make_chart('./4mgs/timezcontrol_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], 2019, test_4mgs, './4mgs/circuit.dss.omd', ansi_bands=True)
 
 
 

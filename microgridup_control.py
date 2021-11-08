@@ -9,7 +9,7 @@ from scipy import spatial
 import scipy.stats as st
 from sklearn.preprocessing import LabelEncoder
 import matplotlib.pyplot as plt
-import plotly as py
+import plotly
 import plotly.graph_objects as go
 from plotly.tools import make_subplots
 
@@ -89,7 +89,7 @@ def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_st
 """
 
 # make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], microgrids)
-def make_chart(csvName, category_name, x, y_list, microgrids, pathToOmd):
+def make_chart(csvName, category_name, x, y_list, year, microgrids, pathToOmd, ansi_bands=False, batt_cycle_chart=True, fossil_loading_chart=True):
 	'helper function to create plots from newQstsPlot'
 	# read in the Omd file for diesel generation kW capacities 
 	with open(pathToOmd) as inFile:
@@ -101,6 +101,7 @@ def make_chart(csvName, category_name, x, y_list, microgrids, pathToOmd):
 	data = []
 	batt_cycles = {}
 	diesel_loading_series = {}
+	fossil_traces = []
 	unreasonable_voltages = {}
 	diesel_kwh_output = 0
 	for ob_name in set(gen_data[category_name]): # grid instrument 
@@ -116,7 +117,7 @@ def make_chart(csvName, category_name, x, y_list, microgrids, pathToOmd):
 			legend_group = "Not_in_MG"
 		for y_name in y_list: # phases
 			this_series = gen_data[gen_data[category_name] == ob_name] # slice of csv for particular object
-			# if load, flip a boolean when voltages aren't within ANSI bands
+			# note loads with voltages aren't within ANSI bands
 			if "_load" in csvName:
 				if (this_series[y_name] > 1.1).any() or (this_series[y_name] < 0.9).any():
 					unreasonable_voltages[f"{ob_name}_{y_name}"] = ob_name
@@ -128,26 +129,66 @@ def make_chart(csvName, category_name, x, y_list, microgrids, pathToOmd):
 						break
 				diesel_percent_loading = [x / float(diesel_kw_rating) for x in this_series[y_name]]
 				diesel_loading_series[f"{ob_name}_{y_name}"] = diesel_percent_loading
+				# traces for fossil loading percentages 
+				new_trace = go.Scatter(
+					x = this_series[x],
+					y = diesel_percent_loading,
+					legendgroup=legend_group,
+					legendgrouptitle_text=legend_group,
+					showlegend=True,
+					name=ob_name + '_' + y_name,
+					hoverlabel = dict(namelength = -1)
+					)
+				fossil_traces.append(new_trace)
 			# find total input_output of battery generators and divide by twice the kwh rating (microgrid dependent)
 			if "battery" in ob_name and not this_series[y_name].isnull().values.any():
 				batt_kwh_input_output = sum(abs(this_series[y_name]))
 				cycles = batt_kwh_input_output / (2 * float(batt_kwh_rating))
+			# normal traces
+			name = ob_name + '_' + y_name
+			if name in unreasonable_voltages:
+				name = '[BAD]_' + name
 			trace = go.Scatter(
 				x = this_series[x],
 				y = this_series[y_name],
 				legendgroup=legend_group,
 				legendgrouptitle_text=legend_group,
 				showlegend = True,
-				name = ob_name + '_' + y_name,
+				name = name,
 				hoverlabel = dict(namelength = -1)
 			)
 			data.append(trace)
 			if "battery" in ob_name and not this_series[y_name].isnull().values.any():
 				batt_cycles[f"{ob_name}_{y_name}"] = cycles
+	# create second optional battery cycle chart if specificied in function call.
+	# if batt_cycle_chart == True and "gen" in csvName:
+	if batt_cycle_chart == True and bool(batt_cycles):
+		new_trace = go.Bar(
+			x = list(batt_cycles.keys()), 
+			y = list(batt_cycles.values()) 
+		)
+		new_layout = go.Layout(
+			title = "Battery Cycles",
+			xaxis = dict(title = 'Battery'),
+			yaxis = dict(title = 'Cycles')
+			)
+		new_fig = plotly.graph_objs.Figure(new_trace, new_layout)
+		plotly.offline.plot(new_fig, filename=f'{csvName}_battery_cycles.plot.html', auto_open=False)
+	# create third optional fossil gen loading chart if specified in function call.
+	if fossil_loading_chart == True and fossil_traces:
+		new_layout = go.Layout(
+			title = "Fossil Genset Loading Percentage",
+			xaxis = dict(title = 'Time'),
+			yaxis = dict(title = 'Fossil Percent Loading')
+			)
+		fossil_fig = plotly.graph_objs.Figure(fossil_traces, new_layout)
+		plotly.offline.plot(fossil_fig, filename=f'{csvName}_fossil_loading.plot.html', auto_open=False)
+
+
 	fuel_consumption_rate_gallons_per_kwh = 1 # <-- TO DO: is this a preset or an input?
 	diesel = fuel_consumption_rate_gallons_per_kwh * diesel_kwh_output
 	if "_source" in csvName:
-		title = f'{csvName} Output. Diesel consumption of gensets = {diesel}'
+		title = f'{csvName} Output. Fossil consumption of gensets = {diesel}'
 	else:
 		title = f'{csvName} Output'
 	layout = go.Layout(
@@ -155,11 +196,23 @@ def make_chart(csvName, category_name, x, y_list, microgrids, pathToOmd):
 		xaxis = dict(title = 'hour'),
 		yaxis = dict(title = str(y_list))
 	)
-	fig = go.Figure(data, layout)
-	py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
-	# print(batt_cycles)
-	# print(diesel_loading_series)
-	# print(unreasonable_voltages)
+	fig = plotly.graph_objs.Figure(data, layout)
+
+	if ansi_bands == True:
+		fig.add_shape(type="line",
+ 			x0=0, y0=0.9, x1=300, y1=0.9,
+ 			line=dict(color="Red", width=3, dash="dashdot")
+		)
+		fig.add_shape(type="line",
+ 			x0=0, y0=1.1, x1=300, y1=1.1,
+ 			line=dict(color="Red", width=3, dash="dashdot")
+		)
+
+
+	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
+	# print("batt_cycles",batt_cycles)
+	# print("diesel_loading_series",diesel_loading_series)
+	# print("unreasonable_voltages",unreasonable_voltages)
 
 def createListOfBuses(microgrids, badBuses):
 	'helper function to get a list of microgrid diesel generators'
@@ -228,6 +281,8 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 						tree.pop(thing)
 	# isolate the fault
 	tree, bestReclosers, badBuses = flisr.cutoffFault(tree, faultedNode, bestReclosers, workDir, radial, buses)
+	# isolate battery objects 
+	tree_batt = [tree[item] for item in tree if tree[item]["object"] == "storage"]
 
 	# 2) get a list of loads associated with each microgrid component
 	# and create a loadshape containing all of said loads
@@ -250,9 +305,13 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 		# create an array of zeroes, representing the amount of load supported by the battery when it's charging
 		busShapesBatteryCharging = {}
 		for bus in busShapesBatteryDischarging:
-			for entry in microgrids:
-				if bus == microgrids[entry].get('gen_bus', ''):
-					chargeRate = float(microgrids[entry].get('kw_rating_battery', ''))
+			# for entry in microgrids:
+			# 	if bus == microgrids[entry].get('gen_bus', ''):
+			# 		chargeRate = float(microgrids[entry].get('kw_rating_battery', ''))
+			# 		busShapesBatteryCharging[bus] = [-chargeRate] * (totalTime)
+			for entry in range(len(tree_batt)):
+				if bus == tree_batt[entry].get("parent", ""):
+					chargeRate = float(tree_batt[entry].get('kwrated'))
 					busShapesBatteryCharging[bus] = [-chargeRate] * (totalTime)
 		# print(existsLoad)
 
@@ -304,9 +363,12 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 				phase = 0
 				while phase < 3:
 					if buses[0] in busShapesBatteryDischarging.keys():
-						for entry in microgrids:
-							if buses[0] == microgrids[entry].get('gen_bus', ''):
-								capacity = float(microgrids[entry].get('kwh_rating_battery', ''))
+						# for entry in microgrids:
+						# 	if buses[0] == microgrids[entry].get('gen_bus', ''):
+						# 		capacity = float(microgrids[entry].get('kwh_rating_battery', ''))
+						for entry in range(len(tree_batt)):
+							if buses[0] == tree_batt[entry].get("parent", ""):
+								capacity = float(tree_batt[entry].get("kwhrated"))
 						if busShapesBatteryDischarging[buses[0]][phase]:
 							for element in batteryControl[buses[0]][phase]:
 								if element > capacity:
@@ -332,9 +394,12 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 				print('discharge')
 				print(minimumDischargeTime)
 				
-				for entry in microgrids:
-					if buses[0] == microgrids[entry].get('gen_bus', ''):
-						maximumBattery = float(microgrids[entry].get('kw_rating_battery', ''))
+				# for entry in microgrids:
+				# 	if buses[0] == microgrids[entry].get('gen_bus', ''):
+				# 		maximumBattery = float(microgrids[entry].get('kw_rating_battery', ''))
+				for entry in range(len(tree_batt)):
+					if buses[0] == tree_batt[entry].get("parent", ""):
+						maximumBattery = float(tree_batt[entry].get('kwrated'))
 
 				if batteryTime[buses[0]] < totalTime:
 					minimumChargeTime = 10000000000000
@@ -357,9 +422,12 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 					phase = 0
 					while phase < 3:
 						if buses[0] in busShapesBattery.keys():
-							for entry in microgrids:
-								if buses[0] == microgrids[entry].get('gen_bus', ''):
-									capacity = float(microgrids[entry].get('kwh_rating_battery', ''))
+							# for entry in microgrids:
+							# 	if buses[0] == microgrids[entry].get('gen_bus', ''):
+							# 		capacity = float(microgrids[entry].get('kwh_rating_battery', ''))
+							for entry in range(len(tree_batt)):
+								if buses[0] == tree_batt[entry].get("parent", ""):
+									capacity = float(tree_batt[entry].get("kwhrated"))
 							if busShapesBattery[buses[0]][phase]:
 								for element in batteryControl[buses[0]][phase]:
 									if element > capacity:
@@ -513,6 +581,11 @@ def play(pathToOmd, pathToDss, pathToTieLines, workDir, microgrids, faultedLine,
 def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePassed, outageStart, busShapes, leftOverBusShapes, leftOverLoad, totalTime, isBattery, isSolar, totalLoad, excessPower, isCharging, existsLoad, microgrids):
 	'function that prepares a single timestep of the simulation to be solved'
 	
+	# this is where we access battery kW rating from
+	tree_batt = [tree[item] for item in tree if tree[item]["object"] == "storage"]
+	tree_gen = [tree[item] for item in tree if tree[item]["object"] == "generator"] 
+	tree_foss = [tree_gen[item] for item in range(len(tree_gen)) if "fossil" in tree_gen[item]["name"]]
+
 	# create a list of the diesel generators
 	buses = createListOfBuses(microgrids, badBuses)
 
@@ -563,13 +636,23 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 				totalLoadHere = {}
 				excessHere = {}
 				maximum = 1.0
-				for entry in microgrids:
-					if bus == microgrids[entry].get('gen_bus', ''):
+				for entry in range(len(tree_batt)):
+					if buses == tree_batt[entry].get("parent", ""):
 						if isBattery:
-							maximum = float(microgrids[entry].get('kw_rating_battery', ''))
+							maximum = float(tree_batt[entry].get('kwrated', ''))
 						else:
-							maximum = float(microgrids[entry].get('kw_rating_diesel', ''))
-							maximumBattery = microgrids[entry].get('kw_rating_battery', '')
+							for item in range(len(tree_foss)):
+								if buses == tree_foss[entry].get("parent", ""):
+									diesel_kw_rating = tree[item]['kw']
+							maximum = diesel_kw_rating
+							maximumBattery = tree_batt[entry].get('kwrated', '')
+				# for entry in microgrids:
+				# 	if bus == microgrids[entry].get('gen_bus', ''):
+				# 		if isBattery:
+				# 			maximum = float(microgrids[entry].get('kw_rating_battery', ''))
+				# 		else:
+				# 			maximum = float(microgrids[entry].get('kw_rating_diesel', ''))
+				# 			maximumBattery = microgrids[entry].get('kw_rating_battery', '')
 						k = 1
 						while k < 4:
 							val = 0
@@ -727,15 +810,24 @@ def playOneStep(tree, bestReclosers, badBuses, pathToDss, switchingTime, timePas
 									if tree[key1].get('name','') == solarshapeName:
 										solarshape = eval(tree[key1].get('mult',''))
 										solarExists = True
-			for entry in microgrids:
-				# populate the shapes dictionary with the values of the total load needed to be supported
-				if buses[0] == microgrids[entry].get('gen_bus', ''):
+			# for entry in microgrids:
+			# 	# populate the shapes dictionary with the values of the total load needed to be supported
+			# 	if buses[0] == microgrids[entry].get('gen_bus', ''):
+			# 		if isBattery:
+			# 			maximum = float(microgrids[entry].get('kw_rating_battery', ''))
+			# 		else:
+			# 			maximum = float(microgrids[entry].get('kw_rating_diesel', ''))
+			# 		if isCharging == True:
+			# 			maximumBattery = float(microgrids[entry].get('kw_rating_battery', ''))
+			for entry in range(len(tree_batt)):
+				if buses[0] == tree_batt[entry].get("parent", ""):
 					if isBattery:
-						maximum = float(microgrids[entry].get('kw_rating_battery', ''))
+						maximum = float(tree_batt[entry].get('kwrated', ''))
 					else:
-						maximum = float(microgrids[entry].get('kw_rating_diesel', ''))
-					if isCharging == True:
-						maximumBattery = float(microgrids[entry].get('kw_rating_battery', ''))
+						for item in range(len(tree_foss)):
+							if buses == tree_foss[entry].get("parent", ""):
+								diesel_kw_rating = tree[item]['kw']
+								maximum = diesel_kw_rating
 						# if isLoad['.1'] == True:
 						# 	loadShapes['.1'] = [i + maximumBattery for i in loadShapes['.1']]
 						# if isLoad['.2'] == True:
@@ -1224,10 +1316,10 @@ def solveSystem(busShapesBattery, busShapesSolar, busShapesDiesel, actionsDict, 
 	# 	fig = py.graph_objs.Figure(data, layout)
 	# 	py.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 	
-	make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], microgrids, pathToOmd)
-	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], microgrids, pathToOmd)
-	make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], microgrids, pathToOmd)
-	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], microgrids, pathToOmd)
+	make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, pathToOmd)
+	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, pathToOmd, ansi_bands=True)
+	make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, pathToOmd)
+	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], 2019, microgrids, pathToOmd)
 
 	return(tree)
 

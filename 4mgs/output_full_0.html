@@ -32,7 +32,7 @@
 	</div>
 	<div id="overview" class="tab" style="margin:5px; overflow:scroll; visibility:visible">
 		<pre style="width:95%; white-space:pre-wrap">Report Generated on </pre>
-		<pre style="width:95%; white-space:pre-wrap">INPUTS: {'circuit': 'circuit.dss', 'loads': 'loads.csv', 'Maximum Proportion of critical load to be served by fossil generation': 1, 'REopt inputs': {'solar': 'on', 'wind': 'off', 'battery': 'on', 'year': '2017', 'analysisYears': '25', 'energyCost': '0.12', 'demandCost': '20', 'urdbLabelSwitch': 'off', 'wholesaleCost': '0.034', 'solarCost': '1600', 'windCost': '4989', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'dieselGenCost': '1000', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '100000', 'windMax': '100000', 'batteryPowerMax': '1000000', 'batteryCapacityMax': '1000000', 'dieselMax': '1000000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outageDuration': '48', 'fuelAvailable': '1000000', 'genExisting': 0, 'minGenLoading': '0', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'dieselFuelCostGal': 1.5, 'dieselCO2Factor': 24.1, 'dieselOMCostKw': 35, 'dieselOMCostKwh': 0.02, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True, 'dieselOnlyRunsDuringOutage': False}, 'microgrid': {'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'switch': '632633', 'gen_bus': '634', 'gen_obs_existing': ['solar_634_existing', 'battery_634_existing'], 'critical_load_kws': [70, 90, 10], 'kw_rating_battery': '7', 'kw_rating_diesel': '100', 'kwh_rating_battery': '100'}}</pre>
+		<pre style="width:95%; white-space:pre-wrap">INPUTS: {'circuit': 'circuit.dss', 'loads': 'loads.csv', 'Maximum Proportion of critical load to be served by fossil generation': 1, 'REopt inputs': {'solar': 'on', 'wind': 'off', 'battery': 'on', 'year': '2017', 'analysisYears': '25', 'discountRate': '0.083', 'energyCost': '0.12', 'demandCost': '20', 'urdbLabelSwitch': 'off', 'wholesaleCost': '0.034', 'solarCost': '1600', 'windCost': '4989', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'dieselGenCost': '1000', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '100000', 'windMax': '100000', 'batteryPowerMax': '1000000', 'batteryCapacityMax': '1000000', 'dieselMax': '1000000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outageDuration': '48', 'fuelAvailable': '1000000', 'genExisting': 0, 'minGenLoading': '0', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'dieselFuelCostGal': 1.5, 'dieselCO2Factor': 24.1, 'dieselOMCostKw': 35, 'dieselOMCostKwh': 0.02, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True, 'dieselOnlyRunsDuringOutage': False}, 'microgrid': {'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'switch': '632633', 'gen_bus': '634', 'gen_obs_existing': ['solar_634_existing', 'battery_634_existing'], 'critical_load_kws': [70, 90, 10], 'kw_rating_battery': '7', 'kw_rating_diesel': '100', 'kwh_rating_battery': '100'}}</pre>
 		<pre style="width:95%; white-space:pre-wrap">User Warnings:</pre>
 		<pre style="width:95%; white-space:pre-wrap"></pre>
 		<!-- formatted below for a dict of lists -->
@@ -115,7 +115,7 @@
 					<td>New Fossil Generation (kW)</td>
 					
 						
-							<td style="text-align:right">182</td>
+							<td style="text-align:right">154</td>
 						
 					
 				</tr>
@@ -133,7 +133,7 @@
 					<td>New Solar (kW)</td>
 					
 						
-							<td style="text-align:right">193</td>
+							<td style="text-align:right">199</td>
 						
 					
 				</tr>
@@ -196,7 +196,7 @@
 					<td>Total Generation on Microgrid (kW)</td>
 					
 						
-							<td style="text-align:right">893</td>
+							<td style="text-align:right">872</td>
 						
 					
 				</tr>
@@ -214,7 +214,7 @@
 					<td>Emissions (Yr 1 Tons CO2)</td>
 					
 						
-							<td style="text-align:right">667</td>
+							<td style="text-align:right">639</td>
 						
 					
 				</tr>
@@ -223,13 +223,13 @@
 					<td>Emissions Reduction (Yr 1 % CO2)</td>
 					
 						
-							<td style="text-align:right">2</td>
+							<td style="text-align:right">6</td>
 						
 					
 				</tr>
 			
 				<tr>
-					<td>Average Outage Survived (h)</td>
+					<td>Minimum Outage Survived (h)</td>
 					
 						
 							<td style="text-align:right">None</td>
@@ -241,7 +241,7 @@
 					<td>O+M Costs (Yr 1 $ before tax)</td>
 					
 						
-							<td style="text-align:right">31,852</td>
+							<td style="text-align:right">27,640</td>
 						
 					
 				</tr>
@@ -250,7 +250,16 @@
 					<td>CapEx ($)</td>
 					
 						
-							<td style="text-align:right">663,987.0</td>
+							<td style="text-align:right">737,870.0</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Net Present Value ($)</td>
+					
+						
+							<td style="text-align:right">14,426.0</td>
 						
 					
 				</tr>
@@ -259,16 +268,7 @@
 					<td>CapEx after Tax Incentives ($)</td>
 					
 						
-							<td style="text-align:right">674,068.0</td>
-						
-					
-				</tr>
-			
-				<tr>
-					<td>NPV over 25 years ($)</td>
-					
-						
-							<td style="text-align:right">-63,562.0</td>
+							<td style="text-align:right">547,976.0</td>
 						
 					
 				</tr>

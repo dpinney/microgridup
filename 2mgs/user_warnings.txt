@@ -1,4 +1,2 @@
-More than one load voltage is specified on microgrid mg0. Check Oneline diagram to verify that voltages of ['634a_data_center', '634b_radar', '634c_atc_tower'] are correctly supported by gen_bus 634.
 Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
 Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-More than one load voltage is specified on microgrid mg1. Check Oneline diagram to verify that voltages of ['675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2'] are correctly supported by gen_bus 675.

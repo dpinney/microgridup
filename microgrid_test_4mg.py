@@ -62,40 +62,28 @@ if __name__ == '__main__':
 			'switch': '632633',
 			'gen_bus': '634',
 			'gen_obs_existing': ['solar_634_existing','battery_634_existing'],
-			'critical_load_kws': [70,90,10],
-			'kw_rating_battery': '7', # total kW rating on 634 bus is 500 kW
-			'kw_rating_diesel': '100',
-			'kwh_rating_battery': '100'
+			'critical_load_kws': [70,90,10]
 		},
 		'mg1': {
 			'loads': ['675a_hospital','675b_residential1','675c_residential1','692_warehouse2'],
 			'switch': '671692',
 			'gen_bus': '675',
 			'gen_obs_existing': ['solar_675_existing'],
-			'critical_load_kws': [150,200,200],
-			'kw_rating_battery': '128',
-			'kw_rating_diesel': '538.0170262240325',
-			'kwh_rating_battery': '553'
+			'critical_load_kws': [150,200,200]
 		},
 		'mg2': {
 			'loads': ['684_command_center','652_residential','611_runway'],
 			'switch': '671684',
 			'gen_bus': '684',
 			'gen_obs_existing': ['fossil_684_existing','battery_684_existing'],
-			'critical_load_kws': [400,20],
-			'kw_rating_battery': '20', # total kW rating on 684 and 652 is 1283 kW
-			'kw_rating_diesel': '593.2050653749545',
-			'kwh_rating_battery': '65.97158243892608'
+			'critical_load_kws': [400,20]
 		},
 		'mg3': {
 			'loads': ['645_hangar','646_office'],
 			'switch': '632645',
 			'gen_bus': '646',
 			'gen_obs_existing': [],
-			'critical_load_kws': [30,70],
-			'kw_rating_battery': '8', # total kW rating on 645 and 646 is 400 kW
-			'kw_rating_diesel': '1000',
-			'kwh_rating_battery': '100'
+			'critical_load_kws': [30,70]
 		}
 	}
 	# Run model.

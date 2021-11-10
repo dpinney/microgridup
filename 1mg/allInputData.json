@@ -83,10 +83,7 @@
                 20,
                 30,
                 70
-            ],
-            "kw_rating_battery": "200",
-            "kw_rating_diesel": "100",
-            "kwh_rating_battery": "500"
+            ]
         }
     },
     "FAULTED_LINE": "670671",

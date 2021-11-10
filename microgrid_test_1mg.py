@@ -63,10 +63,7 @@ if __name__ == '__main__':
 			'switch': '650632',
 			'gen_bus': '670',
 			'gen_obs_existing': ['solar_634_existing','battery_634_existing','solar_675_existing','fossil_684_existing','battery_684_existing'],
-			'critical_load_kws': [70,90,10,150,200,200,400,20,30,70],
-			'kw_rating_battery': '200',
-			'kw_rating_diesel': '100',
-			'kwh_rating_battery': '500'
+			'critical_load_kws': [70,90,10,150,200,200,400,20,30,70]
 		}
 	}
 	# Run model.

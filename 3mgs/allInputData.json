@@ -10,6 +10,7 @@
         "battery": "on",
         "year": "2017",
         "analysisYears": "25",
+        "discountRate": "0.083",
         "energyCost": "0.12",
         "demandCost": "20",
         "urdbLabelSwitch": "off",
@@ -63,10 +64,7 @@
                 70,
                 90,
                 10
-            ],
-            "kw_rating_battery": "700",
-            "kw_rating_diesel": "1000000",
-            "kwh_rating_battery": "10000"
+            ]
         },
         "mg1": {
             "loads": [
@@ -84,10 +82,7 @@
                 150,
                 200,
                 200
-            ],
-            "kw_rating_battery": "100",
-            "kw_rating_diesel": "900",
-            "kwh_rating_battery": "2000"
+            ]
         },
         "mg2": {
             "loads": [
@@ -100,10 +95,7 @@
             "critical_load_kws": [
                 30,
                 70
-            ],
-            "kw_rating_battery": "800",
-            "kw_rating_diesel": "1000000",
-            "kwh_rating_battery": "10000"
+            ]
         }
     },
     "FAULTED_LINE": "670671",

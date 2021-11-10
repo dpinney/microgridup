@@ -1,4 +1,4 @@
-import microgridup_control
+import microgridup_control_old as microgridup_control
 
 omds = ['test1.omd','test2.omd']
 # dss_files = [convert_omd_dss(x) for x in omds]

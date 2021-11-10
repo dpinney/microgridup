@@ -235,6 +235,5 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, dssTree, ansi_bands=True)
 	make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree)
 	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], 2019, microgrids, dssTree)
-
-# play('./4mgs/circuit.dss.omd', './4mgs/circuit_plusmg_3.dss', None, None, microgrids, '670671', False, 60, 120, 30) 
-
+	# Undo directory change.
+	os.chdir(curr_dir)

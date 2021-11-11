@@ -228,6 +228,9 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			# 	disable object=vsource.{safe_new_name}
 			# 	enable object={big_gen_ob['object']}
 			# '''
+	# Additional calcv to make sure the simulation runs.
+	actions[outageStart] += f'calcv'
+	actions[outageEnd] += f'calcv'
 	# Write the adjusted opendss file with new kw, generators.
 	dssConvert.treeToDss(dssTree, 'circuit_control.dss')
 	# Run the simulation

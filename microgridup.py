@@ -1451,7 +1451,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	make_chart('timeseries_source.csv', FULL_NAME, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Voltage Source Output", "kW per hour")
 	make_chart('timeseries_control.csv', FULL_NAME, 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS, "Tap Position", "PU")
 	# Perform control sim.
-	microgridup_control.play(BASE_NAME, os.getcwd(), playground_microgrids, FAULTED_LINE)
+	microgridup_control.play(FULL_NAME, os.getcwd(), playground_microgrids, FAULTED_LINE)
 	# Generate microgrid control hardware costs.
 	mg_add_cost(ADD_COST_NAME, microgrid, mg_name)	
 	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)

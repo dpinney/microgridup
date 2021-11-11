@@ -215,14 +215,24 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			big_gen_bus = big_gen_ob.get('bus1')
 			big_gen_index = dssTree.index(big_gen_ob)
 			safe_busname = big_gen_bus.replace('.','_')
-			#TODO: debug vsource behavior. new object=vsource.secondsource basekv=4.16 bus1=680.1.2.3 pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001
-			# dssTree.insert(big_gen_index, {'!CMD':'new', 'object':f'vsource.lead_gen_{safe_busname}', 'bus1':big_gen_bus, 'enabled':'n', 'phases':'1'})
-		# TODO: Enable the diesel vsources during the outage via actions.
+			safe_new_name = f'vsource.lead_gen_{safe_busname}'
+			#TODO: debug vsource behavior. Runs but creates bizarre behavior.
+			#new object=vsource.secondsource basekv=4.16 bus1=680.1.2.3 pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001
+			# dssTree.insert(big_gen_index, {'!CMD':'new', 'object':safe_new_name, 'bus1':big_gen_bus, 'enabled':'n', 'phases':'1'})
+			# Enable/disable the diesel vsources during the outage via actions.
+			# actions[outageStart] += f'''
+			# 	enable object=vsource.{safe_new_name}
+			# 	disable object={big_gen_ob['object']}
+			# '''
+			# actions[outageEnd] += f'''
+			# 	disable object=vsource.{safe_new_name}
+			# 	enable object={big_gen_ob['object']}
+			# '''
 	# Write the adjusted opendss file with new kw, generators.
 	dssConvert.treeToDss(dssTree, 'circuit_control.dss')
 	# Run the simulation
 	FPREFIX = 'timezcontrol'
-	opendss.newQstsPlot( #TODO: retry with new_newQstsPlot(
+	opendss.newQstsPlot( #TODO: retry with new_newQstsPlot because original crashes with lots of vsources
 		'circuit_control.dss',
 		stepSizeInMinutes=60, 
 		numberOfSteps=300,

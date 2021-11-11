@@ -175,6 +175,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		close object=line.{faultedLine} term=2
 		close object=line.{faultedLine} term=3
 	'''
+	actions[1] = ''
 	# Add per-microgrid objects, edits and actions.
 	for mg_key, mg_values in microgrids.items():
 		# Add load shed.
@@ -211,26 +212,36 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		all_mg_fossil.sort(key=lambda x:x.get('kw'))
 		# Insert a vsource for the largest fossil unit in each microgrid.
 		if len(all_mg_fossil) > 0: # i.e. if we have a fossil generator
+			# vsource variables.
 			big_gen_ob = all_mg_fossil[0]
 			big_gen_bus = big_gen_ob.get('bus1')
 			big_gen_index = dssTree.index(big_gen_ob)
 			safe_busname = big_gen_bus.replace('.','_')
-			safe_new_name = f'vsource.lead_gen_{safe_busname}'
-			#TODO: debug vsource behavior. Runs but creates bizarre behavior.
-			#new object=vsource.secondsource basekv=4.16 bus1=680.1.2.3 pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001
-			# dssTree.insert(big_gen_index, {'!CMD':'new', 'object':safe_new_name, 'bus1':big_gen_bus, 'enabled':'n', 'phases':'1'})
-			# Enable/disable the diesel vsources during the outage via actions.
-			# actions[outageStart] += f'''
-			# 	enable object=vsource.{safe_new_name}
-			# 	disable object={big_gen_ob['object']}
-			# '''
-			# actions[outageEnd] += f'''
-			# 	disable object=vsource.{safe_new_name}
-			# 	enable object={big_gen_ob['object']}
-			# '''
+			vsource_ob_and_name = f'vsource.lead_gen_{safe_busname}'
+			line_name = f'line.line_for_lead_gen_{safe_busname}'
+			new_bus_name = f'bus_for_lead_gen_{safe_busname}.1.2.3'
+			base_kv = big_gen_ob.get('kv','3.14')
+			# Remove fossil unit, add new gen and line
+			del dssTree[big_gen_index]
+			dssTree.insert(big_gen_index, {'!CMD':'new', 'object':vsource_ob_and_name, 'bus1':new_bus_name, 'basekv':base_kv})
+			dssTree.insert(big_gen_index, {'!CMD':'new', 'object':line_name, 'bus1':big_gen_bus, 'bus2':new_bus_name, 'switch':'yes'})
+			# Disable the new lead gen by default.
+			actions[1] += f'''
+				open {line_name}
+				calcv
+			'''
+			#Enable/disable the diesel vsources during the outage via actions.
+			actions[outageStart] += f'''
+				close {line_name}
+				calcv
+			'''
+			actions[outageEnd] += f'''
+				open {line_name}
+				calcv
+			'''
 	# Additional calcv to make sure the simulation runs.
-	actions[outageStart] += f'calcv'
-	actions[outageEnd] += f'calcv'
+	actions[outageStart] += f'calcv\n'
+	actions[outageEnd] += f'calcv\n'
 	# Write the adjusted opendss file with new kw, generators.
 	dssConvert.treeToDss(dssTree, 'circuit_control.dss')
 	# Run the simulation

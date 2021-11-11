@@ -246,7 +246,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 	dssConvert.treeToDss(dssTree, 'circuit_control.dss')
 	# Run the simulation
 	FPREFIX = 'timezcontrol'
-	opendss.newQstsPlot( #TODO: retry with new_newQstsPlot because original crashes with lots of vsources
+	opendss.newQstsPlot(
 		'circuit_control.dss',
 		stepSizeInMinutes=60, 
 		numberOfSteps=300,

@@ -657,7 +657,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 			'phases':len(phase_and_kv['phases']),
 			'kv':phase_and_kv['kv'],
 			'kwrated':f'{battery_pow_total}',
-			'dispmode':'follow',
+			'dispmode':'default',
 			'kwhstored':f'{battery_cap_total}',
 			'kwhrated':f'{battery_cap_total}',
 			'%charge':'100',

@@ -574,9 +574,9 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	fossil_size_new = gen_sizes.get('fossil_size_new')
 	fossil_size_existing = gen_sizes.get('fossil_size_existing')
 	# remove 1 kw new fossil if built as an artifact of feedback_reopt_gen_values()
-	if fossil_size_new == 1:
+	if fossil_size_new < 1.01 and fossil_size_new > 0.99:
 		fossil_size_new = 0
-		fossil_size_total -= 1
+		fossil_size_total -= fossil_size_new
 	if fossil_size_new > 0:
 		gen_obs.append({
 			'!CMD': 'new',
@@ -1129,10 +1129,10 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		# do not show the 1kw fossil that is a necessary artifact of final run of REopt
 		diesel_used_gal =reopt_out.get(f'fuelUsedDiesel{mg_num}', 0.0)
 		fossil_output_one_kw = False
-		if fossil_size_new == 1:
+		if fossil_size_new < 1.01 and fossil_size_new > 0.99:
 			fossil_output_one_kw = True
+			fossil_size_total = fossil_size_total - fossil_size_new
 			fossil_size_new = 0
-			fossil_size_total = fossil_size_total - 1
 		total_gen = fossil_size_total + solar_size_total + battery_pow_total + wind_size_total
 		renewable_gen = reopt_out.get(f'yearOnePercentRenewable{mg_num}', 0.0)
 		year_one_emissions = reopt_out.get(f'yearOneEmissionsTons{mg_num}', 0.0)
@@ -1214,10 +1214,10 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	fossil_size_new = gen_sizes.get('fossil_size_new')
 	fossil_size_existing = gen_sizes.get('fossil_size_existing')
 	fossil_output_one_kw = False
-	if fossil_size_new == 1:
+	if fossil_size_new < 1.01 and fossil_size_new > 0.99:
 		fossil_output_one_kw = True
+		fossil_size_total = fossil_size_total - fossil_size_new
 		fossil_size_new = 0
-		fossil_size_total = fossil_size_total - 1
 		# To Do: subtract any fuel use from 1kw fossil if fuelUsedDiesel is an output
 	wind_size_total = gen_sizes.get('wind_size_total')
 	wind_size_new = gen_sizes.get('wind_size_new')

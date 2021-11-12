@@ -1,6 +1,6 @@
 {
     "MODEL_DIR": "4mgs",
-    "BASE_DSS": "lehigh_base_fossil.dss",
+    "BASE_DSS": "lehigh_base_4mg.dss",
     "LOAD_CSV": "lehigh_load.csv",
     "QSTS_STEPS": 480,
     "FOSSIL_BACKUP_PERCENT": 1,

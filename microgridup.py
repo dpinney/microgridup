@@ -191,13 +191,13 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 		#To Do: Test that dieselMax = 0 is passed to REopt if both fossil_max_kw and sum(fossil_kw_exist) == 0
 		# Set max fossil kw used to support critical load
 		fossil_max_kw = set_fossil_max_kw(FOSSIL_BACKUP_PERCENT, max_crit_load)
-		#print("reopt_gen_mg_specs.fossil_max_kw:", fossil_max_kw)
+		# print("reopt_gen_mg_specs.fossil_max_kw:", fossil_max_kw)
 		if fossil_max_kw <= sum(fossil_kw_exist):
 			allInputData['dieselMax'] = str(sum(fossil_kw_exist))	
 		elif fossil_max_kw > sum(fossil_kw_exist):
 			allInputData['dieselMax'] = fossil_max_kw
-		#print("allInputData['dieselMax']:", allInputData['dieselMax'])
-		#print("allInputData['genExisting']:", allInputData['genExisting'])
+		# print("allInputData['dieselMax']:", allInputData['dieselMax'])
+		# print("allInputData['genExisting']:", allInputData['genExisting'])
 
 		# enable following 9 lines when using gen_existing_ref_shapes()
 		# if not already turned on, set solar and wind on to 1 kw to provide loadshapes for existing gen in make_full_dss()
@@ -389,7 +389,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 		battery_pow_new = gen_sizes.get('battery_pow_new')
 		battery_pow_existing = gen_sizes.get('battery_pow_existing')
 
-		#print("feedback_reopt_gen_values.fossil_size_total:", fossil_size_total)
+		print("feedback_reopt_gen_values.fossil_size_total start:", fossil_size_total)
 		if fossil_size_total > 0:
 			allInputData['dieselMax'] = fossil_size_total
 			allInputData['dieselMin'] = fossil_size_total
@@ -401,7 +401,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			allInputData['solar'] = 'off'
 			# Allow 1kw extra kw of fossil to make sure no infeasible solution during final run of REopt for this mg
 			fossil_size_total += 1
-			allInputData['dieselMax'] = fossil_size_total
+			# allInputData['dieselMax'] = fossil_size_total
 			# allInputData['dieselMin'] = fossil_size_total + 1
 		elif solar_size_total - solar_size_existing == 1:
 			allInputData['solarMin'] = 0
@@ -464,7 +464,9 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			allInputData['wind'] = 'off'
 			# Allow 1kw extra of fossil to make sure no infeasible solution during final run of REopt for this mg
 			fossil_size_total += 1
-			allInputData['dieselMax'] = fossil_size_total
+		# make sure to set dieselMax so that default is not used.
+		print("feedback_reopt_gen_values.fossil_size_total final:", fossil_size_total)
+		allInputData['dieselMax'] = fossil_size_total
 
 			#allInputData['dieselMin'] = fossil_size_total + 1
 
@@ -682,7 +684,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 			'phases':len(phase_and_kv['phases']),
 			'kv':phase_and_kv['kv'],
 			'kwrated':f'{battery_pow_existing}', # in this case, battery_pow_existing = battery_pow_total
-			'dispmode':'follow',
+			'dispmode':'default',
 			'kwhstored':f'{battery_cap_new}',
 			'kwhrated':f'{battery_cap_new}',
 			'%charge':'100',
@@ -1554,7 +1556,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 	# generate file map
 	out = template.render(
 		x='Daniel, David',
-		y='Matt',
+		y='Matt, Thomas',
 		now=current_time,
 		summary=stats,
 		inputs=inputs, #TODO: Make the inputs clearer and maybe at the bottom, showing only the appropriate keys from MICROGRIDS as necessary

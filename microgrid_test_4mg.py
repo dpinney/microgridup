@@ -1,11 +1,11 @@
 from microgridup import *
 
-'''Test to confirm existing and new natural gas backup, and existing wind with FOSSIL_BACKUP_PERCENT = 1'''
+'''Test to confirm existing and new natural gas backup with FOSSIL_BACKUP_PERCENT = 1'''
 
 if __name__ == '__main__':
 	# Input data.
 	MODEL_DIR = '4mgs'
-	BASE_DSS = 'lehigh_base_fossil.dss'
+	BASE_DSS = 'lehigh_base_4mg.dss'
 	LOAD_CSV = 'lehigh_load.csv'
 	FAULTED_LINE = '670671'
 	QSTS_STEPS = 24*20
@@ -22,7 +22,7 @@ if __name__ == '__main__':
 		"demandCost" : '20',
 		"urdbLabelSwitch": "off",
 		# "urdbLabel" : '5b75cfe95457a3454faf0aea', # EPEC General Service TOU Rate https://openei.org/apps/IURDB/rate/view/5b75cfe95457a3454faf0aea#1__Basic_Information
-		"wholesaleCost" : "0.034",
+		"wholesaleCost" : "0.034", # To turn off energy export/net-metering, set wholesaleCost to "0" and excess PV gen will be curtailed
 		"solarCost" : "1600",
 		"windCost" : "4989",
 		"batteryPowerCost" : "840",

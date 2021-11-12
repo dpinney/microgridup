@@ -213,7 +213,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		# Insert a vsource for the largest fossil unit in each microgrid.
 		if len(all_mg_fossil) > 0: # i.e. if we have a fossil generator
 			# vsource variables.
-			big_gen_ob = all_mg_fossil[0]
+			big_gen_ob = all_mg_fossil[-1]
 			big_gen_bus = big_gen_ob.get('bus1')
 			big_gen_index = dssTree.index(big_gen_ob)
 			safe_busname = big_gen_bus.replace('.','_')

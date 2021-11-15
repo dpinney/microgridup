@@ -23,71 +23,72 @@ from omf.models import flisr
 from omf.solvers.opendss import dssConvert
 from omf.solvers import opendss
 
-def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, ansi_bands=False, batt_cycle_chart=True, fossil_loading_chart=True):
-	'helper function to create plots from newQstsPlot'
-	# read in the Omd file for diesel generation kW capacities 
-	gen_bus = {}
-	for key in microgrids:
-		gen_bus[key] = microgrids[key]['gen_bus']
+def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, ansi_bands=False, batt_cycle_chart=False, fossil_loading_chart=False):
 	gen_data = pd.read_csv(csvName)
 	data = []
-	batt_cycles = {}
-	diesel_loading_series = {}
-	fossil_traces = []
 	unreasonable_voltages = {}
-	diesel_kwh_output = 0
-	for ob_name in set(gen_data[category_name]): # grid instrument 
-		# tally up total diesel genset output
-		if "fossil" in ob_name and "_source" in csvName:
-			diesel_kwh_output = diesel_kwh_output + sum(gen_data[gen_data[category_name] == ob_name]['V1'])
-		# add grid instrument to legend group corresponding with appropriate microgrid
+	batt_cycles = {}
+	fossil_kwh_output = 0
+	batt_kwh_ratings = {}
+	fossil_kw_ratings = {}
+	fossil_traces = []
+	
+	# info we need from tree: every battery by name with corresponding kwhrated, every fossil gen by name with corresponding kw 
+	if batt_cycle_chart == True or fossil_loading_chart == True:
+		for item in tree:
+			if "generator.fossil" in item.get("object","x.x"):
+				fossil_kw_ratings[item.get("object").split(".")[1]] = item.get("kw")
+			if "storage.battery" in item.get("object","x.x"):
+				batt_kwh_ratings[item.get("object").split(".")[1]] = item.get("kwhrated")
+		# print("fossil_kw_ratings",fossil_kw_ratings)
+		# print("batt_kwh_ratings",batt_kwh_ratings)
+
+	# loop through objects in circuit
+	for ob_name in set(gen_data[category_name]): 
+
+		# set appropriate legend group based on microgrid 
 		for key in microgrids:
 			if microgrids[key]['gen_bus'] in ob_name:
-				#batt_kwh_rating = microgrids[key]['kwh_rating_battery']
-				batt_kwh_rating = 1000
 				legend_group = key
 				break
 			legend_group = "Not_in_MG"
-		for y_name in y_list: # phases
-			this_series = gen_data[gen_data[category_name] == ob_name] # slice of csv for particular object
-			# note loads with voltages aren't within ANSI bands
+
+		# loop through phases
+		for y_name in y_list: 
+			this_series = gen_data[gen_data[category_name] == ob_name]
+
+			# if fossil and not null values, add total output to running tally
+			if "fossil" in ob_name and not this_series[y_name].isnull().values.any():
+				fossil_kwh_output += sum(this_series[y_name])
+				# also divide all outputs by capacity to find genset loading percentage
+				fossil_kw_rating = fossil_kw_ratings[ob_name.split("-")[1]]
+				fossil_percent_loading = [x / float(fossil_kw_rating) for x in this_series[y_name]]
+				# add traces for fossil loading percentages to graph variable
+				fossil_trace = go.Scatter(
+					x = this_series[x],
+					y = fossil_percent_loading,
+					legendgroup=legend_group,
+					legendgrouptitle_text=legend_group,
+					showlegend=True,
+					name=ob_name + '_' + y_name,
+					hoverlabel = dict(namelength = -1)
+					)
+				fossil_traces.append(fossil_trace)
+
+			# if battery and not null values, count battery cycles 
+			if "battery" in ob_name and not this_series[y_name].isnull().values.any():
+				batt_kwh_input_output = sum(abs(this_series[y_name]))
+				batt_kwh_rating = batt_kwh_ratings[ob_name.split("-")[1]]
+				cycles = batt_kwh_input_output / (2 * float(batt_kwh_rating)) 
+				batt_cycles[f"{ob_name}_{y_name}"] = cycles
+				# print("batt_kwh_input_output",batt_kwh_input_output,"batt_kwh_rating",batt_kwh_rating,"cycles",cycles)
+
+			# flag loads that don't fall within ansi bands
 			if "_load" in csvName:
 				if (this_series[y_name] > 1.1).any() or (this_series[y_name] < 0.9).any():
 					unreasonable_voltages[f"{ob_name}_{y_name}"] = ob_name
-			# if fossil generation, create series representing loading percentage
-			try: #TODO: fix this code. it breaks if there are too few or too many diesel gensets.
-				if ("fossil" in ob_name and "_gen" in csvName) and not this_series[y_name].isnull().values.any():
-					for item in tree:
-						if item.get('name') == ob_name:
-							diesel_kw_rating = item['kw']
-							break
-					diesel_percent_loading = [x / float(diesel_kw_rating) for x in this_series[y_name]]
-					diesel_percent_loading = 0.0
-					diesel_loading_series[f"{ob_name}_{y_name}"] = diesel_percent_loading
-					# traces for fossil loading percentages 
-					new_trace = go.Scatter(
-						x = this_series[x],
-						y = diesel_percent_loading,
-						legendgroup=legend_group,
-						legendgrouptitle_text=legend_group,
-						showlegend=True,
-						name=ob_name + '_' + y_name,
-						hoverlabel = dict(namelength = -1)
-						)
-					fossil_traces.append(new_trace)
-			except:
-				pass
-			# find total input_output of battery generators and divide by twice the kwh rating (microgrid dependent)
-			try: #TODO: fix this. Errors on too many/too few batteries.
-				if "battery" in ob_name and not this_series[y_name].isnull().values.any():
-					batt_kwh_input_output = sum(abs(this_series[y_name]))
-					try:
-						cycles = batt_kwh_input_output / (2 * float(batt_kwh_rating))
-					except:
-						cycles = 0 #TODO: fix this.
-			except:
-				pass
-			# normal traces
+
+			# traces for gen, load, source, control
 			name = ob_name + '_' + y_name
 			if name in unreasonable_voltages:
 				name = '[BAD]_' + name
@@ -101,14 +102,20 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, ansi_b
 				hoverlabel = dict(namelength = -1)
 			)
 			data.append(trace)
-			try: #TODO: fix this
-				if "battery" in ob_name and not this_series[y_name].isnull().values.any():
-					batt_cycles[f"{ob_name}_{y_name}"] = cycles
-			except:
-				pass
-	# create second optional battery cycle chart if specificied in function call.
-	# if batt_cycle_chart == True and "gen" in csvName:
-	if batt_cycle_chart == True and bool(batt_cycles):
+	
+	# make fossil genset loading plot
+	if fossil_loading_chart == True:
+		new_layout = go.Layout(
+			title = "Fossil Genset Loading Percentage",
+			xaxis = dict(title = 'Time'),
+			yaxis = dict(title = 'Fossil Percent Loading')
+			)
+		fossil_fig = plotly.graph_objs.Figure(fossil_traces, new_layout)
+		plotly.offline.plot(fossil_fig, filename=f'{csvName}_fossil_loading.plot.html', auto_open=False)
+
+	# make battery cycles bar chart
+	if batt_cycle_chart == True:
+		# print("csvName",csvName, "batt_cycles",batt_cycles)
 		new_trace = go.Bar(
 			x = list(batt_cycles.keys()), 
 			y = list(batt_cycles.values()) 
@@ -120,22 +127,17 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, ansi_b
 			)
 		new_fig = plotly.graph_objs.Figure(new_trace, new_layout)
 		plotly.offline.plot(new_fig, filename=f'{csvName}_battery_cycles.plot.html', auto_open=False)
-	# create third optional fossil gen loading chart if specified in function call.
-	if fossil_loading_chart == True and fossil_traces:
-		new_layout = go.Layout(
-			title = "Fossil Genset Loading Percentage",
-			xaxis = dict(title = 'Time'),
-			yaxis = dict(title = 'Fossil Percent Loading')
-			)
-		fossil_fig = plotly.graph_objs.Figure(fossil_traces, new_layout)
-		plotly.offline.plot(fossil_fig, filename=f'{csvName}_fossil_loading.plot.html', auto_open=False)
-	# calculate fuel consumption
+
+	# calculate total fossil genset consumption
 	fuel_consumption_rate_gallons_per_kwh = 1 # <-- TO DO: is this a preset or an input?
-	diesel = fuel_consumption_rate_gallons_per_kwh * diesel_kwh_output
-	if "_source" in csvName:
-		title = f'{csvName} Output. Fossil consumption of gensets = {diesel}'
+	total_fossil = fuel_consumption_rate_gallons_per_kwh * fossil_kwh_output
+	# add total fossil genset consumption to source plot title 
+	if "_source" in csvName or "_gen" in csvName:
+		title = f'{csvName} Output. Fossil consumption of gensets = {total_fossil}'
 	else:
 		title = f'{csvName} Output'
+
+	# plots for gen, load, source, control
 	layout = go.Layout(
 		title = title,
 		xaxis = dict(title = 'hour'),
@@ -147,9 +149,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, ansi_b
 		fig.add_hline(y=0.9, line=line_style)
 		fig.add_hline(y=1.1, line=line_style)
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
-	# print("batt_cycles",batt_cycles)
-	# print("diesel_loading_series",diesel_loading_series)
-	# print("unreasonable_voltages",unreasonable_voltages)
+
 
 def play(pathToDss, workDir, microgrids, faultedLine):
 	# TODO: do we need non-default outage timing?
@@ -213,7 +213,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		# Insert a vsource for the largest fossil unit in each microgrid.
 		if len(all_mg_fossil) > 0: # i.e. if we have a fossil generator
 			# vsource variables.
-			big_gen_ob = all_mg_fossil[0]
+			big_gen_ob = all_mg_fossil[-1]
 			big_gen_bus = big_gen_ob.get('bus1')
 			big_gen_index = dssTree.index(big_gen_ob)
 			safe_busname = big_gen_bus.replace('.','_')
@@ -255,7 +255,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		filePrefix=FPREFIX
 	)
 	# Generate the output charts.
-	make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree)
+	make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, batt_cycle_chart=True, fossil_loading_chart=True)
 	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, dssTree, ansi_bands=True)
 	make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree)
 	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], 2019, microgrids, dssTree)

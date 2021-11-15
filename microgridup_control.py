@@ -104,7 +104,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, ansi_b
 			data.append(trace)
 	
 	# make fossil genset loading plot
-	if fossil_loading_chart == True and fossil_traces:
+	if fossil_loading_chart == True:
 		new_layout = go.Layout(
 			title = "Fossil Genset Loading Percentage",
 			xaxis = dict(title = 'Time'),

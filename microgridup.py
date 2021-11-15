@@ -1113,7 +1113,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 							"Existing Battery Power (kW)", "Existing Battery Energy Storage (kWh)", "New Battery Power (kW)",
 							"New Battery Energy Storage (kWh)", "Existing Wind (kW)", "New Wind (kW)", 
 							"Total Generation on Microgrid (kW)", "Renewable Generation (% of Yr 1 kWh)", "Emissions (Yr 1 Tons CO2)", 
-							"Emissions Reduction (Yr 1 % CO2)", "Minimum Outage Survived (h)",
+							"Emissions Reduction (Yr 1 % CO2)", "Average Outage Survived (h)",
 							"O+M Costs (Yr 1 $ before tax)",
 							"CapEx ($)", "CapEx after Tax Incentives ($)", "Net Present Value ($)"])
 		mg_num = 1 # mg_num refers to the dict key suffix in allOutputData.json from reopt folder
@@ -1189,10 +1189,13 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 				year_one_OM = year_one_OM - 1*reopt_out.get(f'dieselOMCostKw{mg_num}', 0.0)-sum(reopt_out.get(f'powerDiesel{mg_num}', 0.0))*reopt_out.get(f'dieselOMCostKwh{mg_num}', 0.0)			
 			elif fossil_size_total != 0:
 				year_one_OM = year_one_OM - 1*reopt_out.get(f'dieselOMCostKw{mg_num}', 0.0)-1/fossil_size_total*sum(reopt_out.get(f'powerDiesel{mg_num}', 0.0))*reopt_out.get(f'dieselOMCostKwh{mg_num}', 0.0)		
-		min_outage = reopt_out.get(f'minOutage{mg_num}')
-		if min_outage is not None:
-			min_outage = int(round(min_outage))
+		# min_outage = reopt_out.get(f'minOutage{mg_num}')
+		# if min_outage is not None:
+		# 	min_outage = int(round(min_outage))
 		# print(f'Minimum Outage Survived (h) for {mg_name}:', min_outage)
+		avg_outage = reopt_out.get(f'avgOutage{mg_num}')
+		if avg_outage is not None:
+			avg_outage = int(round(avg_outage))
 
 		row =[str(mg_name), gen_bus_name, min_load, ave_load, round(avg_daytime_load), 
 		max_load, round(max_crit_load),
@@ -1200,7 +1203,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		round(solar_size_existing), 
 		round(solar_size_new), round(battery_pow_existing), round(battery_cap_existing), round(battery_pow_new),
 		round(battery_cap_new), round(wind_size_existing), round(wind_size_new), round(total_gen), round(renewable_gen),
-		round(year_one_emissions), round(year_one_emissions_reduced), min_outage,
+		round(year_one_emissions), round(year_one_emissions_reduced), avg_outage,
 		int(round(year_one_OM)), int(round(cap_ex_existing_gen_adj)), int(round(cap_ex_after_incentives_existing_gen_adj)), int(round(npv_existing_gen_adj))]
 		writer.writerow(row)
 		# print("row:", row)
@@ -1282,10 +1285,14 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	mg_dict["Renewable Generation (% of Yr 1 kWh)"] = round(reopt_out.get(f'yearOnePercentRenewable{mg_num}', 0.0))	
 	mg_dict["Emissions (Yr 1 Tons CO2)"] = round(reopt_out.get(f'yearOneEmissionsTons{mg_num}', 0.0))
 	mg_dict["Emissions Reduction (Yr 1 % CO2)"] = round(reopt_out.get(f'yearOneEmissionsReducedPercent{mg_num}', 0.0))
-	min_outage = reopt_out.get(f'minOutage{mg_num}')
-	if min_outage is not None:
-		min_outage = int(round(min_outage))
-	mg_dict["Minimum Outage Survived (h)"] = min_outage
+	# min_outage = reopt_out.get(f'minOutage{mg_num}')
+	# if min_outage is not None:
+	# 	min_outage = int(round(min_outage))
+	# mg_dict["Minimum Outage Survived (h)"] = min_outage
+	avg_outage = reopt_out.get(f'avgOutage{mg_num}')
+	if avg_outage is not None:
+		avg_outage = int(round(avg_outage))
+	mg_dict["Average Outage Survived (h)"] = avg_outage
 	# calculate added year 0 costs from mg_add_cost()
 	mg_add_cost_df = pd.read_csv(ADD_COST_NAME)
 	mg_add_cost = mg_add_cost_df['Cost Estimate ($)'].sum()
@@ -1405,10 +1412,14 @@ def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
 	reps['CapEx ($)'].append(sum(reps['CapEx ($)']))
 	reps['CapEx after Tax Incentives ($)'].append(sum(reps['CapEx after Tax Incentives ($)']))
 	reps['O+M Costs (Yr 1 $ before tax)'].append(sum(reps['O+M Costs (Yr 1 $ before tax)']))
-	if all([h != None for h in reps['Minimum Outage Survived (h)']]):
-		reps['Minimum Outage Survived (h)'].append(round(min(reps['Minimum Outage Survived (h)']),0))
+	# if all([h != None for h in reps['Minimum Outage Survived (h)']]):
+	# 	reps['Minimum Outage Survived (h)'].append(round(min(reps['Minimum Outage Survived (h)']),0))
+	# else:
+	# 	reps['Minimum Outage Survived (h)'].append(None)
+	if all([h != None for h in reps['Average Outage Survived (h)']]):
+		reps['Average Outage Survived (h)'].append(round(min(reps['Average Outage Survived (h)']),0))
 	else:
-		reps['Minimum Outage Survived (h)'].append(None)
+		reps['Average Outage Survived (h)'].append(None)
 	# print(reps)
 	return(reps)
 

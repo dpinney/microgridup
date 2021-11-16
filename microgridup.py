@@ -1471,7 +1471,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
 	# convert mg_list_of_dicts_full to dict of lists for columnar output in output_template.html
 	mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
-	# Create giant consolidated report.
+	# Create consolidated report per mg.
 	mg_add_cost_dict_of_lists = pd.read_csv(ADD_COST_NAME).to_dict(orient='list')
 	template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
 	out = template.render(

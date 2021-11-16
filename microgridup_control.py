@@ -23,7 +23,8 @@ from omf.models import flisr
 from omf.solvers.opendss import dssConvert
 from omf.solvers import opendss
 
-def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, ansi_bands=False, batt_cycle_chart=False, fossil_loading_chart=False):
+def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, ansi_bands=False, batt_cycle_chart=False, fossil_loading_chart=False, vsource_ratings=None):
+	# print("vsource_ratings",vsource_ratings)
 	gen_data = pd.read_csv(csvName)
 	data = []
 	unreasonable_voltages = {}
@@ -57,12 +58,31 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, ansi_b
 		for y_name in y_list: 
 			this_series = gen_data[gen_data[category_name] == ob_name]
 
-			# if fossil and not null values, add total output to running tally
-			if "fossil" in ob_name and not this_series[y_name].isnull().values.any():
+			# if lead_gen_ and not null values, add total output to running tally 
+			if "lead_gen_" in ob_name and not this_series[y_name].isnull().values.any(): 
 				fossil_kwh_output += sum(this_series[y_name])
-				# also divide all outputs by capacity to find genset loading percentage
+				# if lead_gen_ and not null values, divide by provided kw rating to create loading percentage series
+				fossil_kw_rating = vsource_ratings[ob_name.split("-")[1]]  
+				fossil_percent_loading = [(x / float(fossil_kw_rating)) * 100 for x in this_series[y_name]]
+				# add traces for fossil loading percentages to graph variable
+				fossil_trace = go.Scatter(
+					x = this_series[x],
+					y = fossil_percent_loading,
+					legendgroup=legend_group,
+					legendgrouptitle_text=legend_group,
+					showlegend=True,
+					name=ob_name + '_' + y_name,
+					hoverlabel = dict(namelength = -1)
+					)
+				fossil_traces.append(fossil_trace)
+				# print("ob_name",ob_name,"this_series[y_name][58:62]",this_series[y_name][58:62],"fossil_kw_rating",fossil_kw_rating,"fossil_percent_loading[58:62]",fossil_percent_loading[58:62])
+
+			# if fossil_ and not null values, add total output to running tally
+			if "fossil_" in ob_name and not this_series[y_name].isnull().values.any():
+				fossil_kwh_output += sum(abs(this_series[y_name]))
+				# if fossil_ and not null values, divide by kw rating to create loading percentage series  
 				fossil_kw_rating = fossil_kw_ratings[ob_name.split("-")[1]]
-				fossil_percent_loading = [x / float(fossil_kw_rating) for x in this_series[y_name]]
+				fossil_percent_loading = [(x / float(fossil_kw_rating)) * -100 for x in this_series[y_name]]
 				# add traces for fossil loading percentages to graph variable
 				fossil_trace = go.Scatter(
 					x = this_series[x],
@@ -75,8 +95,8 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, ansi_b
 					)
 				fossil_traces.append(fossil_trace)
 
-			# if battery and not null values, count battery cycles 
-			if "battery" in ob_name and not this_series[y_name].isnull().values.any():
+			# if battery_ and not null values, count battery cycles 
+			if "battery_" in ob_name and not this_series[y_name].isnull().values.any():
 				batt_kwh_input_output = sum(abs(this_series[y_name]))
 				batt_kwh_rating = batt_kwh_ratings[ob_name.split("-")[1]]
 				cycles = batt_kwh_input_output / (2 * float(batt_kwh_rating)) 
@@ -106,7 +126,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, ansi_b
 	# make fossil genset loading plot
 	if fossil_loading_chart == True:
 		new_layout = go.Layout(
-			title = "Fossil Genset Loading Percentage",
+			title = f"Fossil Genset Loading Percentage ({csvName})",
 			xaxis = dict(title = 'Time'),
 			yaxis = dict(title = 'Fossil Percent Loading')
 			)
@@ -176,6 +196,10 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		close object=line.{faultedLine} term=3
 	'''
 	actions[1] = ''
+
+	# initialize dict of vsource ratings 
+	big_gen_ratings = {}
+
 	# Add per-microgrid objects, edits and actions.
 	for mg_key, mg_values in microgrids.items():
 		# Add load shed.
@@ -221,6 +245,11 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			line_name = f'line.line_for_lead_gen_{safe_busname}'
 			new_bus_name = f'bus_for_lead_gen_{safe_busname}.1.2.3'
 			base_kv = big_gen_ob.get('kv','3.14')
+
+			# Before removing fossil unit, grab kW rating 
+			big_gen_ratings[f"lead_gen_{safe_busname}"] = big_gen_ob.get("kw")
+			# print("big_gen_ob",big_gen_ob)
+
 			# Remove fossil unit, add new gen and line
 			del dssTree[big_gen_index]
 			dssTree.insert(big_gen_index, {'!CMD':'new', 'object':vsource_ob_and_name, 'bus1':new_bus_name, 'basekv':base_kv})
@@ -239,6 +268,9 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 				open {line_name}
 				calcv
 			'''
+
+	# print("big_gen_ratings",big_gen_ratings)
+
 	# Additional calcv to make sure the simulation runs.
 	actions[outageStart] += f'calcv\n'
 	actions[outageEnd] += f'calcv\n'
@@ -257,7 +289,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 	# Generate the output charts.
 	make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, batt_cycle_chart=True, fossil_loading_chart=True)
 	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, dssTree, ansi_bands=True)
-	make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree)
+	make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, fossil_loading_chart=True, vsource_ratings=big_gen_ratings)
 	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], 2019, microgrids, dssTree)
 	# Undo directory change.
 	os.chdir(curr_dir)

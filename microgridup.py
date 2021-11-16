@@ -1028,7 +1028,7 @@ def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_st
 	chart_name is the name of the chart to be displayed'''
 	gen_data = pd.read_csv(csvName)
 	tree = dssConvert.dssToTree(circuitFilePath)
-	data = [] 
+	data = []
 
 	for ob_name in set(gen_data[category_name]):
 		# csv_column_headers = y_list

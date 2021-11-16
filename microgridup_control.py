@@ -244,6 +244,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			vsource_ob_and_name = f'vsource.lead_gen_{safe_busname}'
 			line_name = f'line.line_for_lead_gen_{safe_busname}'
 			new_bus_name = f'bus_for_lead_gen_{safe_busname}.1.2.3'
+			#TO DO: update default kv assignment to match max kv on grid
 			base_kv = big_gen_ob.get('kv','3.14')
 
 			# Before removing fossil unit, grab kW rating 

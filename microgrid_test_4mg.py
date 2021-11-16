@@ -69,14 +69,14 @@ if __name__ == '__main__':
 			'switch': '671692',
 			'gen_bus': '675',
 			'gen_obs_existing': ['solar_675_existing'],
-			'critical_load_kws': [150,200,200]
+			'critical_load_kws': [150,200,200,0]
 		},
 		'mg2': {
 			'loads': ['684_command_center','652_residential','611_runway'],
 			'switch': '671684',
 			'gen_bus': '684',
 			'gen_obs_existing': ['fossil_684_existing','battery_684_existing'],
-			'critical_load_kws': [400,20]
+			'critical_load_kws': [400,20,0]
 		},
 		'mg3': {
 			'loads': ['645_hangar','646_office'],

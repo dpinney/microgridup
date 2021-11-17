@@ -44,10 +44,10 @@ new object=load.634b_radar bus1=634.1 phases=1 conn=wye model=1 kv=0.277 kw=120 
 new object=load.634c_atc_tower bus1=634.1 phases=1 conn=wye model=1 kv=0.277 kw=120 kvar=90 yearly=634c_atc_tower_shape
 new object=load.645_hangar bus1=645.2 phases=1 conn=wye model=1 kv=2.4 kw=170 kvar=125 yearly=645_hangar_shape
 new object=load.646_office bus1=646.2 phases=1 conn=wye model=2 kv=2.4 kw=230 kvar=132 yearly=646_office_shape
-new object=load.692_warehouse2 bus1=692.1.2.3 phases=3 conn=delta model=5 kv=4.16 kw=170 kvar=151 yearly=692_warehouse2_shape
-new object=load.675a_hospital bus1=675.1.2.3 phases=3 conn=wye model=1 kv=4.16 kw=485 kvar=190 yearly=675a_hospital_shape
-new object=load.675b_residential1 bus1=675.1.2.3 phases=3 conn=wye model=1 kv=4.16 kw=68 kvar=60 yearly=675b_residential1_shape
-new object=load.675c_residential1 bus1=675.1.2.3 phases=3 conn=wye model=1 kv=4.16 kw=290 kvar=212 yearly=675c_residential1_shape
+new object=load.692_warehouse2 bus1=692.1.2.3 phases=3 conn=delta model=5 kv=2.4 kw=170 kvar=151 yearly=692_warehouse2_shape
+new object=load.675a_hospital bus1=675.1.2.3 phases=3 conn=wye model=1 kv=2.4 kw=485 kvar=190 yearly=675a_hospital_shape
+new object=load.675b_residential1 bus1=675.1.2.3 phases=3 conn=wye model=1 kv=2.4 kw=68 kvar=60 yearly=675b_residential1_shape
+new object=load.675c_residential1 bus1=675.1.2.3 phases=3 conn=wye model=1 kv=2.4 kw=290 kvar=212 yearly=675c_residential1_shape
 new object=load.611_runway bus1=611.3 phases=1 conn=wye model=5 kv=2.4 kw=170 kvar=80 yearly=611_runway_shape
 new object=load.652_residential bus1=652.3 phases=1 conn=wye model=2 kv=2.4 kw=128 kvar=86 yearly=652_residential_shape
 new object=load.670a_residential2 bus1=670.1 phases=1 conn=wye model=1 kv=2.4 kw=17 kvar=10 yearly=670a_residential2_shape
@@ -55,7 +55,7 @@ new object=load.670b_residential2 bus1=670.2 phases=1 conn=wye model=1 kv=2.4 kw
 new object=load.670c_residential2 bus1=670.3 phases=1 conn=wye model=1 kv=2.4 kw=117 kvar=68 yearly=670c_residential2_shape
 new object=generator.wind_634_existing bus1=634.1 phases=1 kv=0.277 kw=200 pf=1 yearly=wind_634_existing_shape
 new object=storage.battery_675_existing bus1=675.1.2.3 phases=3 kv=2.4 kwrated=198 kwhstored=553 kwhrated=553 dispmode=default %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50 yearly=battery_675_existing_shape
-new object=capacitor.cap1 bus1=675 phases=3 kvar=600 kv=4.16
+new object=capacitor.cap1 bus1=675 phases=3 kvar=600 kv=2.4
 new object=capacitor.cap2 bus1=611.3 phases=1 kvar=100 kv=2.4
 new object=line.670671 phases=3 bus1=670.1.2.3 bus2=671.1.2.3 linecode=mtx601 length=1333 units=ft
 new object=line.645646 phases=1 bus1=645.2 bus2=646.2 linecode=mtx603 length=300 units=ft

@@ -305,7 +305,7 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 		'fossil_size_total':fossil_size_total, 'fossil_size_existing':fossil_size_existing, 'fossil_size_new':fossil_size_new, \
 		'battery_cap_total':battery_cap_total, 'battery_cap_existing':battery_cap_existing, 'battery_cap_new':battery_cap_new, \
 		'battery_pow_total':battery_pow_total, 'battery_pow_existing':battery_pow_existing, 'battery_pow_new':battery_pow_new})
-	#print("gen_sizes:",gen_sizes)
+	# print("gen_sizes:",gen_sizes)
 	return gen_sizes #dictionary of all gen sizes
 
 def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, microgrid, critical_load_percent, diesel_total_calc=False):
@@ -389,7 +389,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 		battery_pow_new = gen_sizes.get('battery_pow_new')
 		battery_pow_existing = gen_sizes.get('battery_pow_existing')
 
-		print("feedback_reopt_gen_values.fossil_size_total start:", fossil_size_total)
+		# print("feedback_reopt_gen_values.fossil_size_total start:", fossil_size_total)
 		if fossil_size_total > 0:
 			allInputData['dieselMax'] = fossil_size_total
 			allInputData['dieselMin'] = fossil_size_total
@@ -465,7 +465,7 @@ def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_B
 			# Allow 1kw extra of fossil to make sure no infeasible solution during final run of REopt for this mg
 			fossil_size_total += 1
 		# make sure to set dieselMax so that default is not used.
-		print("feedback_reopt_gen_values.fossil_size_total final:", fossil_size_total)
+		# print("feedback_reopt_gen_values.fossil_size_total final:", fossil_size_total)
 		allInputData['dieselMax'] = fossil_size_total
 
 			#allInputData['dieselMin'] = fossil_size_total + 1
@@ -537,7 +537,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	will need to implement searching the tree of FULL_NAME to find kw ratings of existing gens'''
 
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER)
-	# print("build_new_gen_ob_and_shape() gen_sizes into OpenDSS:", gen_sizes)
+	print("build_new_gen_ob_and_shape() gen_sizes into OpenDSS:", gen_sizes)
 	reopt_out = json.load(open(REOPT_FOLDER + '/allOutputData.json'))
 	gen_df_builder = pd.DataFrame()
 	gen_obs = []
@@ -709,7 +709,6 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 			if battery_pow_new > 0:
 				# print("build_new_gen() storage 4", gen_ob_existing)
 				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(np.zeros(8760))
-				#TODO: collect this print statement as a warning in the template_output 
 				warning_message = f'Pre-existing battery {gen_ob_existing} will not be utilized to support loads in microgrid {mg_name}.\n'
 				print(warning_message)
 				with open("user_warnings.txt", "a") as myfile:
@@ -804,10 +803,10 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 	ASSUMPTIONS: 
 	SIDE EFFECTS: writes FULL_NAME dss'''
 	tree = dssConvert.dssToTree(BASE_NAME)
-	# print(tree)
+	# print("tree:", tree)
 	# make a list of names all existing loadshape objects
 	load_map = {x.get('object',''):i for i, x in enumerate(tree)}
-	#print(load_map)
+	#print("load_map:", load_map)
 	gen_obs_existing = microgrid['gen_obs_existing']
 
 	bus_list_pos = -1
@@ -832,6 +831,9 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 			ob_string = ob.get('object','')
 			# reset shape_data to be blank before every run of the loop
 			shape_data = None
+			# since this loop can execute deletions of generator and load shape objects in the tree, update the load map after every run of the loop
+			# load_map = {x.get('object',''):i for i, x in enumerate(tree)}
+			#print("load_map:", load_map)
 			# insert loadshapes for load objects
 			if ob_string.startswith('load.'):
 				ob_name = ob_string[5:]
@@ -951,16 +953,16 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 					}
 			# insert loadshapes for storage objects
 			elif ob_string.startswith('storage.'):
-				# print("1_storage:", ob)
+				print("1_storage:", ob)
 				ob_name = ob_string[8:]
 				shape_name = ob_name + '_shape'
 				
 				# TODO: if actual power production loadshape is available for a given storage object, insert it, else use synthetic loadshapes as defined here
 				if ob_name.endswith('_existing'):
-					# print("2_storage:", ob)
+					print("2_storage:", ob_name)
 					# if object is outside of microgrid and without a loadshape, give it a loadshape of zeros
 					if ob_name not in gen_obs_existing and f'loadshape.{shape_name}' not in load_map:					
-						# print("3_storage:", ob)
+						print("3_storage:", ob_name)
 						ob['yearly'] = shape_name
 						shape_data = list_of_zeros
 						shape_insert_list[i] = {
@@ -973,11 +975,27 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 						}
 					
 					elif ob_name in gen_obs_existing:
-						# print("4_storage:", ob)
-						# if loadshape object already exists, overwrite the 8760 hour data in ['mult']
+						print("4_storage:", ob_name)
+						# HACK implemented here to erase unused existing batteries from the dss file
+						# if the loadshape of an existing battery is populated as zeros in build_new_gen_ob_and_shape(), this object is not in use and should be erased along with its loadshape
+						if sum(gen_df[ob_name]) == 0:
+							print("4a_storage Existing battery", ob_name, "scheduled for deletion from DSS file.")
+							# print("load_map before existing battery deletion:", load_map)
+							del tree[i]
+							# Does this in-line deletion mean that load_map and tree no longer match up?
+							load_map = {x.get('object',''):i for i, x in enumerate(tree)}
+							# print("load_map after existing battery deletion:", load_map)
+							if f'loadshape.{shape_name}' in load_map:
+								j = load_map.get(f'loadshape.{shape_name}')
+								del tree[j]
+								load_map = {x.get('object',''):i for i, x in enumerate(tree)}
+								# print("load_map after existing battery shape deletion:", load_map)
+							else:
+								pass
+						# if loadshape object already exists and is not zeros, overwrite the 8760 hour data in ['mult']
 						# ASSUMPTION: Existing generators in gen_obs_existing will be reconfigured to be controlled by new microgrid
-						if f'loadshape.{shape_name}' in load_map:
-							# print("4a_storage:", ob)
+						elif f'loadshape.{shape_name}' in load_map:
+							print("4b_storage:", ob_name)
 							j = load_map.get(f'loadshape.{shape_name}') # indexes of load_map and tree match				
 							shape_data = gen_df[ob_name]
 							# print(shape_name, 'shape_data:', shape_data.head(20))
@@ -985,7 +1003,7 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 							# print(shape_name, "tree[j]['mult']:", tree[j]['mult'][:20])
 							# print("4a_storage achieved insert")
 						else:
-							# print("4b_storage:", ob)
+							print("4c_storage:", ob_name)
 							ob['yearly'] = shape_name
 							shape_data = gen_df[ob_name]
 							shape_insert_list[i] = {
@@ -1000,7 +1018,7 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 							# print("4b_storage achieved insert")
 				# insert loadshapes for new storage objects with shape_data in GEN_NAME
 				elif f'loadshape.{shape_name}' not in load_map:
-					# print("5_storage", ob)
+					print("5_storage", ob_name)
 					shape_data = gen_df[ob_name]
 					ob['yearly'] = shape_name
 					shape_insert_list[i] = {
@@ -1080,6 +1098,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 	''' Generate a report on each microgrid '''
 	reopt_out = json.load(open(REOPT_FOLDER + inputName))
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False)
+	print("microgrid_report_csv() gen_sizes into CSV report:", gen_sizes)
 	solar_size_total = gen_sizes.get('solar_size_total')
 	solar_size_new = gen_sizes.get('solar_size_new')
 	solar_size_existing = gen_sizes.get('solar_size_existing')
@@ -1095,6 +1114,9 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 	battery_pow_total = gen_sizes.get('battery_pow_total')
 	battery_pow_new = gen_sizes.get('battery_pow_new')
 	battery_pow_existing = gen_sizes.get('battery_pow_existing')
+	# if additional battery capacity is being recomended, update kw of new battery to that of existing battery
+	if battery_cap_new > 0 and battery_pow_new == 0:
+		battery_pow_new = battery_pow_existing
 	# load = pd.read_csv(REOPT_FOLDER + '/loadShape.csv',header = None)
 	load = []
 	with open(REOPT_FOLDER + '/loadShape.csv', newline = '') as csvfile:
@@ -1233,6 +1255,9 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	battery_pow_total = gen_sizes.get('battery_pow_total')
 	battery_pow_new = gen_sizes.get('battery_pow_new')
 	battery_pow_existing = gen_sizes.get('battery_pow_existing')
+	# if additional battery capacity is being recomended, update kw of new battery to that of existing battery
+	if battery_cap_new > 0 and battery_pow_new == 0:
+		battery_pow_new = battery_pow_existing
 	list_of_mg_dict = []
 	mg_dict = {}
 	mg_num = 1

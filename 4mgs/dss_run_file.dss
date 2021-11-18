@@ -25,7 +25,6 @@ new object=monitor.mongenerator-solar_634_existing element=generator.solar_634_e
 new object=monitor.mongenerator-battery_634_existing element=storage.battery_634_existing terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-solar_675_existing element=generator.solar_675_existing terminal=1 mode=1 ppolar=no
 new object=monitor.monvsource-lead_gen_684_3 element=vsource.lead_gen_684_3 terminal=1 mode=0
-new object=monitor.mongenerator-battery_684_existing element=storage.battery_684_existing terminal=1 mode=1 ppolar=no
 new object=monitor.moncapacitor-cap1 element=capacitor.cap1 terminal=1 mode=6
 new object=monitor.moncapacitor-cap2 element=capacitor.cap2 terminal=1 mode=6
 new object=monitor.monvsource-lead_gen_634_1 element=vsource.lead_gen_634_1 terminal=1 mode=0
@@ -443,7 +442,6 @@ export monitors monitorname=mongenerator-solar_634_existing
 export monitors monitorname=mongenerator-battery_634_existing
 export monitors monitorname=mongenerator-solar_675_existing
 export monitors monitorname=monvsource-lead_gen_684_3
-export monitors monitorname=mongenerator-battery_684_existing
 export monitors monitorname=moncapacitor-cap1
 export monitors monitorname=moncapacitor-cap2
 export monitors monitorname=monvsource-lead_gen_634_1

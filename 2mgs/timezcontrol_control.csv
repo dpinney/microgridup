@@ -608,7 +608,7 @@ hour,t(sec),Tap(pu),Type,Name
 7,0.0,0.99375,Transformer,monregcontrol-reg1
 8,0.0,0.99375,Transformer,monregcontrol-reg1
 9,0.0,0.99375,Transformer,monregcontrol-reg1
-10,0.0,0.9875,Transformer,monregcontrol-reg1
+10,0.0,0.99375,Transformer,monregcontrol-reg1
 11,0.0,0.9875,Transformer,monregcontrol-reg1
 12,0.0,0.98125,Transformer,monregcontrol-reg1
 13,0.0,0.98125,Transformer,monregcontrol-reg1
@@ -642,8 +642,8 @@ hour,t(sec),Tap(pu),Type,Name
 41,0.0,0.9625,Transformer,monregcontrol-reg1
 42,0.0,0.98125,Transformer,monregcontrol-reg1
 43,0.0,0.98125,Transformer,monregcontrol-reg1
-44,0.0,0.96875,Transformer,monregcontrol-reg1
-45,0.0,0.96875,Transformer,monregcontrol-reg1
+44,0.0,0.975,Transformer,monregcontrol-reg1
+45,0.0,0.975,Transformer,monregcontrol-reg1
 46,0.0,0.96875,Transformer,monregcontrol-reg1
 47,0.0,0.96875,Transformer,monregcontrol-reg1
 48,0.0,0.96875,Transformer,monregcontrol-reg1
@@ -942,8 +942,8 @@ hour,t(sec),Tap(pu),Type,Name
 41,0.0,0.975,Transformer,monregcontrol-reg2
 42,0.0,0.98125,Transformer,monregcontrol-reg2
 43,0.0,0.98125,Transformer,monregcontrol-reg2
-44,0.0,0.975,Transformer,monregcontrol-reg2
-45,0.0,0.975,Transformer,monregcontrol-reg2
+44,0.0,0.98125,Transformer,monregcontrol-reg2
+45,0.0,0.98125,Transformer,monregcontrol-reg2
 46,0.0,0.975,Transformer,monregcontrol-reg2
 47,0.0,0.975,Transformer,monregcontrol-reg2
 48,0.0,0.975,Transformer,monregcontrol-reg2
@@ -956,7 +956,7 @@ hour,t(sec),Tap(pu),Type,Name
 55,0.0,0.98125,Transformer,monregcontrol-reg2
 56,0.0,0.9875,Transformer,monregcontrol-reg2
 57,0.0,0.9875,Transformer,monregcontrol-reg2
-58,0.0,0.975,Transformer,monregcontrol-reg2
+58,0.0,0.98125,Transformer,monregcontrol-reg2
 59,0.0,0.975,Transformer,monregcontrol-reg2
 60,0.0,1.00625,Transformer,monregcontrol-reg2
 61,0.0,1.00625,Transformer,monregcontrol-reg2
@@ -1228,8 +1228,8 @@ hour,t(sec),Tap(pu),Type,Name
 27,0.0,0.975,Transformer,monregcontrol-reg3
 28,0.0,0.975,Transformer,monregcontrol-reg3
 29,0.0,0.98125,Transformer,monregcontrol-reg3
-30,0.0,0.975,Transformer,monregcontrol-reg3
-31,0.0,0.975,Transformer,monregcontrol-reg3
+30,0.0,0.98125,Transformer,monregcontrol-reg3
+31,0.0,0.98125,Transformer,monregcontrol-reg3
 32,0.0,0.99375,Transformer,monregcontrol-reg3
 33,0.0,0.99375,Transformer,monregcontrol-reg3
 34,0.0,0.99375,Transformer,monregcontrol-reg3
@@ -1244,7 +1244,7 @@ hour,t(sec),Tap(pu),Type,Name
 43,0.0,0.99375,Transformer,monregcontrol-reg3
 44,0.0,0.98125,Transformer,monregcontrol-reg3
 45,0.0,0.98125,Transformer,monregcontrol-reg3
-46,0.0,0.975,Transformer,monregcontrol-reg3
+46,0.0,0.98125,Transformer,monregcontrol-reg3
 47,0.0,0.975,Transformer,monregcontrol-reg3
 48,0.0,0.975,Transformer,monregcontrol-reg3
 49,0.0,0.975,Transformer,monregcontrol-reg3
@@ -1418,9 +1418,9 @@ hour,t(sec),Tap(pu),Type,Name
 217,0.0,1.0,Transformer,monregcontrol-reg3
 218,0.0,1.0,Transformer,monregcontrol-reg3
 219,0.0,1.0,Transformer,monregcontrol-reg3
-220,0.0,0.99375,Transformer,monregcontrol-reg3
-221,0.0,0.99375,Transformer,monregcontrol-reg3
-222,0.0,0.99375,Transformer,monregcontrol-reg3
+220,0.0,1.0,Transformer,monregcontrol-reg3
+221,0.0,1.0,Transformer,monregcontrol-reg3
+222,0.0,1.0,Transformer,monregcontrol-reg3
 223,0.0,1.0,Transformer,monregcontrol-reg3
 224,0.0,1.0,Transformer,monregcontrol-reg3
 225,0.0,1.0,Transformer,monregcontrol-reg3
@@ -1456,7 +1456,7 @@ hour,t(sec),Tap(pu),Type,Name
 255,0.0,0.9625,Transformer,monregcontrol-reg3
 256,0.0,0.96875,Transformer,monregcontrol-reg3
 257,0.0,0.96875,Transformer,monregcontrol-reg3
-258,0.0,0.9875,Transformer,monregcontrol-reg3
+258,0.0,0.99375,Transformer,monregcontrol-reg3
 259,0.0,0.99375,Transformer,monregcontrol-reg3
 260,0.0,0.99375,Transformer,monregcontrol-reg3
 261,0.0,0.99375,Transformer,monregcontrol-reg3

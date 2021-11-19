@@ -23,7 +23,7 @@ from omf.models import flisr
 from omf.solvers.opendss import dssConvert
 from omf.solvers import opendss
 
-def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, ansi_bands=False, batt_cycle_chart=False, fossil_loading_chart=False, vsource_ratings=None):
+def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_name, y_axis_name, ansi_bands=False, batt_cycle_chart=False, fossil_loading_chart=False, vsource_ratings=None):
 	# print("vsource_ratings",vsource_ratings)
 	gen_data = pd.read_csv(csvName)
 	data = []
@@ -66,7 +66,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, ansi_b
 				fossil_percent_loading = [(x / float(fossil_kw_rating)) * 100 for x in this_series[y_name]]
 				# add traces for fossil loading percentages to graph variable
 				fossil_trace = go.Scatter(
-					x = this_series[x],
+					x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
 					y = fossil_percent_loading,
 					legendgroup=legend_group,
 					legendgrouptitle_text=legend_group,
@@ -85,7 +85,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, ansi_b
 				fossil_percent_loading = [(x / float(fossil_kw_rating)) * -100 for x in this_series[y_name]]
 				# add traces for fossil loading percentages to graph variable
 				fossil_trace = go.Scatter(
-					x = this_series[x],
+					x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
 					y = fossil_percent_loading,
 					legendgroup=legend_group,
 					legendgrouptitle_text=legend_group,
@@ -113,7 +113,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, ansi_b
 			if name in unreasonable_voltages:
 				name = '[BAD]_' + name
 			trace = go.Scatter(
-				x = this_series[x],
+				x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
 				y = this_series[y_name],
 				legendgroup=legend_group,
 				legendgrouptitle_text=legend_group,
@@ -127,7 +127,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, ansi_b
 	if fossil_loading_chart == True:
 		new_layout = go.Layout(
 			title = f"Fossil Genset Loading Percentage ({csvName})",
-			xaxis = dict(title = 'Time'),
+			xaxis = dict(title = 'Date'),
 			yaxis = dict(title = 'Fossil Percent Loading')
 			)
 		fossil_fig = plotly.graph_objs.Figure(fossil_traces, new_layout)
@@ -153,15 +153,15 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, ansi_b
 	total_fossil = fuel_consumption_rate_gallons_per_kwh * fossil_kwh_output
 	# add total fossil genset consumption to source plot title 
 	if "_source" in csvName or "_gen" in csvName:
-		title = f'{csvName} Output. Fossil consumption of gensets = {total_fossil}'
+		title = f'{chart_name}. Fossil consumption of gensets = {total_fossil}'
 	else:
-		title = f'{csvName} Output'
+		title = f'{chart_name}'
 
 	# plots for gen, load, source, control
 	layout = go.Layout(
 		title = title,
-		xaxis = dict(title = 'hour'),
-		yaxis = dict(title = str(y_list))
+		xaxis = dict(title = 'Date'),
+		yaxis = dict(title = y_axis_name)
 	)
 	fig = plotly.graph_objs.Figure(data, layout)
 	if ansi_bands == True:
@@ -288,9 +288,9 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		filePrefix=FPREFIX
 	)
 	# Generate the output charts.
-	make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, batt_cycle_chart=True, fossil_loading_chart=True)
-	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, dssTree, ansi_bands=True)
-	make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, fossil_loading_chart=True, vsource_ratings=big_gen_ratings)
-	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], 2019, microgrids, dssTree)
+	make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Generator Output", "kW per hour", batt_cycle_chart=True, fossil_loading_chart=True)
+	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, dssTree, "Load Voltage", "PU", ansi_bands=True)
+	make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Voltage Source Output", "kW per hour", fossil_loading_chart=True, vsource_ratings=big_gen_ratings)
+	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], 2019, microgrids, dssTree, "Tap Position", "PU")
 	# Undo directory change.
 	os.chdir(curr_dir)

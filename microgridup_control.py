@@ -172,6 +172,9 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 
 
 def play(pathToDss, workDir, microgrids, faultedLine):
+	# # show microgrids 
+	# print("microgrids",microgrids)
+	# return
 	# TODO: do we need non-default outage timing?
 	(outageStart, lengthOfOutage, switchingTime) = 60, 120, 30
 	outageEnd = outageStart + lengthOfOutage
@@ -269,6 +272,62 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 				open {line_name}
 				calcv
 			'''
+
+		# Do vector subtraction to figure out battery loadshapes. 
+		# First get all loads.
+		all_mg_loads = [
+			ob for ob in dssTree
+			if ob.get('bus1','x.x').split('.')[0] == gen_bus
+			and 'load.' in ob.get('object')
+		]
+		if len(all_mg_loads) > 0: # i.e. if we have loads
+			load_loadshapes = []
+			for load_idx in range(len(all_mg_loads)):
+				# Get loadshapes of all renewable generation.
+				load_loadshape_name = all_mg_loads[load_idx].get('yearly')
+				load_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and load_loadshape_name in ob.get("object")]
+				list_load_loadshape = [float(shape) for shape in load_loadshape[0][1:-1].split(",")]
+				load_loadshapes.append(list_load_loadshape)
+			data = np.array(load_loadshapes)
+			cum_load_loadshapes = np.sum(data,0)
+
+		# Second, get all renewable generation.
+		all_mg_rengen = [
+			ob for ob in dssTree
+			if ob.get('bus1','x.x').split('.')[0] == gen_bus
+			and ('generator.solar' in ob.get('object') or 'generator.wind' in ob.get('object'))
+		]
+		if len(all_mg_rengen) > 0: # i.e. if we have rengen
+			rengen_loadshapes = []
+			for gen_idx in range(len(all_mg_rengen)):
+				# Get loadshapes of all renewable generation.
+				rengen_loadshape_name = all_mg_rengen[gen_idx].get('yearly')
+				rengen_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and rengen_loadshape_name in ob.get("object")]
+				list_rengen_loadshape = [float(shape) for shape in rengen_loadshape[0][1:-1].split(",")]
+				rengen_loadshapes.append(list_rengen_loadshape)
+			data = np.array(rengen_loadshapes)
+			cum_rengen_loadshapes = np.sum(data,0)
+
+		# Third, get all batteries.
+		all_mg_batt = [
+			ob for ob in dssTree
+			if ob.get('bus1','x.x').split('.')[0] == gen_bus
+			and 'storage' in ob.get('object')
+		]
+		if len(all_mg_batt) > 0: # i.e. if we have a battery
+			for batt_idx in range(len(all_mg_batt)):
+				# Get the existing battery loadshape.
+				batt_loadshape_name = all_mg_batt[batt_idx].get('yearly')
+				batt_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")]
+				list_batt_loadshape = [float(shape) for shape in load_loadshape[0][1:-1].split(",")]
+
+	
+		# TO DO
+		# Combine loadshapes of all renewable generation.
+		# Subtract renewables from load to create new battery loadshape. 
+		# Insert battery loadshape into dss. 
+
+
 
 	# print("big_gen_ratings",big_gen_ratings)
 

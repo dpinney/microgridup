@@ -264,7 +264,9 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 	'''	Notes: Existing solar and diesel are supported natively in REopt.
 		If turned on, diesel_total_calc is used to set the total amount of fossil generation.
 		Existing wind and batteries require setting the minimimum generation threshold (windMin, batteryPowerMin, batteryCapacityMin) 
-		explicitly to the existing generator sizes in REopt'''
+		explicitly to the existing generator sizes in REopt
+		SIDE EFFECTS: If additional kwh but not additional kw above existing battery kw is recommended by REopt,
+		 gen_sizes will show new batteries with kwh>0 but kw = 0.  This side effect is handled explicitly in '''
 	solar_size_total = reopt_out.get(f'sizePV{mg_num}', 0.0)
 	solar_size_existing = reopt_out.get(f'sizePVExisting{mg_num}', 0.0)
 	solar_size_new = solar_size_total - solar_size_existing
@@ -649,7 +651,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 			windToBat = pd.Series(reopt_out.get(f'powerWindToBattery{mg_num}'))
 		battery_load = batToLoad - gridToBat - pVToBat - fossilToBat - windToBat
 	# get DSS objects and loadshapes for new battery
-	# if additional battery power of more than 5 kw is recommended by REopt, give existing batteries loadshape of zeros and add in full sized new battery
+	# if additional battery power is recommended by REopt, give existing batteries loadshape of zeros and add in full sized new battery
 	if battery_pow_new > 0:
 		# print("build_new_gen() 1a")
 		gen_obs.append({

@@ -1,6 +1,6 @@
 from microgridup import *
 
-'''Test to confirm existing and new natural gas backup with FOSSIL_BACKUP_PERCENT = 1'''
+'''Test to confirm all 3 potential outcomes for existing batteries (new, new+ existing, use existing only) assuming natural gas backup with FOSSIL_BACKUP_PERCENT = 1'''
 
 if __name__ == '__main__':
 	# Input data.
@@ -55,6 +55,7 @@ if __name__ == '__main__':
 		"solarCanCurtail": True,
 		"solarCanExport": True,
 		"dieselOnlyRunsDuringOutage": False
+		# "batteryMacrsOptionYears": 0
 	}
 	MICROGRIDS = {
 		'mg0': {
@@ -82,7 +83,7 @@ if __name__ == '__main__':
 			'loads': ['645_hangar','646_office'],
 			'switch': '632645',
 			'gen_bus': '646',
-			'gen_obs_existing': [],
+			'gen_obs_existing': ['battery_646_existing'],
 			'critical_load_kws': [30,70]
 		}
 	}

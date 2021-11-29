@@ -1202,6 +1202,18 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
 								- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis)
 		year_one_OM = reopt_out.get(f'yearOneOMCostsBeforeTax{mg_num}', 0.0)
+		# When an existing battery and new battery are suggested by the model, need to add back in the existing inverter cost
+		if battery_pow_new == battery_pow_existing and battery_pow_existing != 0: 
+			npv_existing_gen_adj = npv_existing_gen_adj \
+								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+								- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis)
+			cap_ex_existing_gen_adj = cap_ex_existing_gen_adj \
+								+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+								+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis)
+			cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives_existing_gen_adj \
+								+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+								+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis)
+
 		# take away the 1kw fossil gen cost if necessary
 		if fossil_output_one_kw == True:
 			cap_ex_existing_gen_adj = cap_ex_existing_gen_adj - 1*reopt_out.get(f'dieselGenCost{mg_num}', 0.0)

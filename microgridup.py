@@ -82,7 +82,7 @@ def set_fossil_max_kw(FOSSIL_BACKUP_PERCENT, max_crit_load):
 	print("fossil_max_kw:", fossil_max_kw)
 	return fossil_max_kw
 
-def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load):
+def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load, mg_name):
 	''' Generate the microgrid specs with REOpt.
 	SIDE-EFFECTS: generates REOPT_FOLDER'''
 	load_df = pd.read_csv(LOAD_NAME)
@@ -151,17 +151,19 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 		if allInputData['solar'] == 'on':
 			allInputData['solarMin'] = '1'	
 
+		# Workflow to deal with existing generators in the microgrid and analyze for these in REopt
+		# This workflow requires pre-selection of all objects in a given microgrid in microgrids['gen_obs_existing']
+		# Multiple existing gens of any type except batteries are permitted
 		# Pull out and add up kw of all existing generators in the microgrid
-		# requires pre-selection of all objects in a given microgrid in microgrids['gen_obs_existing']
 		load_map = {x.get('object',''):i for i, x in enumerate(tree)}
-		# TODO: update for CHP and other types of generation
+
 		solar_kw_exist = []
 		fossil_kw_exist = []
 		battery_kw_exist = []
 		battery_kwh_exist = []
 		wind_kw_exist = []
-		gen_obs = microgrid['gen_obs_existing']
-		for gen_ob in gen_obs:
+		gen_obs_existing = microgrid['gen_obs_existing']
+		for gen_ob in gen_obs_existing:
 			if gen_ob.startswith('solar_'):
 				solar_kw_exist.append(float(tree[load_map[f'generator.{gen_ob}']].get('kw')))
 			elif gen_ob.startswith('fossil_'):
@@ -176,7 +178,20 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 		if sum(solar_kw_exist) > 0:
 			allInputData['solarExisting'] = str(sum(solar_kw_exist))
 			allInputData['solar'] = 'on'
-		if sum(battery_kwh_exist) > 0:
+		# do not analyze existing batteries if multiple existing batteries exist
+		if len(battery_kwh_exist) > 1:
+			allInputData['batteryKwExisting'] = 0
+			allInputData['batteryKwhExisting'] = 0
+			multiple_existing_battery_message = f'More than one existing battery storage asset is specified on microgrid {mg_name}. Configuration of microgrid controller is not assumed to control multiple existing batteries, and thus all existing batteries will be removed from analysis of {mg_name}.\n'
+			print(multiple_existing_battery_message)
+			if path.exists("user_warnings.txt"):
+				with open("user_warnings.txt", "r+") as myfile:
+					if multiple_existing_battery_message not in myfile.read():
+						myfile.write(multiple_existing_battery_message)
+			else:
+				with open("user_warnings.txt", "a") as myfile:
+					myfile.write(multiple_existing_battery_message)
+		elif sum(battery_kwh_exist) > 0:
 			allInputData['batteryKwExisting'] = str(sum(battery_kw_exist))
 			allInputData['batteryPowerMin'] = str(sum(battery_kw_exist))
 			allInputData['batteryKwhExisting'] = str(sum(battery_kwh_exist))
@@ -549,6 +564,8 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	gen_obs_existing = mg_ob['gen_obs_existing']
 	#print("microgrid:", microgrid)
 	phase_and_kv = mg_phase_and_kv(BASE_NAME, microgrid, mg_name)
+	tree = dssConvert.dssToTree(BASE_NAME)
+	gen_map = {x.get('object',''):i for i, x in enumerate(tree)}\
 	
 	# Build new solar gen objects and loadshapes
 	solar_size_total = gen_sizes.get('solar_size_total')
@@ -570,8 +587,9 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	if solar_size_existing > 0:
 		for gen_ob_existing in gen_obs_existing:
 			if gen_ob_existing.startswith('solar_'):
-				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerPV{mg_num}'))/solar_size_total*solar_size_existing 
-				#HACK Implemented: TODO: IF multiple existing solar generator objects are in gen_obs, we need to scale the output loadshapes by their rated kW 
+				# get kw rating for this generator from the DSS tree
+				gen_kw = float(tree[gen_map[f'generator.{gen_ob_existing}']].get('kw',''))
+				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerPV{mg_num}'))/solar_size_total*gen_kw 
 	
 	# Build new fossil gen objects and loadshapes
 	fossil_size_total = gen_sizes.get('fossil_size_total')
@@ -594,15 +612,15 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 			'h':'2'
 		})
 		# 0-1 scale the power output loadshape to the total generation kw of that type of generator
-		gen_df_builder[f'fossil_{gen_bus_name}'] = pd.Series(reopt_out.get(f'powerDiesel{mg_num}'))/fossil_size_total*fossil_size_new # insert the 0-1 fossil generation shape provided by REopt to simulate the outage specified in REopt
+		gen_df_builder[f'fossil_{gen_bus_name}'] = pd.Series(reopt_out.get(f'powerDiesel{mg_num}'))/fossil_size_total*fossil_size_new 
 		# TODO: if using real loadshapes for fossil, need to scale them based on rated kw of the new fossil
 		# gen_df_builder[f'fossil_{gen_bus_name}'] = pd.Series(np.zeros(8760)) # insert an array of zeros for the fossil generation shape to simulate no outage
-	# build loadshapes for existing generation from BASE_NAME, inputting the 0-1 fossil generation loadshape 
+	# build loadshapes for multiple existing fossil generators from BASE_NAME, inputting the 0-1 fossil generation loadshape and multiplying by the kw of the existing gen
 	if fossil_size_existing > 0:	
 		for gen_ob_existing in gen_obs_existing:
 			if gen_ob_existing.startswith('fossil_'):
-				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerDiesel{mg_num}'))/fossil_size_total*fossil_size_existing # insert the 0-1 fossil generation shape provided by REopt to simulate the outage specified in REopt
-				# TODO: if using real loadshapes for fossil, need to scale them based on rated kw of that individual generator object
+				gen_kw = float(tree[gen_map[f'generator.{gen_ob_existing}']].get('kw',''))
+				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerDiesel{mg_num}'))/fossil_size_total*gen_kw
 				# gen_df_builder[f'{gen_ob_existing}'] = pd.Series(np.zeros(8760)) # insert an array of zeros for the fossil generation shape to simulate no outage
 	
 	# Build new wind gen objects and loadshapes
@@ -625,8 +643,8 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	if wind_size_existing > 0:	
 		for gen_ob_existing in gen_obs_existing:
 			if gen_ob_existing.startswith('wind_'):
-				#HACK Implemented: TODO: IF multiple existing wind generator objects are in gen_obs, we need to scale the output loadshapes by their rated kW
-				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerWind{mg_num}'))/wind_size_total*wind_size_existing
+				gen_kw = float(tree[gen_map[f'generator.{gen_ob_existing}']].get('kw',''))
+				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerWind{mg_num}'))/wind_size_total*gen_kw
 
 	# calculate battery loadshape (serving load - charging load)
 	battery_cap_total = gen_sizes.get('battery_cap_total')
@@ -718,7 +736,8 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 			# if only additional energy storage (kWh) is recommended, scale the existing shape to the % of kwh storage capacity of the existing battery
 			elif battery_cap_new > 0:
 				# print("build_new_gen() storage 5", gen_ob_existing)
-				gen_df_builder[f'{gen_ob_existing}'] = battery_load/battery_cap_total*battery_cap_existing
+				# batt_kwh = float(tree[gen_map[f'storage.{gen_ob_existing}']].get('kwhrated',''))
+				gen_df_builder[f'{gen_ob_existing}'] = battery_load/battery_cap_total*battery_cap_existing #batt_kwh
 			# if no new battery has been built, existing battery takes the full battery load
 			else:
 	 			# print("build_new_gen() storage 6", gen_ob_existing)
@@ -832,9 +851,9 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 
 	for i, ob in enumerate(tree):
 		try:
-			print("ob:", ob)
+			# print("ob:", ob)
 			ob_string = ob.get('object','')
-			print("ob_string:", ob_string)
+			# print("ob_string:", ob_string)
 			# reset shape_data to be blank before every run of the loop
 			shape_data = None
 			# since this loop can execute deletions of generator and load shape objects in the tree, update the load map after every run of the loop
@@ -858,17 +877,17 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 					}
 			# insert loadshapes for generator objects
 			elif ob_string.startswith('generator.'):
-				print("1_gen:", ob)
+				# print("1_gen:", ob)
 				ob_name = ob_string[10:]
 				# print('ob_name:', ob_name)
 				shape_name = ob_name + '_shape'
 				# insert loadshape for existing generators
 				if ob_name.endswith('_existing'):
 					# TODO: if actual production loadshape is available for a given object, insert it, else use synthetic loadshapes as defined here
-					print("2_gen:", ob)
+					# print("2_gen:", ob)
 					# if object is outside of microgrid and without a loadshape, give it a valid production loadshape for solar and wind or a loadshape of zeros for fossil
 					if ob_name not in gen_obs_existing and f'loadshape.{shape_name}' not in load_map:					
-						print("3_gen:", ob)
+						# print("3_gen:", ob)
 						if ob_name.startswith('fossil_'):
 							# print("3a_gen:", ob)
 							ob['yearly'] = shape_name
@@ -882,7 +901,7 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 								'mult': f'{list(shape_data)}'.replace(' ','')
 							}
 						elif ob_name.startswith('solar_'):
-							print("3b_gen:", ob)
+							# print("3b_gen:", ob)
 							ob['yearly'] = shape_name
 							# TODO: Fix loadshape to match actual production potential of the generator using a reference shapes from the first run of REopt
 							# scale 1kw reference loadshape by kw rating of generator
@@ -919,18 +938,18 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 							#pass
 					# if generator object is located in the microgrid, insert new loadshape object
 					elif ob_name in gen_obs_existing:
-						print("4_gen:", ob)
+						# print("4_gen:", ob)
 						# if loadshape object already exists, overwrite the 8760 hour data in ['mult']
 						# ASSUMPTION: Existing generators will be reconfigured to be controlled by new microgrid
 						if f'loadshape.{shape_name}' in load_map:
-							print("4a_gen:", ob)
+							# print("4a_gen:", ob)
 							j = load_map.get(f'loadshape.{shape_name}') # indexes of load_map and tree match				
 							shape_data = gen_df[ob_name]
 							# print("shape data:", shape_name, shape_data.head(20))
 							tree[j]['mult'] = f'{list(shape_data)}'.replace(' ','')
 							# print("4a_gen achieved insert")
 						else:
-							print("4b_gen:", ob)
+							# print("4b_gen:", ob)
 							ob['yearly'] = shape_name
 							shape_data = gen_df[ob_name]
 							# print('shape_data', shape_data.head(10))
@@ -944,7 +963,7 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 							}
 				# insert loadshape for new generators with shape_data in GEN_NAME
 				elif f'loadshape.{shape_name}' not in load_map:
-					print("5_gen:", ob)
+					# print("5_gen:", ob)
 					# shape_name = ob_name + '_shape'
 					ob['yearly'] = shape_name
 					shape_data = gen_df[ob_name]
@@ -959,16 +978,16 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 					}
 			# insert loadshapes for storage objects
 			elif ob_string.startswith('storage.'):
-				print("1_storage:", ob)
+				# print("1_storage:", ob)
 				ob_name = ob_string[8:]
 				shape_name = ob_name + '_shape'
 				
 				# TODO: if actual power production loadshape is available for a given storage object, insert it, else use synthetic loadshapes as defined here
 				if ob_name.endswith('_existing'):
-					print("2_storage:", ob_name)
+					# print("2_storage:", ob_name)
 					# if object is outside of microgrid and without a loadshape, give it a loadshape of zeros
 					if ob_name not in gen_obs_existing and f'loadshape.{shape_name}' not in load_map:					
-						print("3_storage:", ob_name)
+						# print("3_storage:", ob_name)
 						ob['yearly'] = shape_name
 						shape_data = list_of_zeros
 						shape_insert_list[i] = {
@@ -981,7 +1000,7 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 						}
 					
 					elif ob_name in gen_obs_existing:
-						print("4_storage:", ob_name)
+						# print("4_storage:", ob_name)
 						# HACK implemented here to erase unused existing batteries from the dss file
 						# if the loadshape of an existing battery is populated as zeros in build_new_gen_ob_and_shape(), this object is not in use and should be erased along with its loadshape
 						if sum(gen_df[ob_name]) == 0:
@@ -989,7 +1008,7 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 							# print("load_map before existing battery deletion:", load_map)
 							ob_deletion_list.append(ob_string)
 							# del tree[i]
-							# Does this in-line deletion mean that load_map and tree no longer match up?
+							# Does this in-line deletion mean that load_map and tree no longer match up? Yes
 							# load_map = {x.get('object',''):i for i, x in enumerate(tree)}
 							# print("load_map after existing battery deletion:", load_map)
 							# if f'loadshape.{shape_name}' in load_map:
@@ -1002,7 +1021,7 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 						# if loadshape object already exists and is not zeros, overwrite the 8760 hour data in ['mult']
 						# ASSUMPTION: Existing generators in gen_obs_existing will be reconfigured to be controlled by new microgrid
 						elif f'loadshape.{shape_name}' in load_map:
-							print("4b_storage:", ob_name)
+							# print("4b_storage:", ob_name)
 							j = load_map.get(f'loadshape.{shape_name}') # indexes of load_map and tree match				
 							shape_data = gen_df[ob_name]
 							# print(shape_name, 'shape_data:', shape_data.head(20))
@@ -1010,7 +1029,7 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 							# print(shape_name, "tree[j]['mult']:", tree[j]['mult'][:20])
 							# print("4a_storage achieved insert")
 						else:
-							print("4c_storage:", ob_name)
+							# print("4c_storage:", ob_name)
 							ob['yearly'] = shape_name
 							shape_data = gen_df[ob_name]
 							shape_insert_list[i] = {
@@ -1025,7 +1044,7 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 							# print("4b_storage achieved insert")
 				# insert loadshapes for new storage objects with shape_data in GEN_NAME
 				elif f'loadshape.{shape_name}' not in load_map:
-					print("5_storage", ob_name)
+					# print("5_storage", ob_name)
 					shape_data = gen_df[ob_name]
 					ob['yearly'] = shape_name
 					shape_insert_list[i] = {
@@ -1045,7 +1064,7 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 		min_pos = min(shape_insert_list.keys())
 		tree.insert(min_pos, shape_insert_list[key])
 
-	# Delete unused existing battery objects and their loadshpaes from the tree
+	# Delete unused existing battery objects and their loadshapes from the tree
 	load_map = {x.get('object',''):i for i, x in enumerate(tree)}
 	for ob_string in ob_deletion_list:
 		i = load_map.get(ob_string)
@@ -1223,7 +1242,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
 								- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis)
 		year_one_OM = reopt_out.get(f'yearOneOMCostsBeforeTax{mg_num}', 0.0)
-		# When an existing battery and new battery are suggested by the model, need to add back in the existing inverter cost
+		# When an existing battery and new battery are suggested by the model, need to add back in the existing inverter cost:
 		if battery_pow_new == battery_pow_existing and battery_pow_existing != 0: 
 			npv_existing_gen_adj = npv_existing_gen_adj \
 								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
@@ -1494,7 +1513,7 @@ def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
 
 def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, FAULTED_LINE, mg_name, ADD_COST_NAME, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR = False, open_results=True):
 	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_NAME, microgrid, mg_name)
-	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load)
+	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load, mg_name)
 	
 	# to run microgridup with automatic feedback loop to update fossil size, include the following:
 	# net_load = max_net_load('/allOutputData.json', REOPT_FOLDER_BASE)

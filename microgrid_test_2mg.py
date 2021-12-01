@@ -68,7 +68,7 @@ if __name__ == '__main__':
 			'loads': ['675a_hospital','675b_residential1','675c_residential1','692_warehouse2'],
 			'switch': '671692',
 			'gen_bus': '675',
-			'gen_obs_existing': ['battery_675_existing'],
+			'gen_obs_existing': ['battery_675_existing', 'battery_675_2_existing'],
 			'critical_load_kws': [150,200,200]
 		}
 	}

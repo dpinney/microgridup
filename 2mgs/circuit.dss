@@ -60,6 +60,7 @@ new object=generator.wind_634_existing bus1=634.1 phases=1 kv=0.277 kw=200 pf=1
 ! new object=generator.solar_675_existing bus1=675.1.2.3 phases=3 kv=2.4 kw=800 pf=1
 ! new object=generator.fossil_675_existing bus1=675.1.2.3 phases=3 kw=265 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2
 new object=storage.battery_675_existing bus1=675.1.2.3 phases=3 kv=2.4 kwrated=585 kwhstored=553 kwhrated=553 dispmode=default %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
+new object=storage.battery_675_2_existing bus1=675.1.2.3 phases=3 kv=2.4 kwrated=100 kwhstored=200 kwhrated=200 dispmode=default %charge=100 %discharge=100 %effcharge=100 %effdischarge=100 %idlingkw=1 %r=0 %x=50
 
 ! microgrid m2 generator definitions
 ! new object=generator.solar_684_existing bus1=684.3 kv=2.4 kw=432 pf=1

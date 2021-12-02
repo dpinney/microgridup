@@ -27,6 +27,10 @@ if __name__ == '__main__':
 		"windCost" : "4989",
 		"batteryPowerCost" : "840",
 		"batteryCapacityCost" : "420",
+		"batteryPowerCostReplace" : "410",
+		"batteryCapacityCostReplace" : "200",
+		"batteryPowerReplaceYear": '10', # year at which batteryPowerCostReplace (the inverter) is reinstalled, one time
+		"batteryCapacityReplaceYear": '10', # year at which batteryCapacityCostReplace (the battery cells) is reinstalled, one time		
 		"dieselGenCost": "1000",
 		"solarMin": 0,
 		"windMin": 0,

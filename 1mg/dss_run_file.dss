@@ -24,6 +24,7 @@ new object=monitor.monload-670c_residential2 element=load.670c_residential2 term
 new object=monitor.mongenerator-solar_634_existing element=generator.solar_634_existing terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-solar_675_existing element=generator.solar_675_existing terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-fossil_684_existing element=generator.fossil_684_existing terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-fossil_646_existing element=generator.fossil_646_existing terminal=1 mode=1 ppolar=no
 new object=monitor.moncapacitor-cap1 element=capacitor.cap1 terminal=1 mode=6
 new object=monitor.moncapacitor-cap2 element=capacitor.cap2 terminal=1 mode=6
 new object=monitor.mongenerator-battery_670 element=storage.battery_670 terminal=1 mode=1 ppolar=no
@@ -381,6 +382,7 @@ export monitors monitorname=monload-670c_residential2
 export monitors monitorname=mongenerator-solar_634_existing
 export monitors monitorname=mongenerator-solar_675_existing
 export monitors monitorname=mongenerator-fossil_684_existing
+export monitors monitorname=mongenerator-fossil_646_existing
 export monitors monitorname=moncapacitor-cap1
 export monitors monitorname=moncapacitor-cap2
 export monitors monitorname=mongenerator-battery_670

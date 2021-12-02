@@ -554,7 +554,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	will need to implement searching the tree of FULL_NAME to find kw ratings of existing gens'''
 
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER)
-	print("build_new_gen_ob_and_shape() gen_sizes into OpenDSS:", gen_sizes)
+	# print("build_new_gen_ob_and_shape() gen_sizes into OpenDSS:", gen_sizes)
 	reopt_out = json.load(open(REOPT_FOLDER + '/allOutputData.json'))
 	gen_df_builder = pd.DataFrame()
 	gen_obs = []
@@ -733,7 +733,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 				print(warning_message)
 				with open("user_warnings.txt", "a") as myfile:
 					myfile.write(warning_message)
-			# if only additional energy storage (kWh) is recommended, scale the existing shape to the % of kwh storage capacity of the existing battery
+			# if only additional energy storage (kWh) is recommended, scale the existing battery shape to the % of kwh storage capacity of the existing battery
 			elif battery_cap_new > 0:
 				# print("build_new_gen() storage 5", gen_ob_existing)
 				# batt_kwh = float(tree[gen_map[f'storage.{gen_ob_existing}']].get('kwhrated',''))
@@ -1218,41 +1218,43 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) + mg_add_cost # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
 		
 		years_of_analysis = reopt_out.get(f'analysisYears{mg_num}', 0.0)
+		battery_replacement_year = reopt_out.get(f'batteryCapacityReplaceYear{mg_num}', 0.0)
+		inverter_replacement_year = reopt_out.get(f'batteryPowerReplaceYear{mg_num}', 0.0)
 		discount_rate = reopt_out.get(f'discountRate{mg_num}', 0.0)
 		# TODO: Once incentive structure is finalized, update NPV and cap_ex_after_incentives calculation to include depreciation over time if appropriate
 		# economic outcomes with the capital costs of existing wind and batteries deducted:
 		npv_existing_gen_adj = npv \
 								+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) * .82 \
 								+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-								+ battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis) \
+								+ battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-battery_replacement_year) \
 								+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-								+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis)
+								+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 		cap_ex_existing_gen_adj = cap_ex \
 								- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
 								- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-								- battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis) \
+								- battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-battery_replacement_year) \
 								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-								- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis)
+								- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 		#TODO: UPDATE cap_ex_after_incentives_existing_gen_adj in 2022 to erase the 18% cost reduction for wind above 100kW as it will have ended
 		# TODO: Update the cap_ex_after_incentives_existing_gen_adj with ITC if it becomes available for batteries
 		cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives \
 								- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0)*.82 \
 								- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-								- battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis) \
+								- battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-battery_replacement_year) \
 								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-								- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis)
+								- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 		year_one_OM = reopt_out.get(f'yearOneOMCostsBeforeTax{mg_num}', 0.0)
 		# When an existing battery and new battery are suggested by the model, need to add back in the existing inverter cost:
 		if battery_pow_new == battery_pow_existing and battery_pow_existing != 0: 
 			npv_existing_gen_adj = npv_existing_gen_adj \
 								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-								- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis)
+								- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 			cap_ex_existing_gen_adj = cap_ex_existing_gen_adj \
 								+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-								+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis)
+								+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 			cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives_existing_gen_adj \
 								+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-								+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis)
+								+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 
 		# take away the 1kw fossil gen cost if necessary
 		if fossil_output_one_kw == True:
@@ -1383,39 +1385,40 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	#TODO: Once incentive structure is finalized, update NPV and cap_ex_after_incentives calculation to include depreciation over time if appropriate, and tenth year replacement of batteries
 	# economic outcomes with the capital costs of existing wind and batteries deducted:
 	years_of_analysis = reopt_out.get(f'analysisYears{mg_num}', 0.0)
+	battery_replacement_year = reopt_out.get(f'batteryCapacityReplaceYear{mg_num}', 0.0)
+	inverter_replacement_year = reopt_out.get(f'batteryPowerReplaceYear{mg_num}', 0.0)
 	discount_rate = reopt_out.get(f'discountRate{mg_num}', 0.0)
 	npv_existing_gen_adj = npv \
 							+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) * .82 \
 							+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-							+ battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis) \
+							+ battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-battery_replacement_year) \
 							+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-							+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis)
+							+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 	cap_ex_existing_gen_adj = cap_ex \
 							- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
 							- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-							- battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis) \
+							- battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-battery_replacement_year) \
 							- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-							- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis)
+							- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 	cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives \
 							- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
 							- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-							- battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis) \
+							- battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-battery_replacement_year) \
 							- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-							- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis)
-			# When an existing battery and new battery are suggested by the model, need to add back in the existing inverter cost
+							- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
+	# When an existing battery and new battery are suggested by the model, need to add back in the existing inverter cost
 	if battery_pow_new == battery_pow_existing and battery_pow_existing != 0: 
 		npv_existing_gen_adj = npv_existing_gen_adj \
 							- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-							- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis)
+							- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 		cap_ex_existing_gen_adj = cap_ex_existing_gen_adj \
 							+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-							+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis)
+							+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 		cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives_existing_gen_adj \
 							+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-							+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1-discount_rate)**years_of_analysis)
+							+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 
 	year_one_OM = reopt_out.get(f'yearOneOMCostsBeforeTax{mg_num}', 0.0)
-	# TODO: update years_of_analysis to pull from reopt_out once variable ['Financial']['analysis_years'] is a user input
 	if fossil_output_one_kw == True:
 		cap_ex_existing_gen_adj = cap_ex_existing_gen_adj - 1*reopt_out.get(f'dieselGenCost{mg_num}', 0.0)
 		cap_ex_after_incentives = cap_ex_after_incentives_existing_gen_adj - 1*reopt_out.get(f'dieselGenCost{mg_num}', 0.0)

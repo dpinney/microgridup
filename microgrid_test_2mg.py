@@ -27,6 +27,10 @@ if __name__ == '__main__':
 		"windCost" : "1500",
 		"batteryPowerCost" : "840",
 		"batteryCapacityCost" : "420",
+		"batteryPowerCostReplace" : "410",
+		"batteryCapacityCostReplace" : "200",
+		"batteryPowerReplaceYear": '10', # year at which batteryPowerCostReplace (the inverter) is reinstalled, one time
+		"batteryCapacityReplaceYear": '10', # year at which batteryCapacityCostReplace (the battery cells) is reinstalled, one time
 		"dieselGenCost": "500",
 		"solarMin": 0,
 		"windMin": 0,
@@ -68,7 +72,7 @@ if __name__ == '__main__':
 			'loads': ['675a_hospital','675b_residential1','675c_residential1','692_warehouse2'],
 			'switch': '671692',
 			'gen_bus': '675',
-			'gen_obs_existing': ['battery_675_existing'],
+			'gen_obs_existing': ['battery_675_existing', 'battery_675_2_existing'],
 			'critical_load_kws': [150,200,200]
 		}
 	}

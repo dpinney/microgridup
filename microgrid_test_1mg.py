@@ -1,4 +1,4 @@
-'''Test file with 1 microgrid matching the loads and existing gens 
+'''Test file with 1 microgrid for all loads and with multiple existing gens of all types
 in microgrid_test_4mg.py for economic comparison'''
 
 from microgridup import *
@@ -28,21 +28,25 @@ if __name__ == '__main__':
 		"windCost" : "4989",
 		"batteryPowerCost" : "840",
 		"batteryCapacityCost" : "420",
+		"batteryPowerCostReplace" : "410",
+		"batteryCapacityCostReplace" : "200",
+		"batteryPowerReplaceYear": '10', # year at which batteryPowerCostReplace (the inverter) is reinstalled, one time
+		"batteryCapacityReplaceYear": '10', # year at which batteryCapacityCostReplace (the battery cells) is reinstalled, one time
 		"dieselGenCost": "1000",
 		"solarMin": 0,
 		"windMin": 0,
 		"batteryPowerMin": 0,
 		"batteryCapacityMin": 0,
-		"solarMax": "100000",
-		"windMax": "100000",
-		"batteryPowerMax": "1000000",
-		"batteryCapacityMax": "1000000",
-		"dieselMax": "1000000",
+		"solarMax": "10000",
+		"windMax": "1000",
+		"batteryPowerMax": "10000",
+		"batteryCapacityMax": "10000",
+		"dieselMax": "10000",
 		"solarExisting": 0,
 		"criticalLoadFactor": "1",
 		#"outage_start_hour": "200",
 		"outageDuration": "48",
-		"fuelAvailable": "100000",
+		"fuelAvailable": "150000",
 		"genExisting": 0,
 		"minGenLoading": 0,
 		"batteryKwExisting": 0,
@@ -62,7 +66,7 @@ if __name__ == '__main__':
 			'loads': ['634a_data_center','634b_radar','634c_atc_tower','675a_hospital','675b_residential1','675c_residential1','692_warehouse2','684_command_center','652_residential','611_runway','645_hangar','646_office'],
 			'switch': '650632',
 			'gen_bus': '670',
-			'gen_obs_existing': ['solar_634_existing','battery_634_existing','solar_675_existing','fossil_684_existing','battery_684_existing'],
+			'gen_obs_existing': ['solar_634_existing','solar_675_existing','fossil_684_existing', 'fossil_646_existing', 'battery_634_existing', 'battery_684_existing'],
 			'critical_load_kws': [70,90,10,150,200,200,400,20,30,70,0,0]
 		}
 	}

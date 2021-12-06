@@ -307,29 +307,72 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 				rengen_loadshapes.append(list_rengen_loadshape)
 			data = np.array(rengen_loadshapes)
 			cum_rengen_loadshapes = np.sum(data,0)
-
-		# Third, get all batteries.
-		all_mg_batt = [
+		
+		# Third, get battery sizes.
+		batt_obj = [
 			ob for ob in dssTree
 			if ob.get('bus1','x.x').split('.')[0] == gen_bus
 			and 'storage' in ob.get('object')
 		]
-		if len(all_mg_batt) > 0: # i.e. if we have a battery
-			for batt_idx in range(len(all_mg_batt)):
-				# Get the existing battery loadshape.
-				batt_loadshape_name = all_mg_batt[batt_idx].get('yearly')
-				batt_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")]
-				list_batt_loadshape = [float(shape) for shape in load_loadshape[0][1:-1].split(",")]
+		if len(batt_obj) > 1:
+			print("ERROR: MORE THAN ONE BATTERY AT BUS")
+		batt_kw = float(batt_obj[0].get("kwrated"))
+		batt_kwh = float(batt_obj[0].get("kwhrated"))
 
-	
-		# TO DO
-		# Combine loadshapes of all renewable generation.
-		# Subtract renewables from load to create new battery loadshape. 
-		# Insert battery loadshape into dss. 
+		# Subtract vectors.
+		new_batt_loadshape = cum_load_loadshapes - cum_rengen_loadshapes # NOTE: <-- load – rengen. 3 cases: above 0, 0, less than 0
 
+		# Slice to outage length.
+		new_batt_loadshape = new_batt_loadshape[outageStart:outageEnd]
 
+		# Set starting battery capacity. starting_capacity will then be modified to represent dischargeable generation.
+		starting_capacity = batt_kwh
 
-	# print("big_gen_ratings",big_gen_ratings)
+		# Unneccessary variable for tracking unsupported load in kwh.
+		unsupported_load_kwh = 0
+
+		# Discharge battery (allowing for negatives that recharge (until hitting capacity)) until battery reaches 0 charge. Allow starting charge to be configurable. 
+		hour = 0
+		while starting_capacity > 0 and hour < len(new_batt_loadshape):
+			# Reduce each value in DS until 0, batt_kw, or starting_capacity reaches 0
+			if starting_capacity < batt_kw:
+				batt_kw = starting_capacity
+			indicator = new_batt_loadshape[hour] - batt_kw 
+			# There is more rengen than load and we can charge our battery (up until reaching batt_kwh).
+			if new_batt_loadshape[hour] < 0:
+				starting_capacity += abs(new_batt_loadshape[hour])
+				if starting_capacity > batt_kwh:
+					starting_capacity = batt_kwh
+				new_batt_loadshape[hour] = starting_capacity - new_batt_loadshape[hour]
+			# There is load left to cover and we can discharge the battery to cover it in its entirety. 
+			elif indicator < 0:
+				starting_capacity -= new_batt_loadshape[hour]
+				new_batt_loadshape[hour] *= -1 
+			# There is load left to cover after discharging as much battery as possible for the hour. Load isn't supported.
+			else:
+				new_batt_loadshape[hour] = -1 * batt_kw
+				starting_capacity -= batt_kw
+				unsupported_load_kwh += indicator
+			hour += 1
+
+		# If there are remaining values in loadshape, set them to 0.
+		if hour < lengthOfOutage:
+			new_batt_loadshape[hour:] = [0 for x in new_batt_loadshape[hour:]]
+		new_batt_loadshape = list(new_batt_loadshape)
+
+		# Get existing battery loadshape. 
+		batt_loadshape_name = batt_obj[0].get("yearly")
+		full_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")]
+		list_full_loadshape = [float(shape) for shape in full_loadshape[0][1:-1].split(",")]
+
+		# Replace outage of existing battery loadshape with outage loadshape.
+		final_batt_loadshape = list_full_loadshape[:outageStart] + new_batt_loadshape + list_full_loadshape[outageEnd:]
+
+		# Get index of battery in tree.
+		batt_loadshape_idx = dssTree.index([ob for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")][0])
+
+		# Replace mult with new loadshape and reinsert into tree.
+		dssTree[batt_loadshape_idx]['mult'] = str(list_full_loadshape).replace(" ","")
 
 	# Additional calcv to make sure the simulation runs.
 	actions[outageStart] += f'calcv\n'

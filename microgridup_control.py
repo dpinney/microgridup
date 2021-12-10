@@ -534,6 +534,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		os.chdir(workDir)
 	# Read in the circuit information.
 	dssTree = dssConvert.dssToTree(pathToDss)
+	# print("HERE ARE THE SOURCES",[ob for ob in dssTree if 'source' in ob.get('object','')])
 	# Add the fault, modeled as a 3 phase open, to the actions.
 	actions[outageStart] = f'''
 		open object=line.{faultedLine} term=1
@@ -603,7 +604,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 
 			# Remove fossil unit, add new gen and line
 			del dssTree[big_gen_index]
-			dssTree.insert(big_gen_index, {'!CMD':'new', 'object':vsource_ob_and_name, 'bus1':new_bus_name, 'basekv':base_kv})
+			dssTree.insert(big_gen_index, {'!CMD':'new', 'object':vsource_ob_and_name, 'basekv':base_kv, 'bus1':new_bus_name})
 			# print("dssTree[big_gen_index]",dssTree[big_gen_index])
 			dssTree.insert(big_gen_index, {'!CMD':'new', 'object':line_name, 'bus1':big_gen_bus, 'bus2':new_bus_name, 'switch':'yes'})
 			# Disable the new lead gen by default.
@@ -681,7 +682,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 
 		# Discharge battery (allowing for negatives that recharge (until hitting capacity)) until battery reaches 0 charge. Allow starting charge to be configurable. 
 		hour = 0
-		while starting_capacity > 0 and hour < len(new_batt_loadshape):
+		while hour < len(new_batt_loadshape):
 			# Reduce each value in DS until 0, batt_kw, or starting_capacity reaches 0
 			if starting_capacity < batt_kw:
 				batt_kw = starting_capacity
@@ -689,9 +690,11 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			# There is more rengen than load and we can charge our battery (up until reaching batt_kwh).
 			if new_batt_loadshape[hour] < 0:
 				starting_capacity += abs(new_batt_loadshape[hour])
+				surplus = 0 # Note: this variable stores how much rengen we need to curb per step. Create a cumulative sum to find overall total.
 				if starting_capacity > batt_kwh:
+					surplus = starting_capacity - batt_kwh
 					starting_capacity = batt_kwh
-				new_batt_loadshape[hour] = starting_capacity - new_batt_loadshape[hour]
+				new_batt_loadshape[hour] = starting_capacity - (starting_capacity + new_batt_loadshape[hour] + surplus)
 			# There is load left to cover and we can discharge the battery to cover it in its entirety. 
 			elif indicator < 0:
 				starting_capacity -= new_batt_loadshape[hour]
@@ -702,11 +705,6 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 				starting_capacity -= batt_kw
 				unsupported_load_kwh += indicator
 			hour += 1
-
-		# If there are remaining values in loadshape, set them to 0.
-		if hour < lengthOfOutage:
-			new_batt_loadshape[hour:] = [0 for x in new_batt_loadshape[hour:]]
-		new_batt_loadshape = list(new_batt_loadshape)
 
 		# Get existing battery loadshape. 
 		batt_loadshape_name = batt_obj[0].get("yearly")
@@ -742,7 +740,6 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 
 	# Merge gen and source csvs for plotting fossil loading percentages
 	inputs = [f'{FPREFIX}_gen.csv', f'{FPREFIX}_source.csv']
-
 	# First determine the field names from the top line of each input file
 	fieldnames = []
 	for filename in inputs:
@@ -752,7 +749,6 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			for h in headers:
 				if h not in fieldnames:
 					fieldnames.append(h)
-
 	# Then copy the data
 	with open(f"{FPREFIX}_source_and_gen.csv", "w", newline="") as f_out:
 		writer = csv.DictWriter(f_out, fieldnames=fieldnames)

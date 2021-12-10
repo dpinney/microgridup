@@ -583,7 +583,8 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			if ob.get('bus1','x.x').split('.')[0] == gen_bus
 			and 'fossil' in ob.get('object')
 		]
-		all_mg_fossil.sort(key=lambda x:x.get('kw'))
+		all_mg_fossil.sort(key=lambda x:float(x.get('kw')))
+		# print("all_mg_fossil",all_mg_fossil)
 		# Insert a vsource for the largest fossil unit in each microgrid.
 		if len(all_mg_fossil) > 0: # i.e. if we have a fossil generator
 			# vsource variables.
@@ -603,6 +604,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			# Remove fossil unit, add new gen and line
 			del dssTree[big_gen_index]
 			dssTree.insert(big_gen_index, {'!CMD':'new', 'object':vsource_ob_and_name, 'bus1':new_bus_name, 'basekv':base_kv})
+			# print("dssTree[big_gen_index]",dssTree[big_gen_index])
 			dssTree.insert(big_gen_index, {'!CMD':'new', 'object':line_name, 'bus1':big_gen_bus, 'bus2':new_bus_name, 'switch':'yes'})
 			# Disable the new lead gen by default.
 			actions[1] += f'''

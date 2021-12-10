@@ -674,8 +674,13 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		# Slice to outage length.
 		new_batt_loadshape = new_batt_loadshape[outageStart:outageEnd]
 
-		# Set starting battery capacity. starting_capacity will then be modified to represent dischargeable generation.
-		starting_capacity = batt_kwh
+		# Get existing battery loadshape. 
+		batt_loadshape_name = batt_obj[0].get("yearly")
+		full_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")]
+		list_full_loadshape = [float(shape) for shape in full_loadshape[0][1:-1].split(",")]
+
+		# Find battery's starting capacity based on charge and discharge history by the start of the outage.
+		starting_capacity = batt_kwh + sum(list_full_loadshape[:outageStart])
 
 		# Unneccessary variable for tracking unsupported load in kwh.
 		unsupported_load_kwh = 0
@@ -683,7 +688,6 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		# Discharge battery (allowing for negatives that recharge (until hitting capacity)) until battery reaches 0 charge. Allow starting charge to be configurable. 
 		hour = 0
 		while hour < len(new_batt_loadshape):
-			# Reduce each value in DS until 0, batt_kw, or starting_capacity reaches 0
 			if starting_capacity < batt_kw:
 				batt_kw = starting_capacity
 			indicator = new_batt_loadshape[hour] - batt_kw 
@@ -706,12 +710,8 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 				unsupported_load_kwh += indicator
 			hour += 1
 
-		# Get existing battery loadshape. 
-		batt_loadshape_name = batt_obj[0].get("yearly")
-		full_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")]
-		list_full_loadshape = [float(shape) for shape in full_loadshape[0][1:-1].split(",")]
-
-		# Replace outage of existing battery loadshape with outage loadshape.
+		# Replace outage portion of existing battery loadshape with outage loadshape.
+		new_batt_loadshape = list(new_batt_loadshape)
 		final_batt_loadshape = list_full_loadshape[:outageStart] + new_batt_loadshape + list_full_loadshape[outageEnd:]
 
 		# Get index of battery in tree.

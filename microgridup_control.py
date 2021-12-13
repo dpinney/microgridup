@@ -62,7 +62,8 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 			if "lead_gen_" in ob_name and not this_series[y_name].isnull().values.any(): 
 				fossil_kwh_output += sum(this_series[y_name])
 				# if lead_gen_ and not null values, divide by provided kw rating to create loading percentage series
-				fossil_kw_rating = vsource_ratings[ob_name.split("-")[1]]  
+				fossil_kw_rating = vsource_ratings[ob_name.split("-")[1]]
+				# print("ob_name",ob_name,"y_name",y_name,"vsource_ratings",vsource_ratings,"fossil_kw_rating",fossil_kw_rating)  
 				fossil_percent_loading = [(x / float(fossil_kw_rating)) * 100 for x in this_series[y_name]]
 				# add traces for fossil loading percentages to graph variable
 				fossil_trace = go.Scatter(
@@ -75,7 +76,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 					hoverlabel = dict(namelength = -1)
 					)
 				fossil_traces.append(fossil_trace)
-				# print("ob_name",ob_name,"this_series[y_name][58:62]",this_series[y_name][58:62],"fossil_kw_rating",fossil_kw_rating,"fossil_percent_loading[58:62]",fossil_percent_loading[58:62])
+				# print("ob_name",ob_name,"y_name",y_name,"this_series[y_name][58:62]",this_series[y_name][58:62],"fossil_kw_rating",fossil_kw_rating,"fossil_percent_loading[58:62]",fossil_percent_loading[58:62])
 
 			# if fossil_ and not null values, add total output to running tally
 			if "fossil_" in ob_name and not this_series[y_name].isnull().values.any():
@@ -183,6 +184,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		os.chdir(workDir)
 	# Read in the circuit information.
 	dssTree = dssConvert.dssToTree(pathToDss)
+	# print("HERE ARE THE SOURCES",[ob for ob in dssTree if 'source' in ob.get('object','')])
 	# Add the fault, modeled as a 3 phase open, to the actions.
 	actions[outageStart] = f'''
 		open object=line.{faultedLine} term=1
@@ -232,7 +234,8 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			if ob.get('bus1','x.x').split('.')[0] == gen_bus
 			and 'fossil' in ob.get('object')
 		]
-		all_mg_fossil.sort(key=lambda x:x.get('kw'))
+		all_mg_fossil.sort(key=lambda x:float(x.get('kw')))
+		# print("all_mg_fossil",all_mg_fossil)
 		# Insert a vsource for the largest fossil unit in each microgrid.
 		if len(all_mg_fossil) > 0: # i.e. if we have a fossil generator
 			# vsource variables.
@@ -248,11 +251,12 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 
 			# Before removing fossil unit, grab kW rating 
 			big_gen_ratings[f"lead_gen_{safe_busname}"] = big_gen_ob.get("kw")
-			# print("big_gen_ob",big_gen_ob)
 
 			# Remove fossil unit, add new gen and line
 			del dssTree[big_gen_index]
-			dssTree.insert(big_gen_index, {'!CMD':'new', 'object':vsource_ob_and_name, 'bus1':new_bus_name, 'basekv':base_kv})
+			dssTree.insert(big_gen_index, {'!CMD':'new', 'object':vsource_ob_and_name, 'basekv':base_kv, 'bus1':new_bus_name})
+			# dssTree.insert(big_gen_index, {'!CMD':'new', 'object':vsource_ob_and_name, 'basekv':base_kv, 'bus1':new_bus_name, 'pu':1.00, 'r1':0, 'x1':0.0001, 'r0':0, 'x0':0.0001})
+			# print("dssTree[big_gen_index]",dssTree[big_gen_index])
 			dssTree.insert(big_gen_index, {'!CMD':'new', 'object':line_name, 'bus1':big_gen_bus, 'bus2':new_bus_name, 'switch':'yes'})
 			# Disable the new lead gen by default.
 			actions[1] += f'''
@@ -312,6 +316,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		]
 		if len(batt_obj) > 1:
 			print("ERROR: MORE THAN ONE BATTERY AT BUS")
+		print("batt_obj",batt_obj)
 		batt_kw = float(batt_obj[0].get("kwrated"))
 		batt_kwh = float(batt_obj[0].get("kwhrated"))
 
@@ -321,7 +326,15 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		# Slice to outage length.
 		new_batt_loadshape = new_batt_loadshape[outageStart:outageEnd]
 
-		# Set starting battery capacity. starting_capacity will then be modified to represent dischargeable generation.
+		# Get existing battery loadshape. 
+		batt_loadshape_name = batt_obj[0].get("yearly")
+		full_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")]
+		list_full_loadshape = [float(shape) for shape in full_loadshape[0][1:-1].split(",")]
+
+		# Find battery's starting capacity based on charge and discharge history by the start of the outage.
+		starting_capacity = batt_kwh + sum(list_full_loadshape[:outageStart])
+
+		# Or, simply set starting_capacity to the batt_kwh, assuming the battery starts the outage at full charge. 
 		starting_capacity = batt_kwh
 
 		# Unneccessary variable for tracking unsupported load in kwh.
@@ -329,17 +342,18 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 
 		# Discharge battery (allowing for negatives that recharge (until hitting capacity)) until battery reaches 0 charge. Allow starting charge to be configurable. 
 		hour = 0
-		while starting_capacity > 0 and hour < len(new_batt_loadshape):
-			# Reduce each value in DS until 0, batt_kw, or starting_capacity reaches 0
+		while hour < len(new_batt_loadshape):
 			if starting_capacity < batt_kw:
 				batt_kw = starting_capacity
 			indicator = new_batt_loadshape[hour] - batt_kw 
 			# There is more rengen than load and we can charge our battery (up until reaching batt_kwh).
 			if new_batt_loadshape[hour] < 0:
 				starting_capacity += abs(new_batt_loadshape[hour])
+				surplus = 0 # Note: this variable stores how much rengen we need to curb per step. Create a cumulative sum to find overall total.
 				if starting_capacity > batt_kwh:
+					surplus = starting_capacity - batt_kwh
 					starting_capacity = batt_kwh
-				new_batt_loadshape[hour] = starting_capacity - new_batt_loadshape[hour]
+				new_batt_loadshape[hour] = starting_capacity - (starting_capacity + new_batt_loadshape[hour] + surplus)
 			# There is load left to cover and we can discharge the battery to cover it in its entirety. 
 			elif indicator < 0:
 				starting_capacity -= new_batt_loadshape[hour]
@@ -351,17 +365,8 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 				unsupported_load_kwh += indicator
 			hour += 1
 
-		# If there are remaining values in loadshape, set them to 0.
-		if hour < lengthOfOutage:
-			new_batt_loadshape[hour:] = [0 for x in new_batt_loadshape[hour:]]
+		# Replace outage portion of existing battery loadshape with outage loadshape.
 		new_batt_loadshape = list(new_batt_loadshape)
-
-		# Get existing battery loadshape. 
-		batt_loadshape_name = batt_obj[0].get("yearly")
-		full_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")]
-		list_full_loadshape = [float(shape) for shape in full_loadshape[0][1:-1].split(",")]
-
-		# Replace outage of existing battery loadshape with outage loadshape.
 		final_batt_loadshape = list_full_loadshape[:outageStart] + new_batt_loadshape + list_full_loadshape[outageEnd:]
 
 		# Get index of battery in tree.
@@ -369,6 +374,8 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 
 		# Replace mult with new loadshape and reinsert into tree.
 		dssTree[batt_loadshape_idx]['mult'] = str(list_full_loadshape).replace(" ","")
+
+	# print("big_gen_ratings",big_gen_ratings)
 
 	# Additional calcv to make sure the simulation runs.
 	actions[outageStart] += f'calcv\n'
@@ -385,10 +392,34 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		actions=actions,
 		filePrefix=FPREFIX
 	)
+
+	# Merge gen and source csvs for plotting fossil loading percentages
+	inputs = [f'{FPREFIX}_gen.csv', f'{FPREFIX}_source.csv']
+	# First determine the field names from the top line of each input file
+	fieldnames = []
+	for filename in inputs:
+		with open(filename, "r", newline="") as f_in:
+			reader = csv.reader(f_in)
+			headers = next(reader)
+			for h in headers:
+				if h not in fieldnames:
+					fieldnames.append(h)
+	# Then copy the data
+	with open(f"{FPREFIX}_source_and_gen.csv", "w", newline="") as f_out:
+		writer = csv.DictWriter(f_out, fieldnames=fieldnames)
+		writer.writeheader()
+		for filename in inputs:
+			with open(filename, "r", newline="") as f_in:
+				reader = csv.DictReader(f_in)  # Uses the field names in this file
+				for line in reader:
+					writer.writerow(line)
+	
 	# Generate the output charts.
-	make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Generator Output", "Average hourly kW", batt_cycle_chart=True, fossil_loading_chart=True)
+	make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Generator Output", "Average hourly kW", batt_cycle_chart=True)
 	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, dssTree, "Load Voltage", "PU", ansi_bands=True)
-	make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Voltage Source Output", "Average hourly kW", fossil_loading_chart=True, vsource_ratings=big_gen_ratings)
+	make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Voltage Source Output", "Average hourly kW", vsource_ratings=big_gen_ratings)
 	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], 2019, microgrids, dssTree, "Tap Position", "PU")
+	make_chart(f'{FPREFIX}_source_and_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "None", "None", fossil_loading_chart=True, vsource_ratings=big_gen_ratings)
+
 	# Undo directory change.
 	os.chdir(curr_dir)

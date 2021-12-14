@@ -113,16 +113,17 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 			name = ob_name + '_' + y_name
 			if name in unreasonable_voltages:
 				name = '[BAD]_' + name
-			trace = go.Scatter(
-				x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
-				y = this_series[y_name],
-				legendgroup=legend_group,
-				legendgrouptitle_text=legend_group,
-				showlegend = True,
-				name = name,
-				hoverlabel = dict(namelength = -1)
-			)
-			data.append(trace)
+			if not this_series[y_name].isnull().values.any():
+				trace = go.Scatter(
+					x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
+					y = this_series[y_name],
+					legendgroup=legend_group,
+					legendgrouptitle_text=legend_group,
+					showlegend = True,
+					name = name,
+					hoverlabel = dict(namelength = -1)
+				)
+				data.append(trace)
 	
 	# make fossil genset loading plot
 	if fossil_loading_chart == True:

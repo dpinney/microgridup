@@ -8,7 +8,7 @@ if __name__ == '__main__':
 	MODEL_DIR = '1mg'
 	BASE_DSS = 'lehigh_base_1mg.dss'
 	LOAD_CSV = 'lehigh_load.csv'
-	FAULTED_LINE = '670671'
+	FAULTED_LINE = '670671' # Why this line, which is not closing off the genbus from source?
 	QSTS_STEPS = 24*20
 	FOSSIL_BACKUP_PERCENT = 1
 	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth

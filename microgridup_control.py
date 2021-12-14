@@ -317,7 +317,15 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		]
 		if len(batt_obj) > 1:
 			print("ERROR: MORE THAN ONE BATTERY AT BUS")
-		print("batt_obj",batt_obj)
+			batt_obj.sort(key=lambda x:float(x.get('kwhrated')), reversed=True)
+			# Delete all but the largest batery object.
+			# batts_deleted = []
+			# for ob_idx in range(len(batt_obj)-1):
+			# 	batts_deleted.append(batt_obj[ob_idx])
+			# 	batt_idx = dssTree.index(batt_obj[ob_idx])
+			# 	del dssTree[batt_idx]
+			# print("Deleted battery objects:",batts_deleted)
+		# print("batt_obj",batt_obj)
 		batt_kw = float(batt_obj[0].get("kwrated"))
 		batt_kwh = float(batt_obj[0].get("kwhrated"))
 

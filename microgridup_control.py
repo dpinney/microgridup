@@ -343,9 +343,8 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		# Discharge battery (allowing for negatives that recharge (until hitting capacity)) until battery reaches 0 charge. Allow starting charge to be configurable. 
 		hour = 0
 		while hour < len(new_batt_loadshape):
-			if starting_capacity < batt_kw:
-				batt_kw = starting_capacity
-			indicator = new_batt_loadshape[hour] - batt_kw 
+			dischargeable = starting_capacity if starting_capacity < batt_kw else batt_kw
+			indicator = new_batt_loadshape[hour] - dischargeable 
 			# There is more rengen than load and we can charge our battery (up until reaching batt_kwh).
 			if new_batt_loadshape[hour] < 0:
 				starting_capacity += abs(new_batt_loadshape[hour])
@@ -360,8 +359,8 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 				new_batt_loadshape[hour] *= -1 
 			# There is load left to cover after discharging as much battery as possible for the hour. Load isn't supported.
 			else:
-				new_batt_loadshape[hour] = -1 * batt_kw
-				starting_capacity -= batt_kw
+				new_batt_loadshape[hour] = -1 * dischargeable
+				starting_capacity -= dischargeable
 				unsupported_load_kwh += indicator
 			hour += 1
 
@@ -373,7 +372,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		batt_loadshape_idx = dssTree.index([ob for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")][0])
 
 		# Replace mult with new loadshape and reinsert into tree.
-		dssTree[batt_loadshape_idx]['mult'] = str(list_full_loadshape).replace(" ","")
+		dssTree[batt_loadshape_idx]['mult'] = str(final_batt_loadshape).replace(" ","")
 
 	# print("big_gen_ratings",big_gen_ratings)
 

@@ -315,19 +315,16 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			if ob.get('bus1','x.x').split('.')[0] == gen_bus
 			and 'storage' in ob.get('object')
 		]
-		if len(batt_obj) > 1:
-			print("ERROR: MORE THAN ONE BATTERY AT BUS")
-			batt_obj.sort(key=lambda x:float(x.get('kwhrated')), reversed=True)
-			# Delete all but the largest batery object.
-			# batts_deleted = []
-			# for ob_idx in range(len(batt_obj)-1):
-			# 	batts_deleted.append(batt_obj[ob_idx])
-			# 	batt_idx = dssTree.index(batt_obj[ob_idx])
-			# 	del dssTree[batt_idx]
-			# print("Deleted battery objects:",batts_deleted)
-		# print("batt_obj",batt_obj)
-		batt_kw = float(batt_obj[0].get("kwrated"))
-		batt_kwh = float(batt_obj[0].get("kwhrated"))
+		# If there are multiple batteries at one bus, combine their kW ratings and kWh capacities. 
+		batt_kws = []
+		batt_kwhs = []
+		batt_obj.sort(key=lambda x:float(x.get('kwhrated')))
+		# Create lists of all ratings and capacities and their sums. 
+		for ob in batt_obj:
+			batt_kws.append(float(ob.get("kwrated")))
+			batt_kwhs.append(float(ob.get("kwhrated")))
+		batt_kw = sum(batt_kws)
+		batt_kwh = sum(batt_kwhs)
 
 		# Subtract vectors.
 		new_batt_loadshape = cum_load_loadshapes - cum_rengen_loadshapes # NOTE: <-- load – rengen. 3 cases: above 0, 0, less than 0
@@ -335,15 +332,17 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		# Slice to outage length.
 		new_batt_loadshape = new_batt_loadshape[outageStart:outageEnd]
 
-		# Get existing battery loadshape. 
-		batt_loadshape_name = batt_obj[0].get("yearly")
-		full_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")]
-		list_full_loadshape = [float(shape) for shape in full_loadshape[0][1:-1].split(",")]
+		# Option 1: Find battery's starting capacity based on charge and discharge history by the start of the outage.
+		cum_loadshape = pd.Series()
+		# Get existing battery's(ies') loadshapes. 
+		for obj in batt_obj:
+			batt_loadshape_name = obj.get("yearly")
+			full_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")]
+			ds_full_loadshape = pd.Series([float(shape) for shape in full_loadshape[0][1:-1].split(",")])
+			cum_loadshape = cum_loadshape.add(ds_full_loadshape)
+		starting_capacity = batt_kwh + sum(cum_loadshape[:outageStart])
 
-		# Find battery's starting capacity based on charge and discharge history by the start of the outage.
-		starting_capacity = batt_kwh + sum(list_full_loadshape[:outageStart])
-
-		# Or, simply set starting_capacity to the batt_kwh, assuming the battery starts the outage at full charge. 
+		# Option 2: Set starting_capacity to the batt_kwh, assuming the battery starts the outage at full charge. 
 		starting_capacity = batt_kwh
 
 		# Unneccessary variable for tracking unsupported load in kwh.
@@ -373,15 +372,20 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 				unsupported_load_kwh += indicator
 			hour += 1
 
-		# Replace outage portion of existing battery loadshape with outage loadshape.
-		new_batt_loadshape = list(new_batt_loadshape)
-		final_batt_loadshape = list_full_loadshape[:outageStart] + new_batt_loadshape + list_full_loadshape[outageEnd:]
-
-		# Get index of battery in tree.
-		batt_loadshape_idx = dssTree.index([ob for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")][0])
-
-		# Replace mult with new loadshape and reinsert into tree.
-		dssTree[batt_loadshape_idx]['mult'] = str(final_batt_loadshape).replace(" ","")
+		# Replace each outage portion of the existing battery loadshapes with a proportion of the new loadshape equal to the proportion of the battery's kwh capacity to the total kwh capacity on the bus.
+		for idx in range(len(batt_kwhs)):
+			factor = batt_kwhs[idx] / batt_kwh
+			new_shape = list(new_batt_loadshape * factor)
+			# Get existing battery loadshape
+			batt_loadshape_name = batt_obj[idx].get("yearly")
+			full_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")]
+			list_full_loadshape = [float(shape) for shape in full_loadshape[0][1:-1].split(",")]
+			# Replace outage portion with outage loadshape.
+			final_batt_loadshape = list_full_loadshape[:outageStart] + new_shape + list_full_loadshape[outageEnd:]
+			# Get index of battery in tree. 
+			batt_loadshape_idx = dssTree.index([ob for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")][0])
+			# Replace mult with new loadshape and reinsert into tree.
+			dssTree[batt_loadshape_idx]['mult'] = str(final_batt_loadshape).replace(" ","")
 
 	# print("big_gen_ratings",big_gen_ratings)
 

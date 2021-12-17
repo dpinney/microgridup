@@ -182,15 +182,15 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 		if len(battery_kwh_exist) > 1:
 			allInputData['batteryKwExisting'] = 0
 			allInputData['batteryKwhExisting'] = 0
-			multiple_existing_battery_message = f'More than one existing battery storage asset is specified on microgrid {mg_name}. Configuration of microgrid controller is not assumed to control multiple existing batteries, and thus all existing batteries will be removed from analysis of {mg_name}.\n'
-			print(multiple_existing_battery_message)
-			if path.exists("user_warnings.txt"):
-				with open("user_warnings.txt", "r+") as myfile:
-					if multiple_existing_battery_message not in myfile.read():
-						myfile.write(multiple_existing_battery_message)
-			else:
-				with open("user_warnings.txt", "a") as myfile:
-					myfile.write(multiple_existing_battery_message)
+			# multiple_existing_battery_message = f'More than one existing battery storage asset is specified on microgrid {mg_name}. Configuration of microgrid controller is not assumed to control multiple existing batteries, and thus all existing batteries will be removed from analysis of {mg_name}.\n'
+			# print(multiple_existing_battery_message)
+			# if path.exists("user_warnings.txt"):
+			# 	with open("user_warnings.txt", "r+") as myfile:
+			# 		if multiple_existing_battery_message not in myfile.read():
+			# 			myfile.write(multiple_existing_battery_message)
+			# else:
+			# 	with open("user_warnings.txt", "a") as myfile:
+			# 		myfile.write(multiple_existing_battery_message)
 		elif sum(battery_kwh_exist) > 0:
 			allInputData['batteryKwExisting'] = str(sum(battery_kw_exist))
 			allInputData['batteryPowerMin'] = str(sum(battery_kw_exist))
@@ -653,10 +653,11 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	battery_pow_total = gen_sizes.get('battery_pow_total')
 	battery_pow_new = gen_sizes.get('battery_pow_new')
 	battery_pow_existing = gen_sizes.get('battery_pow_existing')
+	# calculate battery load
 	if battery_pow_total > 0:	
 		batToLoad = pd.Series(reopt_out.get(f'powerBatteryToLoad{mg_num}'))
 		gridToBat = np.zeros(8760)
-		# TO DO: add logic to update insertion of grid charging when Daniel's islanding framework is complete 	
+		# TO DO: add logic to update insertion of grid charging if microgird_control.py supports it 	
 		gridToBat = pd.Series(reopt_out.get(f'powerGridToBattery{mg_num}'))
 		pVToBat = np.zeros(8760)
 		if solar_size_total > 0:
@@ -669,7 +670,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 			windToBat = pd.Series(reopt_out.get(f'powerWindToBattery{mg_num}'))
 		battery_load = batToLoad - gridToBat - pVToBat - fossilToBat - windToBat
 	# get DSS objects and loadshapes for new battery
-	# if additional battery power is recommended by REopt, give existing batteries loadshape of zeros and add in full sized new battery
+	# if additional battery power is recommended by REopt, add in full sized new battery
 	if battery_pow_new > 0:
 		# print("build_new_gen() 1a")
 		gen_obs.append({
@@ -679,20 +680,18 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 			'phases':len(phase_and_kv['phases']),
 			'kv':phase_and_kv['kv'],
 			'kwrated':f'{battery_pow_total}',
-			'dispmode':'default',
+			'dispmode':'follow',
 			'kwhstored':f'{battery_cap_total}',
 			'kwhrated':f'{battery_cap_total}',
 			'%charge':'100',
 			'%discharge':'100',
-			'%effcharge':'100',
-			'%effdischarge':'100',
-			'%idlingkw':'0',
-			'%r':'0',
-			'%x':'50',
-			'%stored':'50'
+			'%effcharge':'96',
+			'%effdischarge':'96',
+			'%idlingkw':'0'
 		})
-		# new battery takes the full battery load, as existing is removed from service
-		gen_df_builder[f'battery_{gen_bus_name}'] = battery_load
+		# in this case the new battery takes the full battery load, as existing battery is removed from service
+		# in dispmode=follow, OpenDSS takes in a 0-1 loadshape and scales it by the kwrated
+		gen_df_builder[f'battery_{gen_bus_name}'] = battery_load/battery_pow_total
 	# if only additional energy storage (kWh) is recommended, add a battery of same power as existing battery with the recommended additional kWh
 	elif battery_cap_new > 0:
 		# print("build_new_gen() 1b")
@@ -704,20 +703,18 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 			'phases':len(phase_and_kv['phases']),
 			'kv':phase_and_kv['kv'],
 			'kwrated':f'{battery_pow_existing}', # in this case, battery_pow_existing = battery_pow_total
-			'dispmode':'default',
+			'dispmode':'follow',
 			'kwhstored':f'{battery_cap_new}',
 			'kwhrated':f'{battery_cap_new}',
 			'%charge':'100',
 			'%discharge':'100',
-			'%effcharge':'100',
-			'%effdischarge':'100',
-			'%idlingkw':'0',
-			'%r':'0',
-			'%x':'50',
-			'%stored':'50'
+			'%effcharge':'96',
+			'%effdischarge':'96',
+			'%idlingkw':'0'
 		})
-		# 0-1 scale the power output loadshape to the total storage kwh and multiply by the new energy storage kwh recommended
-		gen_df_builder[f'battery_{gen_bus_name}'] = battery_load/battery_cap_total*battery_cap_new
+		# 0-1 scale the power output loadshape to the total power, and multiply by the ratio of new energy storage kwh over the total storage kwh
+		# in dispmode=follow, OpenDSS takes in a 0-1 loadshape and auto scales it by the kwrated
+		gen_df_builder[f'battery_{gen_bus_name}'] = battery_load/battery_pow_total*battery_cap_new/battery_cap_total
 	
 	# build loadshapes for existing battery generation from BASE_NAME
 	for gen_ob_existing in gen_obs_existing:
@@ -737,11 +734,11 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 			elif battery_cap_new > 0:
 				# print("build_new_gen() storage 5", gen_ob_existing)
 				# batt_kwh = float(tree[gen_map[f'storage.{gen_ob_existing}']].get('kwhrated',''))
-				gen_df_builder[f'{gen_ob_existing}'] = battery_load/battery_cap_total*battery_cap_existing #batt_kwh
-			# if no new battery has been built, existing battery takes the full battery load
+				gen_df_builder[f'{gen_ob_existing}'] = battery_load/battery_pow_total*battery_cap_existing/battery_cap_total #batt_kwh
+			# if no new battery has been built, existing battery takes the full battery load, using 0-1 scale
 			else:
 	 			# print("build_new_gen() storage 6", gen_ob_existing)
-	 			gen_df_builder[f'{gen_ob_existing}'] = battery_load
+	 			gen_df_builder[f'{gen_ob_existing}'] = battery_load/battery_pow_total
 
 	gen_df_builder.to_csv(GEN_NAME, index=False)
 	return gen_obs
@@ -1176,7 +1173,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 							"Existing Solar (kW)", "New Solar (kW)", 
 							"Existing Battery Power (kW)", "Existing Battery Energy Storage (kWh)", "New Battery Power (kW)",
 							"New Battery Energy Storage (kWh)", "Existing Wind (kW)", "New Wind (kW)", 
-							"Total Generation on Microgrid (kW)", "Renewable Generation (% of Yr 1 kWh)", "Emissions (Yr 1 Tons CO2)", 
+							"Total Generation on Microgrid (kW)", "Renewable Generation (% of Annual kWh)", "Emissions (Yr 1 Tons CO2)", 
 							"Emissions Reduction (Yr 1 % CO2)", "Average Outage Survived (h)",
 							"O+M Costs (Yr 1 $ before tax)",
 							"CapEx ($)", "CapEx after Tax Incentives ($)", "Net Present Value ($)"])
@@ -1363,7 +1360,7 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	mg_dict["New Wind (kW)"] = round(wind_size_new)
 	total_gen = fossil_size_total + solar_size_total + battery_pow_total + wind_size_total
 	mg_dict["Total Generation on Microgrid (kW)"] = round(total_gen)
-	mg_dict["Renewable Generation (% of Yr 1 kWh)"] = round(reopt_out.get(f'yearOnePercentRenewable{mg_num}', 0.0))	
+	mg_dict["Renewable Generation (% of Annual kWh)"] = round(reopt_out.get(f'yearOnePercentRenewable{mg_num}', 0.0))	
 	mg_dict["Emissions (Yr 1 Tons CO2)"] = round(reopt_out.get(f'yearOneEmissionsTons{mg_num}', 0.0))
 	mg_dict["Emissions Reduction (Yr 1 % CO2)"] = round(reopt_out.get(f'yearOneEmissionsReducedPercent{mg_num}', 0.0))
 	# min_outage = reopt_out.get(f'minOutage{mg_num}')
@@ -1485,11 +1482,11 @@ def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
 	reps['New Wind (kW)'].append(round(sum(reps['New Wind (kW)'])))
 	reps['Total Generation on Microgrid (kW)'].append(round(sum(reps['Total Generation on Microgrid (kW)'])))
 	# calculate weighted average % renewables across all microgrids
-	renewables_perc_list = reps['Renewable Generation (% of Yr 1 kWh)']
+	renewables_perc_list = reps['Renewable Generation (% of Annual kWh)']
 	avg_load_list = reps['Average 1 hr Load (kW)']
 	wgtd_avg_renewables_perc = sum([renewables_perc_list[i]/100 * avg_load_list[i] for i in range(len(renewables_perc_list))])/sum(avg_load_list[:-1])*100 # remove the final item of avg_load, which is the sum of the list entries from 'Average 1 hr Load (kW)' above
 	# print("wgtd_avg_renewables_perc:", wgtd_avg_renewables_perc)
-	reps['Renewable Generation (% of Yr 1 kWh)'].append(round(wgtd_avg_renewables_perc))
+	reps['Renewable Generation (% of Annual kWh)'].append(round(wgtd_avg_renewables_perc))
 	# using yr 1 emissions and percent reductions, calculate a weighted average of % reduction in emissions for yr 1
 	yr1_emis = reps['Emissions (Yr 1 Tons CO2)']
 	reps['Emissions (Yr 1 Tons CO2)'].append(round(sum(reps['Emissions (Yr 1 Tons CO2)'])))

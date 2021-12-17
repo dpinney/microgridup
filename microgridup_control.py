@@ -244,7 +244,6 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			and 'fossil' in ob.get('object')
 		]
 		all_mg_fossil.sort(key=lambda x:float(x.get('kw')))
-		# print("all_mg_fossil",all_mg_fossil)
 		# Insert a vsource for the largest fossil unit in each microgrid.
 		if len(all_mg_fossil) > 0: # i.e. if we have a fossil generator
 			# vsource variables.
@@ -383,7 +382,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		# Replace each outage portion of the existing battery loadshapes with a proportion of the new loadshape equal to the proportion of the battery's kwh capacity to the total kwh capacity on the bus.
 		for idx in range(len(batt_kwhs)):
 			factor = batt_kwhs[idx] / batt_kwh
-			new_shape = list(new_batt_loadshape * factor)
+			new_shape = list((new_batt_loadshape * factor)/batt_kws[idx])
 			# Get existing battery loadshape
 			batt_loadshape_name = batt_obj[idx].get("yearly")
 			full_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")]

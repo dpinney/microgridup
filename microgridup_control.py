@@ -24,7 +24,8 @@ from omf.solvers.opendss import dssConvert
 from omf.solvers import opendss
 
 def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_name, y_axis_name, ansi_bands=False, batt_cycle_chart=False, fossil_loading_chart=False, vsource_ratings=None):
-	# print("vsource_ratings",vsource_ratings)
+	(outageStart, lengthOfOutage, switchingTime) = 60, 120, 30
+	outageEnd = outageStart + lengthOfOutage
 	gen_data = pd.read_csv(csvName)
 	data = []
 	unreasonable_voltages = {}
@@ -34,27 +35,31 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 	fossil_kw_ratings = {}
 	fossil_traces = []
 	
-	# info we need from tree: every battery by name with corresponding kwhrated, every fossil gen by name with corresponding kw 
+	# Info we need from tree: every battery by name with corresponding kwhrated, every fossil gen by name with corresponding kw.
 	if batt_cycle_chart == True or fossil_loading_chart == True:
 		for item in tree:
 			if "generator.fossil" in item.get("object","x.x"):
 				fossil_kw_ratings[item.get("object").split(".")[1]] = item.get("kw")
 			if "storage.battery" in item.get("object","x.x"):
 				batt_kwh_ratings[item.get("object").split(".")[1]] = item.get("kwhrated")
-		# print("fossil_kw_ratings",fossil_kw_ratings)
-		# print("batt_kwh_ratings",batt_kwh_ratings)
 
-	# loop through objects in circuit
+	# Loop through objects in circuit.
 	for ob_name in set(gen_data[category_name]): 
-
-		# set appropriate legend group based on microgrid 
+		# Set appropriate legend group based on microgrid.
 		for key in microgrids:
-			if microgrids[key]['gen_bus'] in ob_name:
+			if microgrids[key]['gen_bus'] in ob_name or ob_name.split("-")[1] in microgrids[key]["loads"]:
 				legend_group = key
 				break
 			legend_group = "Not_in_MG"
 
-		# loop through phases
+		# HACK: Loads in 2mgs/3mgs must be doubled during outage. Loads in all mgs must be multipled by sqrt(3) during outage.
+		double, mult_sqrt3 = False, False
+		if legend_group == "mg0" or legend_group == "mg1":
+			mult_sqrt3 = True
+		if legend_group == "mg2" or legend_group == "mg3":
+			double, mult_sqrt3 = True, True
+
+		# Loop through phases.
 		for y_name in y_list: 
 			this_series = gen_data[gen_data[category_name] == ob_name]
 
@@ -76,9 +81,8 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 					hoverlabel = dict(namelength = -1)
 					)
 				fossil_traces.append(fossil_trace)
-				# print("ob_name",ob_name,"y_name",y_name,"this_series[y_name][58:62]",this_series[y_name][58:62],"fossil_kw_rating",fossil_kw_rating,"fossil_percent_loading[58:62]",fossil_percent_loading[58:62])
 
-			# if fossil_ and not null values, add total output to running tally
+			# if fossil_ and not null values, add total output to running tally.
 			if "fossil_" in ob_name and not this_series[y_name].isnull().values.any():
 				fossil_kwh_output += sum(abs(this_series[y_name]))
 				# if fossil_ and not null values, divide by kw rating to create loading percentage series  
@@ -96,20 +100,25 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 					)
 				fossil_traces.append(fossil_trace)
 
-			# if battery_ and not null values, count battery cycles 
+			# if battery_ and not null values, count battery cycles.
 			if "battery_" in ob_name and not this_series[y_name].isnull().values.any():
 				batt_kwh_input_output = sum(abs(this_series[y_name]))
 				batt_kwh_rating = batt_kwh_ratings[ob_name.split("-")[1]]
 				cycles = batt_kwh_input_output / (2 * float(batt_kwh_rating)) 
 				batt_cycles[f"{ob_name}_{y_name}"] = cycles
-				# print("batt_kwh_input_output",batt_kwh_input_output,"batt_kwh_rating",batt_kwh_rating,"cycles",cycles)
 
-			# flag loads that don't fall within ansi bands
+			# Flag loads that don't fall within ansi bands. Also continue HACK.
 			if "_load" in csvName:
+				# if double == True:
+					# this_series[y_name][outageStart-1:outageEnd-1] *= 2
+					# this_series[y_name].iloc[outageStart-1:outageEnd-1] *= 2
+				# if mult_sqrt3 == True:
+					# this_series[y_name][outageStart-1:outageEnd-1] *= math.sqrt(3)
+					# this_series[y_name].iloc[outageStart-1:outageEnd-1] *= math.sqrt(3)
 				if (this_series[y_name] > 1.1).any() or (this_series[y_name] < 0.9).any():
 					unreasonable_voltages[f"{ob_name}_{y_name}"] = ob_name
 
-			# traces for gen, load, source, control
+			# Traces for gen, load, source, control.
 			name = ob_name + '_' + y_name
 			if name in unreasonable_voltages:
 				name = '[BAD]_' + name
@@ -125,7 +134,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 				)
 				data.append(trace)
 	
-	# make fossil genset loading plot
+	# Make fossil genset loading plot.
 	if fossil_loading_chart == True:
 		new_layout = go.Layout(
 			title = f"Fossil Genset Loading Percentage ({csvName})",
@@ -135,7 +144,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 		fossil_fig = plotly.graph_objs.Figure(fossil_traces, new_layout)
 		plotly.offline.plot(fossil_fig, filename=f'{csvName}_fossil_loading.plot.html', auto_open=False)
 
-	# make battery cycles bar chart
+	# Make battery cycles bar chart.
 	if batt_cycle_chart == True:
 		# print("csvName",csvName, "batt_cycles",batt_cycles)
 		new_trace = go.Bar(
@@ -150,7 +159,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 		new_fig = plotly.graph_objs.Figure(new_trace, new_layout)
 		plotly.offline.plot(new_fig, filename=f'{csvName}_battery_cycles.plot.html', auto_open=False)
 
-	# calculate total fossil genset consumption
+	# Calculate total fossil genset consumption.
 	fuel_consumption_rate_gallons_per_kwh = 1 # <-- TO DO: is this a preset or an input?
 	total_fossil = fuel_consumption_rate_gallons_per_kwh * fossil_kwh_output
 	# add total fossil genset consumption to source plot title 
@@ -159,7 +168,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 	else:
 		title = f'{chart_name}'
 
-	# plots for gen, load, source, control
+	# Plots for gen, load, source, control.
 	layout = go.Layout(
 		title = title,
 		xaxis = dict(title = 'Date'),
@@ -185,7 +194,6 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		os.chdir(workDir)
 	# Read in the circuit information.
 	dssTree = dssConvert.dssToTree(pathToDss)
-	# print("HERE ARE THE SOURCES",[ob for ob in dssTree if 'source' in ob.get('object','')])
 	# Add the fault, modeled as a 3 phase open, to the actions.
 	actions[outageStart] = f'''
 		open object=line.{faultedLine} term=1

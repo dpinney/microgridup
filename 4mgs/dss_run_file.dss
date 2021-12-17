@@ -1,4 +1,4 @@
-redirect circuit_plusmg_3.dss
+redirect circuit_control.dss
 set datapath="/Users/matt2/Documents/NRECA/MicrogridUp/microgridup/4mgs"
 calcvoltagebases
 new object=monitor.monvsource-source element=vsource.source terminal=1 mode=0
@@ -28,19 +28,396 @@ new object=monitor.mongenerator-fossil_684_existing element=generator.fossil_684
 new object=monitor.mongenerator-battery_646_existing element=storage.battery_646_existing terminal=1 mode=1 ppolar=no
 new object=monitor.moncapacitor-cap1 element=capacitor.cap1 terminal=1 mode=6
 new object=monitor.moncapacitor-cap2 element=capacitor.cap2 terminal=1 mode=6
-new object=monitor.mongenerator-fossil_634 element=generator.fossil_634 terminal=1 mode=1 ppolar=no
+new object=monitor.monvsource-lead_gen_634_1 element=vsource.lead_gen_634_1 terminal=1 mode=0
 new object=monitor.mongenerator-solar_634 element=generator.solar_634 terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-battery_675 element=storage.battery_675 terminal=1 mode=1 ppolar=no
-new object=monitor.mongenerator-fossil_675 element=generator.fossil_675 terminal=1 mode=1 ppolar=no
+new object=monitor.monvsource-lead_gen_675_1_2_3 element=vsource.lead_gen_675_1_2_3 terminal=1 mode=0
 new object=monitor.mongenerator-solar_675 element=generator.solar_675 terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-battery_684 element=storage.battery_684 terminal=1 mode=1 ppolar=no
-new object=monitor.mongenerator-fossil_684 element=generator.fossil_684 terminal=1 mode=1 ppolar=no
+new object=monitor.monvsource-lead_gen_684_3 element=vsource.lead_gen_684_3 terminal=1 mode=0
 new object=monitor.mongenerator-solar_684 element=generator.solar_684 terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-battery_646 element=storage.battery_646 terminal=1 mode=1 ppolar=no
-new object=monitor.mongenerator-fossil_646 element=generator.fossil_646 terminal=1 mode=1 ppolar=no
+new object=monitor.monvsource-lead_gen_646_2 element=vsource.lead_gen_646_2 terminal=1 mode=0
 new object=monitor.mongenerator-solar_646 element=generator.solar_646 terminal=1 mode=1 ppolar=no
 set mode=yearly stepsize=60m 
-set number=480
+set number=1
+
+				open line.line_for_lead_gen_634_1
+				calcv
+			
+				open line.line_for_lead_gen_675_1_2_3
+				calcv
+			
+				open line.line_for_lead_gen_684_3
+				calcv
+			
+				open line.line_for_lead_gen_646_2
+				calcv
+			solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+
+		open object=line.670671 term=1
+		open object=line.670671 term=2
+		open object=line.670671 term=3
+	
+			open object=line.632633 term=1
+			open object=line.632633 term=2
+			open object=line.632633 term=3
+		
+				close line.line_for_lead_gen_634_1
+				calcv
+			
+			open object=line.671692 term=1
+			open object=line.671692 term=2
+			open object=line.671692 term=3
+		
+				close line.line_for_lead_gen_675_1_2_3
+				calcv
+			
+			open object=line.671684 term=1
+			open object=line.671684 term=2
+			open object=line.671684 term=3
+		
+				close line.line_for_lead_gen_684_3
+				calcv
+			
+			open object=line.632645 term=1
+			open object=line.632645 term=2
+			open object=line.632645 term=3
+		
+				close line.line_for_lead_gen_646_2
+				calcv
+			calcv
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+
+		close object=line.670671 term=1
+		close object=line.670671 term=2
+		close object=line.670671 term=3
+	
+			close object=line.632633 term=1
+			close object=line.632633 term=2
+			close object=line.632633 term=3
+		
+				open line.line_for_lead_gen_634_1
+				calcv
+			
+			close object=line.671692 term=1
+			close object=line.671692 term=2
+			close object=line.671692 term=3
+		
+				open line.line_for_lead_gen_675_1_2_3
+				calcv
+			
+			close object=line.671684 term=1
+			close object=line.671684 term=2
+			close object=line.671684 term=3
+		
+				open line.line_for_lead_gen_684_3
+				calcv
+			
+			close object=line.632645 term=1
+			close object=line.632645 term=2
+			close object=line.632645 term=3
+		
+				open line.line_for_lead_gen_646_2
+				calcv
+			calcv
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
 solve
 export monitors monitorname=monvsource-source
 export monitors monitorname=monvsource-secondsource
@@ -69,14 +446,14 @@ export monitors monitorname=mongenerator-fossil_684_existing
 export monitors monitorname=mongenerator-battery_646_existing
 export monitors monitorname=moncapacitor-cap1
 export monitors monitorname=moncapacitor-cap2
-export monitors monitorname=mongenerator-fossil_634
+export monitors monitorname=monvsource-lead_gen_634_1
 export monitors monitorname=mongenerator-solar_634
 export monitors monitorname=mongenerator-battery_675
-export monitors monitorname=mongenerator-fossil_675
+export monitors monitorname=monvsource-lead_gen_675_1_2_3
 export monitors monitorname=mongenerator-solar_675
 export monitors monitorname=mongenerator-battery_684
-export monitors monitorname=mongenerator-fossil_684
+export monitors monitorname=monvsource-lead_gen_684_3
 export monitors monitorname=mongenerator-solar_684
 export monitors monitorname=mongenerator-battery_646
-export monitors monitorname=mongenerator-fossil_646
+export monitors monitorname=monvsource-lead_gen_646_2
 export monitors monitorname=mongenerator-solar_646

@@ -1576,7 +1576,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	if open_results:
 		os.system(f'open {BIG_OUT_NAME}')
 
-def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, DIESEL_SAFETY_FACTOR=False, DELETE_FILES=False):
+def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, DIESEL_SAFETY_FACTOR=False, DELETE_FILES=False, open_results=False):
 	# CONSTANTS
 	MODEL_DSS = 'circuit.dss'
 	MODEL_LOAD_CSV = 'loads.csv'
@@ -1668,7 +1668,8 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 	FINAL_REPORT = 'output_final.html'
 	with open(FINAL_REPORT,'w') as outFile:
 		outFile.write(out)
-	os.system(f'open {FINAL_REPORT}')
+	if open_results:
+		os.system(f'open {FINAL_REPORT}')
 
 def _tests():
 	pass

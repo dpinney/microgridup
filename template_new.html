@@ -1,10 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>MicrogridUP - New</title>
+	<title>MicrogridUP &raquo; New</title>
+	<!-- <link rel='stylesheet' href='/template.css'/> -->
+	<style type="text/css">
+		body {margin:0; padding:0; border:0; font-family:sans-serif}
+	</style>
 </head>
-<body style="margin:0px; height:30px">
+<body>
+	<div style="height:40px; width:100%; background:black; line-height:40px; padding-left:10px;">
+		<p style="color:white; margin:0px"><a style="color:white; text-decoration:none" href="/"><b>MicrogridUP</b></a> &raquo; New</p>
+	</div>
 	<form action="/run" method="post" enctype="multipart/form-data">
+		<h3>General Inputs</h3>
 		<label for="MODEL_DIR">MODEL_DIR</label>
 		<input type="text" name="MODEL_DIR" value="{{in_data.MODEL_DIR}}">
 		{% if 'BASE_DSS' in in_data %}
@@ -31,9 +39,9 @@
 		<input type="text" name="DIESEL_SAFETY_FACTOR" value="{{in_data.DIESEL_SAFETY_FACTOR}}">
 		<label for="FOSSIL_BACKUP_PERCENT">FOSSIL_BACKUP_PERCENT</label>
 		<input type="text" name="FOSSIL_BACKUP_PERCENT" value="{{in_data.FOSSIL_BACKUP_PERCENT}}">
-		<h2>REOpt Inputs</h2>
+		<h3>REOpt Inputs</h3>
 		<textarea name="REOPT_INPUTS" rows="20" cols="100">{{in_data.REOPT_INPUTS | tojson}}</textarea>
-		<h2>Microgrid Definitions</h2>
+		<h3>Microgrid Definitions</h3>
 		<label for="MG_DEF_METHOD">MG_DEF_METHOD</label>
 		<select name="MG_DEF_METHOD">
 			<option value="manual" {% if in_data.MG_DEF_METHOD == 'manual' %}selected{% endif %}>Manual</option>

@@ -1654,8 +1654,6 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 	template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
 	# generate file map
 	out = template.render(
-		x='Daniel, David',
-		y='Matt, Thomas',
 		now=current_time,
 		summary=stats,
 		inputs=inputs, #TODO: Make the inputs clearer and maybe at the bottom, showing only the appropriate keys from MICROGRIDS as necessary

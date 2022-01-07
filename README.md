@@ -5,7 +5,7 @@ MicrogridUp Design Tool - for a given circuit, determine an optimal set of micro
 ## Installation (for Users)
 
 1. Install [Docker](https://docs.docker.com/get-docker/)
-1. Get the app `docker pull dpinney/microgridup`
+1. Get the app `docker pull ghcr.io/dpinney/microgridup:main`
 1. Start the app with `docker run -d -p 5000:5000 --name mgucont mguim`
 1. The web app will then be running at http://127.0.0.1:5000
 

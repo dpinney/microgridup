@@ -75,14 +75,12 @@ def run():
 		csv_file.save(f'{_myDir}/uploads/LOAD_CSV_{model_dir}')
 		dss_path = f'{_myDir}/uploads/BASE_DSS_{model_dir}'
 		csv_path = f'{_myDir}/uploads/LOAD_CSV_{model_dir}'
-		# print('HI MOM!!!!')
 	# Handle arguments to our main function.
 	crit_loads = flask.request.form['CRITICAL_LOADS'].split(',')
 	mg_method = flask.request.form['MG_DEF_METHOD']
 	if mg_method == 'manual':
 		microgrids = json.loads(flask.request.form['MICROGRIDS'])
 	elif mg_method == 'lukes':
-		# print('YO MOM LOOK', dss_path)
 		microgrids = microgridup_gen_mgs.mg_group(dss_path, crit_loads, 'lukes')
 	elif mg_method == 'branch':
 		microgrids = microgridup_gen_mgs.mg_group(dss_path, crit_loads, 'branch')

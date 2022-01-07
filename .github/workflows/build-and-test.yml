@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v2 # check-out the repository
       - name: Build With Docker
         run: |
-          docker build . - Dockerfile -t mguim
+          docker build . -f Dockerfile -t mguim
           sudo apt-get install wget
       - name: Test
         run: |

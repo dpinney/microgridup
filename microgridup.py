@@ -1563,12 +1563,10 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	mg_add_cost_dict_of_lists = pd.read_csv(ADD_COST_NAME).to_dict(orient='list')
 	template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
 	out = template.render(
-		x='Daniel, David',
-		y='Matt',
 		summary=mg_dict_of_lists_full,
 		inputs={'circuit':BASE_NAME,'loads':LOAD_NAME, 'Maximum Proportion of critical load to be served by fossil generation':FOSSIL_BACKUP_PERCENT, 'REopt inputs':REOPT_INPUTS,'microgrid':microgrid},
-		reopt_folders=[REOPT_FOLDER_FINAL],
-		added_costs = mg_add_cost_dict_of_lists
+		added_costs = mg_add_cost_dict_of_lists,
+		mg_names_and_reopt_folders = {mg_name:REOPT_FOLDER_FINAL}
 	)
 	#TODO: have an option where we make the template <iframe srcdoc="{{X}}"> to embed the html and create a single file.
 	with open(BIG_OUT_NAME,'w') as outFile:
@@ -1636,7 +1634,6 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 	# create an orderedDict of the mg_add_cost_files:
 	# mg_add_cost_dict_of_lists = pd.concat([pd.read_csv(x) for x in mg_add_cost_files]).to_dict(orient='list')
 	# print("mg_add_cost_dict_of_lists:",mg_add_cost_dict_of_lists)
-
 	# create a row-based list of lists of mg_add_cost_files
 	add_cost_rows = []
 	for file in mg_add_cost_files:
@@ -1645,7 +1642,6 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 			next(reader, None) #skip the header
 			for row in reader:
 				add_cost_rows.append([row[0],row[1],row[2],int(row[3])])
-	
 	current_time = datetime.datetime.now() 
 	warnings = "None"
 	if os.path.exists("user_warnings.txt"):
@@ -1653,15 +1649,17 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 			warnings = myfile.read()
 	template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
 	# generate file map
+	mg_names = list(MICROGRIDS.keys())
+	names_and_folders = {x[0]:x[1] for x in zip(mg_names, reopt_folders)}
 	out = template.render(
 		now=current_time,
 		summary=stats,
 		inputs=inputs, #TODO: Make the inputs clearer and maybe at the bottom, showing only the appropriate keys from MICROGRIDS as necessary
-		reopt_folders=reopt_folders,
 		warnings = warnings,
 		raw_files = _walkTree('.'),
 		model_name = MODEL_DIR,
-		add_cost_rows = add_cost_rows
+		add_cost_rows = add_cost_rows,
+		mg_names_and_reopt_folders = names_and_folders
 	)
 	FINAL_REPORT = 'output_final.html'
 	with open(FINAL_REPORT,'w') as outFile:

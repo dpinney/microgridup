@@ -30,8 +30,8 @@
 			<button onclick="openTab('map')">Map</button>
 			<button onclick="openTab('interconnection')">Interconnection</button>
 			<button onclick="openTab('control')">Control</button>
-			{% for reopt_folder in reopt_folders %}
-				<button onclick="openTab('{{reopt_folder}}')">{{reopt_folder}}</button>
+			{% for name, folder in mg_names_and_reopt_folders.items() %}
+				<button onclick="openTab('{{folder}}')">{{name}}</button>			
 			{% endfor %}
 			<button onclick="openTab('files')">Files</button>
 		</p>
@@ -108,9 +108,9 @@
 			<iframe src="timezcontrol_source_and_gen.csv_fossil_loading.plot.html"></iframe>
 		</div>
 	</div>
-	{% for reopt_folder in reopt_folders %}
-	<div id="{{reopt_folder}}" class="tab" style="visibility:hidden">
-		<iframe src="{{reopt_folder}}/inlineTemplate.html" style="height:100vh"></iframe>
+	{% for name, folder in mg_names_and_reopt_folders.items() %}
+	<div id="{{folder}}" class="tab" style="visibility:hidden">
+		<iframe src="{{folder}}/inlineTemplate.html" style="height:100vh"></iframe>
 	</div>
 	{% endfor %}
 	<div id="files" class="tab" style="visibility:hidden">

@@ -17,6 +17,7 @@ import re
 import math
 import random
 import datetime
+import traceback
 
 MGU_FOLDER = os.path.dirname(__file__)
 
@@ -1514,12 +1515,10 @@ def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
 def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, FAULTED_LINE, mg_name, ADD_COST_NAME, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR = False, open_results=True):
 	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_NAME, microgrid, mg_name)
 	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load, mg_name)
-	
 	# to run microgridup with automatic feedback loop to update fossil size, include the following:
 	# net_load = max_net_load('/allOutputData.json', REOPT_FOLDER_BASE)
 	# diesel_total_calc = diesel_sizing('/allOutputData.json',REOPT_FOLDER_BASE, DIESEL_SAFETY_FACTOR, net_load)
 	feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, microgrid, critical_load_percent, diesel_total_calc=False )
-	
 	# to run microgridup without automated fossil updates nor feedback loop, specify REOPT_FOLDER_BASE instead of REOPT_FOLDER_FINAL in build_new_gen_ob_and_shape(), microgrid_report_csv(), and microgrid_report_list_of_dicts(), the last argument of gen_existing_ref_shapes() and out = template.render() below, as well as reopt_folders to pull from _final_ in full()
 	# to run mgup with automated fossil updates, change the references back to REOPT_FOLDER_FINAL
 	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, diesel_total_calc=False)
@@ -1563,12 +1562,15 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	mg_add_cost_dict_of_lists = pd.read_csv(ADD_COST_NAME).to_dict(orient='list')
 	template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
 	out = template.render(
+<<<<<<< HEAD
 		x='Matt, David',
 		y='Thomas',
+=======
+>>>>>>> a1f39e46f4b735a104ead9dbf024a79523bb340d
 		summary=mg_dict_of_lists_full,
 		inputs={'circuit':BASE_NAME,'loads':LOAD_NAME, 'Maximum Proportion of critical load to be served by fossil generation':FOSSIL_BACKUP_PERCENT, 'REopt inputs':REOPT_INPUTS,'microgrid':microgrid},
-		reopt_folders=[REOPT_FOLDER_FINAL],
-		added_costs = mg_add_cost_dict_of_lists
+		added_costs = mg_add_cost_dict_of_lists,
+		mg_names_and_reopt_folders = {mg_name:REOPT_FOLDER_FINAL}
 	)
 	#TODO: have an option where we make the template <iframe srcdoc="{{X}}"> to embed the html and create a single file.
 	with open(BIG_OUT_NAME,'w') as outFile:
@@ -1585,12 +1587,15 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 	OMD_NAME = 'circuit.dss.omd'
 	MAP_NAME = 'circuit_map'
 	ONELINE_NAME = 'circuit_oneline.html'
+	FINAL_REPORT = 'output_final.html'
 	# Create initial files.
 	if not os.path.isdir(MODEL_DIR):
 		os.mkdir(MODEL_DIR)
 	try:
 		shutil.copyfile(BASE_DSS, f'{MODEL_DIR}/{MODEL_DSS}')
 		shutil.copyfile(LOAD_CSV, f'{MODEL_DIR}/{MODEL_LOAD_CSV}')
+		os.system(f'touch {MODEL_DIR}/0running.txt')
+		os.remove("0crashed.txt")
 	except:
 		print('Rerunning existing analysis. DSS and CSV files not moved.')
 	if DELETE_FILES:
@@ -1598,76 +1603,85 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 			try:
 				os.remove(fname)
 			except:
-				pass
+				print(f'failed to delete {fname}')
 	# HACK: work in directory because we're very picky about the current dir.
-	os.chdir(MODEL_DIR)
+	curr_dir = os.getcwd()
+	workDir = os.path.abspath(MODEL_DIR)
+	if curr_dir != workDir:
+		os.chdir(workDir)
 	if os.path.exists("user_warnings.txt"):
 		os.remove("user_warnings.txt")
 	# Dump the inputs for future reference.
-	with open('allInputData.json','w') as inputs_file:
-		inputs = {
-			'MODEL_DIR':MODEL_DIR,
-			'BASE_DSS':BASE_DSS,
-			'LOAD_CSV':LOAD_CSV,
-			'QSTS_STEPS':QSTS_STEPS,
-			'FOSSIL_BACKUP_PERCENT':FOSSIL_BACKUP_PERCENT,
-			'REOPT_INPUTS':REOPT_INPUTS,
-			'MICROGRIDS':MICROGRIDS,
-			'FAULTED_LINE':FAULTED_LINE,
-			'DIESEL_SAFETY_FACTOR':DIESEL_SAFETY_FACTOR
-		}
-		json.dump(inputs, inputs_file, indent=4)
-	# Run the analysis
-	mgs_name_sorted = sorted(MICROGRIDS.keys())
-	for i, mg_name in enumerate(mgs_name_sorted):
-		BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
-		new_mg_names = mgs_name_sorted[0:i+1]
-		new_mg_for_control = {name:MICROGRIDS[name] for name in new_mg_names}
-		main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], new_mg_for_control, GEN_NAME, REF_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, FAULTED_LINE, mg_name, f'mg_add_cost_{i}.csv', FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR, open_results=False)
-	# Build Final report
-	reports = [x for x in os.listdir('.') if x.startswith('ultimate_rep_')]
-	reports.sort()
-	reopt_folders = [x for x in os.listdir('.') if x.startswith('reopt_final_')]
-	reopt_folders.sort()
-	reps = pd.concat([pd.read_csv(x) for x in reports]).to_dict(orient='list')
-	stats = summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV)
-	mg_add_cost_files = [x for x in os.listdir('.') if x.startswith('mg_add_cost_')]
-	mg_add_cost_files.sort()
-	# create an orderedDict of the mg_add_cost_files:
-	# mg_add_cost_dict_of_lists = pd.concat([pd.read_csv(x) for x in mg_add_cost_files]).to_dict(orient='list')
-	# print("mg_add_cost_dict_of_lists:",mg_add_cost_dict_of_lists)
-
-	# create a row-based list of lists of mg_add_cost_files
-	add_cost_rows = []
-	for file in mg_add_cost_files:
-		with open(file, "r") as f:
-			reader = csv.reader(f, delimiter=',')
-			next(reader, None) #skip the header
-			for row in reader:
-				add_cost_rows.append([row[0],row[1],row[2],int(row[3])])
-	
-	current_time = datetime.datetime.now() 
-	warnings = "None"
-	if os.path.exists("user_warnings.txt"):
-		with open("user_warnings.txt") as myfile:
-			warnings = myfile.read()
-	template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
-	# generate file map
-	out = template.render(
-		now=current_time,
-		summary=stats,
-		inputs=inputs, #TODO: Make the inputs clearer and maybe at the bottom, showing only the appropriate keys from MICROGRIDS as necessary
-		reopt_folders=reopt_folders,
-		warnings = warnings,
-		raw_files = _walkTree('.'),
-		model_name = MODEL_DIR,
-		add_cost_rows = add_cost_rows
-	)
-	FINAL_REPORT = 'output_final.html'
-	with open(FINAL_REPORT,'w') as outFile:
-		outFile.write(out)
-	if open_results:
-		os.system(f'open {FINAL_REPORT}')
+	try:
+		with open('allInputData.json','w') as inputs_file:
+			inputs = {
+				'MODEL_DIR':MODEL_DIR,
+				'BASE_DSS':BASE_DSS,
+				'LOAD_CSV':LOAD_CSV,
+				'QSTS_STEPS':QSTS_STEPS,
+				'FOSSIL_BACKUP_PERCENT':FOSSIL_BACKUP_PERCENT,
+				'REOPT_INPUTS':REOPT_INPUTS,
+				'MICROGRIDS':MICROGRIDS,
+				'FAULTED_LINE':FAULTED_LINE,
+				'DIESEL_SAFETY_FACTOR':DIESEL_SAFETY_FACTOR
+			}
+			json.dump(inputs, inputs_file, indent=4)
+		# Run the analysis
+		mgs_name_sorted = sorted(MICROGRIDS.keys())
+		for i, mg_name in enumerate(mgs_name_sorted):
+			BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
+			new_mg_names = mgs_name_sorted[0:i+1]
+			new_mg_for_control = {name:MICROGRIDS[name] for name in new_mg_names}
+			main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], new_mg_for_control, GEN_NAME, REF_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, FAULTED_LINE, mg_name, f'mg_add_cost_{i}.csv', FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR, open_results=False)
+		# Build Final report
+		reports = [x for x in os.listdir('.') if x.startswith('ultimate_rep_')]
+		reports.sort()
+		reopt_folders = [x for x in os.listdir('.') if x.startswith('reopt_final_')]
+		reopt_folders.sort()
+		reps = pd.concat([pd.read_csv(x) for x in reports]).to_dict(orient='list')
+		stats = summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV)
+		mg_add_cost_files = [x for x in os.listdir('.') if x.startswith('mg_add_cost_')]
+		mg_add_cost_files.sort()
+		# create an orderedDict of the mg_add_cost_files:
+		# mg_add_cost_dict_of_lists = pd.concat([pd.read_csv(x) for x in mg_add_cost_files]).to_dict(orient='list')
+		# print("mg_add_cost_dict_of_lists:",mg_add_cost_dict_of_lists)
+		# create a row-based list of lists of mg_add_cost_files
+		add_cost_rows = []
+		for file in mg_add_cost_files:
+			with open(file, "r") as f:
+				reader = csv.reader(f, delimiter=',')
+				next(reader, None) #skip the header
+				for row in reader:
+					add_cost_rows.append([row[0],row[1],row[2],int(row[3])])
+		current_time = datetime.datetime.now() 
+		warnings = "None"
+		if os.path.exists("user_warnings.txt"):
+			with open("user_warnings.txt") as myfile:
+				warnings = myfile.read()
+		template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
+		# generate file map
+		mg_names = list(MICROGRIDS.keys())
+		names_and_folders = {x[0]:x[1] for x in zip(mg_names, reopt_folders)}
+		out = template.render(
+			now=current_time,
+			summary=stats,
+			inputs=inputs, #TODO: Make the inputs clearer and maybe at the bottom, showing only the appropriate keys from MICROGRIDS as necessary
+			warnings = warnings,
+			raw_files = _walkTree('.'),
+			model_name = MODEL_DIR,
+			add_cost_rows = add_cost_rows,
+			mg_names_and_reopt_folders = names_and_folders
+		)
+		with open(FINAL_REPORT,'w') as outFile:
+			outFile.write(out)
+		if open_results:
+			os.system(f'open {FINAL_REPORT}')
+	except Exception:
+		print(traceback.format_exc())
+		os.system(f'touch "{MODEL_DIR}/0crashed.txt"')
+	finally:
+		os.chdir(curr_dir)
+		os.system(f'rm "{workDir}/0running.txt"')
 
 def _tests():
 	pass

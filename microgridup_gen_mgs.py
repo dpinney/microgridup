@@ -6,7 +6,7 @@ from pprint import pprint as pp
 # See experiments with networkx here: https://colab.research.google.com/drive/1RZyD6pRIdRAT-V2sBB0nPKVIvZP_RGHw
 
 # Test inputs
-CIRC_FILE = '../lehigh_base_phased.dss'
+CIRC_FILE = 'lehigh_base_3mg.dss'
 CRITICAL_LOADS = ['645_hangar','684_command_center', '611_runway','675a_hospital','634a_data_center', '634b_radar', '634c_atc_tower']
 ALGO = 'lukes' #'branch'
 

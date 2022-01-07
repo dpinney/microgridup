@@ -24,10 +24,15 @@ def home():
 
 @app.route('/load/<analysis>')
 def load(analysis):
-	if 'output_final.html' in os.listdir(analysis):
+	ana_files = os.listdir(analysis)
+	if '0crashed.txt' in ana_files:
+		return 'Model Crashed. Please delete and recreate.'
+	elif '0running.txt' in ana_files:
+		return 'Model Running. Please reload to check for completion.'
+	elif 'output_final.html' in ana_files:
 		return flask.redirect(f'/{analysis}/output_final.html')
 	else:
-		return 'Model Running. Please reload to check for completion.'
+		return 'Model is in an inconsistent state. Please delete and recreate.'
 
 @app.route('/edit/<analysis>')
 def edit(analysis):
@@ -75,14 +80,12 @@ def run():
 		csv_file.save(f'{_myDir}/uploads/LOAD_CSV_{model_dir}')
 		dss_path = f'{_myDir}/uploads/BASE_DSS_{model_dir}'
 		csv_path = f'{_myDir}/uploads/LOAD_CSV_{model_dir}'
-		# print('HI MOM!!!!')
 	# Handle arguments to our main function.
 	crit_loads = flask.request.form['CRITICAL_LOADS'].split(',')
 	mg_method = flask.request.form['MG_DEF_METHOD']
 	if mg_method == 'manual':
 		microgrids = json.loads(flask.request.form['MICROGRIDS'])
 	elif mg_method == 'lukes':
-		# print('YO MOM LOOK', dss_path)
 		microgrids = microgridup_gen_mgs.mg_group(dss_path, crit_loads, 'lukes')
 	elif mg_method == 'branch':
 		microgrids = microgridup_gen_mgs.mg_group(dss_path, crit_loads, 'branch')
@@ -100,7 +103,7 @@ def run():
 	new_proc = multiprocessing.Process(target=microgridup.full, args=mgu_args)
 	new_proc.start()
 	# Redirect to home after waiting a little for the file creation to happen.
-	time.sleep(1.5)
+	time.sleep(3)
 	return flask.redirect(f'/')
 
 if __name__ == "__main__":

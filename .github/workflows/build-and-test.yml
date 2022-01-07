@@ -1,4 +1,4 @@
-name: build_and_test
+name: build-and-test
 on:
   push:
     branches: [ main ]
@@ -10,9 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2 # check-out the repository
-      - name: Build
-        run: echo Hello, world!
+      - name: Build With Docker
+        run: |
+          docker build . -f Dockerfile -t mguim
+          sudo apt-get install wget
       - name: Test
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          docker run -d -p 5000:5000 --name mgucont mguim
+          sleep 10
+          wget localhost:5000

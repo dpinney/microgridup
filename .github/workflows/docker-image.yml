@@ -31,6 +31,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-#- uses: actions/checkout@v2
-#    - name: Build the Docker image
-#      run: docker build . --file mgu.Dockerfile --tag my-image-name:$(date +%s)

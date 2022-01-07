@@ -24,10 +24,15 @@ def home():
 
 @app.route('/load/<analysis>')
 def load(analysis):
-	if 'output_final.html' in os.listdir(analysis):
+	ana_files = os.listdir(analysis)
+	if '0crashed.txt' in ana_files:
+		return 'Model Crashed. Please delete and recreate.'
+	elif '0running.txt' in ana_files:
+		return 'Model Running. Please reload to check for completion.'
+	elif 'output_final.html' in ana_files:
 		return flask.redirect(f'/{analysis}/output_final.html')
 	else:
-		return 'Model Running. Please reload to check for completion.'
+		return 'Model is in an inconsistent state. Please delete and recreate.'
 
 @app.route('/edit/<analysis>')
 def edit(analysis):
@@ -98,7 +103,7 @@ def run():
 	new_proc = multiprocessing.Process(target=microgridup.full, args=mgu_args)
 	new_proc.start()
 	# Redirect to home after waiting a little for the file creation to happen.
-	time.sleep(1.5)
+	time.sleep(3)
 	return flask.redirect(f'/')
 
 if __name__ == "__main__":

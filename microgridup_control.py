@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import plotly
 import plotly.graph_objects as go
 from plotly.tools import make_subplots
+import math
 
 # OMF imports
 import omf
@@ -254,16 +255,17 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			vsource_ob_and_name = f'vsource.lead_gen_{safe_busname}'
 			line_name = f'line.line_for_lead_gen_{safe_busname}'
 			new_bus_name = f'bus_for_lead_gen_{safe_busname}.1.2.3'
-			#TO DO: update default kv assignment to match max kv on grid
-			base_kv = big_gen_ob.get('kv','3.14')
-
+			#NOTE: vsources use line-to-line voltages, so 3 phase gens get sqrt(3) multiplier
+			phase_count = big_gen_ob.get('phases')
+			gen_base_kv = float(big_gen_ob['kv'])
+			if phase_count == '3':
+				gen_base_kv = gen_base_kv * math.sqrt(3)
 			# Before removing fossil unit, grab kW rating 
 			big_gen_ratings[f"lead_gen_{safe_busname}"] = big_gen_ob.get("kw")
-
 			# Remove fossil unit, add new gen and line
 			del dssTree[big_gen_index]
-			dssTree.insert(big_gen_index, {'!CMD':'new', 'object':vsource_ob_and_name, 'basekv':base_kv, 'bus1':new_bus_name})
-			# dssTree.insert(big_gen_index, {'!CMD':'new', 'object':vsource_ob_and_name, 'basekv':base_kv, 'bus1':new_bus_name, 'pu':1.00, 'r1':0, 'x1':0.0001, 'r0':0, 'x0':0.0001})
+			dssTree.insert(big_gen_index, {'!CMD':'new', 'object':vsource_ob_and_name, 'basekv':str(gen_base_kv), 'bus1':new_bus_name, 'phases':phase_count})
+			# dssTree.insert(big_gen_index, {'!CMD':'new', 'object':vsource_ob_and_name, 'basekv':gen_base_kv, 'bus1':new_bus_name, 'pu':1.00, 'r1':0, 'x1':0.0001, 'r0':0, 'x0':0.0001})
 			# print("dssTree[big_gen_index]",dssTree[big_gen_index])
 			dssTree.insert(big_gen_index, {'!CMD':'new', 'object':line_name, 'bus1':big_gen_bus, 'bus2':new_bus_name, 'switch':'yes'})
 			# Disable the new lead gen by default.

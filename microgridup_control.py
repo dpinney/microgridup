@@ -119,14 +119,18 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 				if (this_series[y_name] > 1.1).any() or (this_series[y_name] < 0.9).any():
 					unreasonable_voltages[f"{ob_name}_{y_name}"] = ob_name
 
-			# Traces for gen, load, source, control.
+			# Traces for gen, load, control.
 			name = ob_name + '_' + y_name
 			if name in unreasonable_voltages:
 				name = '[BAD]_' + name
+			if "mongenerator" in ob_name:
+				y_axis = this_series[y_name] * -1
+			else:
+				y_axis = this_series[y_name]
 			if not this_series[y_name].isnull().values.any():
 				trace = go.Scatter(
 					x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
-					y = this_series[y_name],
+					y = y_axis,
 					legendgroup=legend_group,
 					legendgrouptitle_text=legend_group,
 					showlegend = True,
@@ -169,7 +173,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 	else:
 		title = f'{chart_name}'
 
-	# Plots for gen, load, source, control.
+	# Plots for gen, load, control.
 	layout = go.Layout(
 		title = title,
 		xaxis = dict(title = 'Date'),

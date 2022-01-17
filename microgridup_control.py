@@ -31,6 +31,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 	data = []
 	unreasonable_voltages = {}
 	batt_cycles = {}
+	fossil_dict = {}
 	fossil_kwh_output = 0
 	batt_kwh_ratings = {}
 	fossil_kw_ratings = {}
@@ -53,43 +54,20 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 				break
 			legend_group = "Not_in_MG"
 
-		# HACK: Loads in 2mgs/3mgs must be doubled during outage. Loads in all mgs must be multipled by sqrt(3) during outage.
-		double, mult_sqrt3 = False, False
-		if legend_group == "mg0" or legend_group == "mg1":
-			mult_sqrt3 = True
-		if legend_group == "mg2" or legend_group == "mg3":
-			double, mult_sqrt3 = True, True
-
 		# Loop through phases.
 		for y_name in y_list: 
 			this_series = gen_data[gen_data[category_name] == ob_name]
 
-			# if lead_gen_ and not null values, add total output to running tally 
-			if "lead_gen_" in ob_name and not this_series[y_name].isnull().values.any(): 
-				fossil_kwh_output += sum(this_series[y_name])
-				# if lead_gen_ and not null values, divide by provided kw rating to create loading percentage series
-				fossil_kw_rating = vsource_ratings[ob_name.split("-")[1]]
-				# print("ob_name",ob_name,"y_name",y_name,"vsource_ratings",vsource_ratings,"fossil_kw_rating",fossil_kw_rating)  
-				fossil_percent_loading = [(x / float(fossil_kw_rating)) * 100 for x in this_series[y_name]]
-				# add traces for fossil loading percentages to graph variable
-				fossil_trace = go.Scatter(
-					x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
-					y = fossil_percent_loading,
-					legendgroup=legend_group,
-					legendgrouptitle_text=legend_group,
-					showlegend=True,
-					name=ob_name + '_' + y_name,
-					hoverlabel = dict(namelength = -1)
-					)
-				fossil_traces.append(fossil_trace)
-
-			# if fossil_ and not null values, add total output to running tally.
-			if "fossil_" in ob_name and not this_series[y_name].isnull().values.any():
-				fossil_kwh_output += sum(abs(this_series[y_name]))
-				# if fossil_ and not null values, divide by kw rating to create loading percentage series  
-				fossil_kw_rating = fossil_kw_ratings[ob_name.split("-")[1]]
-				fossil_percent_loading = [(x / float(fossil_kw_rating)) * -100 for x in this_series[y_name]]
-				# add traces for fossil loading percentages to graph variable
+			# Add kwh output of fossil fuel generators to dictionary variable.
+			if ("lead_gen_" in ob_name or "fossil_" in ob_name) and not this_series[y_name].isnull().values.any(): 
+				fossil_kwh_output += sum(abs(this_series[y_name])) if "fossil_" in ob_name else sum(this_series[y_name])
+				if legend_group in fossil_dict.keys():
+					fossil_dict[legend_group] += sum(abs(this_series[y_name])) if "fossil_" in ob_name else sum(this_series[y_name])
+				else:
+					fossil_dict[legend_group] = sum(abs(this_series[y_name])) if "fossil_" in ob_name else sum(this_series[y_name])
+				# Make fossil loading percentages chart.
+				fossil_kw_rating = fossil_kw_ratings[ob_name.split("-")[1]] if "fossil_" in ob_name else vsource_ratings[ob_name.split("-")[1]]
+				fossil_percent_loading = [(x / float(fossil_kw_rating)) * -100 for x in this_series[y_name]] if "fossil_" in ob_name else [(x / float(fossil_kw_rating)) * 100 for x in this_series[y_name]]
 				fossil_trace = go.Scatter(
 					x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
 					y = fossil_percent_loading,
@@ -110,12 +88,6 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 
 			# Flag loads that don't fall within ansi bands. Also continue HACK.
 			if "_load" in csvName:
-				# if double == True:
-					# this_series[y_name][outageStart-1:outageEnd-1] *= 2
-					# this_series[y_name].iloc[outageStart-1:outageEnd-1] *= 2
-				# if mult_sqrt3 == True:
-					# this_series[y_name][outageStart-1:outageEnd-1] *= math.sqrt(3)
-					# this_series[y_name].iloc[outageStart-1:outageEnd-1] *= math.sqrt(3)
 				if (this_series[y_name] > 1.1).any() or (this_series[y_name] < 0.9).any():
 					unreasonable_voltages[f"{ob_name}_{y_name}"] = ob_name
 
@@ -139,7 +111,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 				)
 				data.append(trace)
 	
-	# Make fossil genset loading plot.
+	# Make fossil genset loading plot. 
 	if fossil_loading_chart == True:
 		new_layout = go.Layout(
 			title = f"Fossil Genset Loading Percentage ({csvName})",
@@ -148,6 +120,23 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 			)
 		fossil_fig = plotly.graph_objs.Figure(fossil_traces, new_layout)
 		plotly.offline.plot(fossil_fig, filename=f'{csvName}_fossil_loading.plot.html', auto_open=False)
+
+		# Calculate total fossil genset consumption.
+		diesel_consumption_rate_gallons_per_kwh = 0.024570024570025 
+		total_fossil = diesel_consumption_rate_gallons_per_kwh * fossil_kwh_output
+		# Make fossil fuel consumption chart. 
+		fossil_dict.update((x, y*diesel_consumption_rate_gallons_per_kwh) for x, y in fossil_dict.items())
+		new_trace = go.Bar(
+			x = list(fossil_dict.keys()), 
+			y = list(fossil_dict.values()) 
+		)
+		new_layout = go.Layout(
+			title = f"Diesel Equivalent Consumption By Microgrid. Total Consumption = {total_fossil} Gallons of Diesel",
+			xaxis = dict(title = 'Microgrid'),
+			yaxis = dict(title = 'Gallons of Diesel Equivalent Consumed') 
+			)
+		new_fig = plotly.graph_objs.Figure(new_trace, new_layout)
+		plotly.offline.plot(new_fig, filename=f'{csvName}_fuel_consumption.plot.html', auto_open=False)
 
 	# Make battery cycles bar chart.
 	if batt_cycle_chart == True:
@@ -164,18 +153,9 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 		new_fig = plotly.graph_objs.Figure(new_trace, new_layout)
 		plotly.offline.plot(new_fig, filename=f'{csvName}_battery_cycles.plot.html', auto_open=False)
 
-	# Calculate total fossil genset consumption.
-	fuel_consumption_rate_gallons_per_kwh = 1 # <-- TO DO: is this a preset or an input?
-	total_fossil = fuel_consumption_rate_gallons_per_kwh * fossil_kwh_output
-	# add total fossil genset consumption to source plot title 
-	if "_source" in csvName or "_gen" in csvName:
-		title = f'{chart_name}. Fossil consumption of gensets = {total_fossil}'
-	else:
-		title = f'{chart_name}'
-
 	# Plots for gen, load, control.
 	layout = go.Layout(
-		title = title,
+		title = f'{chart_name}',
 		xaxis = dict(title = 'Date'),
 		yaxis = dict(title = y_axis_name)
 	)

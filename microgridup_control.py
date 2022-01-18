@@ -65,7 +65,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 					fossil_dict[legend_group] += sum(abs(this_series[y_name])) if "fossil_" in ob_name else sum(this_series[y_name])
 				else:
 					fossil_dict[legend_group] = sum(abs(this_series[y_name])) if "fossil_" in ob_name else sum(this_series[y_name])
-				# Make fossil loading percentages chart.
+				# Make fossil loading percentages traces.
 				fossil_kw_rating = fossil_kw_ratings[ob_name.split("-")[1]] if "fossil_" in ob_name else vsource_ratings[ob_name.split("-")[1]]
 				fossil_percent_loading = [(x / float(fossil_kw_rating)) * -100 for x in this_series[y_name]] if "fossil_" in ob_name else [(x / float(fossil_kw_rating)) * 100 for x in this_series[y_name]]
 				fossil_trace = go.Scatter(
@@ -123,7 +123,10 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 
 		# Calculate total fossil genset consumption.
 		diesel_consumption_rate_gallons_per_kwh = 0.024570024570025 
-		total_fossil = diesel_consumption_rate_gallons_per_kwh * fossil_kwh_output
+		kwh_to_mmbtu = 0.00341214163312794
+		total_gal_diesel = "{:e}".format(diesel_consumption_rate_gallons_per_kwh * fossil_kwh_output)
+		fossil_mmbtu_output = "{:e}".format(fossil_kwh_output * kwh_to_mmbtu)
+		fossil_kwh_output = "{:e}".format(fossil_kwh_output)
 		# Make fossil fuel consumption chart. 
 		fossil_dict.update((x, y*diesel_consumption_rate_gallons_per_kwh) for x, y in fossil_dict.items())
 		new_trace = go.Bar(
@@ -131,7 +134,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 			y = list(fossil_dict.values()) 
 		)
 		new_layout = go.Layout(
-			title = f"Diesel Equivalent Consumption By Microgrid. Total Consumption = {total_fossil} Gallons of Diesel",
+			title = f"Diesel Equivalent Consumption By Microgrid<br><sup>Total Consumption in Gallons of Diesel = {total_gal_diesel} || Total Ouput in kWh = {fossil_kwh_output} || Total Output in MMBTU = {fossil_mmbtu_output}</sup>",
 			xaxis = dict(title = 'Microgrid'),
 			yaxis = dict(title = 'Gallons of Diesel Equivalent Consumed') 
 			)
@@ -140,7 +143,6 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 
 	# Make battery cycles bar chart.
 	if batt_cycle_chart == True:
-		# print("csvName",csvName, "batt_cycles",batt_cycles)
 		new_trace = go.Bar(
 			x = list(batt_cycles.keys()), 
 			y = list(batt_cycles.values()) 

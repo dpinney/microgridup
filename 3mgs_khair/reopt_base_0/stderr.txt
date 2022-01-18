@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/Users/dpinney/gdrive/LATERBASE/omf/omf/models/__neoMetaModel__.py", line 51, in heavyProcessing
+    outData = work(modelDir, inputDict)
+  File "/Users/dpinney/gdrive/LATERBASE/omf/omf/models/microgridDesign.py", line 342, in work
+    outData['yearOneEmissionsLbsBau' + indexString] = resultsSubset['year_one_emissions_bau_lb_C02']
+KeyError: 'year_one_emissions_bau_lb_C02'

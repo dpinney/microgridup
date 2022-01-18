@@ -31,18 +31,18 @@
 			<button onclick="openTab('interconnection')">Interconnection</button>
 			<button onclick="openTab('control')">Control</button>
 			
-				<button onclick="openTab('reopt_final_0')">reopt_final_0</button>
+				<button onclick="openTab('reopt_final_0')">mg0</button>			
 			
-				<button onclick="openTab('reopt_final_1')">reopt_final_1</button>
+				<button onclick="openTab('reopt_final_1')">mg1</button>			
 			
 			<button onclick="openTab('files')">Files</button>
 		</p>
 	</div>
 	<div id="overview" class="tab" style="margin:5px; overflow:scroll; visibility:visible">
 		<h3>Report Generated</h2>
-		<pre style="width:95%; white-space:pre-wrap">2021-12-29 12:15:18.839054</pre>
+		<pre style="width:95%; white-space:pre-wrap">2022-01-18 13:23:58.559605</pre>
 		<h3>Model Inputs</h2>
-		<pre style="width:95%; white-space:pre-wrap">{'MODEL_DIR': '2mgs', 'BASE_DSS': 'lehigh_base_2mg.dss', 'LOAD_CSV': 'lehigh_load.csv', 'QSTS_STEPS': 480, 'FOSSIL_BACKUP_PERCENT': 0, 'REOPT_INPUTS': {'solar': 'on', 'wind': 'on', 'battery': 'on', 'year': '2017', 'analysisYears': '25', 'discountRate': '0.083', 'energyCost': '0.12', 'demandCost': '20', 'urdbLabelSwitch': 'off', 'wholesaleCost': '0.034', 'solarCost': '1600', 'windCost': '1500', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'batteryPowerCostReplace': '410', 'batteryCapacityCostReplace': '200', 'batteryPowerReplaceYear': '10', 'batteryCapacityReplaceYear': '10', 'dieselGenCost': '500', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '10000', 'windMax': '10000', 'batteryPowerMax': '10000', 'batteryCapacityMax': '10000', 'dieselMax': '100000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outageDuration': '48', 'fuelAvailable': '10000', 'genExisting': 0, 'minGenLoading': '0.3', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'dieselFuelCostGal': 3, 'dieselCO2Factor': 22.4, 'dieselOMCostKw': 25, 'dieselOMCostKwh': 0.02, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True, 'dieselOnlyRunsDuringOutage': True}, 'MICROGRIDS': {'mg0': {'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'switch': '632633', 'gen_bus': '634', 'gen_obs_existing': ['wind_634_existing'], 'critical_load_kws': [70, 90, 10]}, 'mg1': {'loads': ['675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2'], 'switch': '671692', 'gen_bus': '675', 'gen_obs_existing': ['battery_675_existing', 'battery_675_2_existing'], 'critical_load_kws': [150, 200, 200]}}, 'FAULTED_LINE': '670671', 'DIESEL_SAFETY_FACTOR': False}</pre>
+		<pre style="width:95%; white-space:pre-wrap">{'MODEL_DIR': '2mgs', 'BASE_DSS': 'lehigh_base_2mg.dss', 'LOAD_CSV': 'lehigh_load.csv', 'QSTS_STEPS': 480, 'FOSSIL_BACKUP_PERCENT': 0, 'REOPT_INPUTS': {'solar': 'on', 'wind': 'on', 'battery': 'on', 'year': '2017', 'analysisYears': '25', 'discountRate': '0.083', 'energyCost': '0.12', 'demandCost': '20', 'urdbLabelSwitch': 'off', 'wholesaleCost': '0.034', 'solarCost': '1600', 'windCost': '1500', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'batteryPowerCostReplace': '410', 'batteryCapacityCostReplace': '200', 'batteryPowerReplaceYear': '10', 'batteryCapacityReplaceYear': '10', 'dieselGenCost': '500', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '10000', 'windMax': '10000', 'batteryPowerMax': '10000', 'batteryCapacityMax': '10000', 'dieselMax': '100000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outageDuration': '48', 'fuelAvailable': '10000', 'genExisting': 0, 'minGenLoading': '0.3', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'dieselFuelCostGal': 3, 'dieselCO2Factor': 22.4, 'dieselOMCostKw': 25, 'dieselOMCostKwh': 0.02, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True, 'dieselOnlyRunsDuringOutage': True}, 'MICROGRIDS': {'mg0': {'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'switch': '632633', 'gen_bus': '634', 'gen_obs_existing': ['wind_634_existing'], 'critical_load_kws': [70, 90, 10]}, 'mg1': {'loads': ['675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2'], 'switch': '671692', 'gen_bus': '675', 'gen_obs_existing': ['battery_675_existing', 'battery_675_2_existing'], 'critical_load_kws': [150, 200, 200]}}, 'FAULTED_LINE': '650632', 'DIESEL_SAFETY_FACTOR': False}</pre>
 		<h3>User Warnings</h3>
 		<pre style="width:95%; white-space:pre-wrap">Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 Pre-existing battery battery_675_existing will not be utilized to support loads in microgrid mg1.
@@ -782,12 +782,12 @@ Pre-existing battery battery_675_2_existing will not be utilized to support load
 	</div>
 	<div id="control" class="tab" style="visibility:hidden">
 		<div style="height:100vh; overflow:scroll">
-			<iframe src="timezcontrol_gen.csv.plot.html"></iframe>
+			<iframe src="timezcontrol_source_and_gen.csv.plot.html"></iframe>
 			<iframe src="timezcontrol_load.csv.plot.html"></iframe>
-			<iframe src="timezcontrol_source.csv.plot.html"></iframe>
 			<iframe src="timezcontrol_control.csv.plot.html"></iframe>
 			<iframe src="timezcontrol_gen.csv_battery_cycles.plot.html"></iframe>
 			<iframe src="timezcontrol_source_and_gen.csv_fossil_loading.plot.html"></iframe>
+			<iframe src="timezcontrol_source_and_gen.csv_fuel_consumption.plot.html"></iframe>
 		</div>
 	</div>
 	
@@ -827,6 +827,8 @@ Pre-existing battery battery_675_2_existing will not be utilized to support load
 			
 			<li><a href='/2mgs/./dss_run_file.dss'>./dss_run_file.dss</a></li>
 			
+			<li><a href='/2mgs/./timezcontrol_source_and_gen.csv_fuel_consumption.plot.html'>./timezcontrol_source_and_gen.csv_fuel_consumption.plot.html</a></li>
+			
 			<li><a href='/2mgs/./circuit_plusmg_0.dss'>./circuit_plusmg_0.dss</a></li>
 			
 			<li><a href='/2mgs/./circuit_plusmg_1.dss'>./circuit_plusmg_1.dss</a></li>
@@ -853,7 +855,11 @@ Pre-existing battery battery_675_2_existing will not be utilized to support load
 			
 			<li><a href='/2mgs/./circuit.dss.omd'>./circuit.dss.omd</a></li>
 			
+			<li><a href='/2mgs/./0running.txt'>./0running.txt</a></li>
+			
 			<li><a href='/2mgs/./timeseries_load.csv.plot.html'>./timeseries_load.csv.plot.html</a></li>
+			
+			<li><a href='/2mgs/./timezcontrol_source_and_gen.csv_battery_cycles.plot.html'>./timezcontrol_source_and_gen.csv_battery_cycles.plot.html</a></li>
 			
 			<li><a href='/2mgs/./timeseries_source.csv'>./timeseries_source.csv</a></li>
 			

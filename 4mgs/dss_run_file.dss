@@ -1,5 +1,5 @@
 redirect circuit_control.dss
-set datapath="/Users/matt2/Documents/NRECA/MicrogridUp/microgridup/4mgs"
+set datapath="/Users/dpinney/gdrive/LATERBASE/NRECA/MICROGRIDUP (MGU) ESTCP FY2020/del2.2.1K - Requirements and Specifications/microgridup mgu test system lehigh/4mgs"
 set maxcontroliter=1000
 calcvoltagebases
 new object=monitor.monvsource-source element=vsource.source terminal=1 mode=0
@@ -114,9 +114,9 @@ solve
 solve
 solve
 
-		open object=line.670671 term=1
-		open object=line.670671 term=2
-		open object=line.670671 term=3
+		open object=line.650632 term=1
+		open object=line.650632 term=2
+		open object=line.650632 term=3
 	
 			open object=line.632633 term=1
 			open object=line.632633 term=2
@@ -267,9 +267,9 @@ solve
 solve
 solve
 
-		close object=line.670671 term=1
-		close object=line.670671 term=2
-		close object=line.670671 term=3
+		close object=line.650632 term=1
+		close object=line.650632 term=2
+		close object=line.650632 term=3
 	
 			close object=line.632633 term=1
 			close object=line.632633 term=2

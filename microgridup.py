@@ -512,6 +512,7 @@ def mg_phase_and_kv(BASE_NAME, microgrid, mg_name):
 		bus_name_list = bus_name.split('.')
 		load_phases = []
 		load_phases = bus_name_list[-(len(bus_name_list)-1):]
+		print("load_phases on bus_name: phases", load_phases, "on bus", bus_name)
 		for phase in load_phases:
 			if phase not in load_phase_list:
 				load_phase_list.append(phase)
@@ -520,11 +521,6 @@ def mg_phase_and_kv(BASE_NAME, microgrid, mg_name):
 		# append all new load_kv's to the list
 		if load_kv not in gen_bus_kv_list:
 			gen_bus_kv_list.append(load_kv)
-		# Logic that throws an error with multiple gen_bus_kv candidates
-		# if load_kv not in gen_bus_kv and len(gen_bus_kv) > 0:
-		# 	raise Exception(f'More than one load voltage is specified on gen_bus {gen_bus_name}. Check voltage of {load_name}.')
-		# elif load_kv not in gen_bus_kv and len(gen_bus_kv) == 0:
-		# 	gen_bus_kv = load_kv
 
 	if len(gen_bus_kv_list) > 1:
 		gen_bus_kv_message = f'More than one load voltage is specified on microgrid {mg_name}. Check Oneline diagram to verify that phases and voltages of {mg_loads} are correctly supported by gen_bus {gen_bus_name}.\n'
@@ -541,10 +537,29 @@ def mg_phase_and_kv(BASE_NAME, microgrid, mg_name):
 	out_dict = {}
 	out_dict['gen_bus'] = gen_bus_name
 	load_phase_list.sort()
+	# neutral phase is assumed, and should not be explicit in load_phase_list
+	if load_phase_list[0] == '0':
+		load_phase_list = load_phase_list[1:]
+		print("load_phase_list after removal of ground phase:", load_phase_list)
+
 	out_dict['phases'] = load_phase_list
+	
+	# Kv selection method prior to January 2022:
 	# Choose the maximum voltage based upon the phases that are supported, assuming all phases in mg can be supported from gen_bus and that existing tranformers will handle any kv change
-	out_dict['kv'] = max(gen_bus_kv_list)
-	# print('mg_phase_and_kv out_dict:', out_dict)
+	# out_dict['kv'] = max(gen_bus_kv_list)
+
+	# Retrieve the calculated line to neutral kv from the gen_bus itself (January 2022):
+	kv_mappings = opendss.get_bus_kv_mappings(BASE_NAME)
+	# print('kv_mappings:',kv_mappings)
+	gen_bus_kv = kv_mappings.get(gen_bus_name)
+	# if 3 phases are supported at the gen_bus, convert the kv rating to line to line voltage
+	# if len(load_phase_list) == 3:
+	# 	gen_bus_kv = gen_bus_kv * math.sqrt(3)
+	# TODO: match up the calculated kv at the gen_bus with the appropriate line to neutral or line to line kv from voltagebases from the BASE_NAME dss file so that PU voltages compute accurately
+
+	out_dict['kv'] = gen_bus_kv
+	print('mg_phase_and_kv out_dict:', out_dict)
+
 	return out_dict
 	
 def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_name, diesel_total_calc=False):

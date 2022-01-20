@@ -11,7 +11,7 @@ from sklearn.preprocessing import LabelEncoder
 import matplotlib.pyplot as plt
 import plotly
 import plotly.graph_objects as go
-from plotly.tools import make_subplots
+from plotly.subplots import make_subplots
 import math
 
 # OMF imports
@@ -60,11 +60,11 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 
 			# Add kwh output of fossil fuel generators to dictionary variable.
 			if ("lead_gen_" in ob_name or "fossil_" in ob_name) and not this_series[y_name].isnull().values.any(): 
-				fossil_kwh_output += sum(abs(this_series[y_name])) if "fossil_" in ob_name else sum(this_series[y_name])
+				fossil_kwh_output += sum(abs(this_series[y_name][outageStart:outageEnd])) if "fossil_" in ob_name else sum(this_series[y_name][outageStart:outageEnd])
 				if legend_group in fossil_dict.keys():
-					fossil_dict[legend_group] += sum(abs(this_series[y_name])) if "fossil_" in ob_name else sum(this_series[y_name])
+					fossil_dict[legend_group] += sum(abs(this_series[y_name][outageStart:outageEnd])) if "fossil_" in ob_name else sum(this_series[y_name][outageStart:outageEnd])
 				else:
-					fossil_dict[legend_group] = sum(abs(this_series[y_name])) if "fossil_" in ob_name else sum(this_series[y_name])
+					fossil_dict[legend_group] = sum(abs(this_series[y_name][outageStart:outageEnd])) if "fossil_" in ob_name else sum(this_series[y_name][outageStart:outageEnd])
 				# Make fossil loading percentages traces.
 				fossil_kw_rating = fossil_kw_ratings[ob_name.split("-")[1]] if "fossil_" in ob_name else vsource_ratings[ob_name.split("-")[1]]
 				fossil_percent_loading = [(x / float(fossil_kw_rating)) * -100 for x in this_series[y_name]] if "fossil_" in ob_name else [(x / float(fossil_kw_rating)) * 100 for x in this_series[y_name]]
@@ -121,28 +121,32 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 		fossil_fig = plotly.graph_objs.Figure(fossil_traces, new_layout)
 		plotly.offline.plot(fossil_fig, filename=f'{csvName}_fossil_loading.plot.html', auto_open=False)
 
-		# Calculate total fossil genset consumption.
+		# Calculate total fossil genset consumption and make fossil fuel consumption chart. 
 		diesel_consumption_rate_gallons_per_kwh = 0.024570024570025 
 		kwh_to_mmbtu = 0.00341214163312794
 		total_gal_diesel = "{:e}".format(diesel_consumption_rate_gallons_per_kwh * fossil_kwh_output)
 		fossil_mmbtu_output = "{:e}".format(fossil_kwh_output * kwh_to_mmbtu)
 		fossil_kwh_output = "{:e}".format(fossil_kwh_output)
 		# Make fossil fuel consumption chart. 
-		fossil_dict.update((x, y*diesel_consumption_rate_gallons_per_kwh) for x, y in fossil_dict.items())
-		new_trace = go.Bar(
-			x = list(fossil_dict.keys()), 
-			y = list(fossil_dict.values()) 
+		fossil_dict = dict(sorted(fossil_dict.items()))
+		diesel_dict = [(x, y*diesel_consumption_rate_gallons_per_kwh) for x, y in fossil_dict.items()]
+		mmbtu_dict = [(x, y*kwh_to_mmbtu) for x, y in fossil_dict.items()]
+
+		fig = make_subplots(shared_xaxes=True, specs=[[{"secondary_y": True}]])
+		fig.add_trace(go.Bar(x = [item[0] for item in diesel_dict], y = [item[1] for item in diesel_dict], name="Diesel"), secondary_y=False)
+		fig.add_trace(go.Bar(x = [item[0] for item in mmbtu_dict], y = [item[1] for item in mmbtu_dict], name="Gas"), secondary_y=True)
+		fig.update_layout(
+		    title_text = f"Diesel Equivalent Consumption During Outage By Microgrid<br><sup>Total Consumption in Gallons of Diesel = {total_gal_diesel} || Total Ouput in kWh = {fossil_kwh_output} || Total Output in MMBTU = {fossil_mmbtu_output}</sup>"
 		)
-		new_layout = go.Layout(
-			title = f"Diesel Equivalent Consumption By Microgrid<br><sup>Total Consumption in Gallons of Diesel = {total_gal_diesel} || Total Ouput in kWh = {fossil_kwh_output} || Total Output in MMBTU = {fossil_mmbtu_output}</sup>",
-			xaxis = dict(title = 'Microgrid'),
-			yaxis = dict(title = 'Gallons of Diesel Equivalent Consumed') 
-			)
-		new_fig = plotly.graph_objs.Figure(new_trace, new_layout)
-		plotly.offline.plot(new_fig, filename=f'{csvName}_fuel_consumption.plot.html', auto_open=False)
+		fig.update_xaxes(title_text="Microgrid")
+		fig.update_yaxes(title_text="Gallons of Diesel Equivalent Consumed", secondary_y=False)
+		fig.update_yaxes(title_text="MMBTU", secondary_y=True)
+
+		plotly.offline.plot(fig, filename=f'{csvName}_fuel_consumption.plot.html', auto_open=False)
 
 	# Make battery cycles bar chart.
 	if batt_cycle_chart == True:
+		batt_cycles = dict(sorted(batt_cycles.items()))
 		new_trace = go.Bar(
 			x = list(batt_cycles.keys()), 
 			y = list(batt_cycles.values()) 

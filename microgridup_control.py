@@ -97,6 +97,8 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 				name = '[BAD]_' + name
 			if "mongenerator" in ob_name:
 				y_axis = this_series[y_name] * -1
+				# if not this_series[y_name].isnull().values.any():
+					# print(f"Maximum generation for {name} = {max(y_axis)}")
 			else:
 				y_axis = this_series[y_name]
 			if not this_series[y_name].isnull().values.any():
@@ -349,6 +351,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 
 		# Discharge battery (allowing for negatives that recharge (until hitting capacity)) until battery reaches 0 charge. Allow starting charge to be configurable. 
 		hour = 0
+		total_surplus = 0 # Curtailed renewable generation (cannot fit in battery) during outage.
 		while hour < len(new_batt_loadshape):
 			dischargeable = starting_capacity if starting_capacity < batt_kw else batt_kw
 			indicator = new_batt_loadshape[hour] - dischargeable 
@@ -360,6 +363,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 					surplus = starting_capacity - batt_kwh
 					starting_capacity = batt_kwh
 				new_batt_loadshape[hour] = starting_capacity - (starting_capacity + new_batt_loadshape[hour] + surplus)
+				total_surplus += surplus
 			# There is load left to cover and we can discharge the battery to cover it in its entirety. 
 			elif indicator < 0:
 				starting_capacity -= new_batt_loadshape[hour]
@@ -370,6 +374,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 				starting_capacity -= dischargeable
 				unsupported_load_kwh += indicator
 			hour += 1
+		# print(f"Total curtailed renewable generation during outage for {mg_key} = {total_surplus}.")
 
 		# Replace each outage portion of the existing battery loadshapes with a proportion of the new loadshape equal to the proportion of the battery's kwh capacity to the total kwh capacity on the bus.
 		for idx in range(len(batt_kwhs)):

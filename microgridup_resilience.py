@@ -11,6 +11,8 @@ import omf
 import csv
 import pandas as pd
 import plotly.graph_objects as go
+import os
+from omf.models.microgridControl import customerCost1, utilityOutageTable
 
 CSV_COL_FIELDS = ['ComponentAff', 'Start', 'Finish', 'Duration_min', 'Meters Affected']
 OUTS_FILENAME = 'lehigh_random_outages.csv'
@@ -148,47 +150,24 @@ def gen_output():
 		outFile.write(stats_html + '\n' + chart_html + '\n' + table_html)
 
 gen_output()
-import os
 os.system('open zoutput.html')
 
-### RAW COST CALCULATIONS
+def customer_outage_cost(csv_path):
+	rows = [x.split(',') for x in open(csv_path).readlines()]
+	header = rows[0]
+	values = rows[1:]
+	# print(header, values)
+	for in_row in values:
+		payload = in_row[1:5]
+		print(in_row[0], payload)
+		out = customerCost1(*payload)
+		print(out)
 
-from omf.models.microgridControl import customerCost1, utilityOutageTable
+customer_outage_cost(f'{omf.omfDir}/static/testFiles/customerInfo.csv')
 
-test_file = f'{omf.omfDir}/static/testFiles/customerInfo.csv'
+def utility_outage_cost_TEST():
+	# utilityOutageTable(average_lost_kwh, profit_on_energy_sales, restoration_cost, hardware_cost, outageDuration, output_dir)
+	utilcost = utilityOutageTable([1000,1000,1000], 0.02, 5000, 9000, 5, None) #None = tempfile output.
+	print(utilcost)
 
-rows = [x.split(',') for x in open(test_file).readlines()]
-header = rows[0]
-values = rows[1:]
-
-# print(header, values)
-
-for in_row in values:
-	payload = in_row[1:5]
-	print(in_row[0], payload)
-	out = customerCost1(*payload)
-	print(out)
-
-# utilityOutageTable(average_lost_kwh, profit_on_energy_sales, restoration_cost, hardware_cost, outageDuration, output_dir)
-utilcost = utilityOutageTable([1000,1000,1000], 0.02, 5000, 9000, 5, None) #None = tempfile output.
-print(utilcost)
-
-### RAW OUTAGE METRICS CALCULATIONS
-
-test_files = ['smartswitch_Outages.csv', 'smartswitch_outagesNew1.csv', 'smartswitch_outagesNew3.csv', 'smartswitch_outagesNew5.csv']
-root_path = f'{omf.omfDir}/static/testFiles/'
-sustainedOutageThreshold = '200'
-numberOfCustomers = '192'
-
-for fname in test_files:
-	pathToCsv = f'{root_path}/{fname}'
-	mc = pd.read_csv(pathToCsv)
-	try:
-		vals = stats(mc, sustainedOutageThreshold, numberOfCustomers)
-		print(fname, vals)
-	except:
-		print(fname, 'FAILURE!')
-
-# help(stats)
-
-# print(mc)
+utility_outage_cost_TEST()

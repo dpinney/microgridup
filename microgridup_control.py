@@ -31,7 +31,8 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 	data = []
 	unreasonable_voltages = {}
 	batt_cycles = {}
-	fossil_dict = {}
+	diesel_dict = {}
+	mmbtu_dict = {}
 	fossil_kwh_output = 0
 	batt_kwh_ratings = {}
 	fossil_kw_ratings = {}
@@ -58,15 +59,24 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 		for y_name in y_list: 
 			this_series = gen_data[gen_data[category_name] == ob_name]
 
-			# Add kwh output of fossil fuel generators to dictionary variable.
+			# Amass data for fuel consumption chart.
 			if ("lead_gen_" in ob_name or "fossil_" in ob_name) and not this_series[y_name].isnull().values.any(): 
 				fossil_kwh_output += sum(abs(this_series[y_name][outageStart:outageEnd])) if "fossil_" in ob_name else sum(this_series[y_name][outageStart:outageEnd])
-				if legend_group in fossil_dict.keys():
-					fossil_dict[legend_group] += sum(abs(this_series[y_name][outageStart:outageEnd])) if "fossil_" in ob_name else sum(this_series[y_name][outageStart:outageEnd])
-				else:
-					fossil_dict[legend_group] = sum(abs(this_series[y_name][outageStart:outageEnd])) if "fossil_" in ob_name else sum(this_series[y_name][outageStart:outageEnd])
-				# Make fossil loading percentages traces.
 				fossil_kw_rating = fossil_kw_ratings[ob_name.split("-")[1]] if "fossil_" in ob_name else vsource_ratings[ob_name.split("-")[1]]
+				additional = sum(abs(this_series[y_name][outageStart:outageEnd])) if "fossil_" in ob_name else sum(this_series[y_name][outageStart:outageEnd])
+				fossil_loading_average_decimal = additional / (float(fossil_kw_rating) * lengthOfOutage)
+				if fossil_loading_average_decimal > 1: fossil_loading_average_decimal = 1
+				diesel_consumption = (0.065728897 * fossil_loading_average_decimal + 0.003682709) * float(fossil_kw_rating) + (-0.027979695 * fossil_loading_average_decimal + 0.568328949)
+				mmbtu_consumption = (0.0112913202545883 * fossil_loading_average_decimal + 0.00171037274039439) * float(fossil_kw_rating) + (-0.0560953826993578* fossil_loading_average_decimal + 0.074238182761738)
+				if legend_group in diesel_dict.keys():
+					diesel_dict[legend_group] += diesel_consumption
+				else:
+					diesel_dict[legend_group] = diesel_consumption
+				if legend_group in mmbtu_dict.keys():
+					mmbtu_dict[legend_group] += mmbtu_consumption
+				else:
+					mmbtu_dict[legend_group] = mmbtu_consumption
+				# Make fossil loading percentages traces.
 				fossil_percent_loading = [(x / float(fossil_kw_rating)) * -100 for x in this_series[y_name]] if "fossil_" in ob_name else [(x / float(fossil_kw_rating)) * 100 for x in this_series[y_name]]
 				fossil_trace = go.Scatter(
 					x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
@@ -124,25 +134,22 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 		plotly.offline.plot(fossil_fig, filename=f'{csvName}_fossil_loading.plot.html', auto_open=False)
 
 		# Calculate total fossil genset consumption and make fossil fuel consumption chart. 
-		diesel_consumption_rate_gallons_per_kwh = 0.024570024570025 
-		kwh_to_mmbtu = 0.00341214163312794
-		total_gal_diesel = "{:e}".format(diesel_consumption_rate_gallons_per_kwh * fossil_kwh_output)
-		fossil_mmbtu_output = "{:e}".format(fossil_kwh_output * kwh_to_mmbtu)
 		fossil_kwh_output = "{:e}".format(fossil_kwh_output)
+		total_gal_diesel = "{:e}".format(sum(diesel_dict.values()))
+		total_mmbtu_gas = "{:e}".format(sum(mmbtu_dict.values()))
 		# Make fossil fuel consumption chart. 
-		fossil_dict = dict(sorted(fossil_dict.items()))
-		diesel_dict = [(x, y*diesel_consumption_rate_gallons_per_kwh) for x, y in fossil_dict.items()]
-		mmbtu_dict = [(x, y*kwh_to_mmbtu) for x, y in fossil_dict.items()]
+		diesel_dict = dict(sorted(diesel_dict.items()))
+		mmbtu_dict = dict(sorted(mmbtu_dict.items()))
 
 		fig = make_subplots(shared_xaxes=True, specs=[[{"secondary_y": True}]])
-		fig.add_trace(go.Bar(x = [item[0] for item in diesel_dict], y = [item[1] for item in diesel_dict], name="Diesel"), secondary_y=False)
-		fig.add_trace(go.Bar(x = [item[0] for item in mmbtu_dict], y = [item[1] for item in mmbtu_dict], name="Gas"), secondary_y=True)
+		fig.add_trace(go.Bar(x = list(diesel_dict.keys()), y = list(diesel_dict.values()), name="Diesel"), secondary_y=False)
+		fig.add_trace(go.Bar(x = list(mmbtu_dict.keys()), y = list(mmbtu_dict.values()), name="Gas"), secondary_y=True)
 		fig.update_layout(
-		    title_text = f"Diesel Equivalent Consumption During Outage By Microgrid<br><sup>Total Consumption in Gallons of Diesel = {total_gal_diesel} || Total Ouput in kWh = {fossil_kwh_output} || Total Output in MMBTU = {fossil_mmbtu_output}</sup>"
+		    title_text = f"Diesel and Natural Gas Equivalent Consumption During Outage By Microgrid<br><sup>Total Consumption in Gallons of Diesel = {total_gal_diesel} || Total Consumption in MMBTU Natural Gas = {total_mmbtu_gas}|| Total Ouput in kWh = {fossil_kwh_output}</sup>"
 		)
 		fig.update_xaxes(title_text="Microgrid")
-		fig.update_yaxes(title_text="Gallons of Diesel Equivalent Consumed", secondary_y=False)
-		fig.update_yaxes(title_text="MMBTU", secondary_y=True)
+		fig.update_yaxes(title_text="Gallons of Diesel Equivalent Consumed During Outage", secondary_y=False)
+		fig.update_yaxes(title_text="MMBTU of Natural Gas Equivalent Consumed During Outage", secondary_y=True)
 
 		plotly.offline.plot(fig, filename=f'{csvName}_fuel_consumption.plot.html', auto_open=False)
 

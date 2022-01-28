@@ -7,29 +7,31 @@ from numpy.random import exponential
 from datetime import datetime as dt
 from datetime import timedelta as td
 from omf.models.outageCost import stats
+import omf
 import csv
 import pandas as pd
 import plotly.graph_objects as go
 
 CSV_COL_FIELDS = ['ComponentAff', 'Start', 'Finish', 'Duration_min', 'Meters Affected']
-
 OUTS_FILENAME = 'lehigh_random_outages.csv'
-TEST_FILE = '/Users/dpinney/gdrive/LATERBASE/NRECA/MICROGRIDUP (MGU) ESTCP FY2020/del2.2.1K - Requirements and Specifications/microgridup mgu test system lehigh/lehigh_base_phased.dss'
+TEST_FILE = 'lehigh_base_phased.dss'
 AFFECTED_OBJ = '692675'
-#TODO: use outage len
-#TODO: what if the fault is inside the microgrid!?
 CRIT_OUT_LEN_MINUTES = 10*24*60
 MG_SUPPORTED_LOADS = ['634a_data_center','634b_radar','634c_atc_tower','675a_hospital','675b_residential1','675c_residential1','692_warehouse2']
+#TODO: use outage len
+#TODO: what if the fault is inside the microgrid!?
 
 tree = dssConvert.dssToTree(TEST_FILE)
 
 def __test_getting_affloads():
+	''' Private test method. '''
 	sub_obs = opendss.get_subtree_obs(AFFECTED_OBJ, tree)
 	print('SUB_OBS', len(sub_obs), sub_obs)
 	sub_loads = [x['object'][5:] for x in sub_obs if x.get('object','').startswith('load.')]
 	print('SUBLOAD_NAMES', len(sub_loads), sub_loads)
 
 def _random_outage():
+	''' Generate single random outage. '''
 	LINE_OBS_LEHIGH = ['670671','645646','692675','684611','684652','671692','632633','671684','632645','632670','650632','671680']
 	out_line = random.choice(LINE_OBS_LEHIGH)
 	duration = exponential(scale=100)
@@ -42,12 +44,14 @@ def _random_outage():
 	return [out_line, start_date, end_date, duration, ' '.join(loads_affected)]
 
 def _write_csv(filename, fields, rows):
+	''' Helper function to write a CSV. '''
 	with open(filename, 'w') as csvfile:
 		csvwriter = csv.writer(csvfile)
 		csvwriter.writerow(fields)
 		csvwriter.writerows(rows)
 
 def _gen_lehigh_outages(count):
+	''' Create <count> outages for the Lehigh circuit. '''
 	rows = []
 	for x in range(count):
 		rows.append(_random_outage())
@@ -56,6 +60,7 @@ def _gen_lehigh_outages(count):
 # _gen_lehigh_outages(100)
 
 def gen_supported_csv():
+	''' Generate a modified outage list factoring out outages that would have been averted by microgrids. '''
 	out_df = pd.read_csv(OUTS_FILENAME)
 	rows = out_df.values.tolist()
 	# print(raw_data)
@@ -69,6 +74,7 @@ def gen_supported_csv():
 	_write_csv(OUTS_FILENAME[0:-4] + '_ADJUSTED.csv', CSV_COL_FIELDS, rows)
 
 def gen_output():
+	''' Output for resilience before/after microgrid deployment. '''
 	# Generate general statistics.
 	gen_supported_csv()
 	out_stats_raw = stats(pd.read_csv(OUTS_FILENAME), '200', '21')
@@ -145,9 +151,9 @@ gen_output()
 import os
 os.system('open zoutput.html')
 
-from omf.models.microgridControl import customerCost1, utilityOutageTable
-import omf
+### RAW COST CALCULATIONS
 
+from omf.models.microgridControl import customerCost1, utilityOutageTable
 
 test_file = f'{omf.omfDir}/static/testFiles/customerInfo.csv'
 
@@ -167,9 +173,7 @@ for in_row in values:
 utilcost = utilityOutageTable([1000,1000,1000], 0.02, 5000, 9000, 5, None) #None = tempfile output.
 print(utilcost)
 
-import omf
-from omf.models.outageCost import stats
-import pandas as pd
+### RAW OUTAGE METRICS CALCULATIONS
 
 test_files = ['smartswitch_Outages.csv', 'smartswitch_outagesNew1.csv', 'smartswitch_outagesNew3.csv', 'smartswitch_outagesNew5.csv']
 root_path = f'{omf.omfDir}/static/testFiles/'

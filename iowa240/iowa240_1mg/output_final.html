@@ -1,0 +1,4466 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>MicrogridUP &raquo; iowa240_1mg</title>
+	<style type="text/css">
+		iframe {width:100%;height:600px}
+		* {font-family:sans-serif}
+	</style>
+	<script>
+		function openTab(tabName) {
+			for (tag of document.getElementsByClassName("tab")) {
+				tag.style.visibility = "hidden";
+			}
+			document.getElementById(tabName).style.visibility = "visible";  
+		}
+		window.onload = function(){ document.getElementById("loading").style.display = "none" }
+	</script>
+	<style type="text/css">
+		.tab {position:fixed; top:40px; left:0px; width:100%; height:100vh; visibility:hidden; border:0px}
+		#loading {width:100%; height:100%; top:0px; left:0px; position:fixed; display:block; z-index:99; background-color:rgba(0,0,0,0.5); text-align:center; line-height:60vh; font-size:80pt; font-family:Helvetica,Arial,Sans-Serif; text-shadow:0px 0px 5px white}
+	</style>
+</head>
+<body style="margin:0px; height:40px">
+	<div id="loading">Loading</div>
+	<div style="height:40px; width:100%; background:black; line-height:40px; padding-left:10px">
+		<p style="color:white; margin:0px">
+			<a style="color:white; text-decoration:none" href="/"><b>MicrogridUP</b></a> &raquo; iowa240_1mg
+			<button onclick="openTab('overview')">Overview</button>
+			<button onclick="openTab('oneline')">Oneline</button>
+			<button onclick="openTab('map')">Map</button>
+			<button onclick="openTab('interconnection')">Interconnection</button>
+			<button onclick="openTab('control')">Control</button>
+			
+				<button onclick="openTab('reopt_final_0')">mg0</button>			
+			
+			<button onclick="openTab('files')">Files</button>
+		</p>
+	</div>
+	<div id="overview" class="tab" style="margin:5px; overflow:scroll; visibility:visible">
+		<h3>Report Generated</h2>
+		<pre style="width:95%; white-space:pre-wrap">2022-01-31 14:30:34.890506</pre>
+		<h3>Model Inputs</h2>
+		<pre style="width:95%; white-space:pre-wrap">{'MODEL_DIR': 'iowa240_1mg', 'BASE_DSS': 'iowa240.clean_updated_coords.dss', 'LOAD_CSV': 'iowa240_load.csv', 'QSTS_STEPS': 480, 'FOSSIL_BACKUP_PERCENT': 1, 'REOPT_INPUTS': {'solar': 'on', 'wind': 'off', 'battery': 'on', 'year': '2017', 'analysisYears': '25', 'discountRate': '0.083', 'energyCost': '0.12', 'demandCost': '20', 'urdbLabelSwitch': 'off', 'wholesaleCost': '0.034', 'solarCost': '1600', 'windCost': '4989', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'batteryPowerCostReplace': '410', 'batteryCapacityCostReplace': '200', 'batteryPowerReplaceYear': '10', 'batteryCapacityReplaceYear': '10', 'dieselGenCost': '1000', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '100000', 'windMax': '100000', 'batteryPowerMax': '1000000', 'batteryCapacityMax': '1000000', 'dieselMax': '1000000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outageDuration': '48', 'fuelAvailable': '1000000', 'genExisting': 0, 'minGenLoading': '0', 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'dieselFuelCostGal': 1.5, 'dieselCO2Factor': 24.1, 'dieselOMCostKw': 35, 'dieselOMCostKwh': 0.02, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True, 'dieselOnlyRunsDuringOutage': False}, 'MICROGRIDS': {'mg0': {'loads': ['load_1003', 'load_1004', 'load_1005', 'load_1006', 'load_1007', 'load_1008', 'load_1009', 'load_1010', 'load_1011', 'load_1012', 'load_1013', 'load_1014', 'load_1015', 'load_1016', 'load_1017', 'load_2002', 'load_2003', 'load_2005', 'load_2008', 'load_2009', 'load_2010', 'load_2011', 'load_2014', 'load_2015', 'load_2016', 'load_2017', 'load_2018', 'load_2020', 'load_2022', 'load_2023', 'load_2024', 'load_2025', 'load_2028', 'load_2029', 'load_2030', 'load_2031', 'load_2032', 'load_2034', 'load_2035', 'load_2037', 'load_2040', 'load_2041', 'load_2042', 'load_2043', 'load_2045', 'load_2046', 'load_2047', 'load_2048', 'load_2049', 'load_2050', 'load_2051', 'load_2052', 'load_2053', 'load_2054', 'load_2055', 'load_2056', 'load_2058', 'load_2059', 'load_2060', 'load_3002', 'load_3004', 'load_3006', 'load_3007', 'load_3009', 'load_3010', 'load_3011', 'load_3012', 'load_3013', 'load_3014', 'load_3016', 'load_3017', 'load_3018', 'load_3019', 'load_3020', 'load_3021', 'load_3023', 'load_3024', 'load_3025', 'load_3026', 'load_3027', 'load_3028', 'load_3029', 'load_3031', 'load_3032', 'load_3033', 'load_3034', 'load_3035', 'load_3036', 'load_3037', 'load_3038', 'load_3039', 'load_3041', 'load_3042', 'load_3043', 'load_3044', 'load_3045', 'load_3047', 'load_3048', 'load_3049', 'load_3050', 'load_3051', 'load_3052', 'load_3054', 'load_3056', 'load_3057', 'load_3058', 'load_3059', 'load_3060', 'load_3061', 'load_3062', 'load_3063', 'load_3064', 'load_3065', 'load_3066', 'load_3067', 'load_3070', 'load_3071', 'load_3072', 'load_3073', 'load_3074', 'load_3077', 'load_3078', 'load_3081', 'load_3083', 'load_3084', 'load_3085', 'load_3086', 'load_3087', 'load_3088', 'load_3089', 'load_3090', 'load_3091', 'load_3093', 'load_3094', 'load_3095', 'load_3096', 'load_3097', 'load_3098', 'load_3099', 'load_3101', 'load_3102', 'load_3103', 'load_3104', 'load_3105', 'load_3106', 'load_3108', 'load_3109', 'load_3110', 'load_3111', 'load_3112', 'load_3114', 'load_3115', 'load_3116', 'load_3117', 'load_3120', 'load_3121', 'load_3122', 'load_3123', 'load_3124', 'load_3125', 'load_3126', 'load_3127', 'load_3128', 'load_3129', 'load_3130', 'load_3131', 'load_3132', 'load_3134', 'load_3135', 'load_3136', 'load_3137', 'load_3138', 'load_3139', 'load_3141', 'load_3142', 'load_3143', 'load_3144', 'load_3145', 'load_3146', 'load_3147', 'load_3148', 'load_3149', 'load_3150', 'load_3151', 'load_3152', 'load_3153', 'load_3154', 'load_3155', 'load_3157', 'load_3158', 'load_3159', 'load_3160', 'load_3161', 'load_3162'], 'switch': 'cb_1', 'gen_bus': 'bus_fault', 'gen_obs_existing': [], 'critical_load_kws': [1000]}}, 'FAULTED_LINE': 'cb_1', 'DIESEL_SAFETY_FACTOR': False}</pre>
+		<h3>User Warnings</h3>
+		<pre style="width:95%; white-space:pre-wrap">Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+</pre>
+		<!-- formatted below for a dict of lists -->
+		<h3>Overview of Microgrid Results</h3>
+		<table style="margin-bottom:40px">
+			
+				<tr>
+					<td>Microgrid Name</td>
+					
+						
+							<td style="text-align:right">mg0</td>
+						
+					
+						
+							<td style="text-align:right">Summary</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Generation Bus</td>
+					
+						
+							<td style="text-align:right">bus_fault</td>
+						
+					
+						
+							<td style="text-align:right">None</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Minimum 1 hr Load (kW)</td>
+					
+						
+							<td style="text-align:right">677</td>
+						
+					
+						
+							<td style="text-align:right">676</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Average 1 hr Load (kW)</td>
+					
+						
+							<td style="text-align:right">1,498</td>
+						
+					
+						
+							<td style="text-align:right">1,498</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Average Daytime 1 hr Load (kW)</td>
+					
+						
+							<td style="text-align:right">1,800</td>
+						
+					
+						
+							<td style="text-align:right">1,800</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Maximum 1 hr Load (kW)</td>
+					
+						
+							<td style="text-align:right">3,530</td>
+						
+					
+						
+							<td style="text-align:right">3,529</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Maximum 1 hr Critical Load (kW)</td>
+					
+						
+							<td style="text-align:right">1,000</td>
+						
+					
+						
+							<td style="text-align:right">1,000</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Existing Fossil Generation (kW)</td>
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>New Fossil Generation (kW)</td>
+					
+						
+							<td style="text-align:right">1,227</td>
+						
+					
+						
+							<td style="text-align:right">1,227</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Existing Solar (kW)</td>
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>New Solar (kW)</td>
+					
+						
+							<td style="text-align:right">3,583</td>
+						
+					
+						
+							<td style="text-align:right">3,583</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Existing Battery Power (kW)</td>
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Existing Battery Energy Storage (kWh)</td>
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>New Battery Power (kW)</td>
+					
+						
+							<td style="text-align:right">103</td>
+						
+					
+						
+							<td style="text-align:right">103</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>New Battery Energy Storage (kWh)</td>
+					
+						
+							<td style="text-align:right">136</td>
+						
+					
+						
+							<td style="text-align:right">136</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Existing Wind (kW)</td>
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>New Wind (kW)</td>
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+						
+							<td style="text-align:right">0</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Total Generation on Microgrid (kW)</td>
+					
+						
+							<td style="text-align:right">4,912</td>
+						
+					
+						
+							<td style="text-align:right">4,912</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Renewable Generation (% of Annual kWh)</td>
+					
+						
+							<td style="text-align:right">33</td>
+						
+					
+						
+							<td style="text-align:right">33</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Emissions (Yr 1 Tons CO2)</td>
+					
+						
+							<td style="text-align:right">7,583</td>
+						
+					
+						
+							<td style="text-align:right">7,583</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Emissions Reduction (Yr 1 % CO2)</td>
+					
+						
+							<td style="text-align:right">33</td>
+						
+					
+						
+							<td style="text-align:right">33</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Average Outage Survived (h)</td>
+					
+						
+							<td style="text-align:right">nan</td>
+						
+					
+						
+							<td style="text-align:right">nan</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>O+M Costs (Yr 1 $ before tax)</td>
+					
+						
+							<td style="text-align:right">151,096</td>
+						
+					
+						
+							<td style="text-align:right">151,096</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>CapEx ($)</td>
+					
+						
+							<td style="text-align:right">8,322,077</td>
+						
+					
+						
+							<td style="text-align:right">8,322,077</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>CapEx after Tax Incentives ($)</td>
+					
+						
+							<td style="text-align:right">5,714,306</td>
+						
+					
+						
+							<td style="text-align:right">5,714,306</td>
+						
+					
+				</tr>
+			
+				<tr>
+					<td>Net Present Value ($)</td>
+					
+						
+							<td style="text-align:right">930,234</td>
+						
+					
+						
+							<td style="text-align:right">930,234</td>
+						
+					
+				</tr>
+			
+		</table>
+		<h3>Distribution Upgrades needed to create Microgrids</h3>
+		<table style="margin-bottom:40px">
+			<tr>
+				<th>Microgrid</th>
+				<th>Location</th>
+				<th>Recommended Upgrade</th>
+				<th>Cost Estimate ($)</th>
+			</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">Microgrid Design</td>
+					
+				
+					
+						<td style="text-align:right">100,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">Microgrid Controls</td>
+					
+				
+					
+						<td style="text-align:right">100,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">cb_1</td>
+					
+				
+					
+						<td style="text-align:right">SCADA disconnect switch</td>
+					
+				
+					
+						<td style="text-align:right">50,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_1003</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_1004</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_1005</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_1006</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_1007</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_1008</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_1009</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_1010</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_1011</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_1012</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_1013</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_1014</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_1015</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_1016</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_1017</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2002</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2003</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2005</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2008</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2009</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2010</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2011</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2014</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2015</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2016</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2017</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2018</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2020</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2022</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2023</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2024</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2025</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2028</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2029</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2030</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2031</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2032</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2034</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2035</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2037</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2040</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2041</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2042</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2043</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2045</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2046</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2047</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2048</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2049</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2050</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2051</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2052</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2053</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2054</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2055</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2056</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2058</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2059</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_2060</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3002</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3004</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3006</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3007</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3009</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3010</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3011</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3012</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3013</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3014</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3016</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3017</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3018</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3019</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3020</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3021</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3023</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3024</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3025</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3026</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3027</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3028</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3029</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3031</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3032</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3033</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3034</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3035</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3036</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3037</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3038</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3039</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3041</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3042</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3043</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3044</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3045</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3047</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3048</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3049</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3050</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3051</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3052</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3054</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3056</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3057</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3058</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3059</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3060</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3061</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3062</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3063</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3064</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3065</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3066</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3067</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3070</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3071</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3072</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3073</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3074</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3077</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3078</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3081</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3083</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3084</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3085</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3086</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3087</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3088</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3089</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3090</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3091</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3093</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3094</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3095</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3096</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3097</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3098</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3099</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3101</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3102</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3103</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3104</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3105</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3106</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3108</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3109</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3110</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3111</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3112</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3114</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3115</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3116</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3117</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3120</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3121</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3122</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3123</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3124</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3125</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3126</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3127</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3128</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3129</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3130</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3131</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3132</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3134</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3135</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3136</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3137</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3138</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3139</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3141</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3142</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3143</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3144</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3145</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3146</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3147</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3148</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3149</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3150</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3151</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3152</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3153</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3154</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3155</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3157</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3158</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3159</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3160</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3161</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+				<tr>
+				
+					
+						<td style="text-align:right">mg0</td>
+					
+				
+					
+						<td style="text-align:right">load_3162</td>
+					
+				
+					
+						<td style="text-align:right">AMI disconnect meter</td>
+					
+				
+					
+						<td style="text-align:right">5,000</td>
+					
+				
+				</tr>
+			
+		</table>
+	</div>
+	<div id="oneline" class="tab" style="visibility:hidden">
+		<iframe src="circuit_oneline.html" style="height:100vh"></iframe>
+	</div>
+	<div id="map" class="tab" style="visibility:hidden">
+		<iframe src="circuit_map/geoJsonMap_offline.html" style="height:100vh"></iframe>
+	</div>
+	<div id="interconnection" class="tab" style="visibility:hidden">
+		<div style="height:100vh; overflow:scroll">
+			<iframe src="timeseries_gen.csv.plot.html"></iframe>
+			<iframe src="timeseries_load.csv.plot.html"></iframe>
+			<iframe src="timeseries_source.csv.plot.html"></iframe>
+			<iframe src="timeseries_control.csv.plot.html"></iframe>
+		</div>
+	</div>
+	<div id="control" class="tab" style="visibility:hidden">
+		<div style="height:100vh; overflow:scroll">
+			<iframe src="timezcontrol_source_and_gen.csv.plot.html"></iframe>
+			<iframe src="timezcontrol_load.csv.plot.html"></iframe>
+			<iframe src="timezcontrol_control.csv.plot.html"></iframe>
+			<iframe src="timezcontrol_source_and_gen.csv_battery_cycles.plot.html"></iframe>
+			<iframe src="timezcontrol_source_and_gen.csv_fossil_loading.plot.html"></iframe>
+			<iframe src="timezcontrol_source_and_gen.csv_fuel_consumption.plot.html"></iframe>
+		</div>
+	</div>
+	
+	<div id="reopt_final_0" class="tab" style="visibility:hidden">
+		<iframe src="reopt_final_0/inlineTemplate.html" style="height:100vh"></iframe>
+	</div>
+	
+	<div id="files" class="tab" style="visibility:hidden">
+		<div style="height:100vh; overflow:scroll">
+			<ul>
+			
+			<li><a href='/iowa240_1mg/./timeseries_control.csv.plot.html'>./timeseries_control.csv.plot.html</a></li>
+			
+			<li><a href='/iowa240_1mg/./loads.csv'>./loads.csv</a></li>
+			
+			<li><a href='/iowa240_1mg/./ref_gen_loads.csv'>./ref_gen_loads.csv</a></li>
+			
+			<li><a href='/iowa240_1mg/./timeseries_control.csv'>./timeseries_control.csv</a></li>
+			
+			<li><a href='/iowa240_1mg/./dss_run_file.dss'>./dss_run_file.dss</a></li>
+			
+			<li><a href='/iowa240_1mg/./circuit_plusmg_0.dss'>./circuit_plusmg_0.dss</a></li>
+			
+			<li><a href='/iowa240_1mg/./circuit.dss'>./circuit.dss</a></li>
+			
+			<li><a href='/iowa240_1mg/./ultimate_rep_circuit_plusmg_0.dss.csv'>./ultimate_rep_circuit_plusmg_0.dss.csv</a></li>
+			
+			<li><a href='/iowa240_1mg/./timeseries_gen.csv'>./timeseries_gen.csv</a></li>
+			
+			<li><a href='/iowa240_1mg/./timeseries_gen.csv.plot.html'>./timeseries_gen.csv.plot.html</a></li>
+			
+			<li><a href='/iowa240_1mg/./circuit.dss.omd'>./circuit.dss.omd</a></li>
+			
+			<li><a href='/iowa240_1mg/./volts.csv'>./volts.csv</a></li>
+			
+			<li><a href='/iowa240_1mg/./Voltage Profile [PU].png'>./Voltage Profile [PU].png</a></li>
+			
+			<li><a href='/iowa240_1mg/./0running.txt'>./0running.txt</a></li>
+			
+			<li><a href='/iowa240_1mg/./timeseries_load.csv.plot.html'>./timeseries_load.csv.plot.html</a></li>
+			
+			<li><a href='/iowa240_1mg/./coords.csv'>./coords.csv</a></li>
+			
+			<li><a href='/iowa240_1mg/./timeseries_source.csv'>./timeseries_source.csv</a></li>
+			
+			<li><a href='/iowa240_1mg/./generation.csv'>./generation.csv</a></li>
+			
+			<li><a href='/iowa240_1mg/./circuit_oneline.html'>./circuit_oneline.html</a></li>
+			
+			<li><a href='/iowa240_1mg/./output_final.html'>./output_final.html</a></li>
+			
+			<li><a href='/iowa240_1mg/./timeseries_load.csv'>./timeseries_load.csv</a></li>
+			
+			<li><a href='/iowa240_1mg/./timeseries_source.csv.plot.html'>./timeseries_source.csv.plot.html</a></li>
+			
+			<li><a href='/iowa240_1mg/./user_warnings.txt'>./user_warnings.txt</a></li>
+			
+			<li><a href='/iowa240_1mg/./240_node_test_system_VLN.Txt'>./240_node_test_system_VLN.Txt</a></li>
+			
+			<li><a href='/iowa240_1mg/./output_full_0.html'>./output_full_0.html</a></li>
+			
+			<li><a href='/iowa240_1mg/./mg_add_cost_0.csv'>./mg_add_cost_0.csv</a></li>
+			
+			<li><a href='/iowa240_1mg/./allInputData.json'>./allInputData.json</a></li>
+			
+			<li><a href='/iowa240_1mg/./reopt_base_0/inlineTemplate.html'>./reopt_base_0/inlineTemplate.html</a></li>
+			
+			<li><a href='/iowa240_1mg/./reopt_base_0/resultsResilience.json'>./reopt_base_0/resultsResilience.json</a></li>
+			
+			<li><a href='/iowa240_1mg/./reopt_base_0/Scenario_test_POST.json'>./reopt_base_0/Scenario_test_POST.json</a></li>
+			
+			<li><a href='/iowa240_1mg/./reopt_base_0/loadShape.csv'>./reopt_base_0/loadShape.csv</a></li>
+			
+			<li><a href='/iowa240_1mg/./reopt_base_0/results.json'>./reopt_base_0/results.json</a></li>
+			
+			<li><a href='/iowa240_1mg/./reopt_base_0/allOutputData.json'>./reopt_base_0/allOutputData.json</a></li>
+			
+			<li><a href='/iowa240_1mg/./reopt_base_0/criticalLoadShape.csv'>./reopt_base_0/criticalLoadShape.csv</a></li>
+			
+			<li><a href='/iowa240_1mg/./reopt_base_0/allInputData.json'>./reopt_base_0/allInputData.json</a></li>
+			
+			<li><a href='/iowa240_1mg/./circuit_map/geoJsonMap_offline.html'>./circuit_map/geoJsonMap_offline.html</a></li>
+			
+			<li><a href='/iowa240_1mg/./reopt_final_0/inlineTemplate.html'>./reopt_final_0/inlineTemplate.html</a></li>
+			
+			<li><a href='/iowa240_1mg/./reopt_final_0/resultsResilience.json'>./reopt_final_0/resultsResilience.json</a></li>
+			
+			<li><a href='/iowa240_1mg/./reopt_final_0/Scenario_test_POST.json'>./reopt_final_0/Scenario_test_POST.json</a></li>
+			
+			<li><a href='/iowa240_1mg/./reopt_final_0/loadShape.csv'>./reopt_final_0/loadShape.csv</a></li>
+			
+			<li><a href='/iowa240_1mg/./reopt_final_0/results.json'>./reopt_final_0/results.json</a></li>
+			
+			<li><a href='/iowa240_1mg/./reopt_final_0/allOutputData.json'>./reopt_final_0/allOutputData.json</a></li>
+			
+			<li><a href='/iowa240_1mg/./reopt_final_0/criticalLoadShape.csv'>./reopt_final_0/criticalLoadShape.csv</a></li>
+			
+			<li><a href='/iowa240_1mg/./reopt_final_0/allInputData.json'>./reopt_final_0/allInputData.json</a></li>
+			
+			</ul>
+		</div>
+	</div>
+</body>
+</html>

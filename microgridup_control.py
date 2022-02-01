@@ -61,21 +61,22 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 
 			# Amass data for fuel consumption chart.
 			if ("lead_gen_" in ob_name or "fossil_" in ob_name) and not this_series[y_name].isnull().values.any(): 
-				fossil_kwh_output += sum(abs(this_series[y_name][outageStart:outageEnd])) if "fossil_" in ob_name else sum(this_series[y_name][outageStart:outageEnd])
-				fossil_kw_rating = fossil_kw_ratings[ob_name.split("-")[1]] if "fossil_" in ob_name else vsource_ratings[ob_name.split("-")[1]]
 				additional = sum(abs(this_series[y_name][outageStart:outageEnd])) if "fossil_" in ob_name else sum(this_series[y_name][outageStart:outageEnd])
+				fossil_kwh_output += additional
+				fossil_kw_rating = fossil_kw_ratings[ob_name.split("-")[1]] if "fossil_" in ob_name else vsource_ratings[ob_name.split("-")[1]]
 				fossil_loading_average_decimal = additional / (float(fossil_kw_rating) * lengthOfOutage)
-				if fossil_loading_average_decimal > 1: fossil_loading_average_decimal = 1
-				diesel_consumption = (0.065728897 * fossil_loading_average_decimal + 0.003682709) * float(fossil_kw_rating) + (-0.027979695 * fossil_loading_average_decimal + 0.568328949)
-				mmbtu_consumption = (0.0112913202545883 * fossil_loading_average_decimal + 0.00171037274039439) * float(fossil_kw_rating) + (-0.0560953826993578* fossil_loading_average_decimal + 0.074238182761738)
+				diesel_consumption_gal_per_hour = (0.065728897 * fossil_loading_average_decimal + 0.003682709) * float(fossil_kw_rating) + (-0.027979695 * fossil_loading_average_decimal + 0.568328949)
+				diesel_consumption_outage = diesel_consumption_gal_per_hour * lengthOfOutage
+				mmbtu_consumption_mmbtu_per_hour = (0.0112913202545883 * fossil_loading_average_decimal + 0.00171037274039439) * float(fossil_kw_rating) + (-0.0560953826993578* fossil_loading_average_decimal + 0.074238182761738)
+				mmbtu_consumption_outage = mmbtu_consumption_mmbtu_per_hour * lengthOfOutage
 				if legend_group in diesel_dict.keys():
-					diesel_dict[legend_group] += diesel_consumption
+					diesel_dict[legend_group] += diesel_consumption_outage
 				else:
-					diesel_dict[legend_group] = diesel_consumption
+					diesel_dict[legend_group] = diesel_consumption_outage
 				if legend_group in mmbtu_dict.keys():
-					mmbtu_dict[legend_group] += mmbtu_consumption
+					mmbtu_dict[legend_group] += mmbtu_consumption_outage
 				else:
-					mmbtu_dict[legend_group] = mmbtu_consumption
+					mmbtu_dict[legend_group] = mmbtu_consumption_outage
 				# Make fossil loading percentages traces.
 				fossil_percent_loading = [(x / float(fossil_kw_rating)) * -100 for x in this_series[y_name]] if "fossil_" in ob_name else [(x / float(fossil_kw_rating)) * 100 for x in this_series[y_name]]
 				fossil_trace = go.Scatter(

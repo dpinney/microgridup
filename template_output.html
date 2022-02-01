@@ -28,6 +28,7 @@
 			<button onclick="openTab('overview')">Overview</button>
 			<button onclick="openTab('oneline')">Oneline</button>
 			<button onclick="openTab('map')">Map</button>
+			{% if resilience_show %}<button onclick="openTab('resilience')">Resilience</button>{% endif %}
 			<button onclick="openTab('interconnection')">Interconnection</button>
 			<button onclick="openTab('control')">Control</button>
 			{% for name, folder in mg_names_and_reopt_folders.items() %}
@@ -90,6 +91,11 @@
 	<div id="map" class="tab" style="visibility:hidden">
 		<iframe src="circuit_map/geoJsonMap_offline.html" style="height:100vh"></iframe>
 	</div>
+	{% if resilience_show %}
+	<div id="resilience" class="tab" style="visibility:hidden">
+		<iframe src="output_resilience.html" style="height:100vh"></iframe>
+	</div>
+	{% endif %}
 	<div id="interconnection" class="tab" style="visibility:hidden">
 		<div style="height:100vh; overflow:scroll">
 			<iframe src="timeseries_gen.csv.plot.html"></iframe>

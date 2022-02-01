@@ -3,6 +3,7 @@ from omf.solvers.opendss import dssConvert
 from omf import distNetViz
 from omf import geo
 import microgridup_control
+import microgridup_resilience
 import shutil
 import os
 from os import path
@@ -1588,7 +1589,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	if open_results:
 		os.system(f'open {BIG_OUT_NAME}')
 
-def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, DIESEL_SAFETY_FACTOR=False, DELETE_FILES=False, open_results=False):
+def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, DIESEL_SAFETY_FACTOR=False, DELETE_FILES=False, open_results=False, OUTAGE_CSV=None):
 	# CONSTANTS
 	MODEL_DSS = 'circuit.dss'
 	MODEL_LOAD_CSV = 'loads.csv'
@@ -1604,6 +1605,8 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 	try:
 		shutil.copyfile(BASE_DSS, f'{MODEL_DIR}/{MODEL_DSS}')
 		shutil.copyfile(LOAD_CSV, f'{MODEL_DIR}/{MODEL_LOAD_CSV}')
+		if OUTAGE_CSV:
+			shutil.copyfile(OUTAGE_CSV, f'{MODEL_DIR}/outages.csv')
 		os.system(f'touch {MODEL_DIR}/0running.txt')
 		os.remove("0crashed.txt")
 	except:
@@ -1633,7 +1636,8 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 				'REOPT_INPUTS':REOPT_INPUTS,
 				'MICROGRIDS':MICROGRIDS,
 				'FAULTED_LINE':FAULTED_LINE,
-				'DIESEL_SAFETY_FACTOR':DIESEL_SAFETY_FACTOR
+				'DIESEL_SAFETY_FACTOR':DIESEL_SAFETY_FACTOR,
+				'OUTAGE_CSV':OUTAGE_CSV
 			}
 			json.dump(inputs, inputs_file, indent=4)
 		# Run the analysis
@@ -1643,6 +1647,12 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 			new_mg_names = mgs_name_sorted[0:i+1]
 			new_mg_for_control = {name:MICROGRIDS[name] for name in new_mg_names}
 			main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], new_mg_for_control, GEN_NAME, REF_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, FAULTED_LINE, mg_name, f'mg_add_cost_{i}.csv', FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR, open_results=False)
+		# Resilience simulation with outages. Optional. Skipped if no OUTAGE_CSV
+		if OUTAGE_CSV:
+			all_microgrid_loads = [x.get('loads',[]) for x in MICROGRIDS.values()]
+			all_loads = [item for sublist in all_microgrid_loads for item in sublist]
+			mg_count = len(MICROGRIDS.keys())
+			microgridup_resilience.main('outages.csv', 'outages_ADJUSTED.csv', all_loads, f'circuit_plusmg_{mg_count-1}.dss', 'output_resilience.html')
 		# Build Final report
 		reports = [x for x in os.listdir('.') if x.startswith('ultimate_rep_')]
 		reports.sort()
@@ -1680,7 +1690,8 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 			raw_files = _walkTree('.'),
 			model_name = MODEL_DIR,
 			add_cost_rows = add_cost_rows,
-			mg_names_and_reopt_folders = names_and_folders
+			mg_names_and_reopt_folders = names_and_folders,
+			resilience_show = (OUTAGE_CSV is not None)
 		)
 		with open(FINAL_REPORT,'w') as outFile:
 			outFile.write(out)

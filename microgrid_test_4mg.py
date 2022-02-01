@@ -10,6 +10,7 @@ if __name__ == '__main__':
 	FAULTED_LINE = '650632'
 	QSTS_STEPS = 24*20
 	FOSSIL_BACKUP_PERCENT = 1
+	OUTAGE_CSV = 'lehigh_random_outages.csv'
 	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth
 	REOPT_INPUTS = {
 		"solar" : "on",
@@ -92,4 +93,4 @@ if __name__ == '__main__':
 		}
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True, OUTAGE_CSV=OUTAGE_CSV)

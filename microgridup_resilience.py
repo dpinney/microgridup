@@ -161,8 +161,12 @@ def utility_outage_cost_TEST():
 	utilcost = utilityOutageTable([1000,1000,1000], 0.02, 5000, 9000, 5, None) #None = tempfile output.
 	print(utilcost)
 
-_many_random_outages(100, 'lehigh_random_outages999.csv', 'lehigh_base_phased.dss')
-utility_outage_cost_TEST()
-customer_outage_cost(f'{omf.omfDir}/static/testFiles/customerInfo.csv')
-main('lehigh_random_outages.csv', 'lehigh_random_outages_ADJUSTED.csv', ['634a_data_center','634b_radar','634c_atc_tower','675a_hospital','675b_residential1','675c_residential1','692_warehouse2'], 'lehigh_base_phased.dss', 'zoutput.html')
-os.system('open zoutput.html')
+def _tests():
+	_many_random_outages(100, 'lehigh_random_outages999.csv', 'lehigh_base_phased.dss')
+	utility_outage_cost_TEST()
+	customer_outage_cost(f'{omf.omfDir}/static/testFiles/customerInfo.csv')
+	main('lehigh_random_outages.csv', 'lehigh_random_outages_ADJUSTED.csv', ['634a_data_center','634b_radar','634c_atc_tower','675a_hospital','675b_residential1','675c_residential1','692_warehouse2'], 'lehigh_base_phased.dss', 'zoutput.html')
+	os.system('open zoutput.html')
+
+if __name__ == '__main__':
+	tests()

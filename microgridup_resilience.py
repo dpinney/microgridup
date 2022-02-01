@@ -14,7 +14,7 @@ import plotly.graph_objects as go
 import os
 from omf.models.microgridControl import customerCost1, utilityOutageTable
 
-CSV_COL_FIELDS = ['ComponentAff', 'Start', 'Finish', 'Duration_min', 'Meters Affected']
+OUTAGE_CSV_COLS = ['ComponentAff', 'Start', 'Finish', 'Duration_min', 'Meters Affected']
 CRIT_OUT_LEN_MINUTES = 10*24*60 #TODO: use outage len
 #TODO: what if the fault is inside the microgrid!?
 
@@ -54,7 +54,7 @@ def _many_random_outages(count, out_filename, in_dss):
 	rows = []
 	for x in range(count):
 		rows.append(_random_outage(tree))
-	_write_csv(out_filename, CSV_COL_FIELDS, rows)
+	_write_csv(out_filename, OUTAGE_CSV_COLS, rows)
 
 def gen_supported_csv(in_path, out_path, mg_supported_loads, tree):
 	''' Generate a modified outage list factoring out outages that would have been averted by microgrids. '''
@@ -68,7 +68,7 @@ def gen_supported_csv(in_path, out_path, mg_supported_loads, tree):
 		# print(f'orig {len(sub_loads)} not supp {len(not_supported)} specifically {not_supported}')
 		row[4] = ' '.join(not_supported)
 	# print(rows)
-	_write_csv(out_path, CSV_COL_FIELDS, rows)
+	_write_csv(out_path, OUTAGE_CSV_COLS, rows)
 
 def main(in_csv, out_csv, mg_supported_loads, in_dss, out_html):
 	''' Output for resilience before/after microgrid deployment. '''

@@ -75,7 +75,7 @@ def main(in_csv, out_csv, mg_supported_loads, in_dss, out_html):
 	# Generate general statistics.
 	tree = dssConvert.dssToTree(in_dss)	
 	gen_supported_csv(in_csv, out_csv, mg_supported_loads, tree)
-	out_stats_raw = stats(pd.read_csv(out_csv), '200', '21')
+	out_stats_raw = stats(pd.read_csv(in_csv), '200', '21')
 	out_stats_new = stats(pd.read_csv(out_csv), '200', '21')
 	stats_html = f'''
 		<h1>Original and Adjusted Resilience Metrics</h1>

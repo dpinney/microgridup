@@ -75,34 +75,38 @@ def main(in_csv, out_csv, mg_supported_loads, in_dss, out_html):
 	# Generate general statistics.
 	tree = dssConvert.dssToTree(in_dss)	
 	gen_supported_csv(in_csv, out_csv, mg_supported_loads, tree)
-	out_stats_raw = stats(pd.read_csv(in_csv), '200', '21')
-	out_stats_new = stats(pd.read_csv(out_csv), '200', '21')
+	raw_df = pd.read_csv(in_csv)
+	new_df = pd.read_csv(out_csv)
+	out_stats_raw = stats(raw_df, '200', '21')
+	out_stats_new = stats(new_df, '200', '21')
+	years = set([x.year for x in pd.to_datetime(raw_df['Start']).dt.date])
+	count_years = len(years)
 	stats_html = f'''
 		<h1>Original and Adjusted Resilience Metrics</h1>
 		<table>
 		<tr>
 			<th></th>
 			<th>SAIDI</th>
-			<th>SAIFI</th> 
+			<th>SAIFI</th>
 			<th>CAIDI</th>
 			<th>ASAI</th>
 			<th>MAIFI</th>
 		</tr>
 		<tr>
 			<td>Current</td>
-			<td>{out_stats_raw[0]}</td>
-			<td>{out_stats_raw[1]}</td>
-			<td>{out_stats_raw[2]}</td>
-			<td>{out_stats_raw[3]}</td>
-			<td>{out_stats_raw[4]}</td>
+			<td>{round(out_stats_raw[0]/count_years,2)}</td>
+			<td>{round(out_stats_raw[1]/count_years,2)}</td>
+			<td>{round(out_stats_raw[2]/count_years,2)}</td>
+			<td>{round(out_stats_raw[3]/count_years,2)}</td>
+			<td>{round(out_stats_raw[4]/count_years,2)}</td>
 		</tr>
 		<tr>
 			<td>Microgrid</td>
-			<td>{out_stats_new[0]}</td>
-			<td>{out_stats_new[1]}</td>
-			<td>{out_stats_new[2]}</td>
-			<td>{out_stats_new[3]}</td>
-			<td>{out_stats_new[4]}</td>
+			<td>{round(out_stats_new[0]/count_years,2)}</td>
+			<td>{round(out_stats_new[1]/count_years,2)}</td>
+			<td>{round(out_stats_new[2]/count_years,2)}</td>
+			<td>{round(out_stats_new[3]/count_years,2)}</td>
+			<td>{round(out_stats_new[4]/count_years,2)}</td>
 		</tr>
 		</table>
 	'''
@@ -169,4 +173,4 @@ def _tests():
 	os.system('open zoutput.html')
 
 if __name__ == '__main__':
-	tests()
+	_tests()

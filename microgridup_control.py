@@ -287,8 +287,8 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		# First get all loads.
 		all_mg_loads = [
 			ob for ob in dssTree
-			if ob.get('bus1','x.x').split('.')[0] == gen_bus
-			and 'load.' in ob.get('object')
+			if ob.get("object","x.x").split('.')[1] in mg_values["loads"]
+			and "load." in ob.get("object")
 		]
 		if len(all_mg_loads) > 0: # i.e. if we have loads
 			load_loadshapes = []

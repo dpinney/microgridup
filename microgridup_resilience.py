@@ -119,12 +119,13 @@ def main(in_csv, out_csv, mg_supported_loads, in_dss, out_html):
 	}).drop(['ComponentAff', 'Start', 'Finish'], 1)
 	df_full = pd.concat([df_init, df_with_mg], axis=1)
 	df_full['Date'] = pd.to_datetime(df_full['Start']).dt.date
-	df_full['Meter Count'] = [len(str(x).split()) for x in df_full['Meters Affected']]
-	df_full['Microgrid Meter Count'] = [len(str(x).split()) for x in df_full['Microgrid Meters Affected']]
+	print(df_full.head())
+	df_full['Meter Count'] = [0 if str(x).lower() == "nan" else len(str(x).split()) for x in df_full['Meters Affected']]
+	df_full['Microgrid Meter Count'] = [0 if str(x).lower() == "nan" else len(str(x).split()) for x in df_full['Microgrid Meters Affected']]
 	df_full['Customer Outage Minutes'] = [x[0]*x[1] for x in zip(df_full['Meter Count'],df_full['Duration_min'])]
 	df_full['Microgrid Customer Outage Minutes'] = [x[0]*x[1] for x in zip(df_full['Microgrid Meter Count'],df_full['Microgrid Duration_min'])]
 	#TODO: better table styling https://pandas.pydata.org/pandas-docs/version/0.23/generated/pandas.DataFrame.to_html.html
-	table_html = '<h1>Full Outage History and Microgrid Adjustements</h1>' + df_full.to_html()
+	table_html = '<h1>Full Outage History and Microgrid Adjustments</h1>' + df_full.to_html()
 	fig = go.Figure(
 		data=[
 			go.Bar(

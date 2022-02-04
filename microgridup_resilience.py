@@ -73,14 +73,14 @@ def gen_supported_csv(in_path, out_path, mg_supported_loads, tree):
 def main(in_csv, out_csv, mg_supported_loads, in_dss, out_html):
 	''' Output for resilience before/after microgrid deployment. '''
 	# Generate general statistics.
-	tree = dssConvert.dssToTree(in_dss)	
+	tree = dssConvert.dssToTree(in_dss)
+	load_count = len([x for x in tree if x.get('object','').startswith('load.')])
+	print('LOAD COUNT', load_count)
 	gen_supported_csv(in_csv, out_csv, mg_supported_loads, tree)
 	raw_df = pd.read_csv(in_csv)
 	new_df = pd.read_csv(out_csv)
-	out_stats_raw = stats(raw_df, '200', '21')
-	out_stats_new = stats(new_df, '200', '21')
-	years = set([x.year for x in pd.to_datetime(raw_df['Start']).dt.date])
-	count_years = len(years)
+	out_stats_raw = stats(raw_df, '200', str(load_count)) #interuption of less than '200' seconds considered momentary.
+	out_stats_new = stats(new_df, '200', str(load_count))
 	stats_html = f'''
 		<h1>Original and Adjusted Resilience Metrics</h1>
 		<table>
@@ -94,19 +94,19 @@ def main(in_csv, out_csv, mg_supported_loads, in_dss, out_html):
 		</tr>
 		<tr>
 			<td>Current</td>
-			<td>{round(out_stats_raw[0]/count_years,2)}</td>
-			<td>{round(out_stats_raw[1]/count_years,2)}</td>
-			<td>{round(out_stats_raw[2]/count_years,2)}</td>
-			<td>{round(out_stats_raw[3]/count_years,2)}</td>
-			<td>{round(out_stats_raw[4]/count_years,2)}</td>
+			<td>{round(out_stats_raw[0],1)}</td>
+			<td>{round(out_stats_raw[1],3)}</td>
+			<td>{round(out_stats_raw[2],3)}</td>
+			<td>{round(out_stats_raw[3],4)}</td>
+			<td>{round(out_stats_raw[4],3)}</td>
 		</tr>
 		<tr>
 			<td>Microgrid</td>
-			<td>{round(out_stats_new[0]/count_years,2)}</td>
-			<td>{round(out_stats_new[1]/count_years,2)}</td>
-			<td>{round(out_stats_new[2]/count_years,2)}</td>
-			<td>{round(out_stats_new[3]/count_years,2)}</td>
-			<td>{round(out_stats_new[4]/count_years,2)}</td>
+			<td>{round(out_stats_new[0],1)}</td>
+			<td>{round(out_stats_new[1],3)}</td>
+			<td>{round(out_stats_new[2],3)}</td>
+			<td>{round(out_stats_new[3],4)}</td>
+			<td>{round(out_stats_new[4],3)}</td>
 		</tr>
 		</table>
 	'''

@@ -326,13 +326,16 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 				y_axis = this_series[y_name]
 			# Splice over the outage portions if manual balance approach was used (rengen only circuit).
 			if rengen_mgs and legend_group in rengen_mgs:
-				if "mongenenerator-wind" in ob_name or "mongenerator-solar" in ob_name:
+				if "mongenerator-wind" in ob_name or "mongenerator-solar" in ob_name:
 					splice = rengen_proportional_loadshapes[legend_group][ob_name.split("-")[1]]
+					y_axis = list(y_axis[:outageStart]) + splice + list(y_axis[outageEnd:])
 				if "mongenerator-battery" in ob_name:
 					splice = storage_proportional_loadshapes[legend_group][ob_name.split("-")[1]]
+					y_axis = list(y_axis[:outageStart]) + splice + list(y_axis[outageEnd:])
 				if "monload-" in ob_name:
 					splice = rengen_mgs[legend_group]["Generic loadshape (kw)"]
-				y_axis = list(y_axis[:outageStart]) + splice + list(y_axis[outageEnd:])
+					y_axis = list(y_axis[:outageStart]) + splice + list(y_axis[outageEnd:])
+				legend_group = f"{legend_group} – Manual Balance Approach used during outage"
 			if not this_series[y_name].isnull().values.any():
 				trace = go.Scatter(
 					x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed

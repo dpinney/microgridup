@@ -177,7 +177,9 @@ def plot_manual_balance_approach(mg_key, outageStart, outageEnd, new_batt_loadsh
 		yaxis = dict(title = "kW")
 	)
 	fig = plotly.graph_objs.Figure(data, layout)
-	plotly.offline.plot(fig, filename=f'{mg_key}_gen_load_storage.plot.html', auto_open=False)
+	out_name = f'{mg_key}_gen_load_storage.plot.html'
+	plotly.offline.plot(fig, filename=out_name, auto_open=False)
+	return out_name
 
 def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_name, y_axis_name, ansi_bands=False, batt_cycle_chart=False, fossil_loading_chart=False, vsource_ratings=None, rengen_mgs=None):
 	(outageStart, lengthOfOutage, switchingTime) = 60, 120, 30
@@ -431,13 +433,12 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		close object=line.{faultedLine} term=3
 	'''
 	actions[1] = ''
-
 	# Initialize dict of vsource ratings 
 	big_gen_ratings = {}
-
 	# Initialize dict of rengen mg labels and data.
 	rengen_mgs = {}
-
+	# Keep track of any renewable-only microgrids.
+	rengen_fnames = []
 	# Add per-microgrid objects, edits and actions.
 	for mg_key, mg_values in microgrids.items():
 		# Add load shed.
@@ -512,21 +513,18 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			'''
 		else:
 			manual_balance_approach = True
-
 		# Manually construct battery loadshapes for outage.
 		dssTree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw = do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTree)
-
 		# Manual Balance Approach plotting call.
 		if manual_balance_approach == True:
-			plot_manual_balance_approach(mg_key, outageStart, outageEnd, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw)
+			fname = plot_manual_balance_approach(mg_key, outageStart, outageEnd, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw)
+			rengen_fnames.append(fname)
 			rengen_mgs[mg_key] = {"All loads loadshapes during outage (kw)":list(all_loads_shapes_kw[outageStart:outageEnd]),
 			"All rengen loadshapes during outage (kw)":list(all_rengen_shapes[outageStart:outageEnd]),
 			"Cumulative battery loadshape during outage (kw)":list(new_batt_loadshape),
 			"Surplus rengen":total_surplus}
-
 	# print("big_gen_ratings",big_gen_ratings)
 	# print("rengen_mgs",rengen_mgs)
-
 	# Additional calcv to make sure the simulation runs.
 	actions[outageStart] += f'calcv\n'
 	actions[outageEnd] += f'calcv\n'
@@ -542,7 +540,6 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		actions=actions,
 		filePrefix=FPREFIX
 	)
-
 	# Merge gen and source csvs for plotting fossil loading percentages
 	inputs = [f'{FPREFIX}_gen.csv', f'{FPREFIX}_source.csv']
 	# First determine the field names from the top line of each input file
@@ -563,13 +560,29 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 				reader = csv.DictReader(f_in)  # Uses the field names in this file
 				for line in reader:
 					writer.writerow(line)
-	
 	# Generate the output charts.
 	# make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Generator Output", "Average hourly kW", batt_cycle_chart=True)
 	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, dssTree, "Load Voltage", "PU", ansi_bands=True, rengen_mgs=rengen_mgs)
 	# make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Voltage Source Output", "Average hourly kW", vsource_ratings=big_gen_ratings)
 	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], 2019, microgrids, dssTree, "Tap Position", "PU")
 	make_chart(f'{FPREFIX}_source_and_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Generator Output", "Average Hourly kW", batt_cycle_chart=True, fossil_loading_chart=True, vsource_ratings=big_gen_ratings, rengen_mgs=rengen_mgs)
-
 	# Undo directory change.
 	os.chdir(curr_dir)
+	# Write final output file.
+	output_slug = '''	
+		<style type="text/css">
+			iframe {width:100%;height:600px}
+			* {font-family:sans-serif}
+		</style>
+		<iframe src="timezcontrol_source_and_gen.csv.plot.html"></iframe>
+		<iframe src="timezcontrol_load.csv.plot.html"></iframe>
+		<iframe src="timezcontrol_control.csv.plot.html"></iframe>
+		<iframe src="timezcontrol_source_and_gen.csv_battery_cycles.plot.html"></iframe>
+		<iframe src="timezcontrol_source_and_gen.csv_fossil_loading.plot.html"></iframe>
+		<iframe src="timezcontrol_source_and_gen.csv_fuel_consumption.plot.html"></iframe>'''
+	print(f'Control microgrids count {len(microgrids)} and renewable count {len(rengen_fnames)}')
+	for rengen_name in rengen_fnames:
+		# insert renewable manual balance plots.
+		output_slug = output_slug + f'<iframe src="{rengen_name}"></iframe>'
+	with open('output_control.html','w') as outFile:
+		outFile.write(output_slug)

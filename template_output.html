@@ -93,7 +93,9 @@
 	</div>
 	{% if resilience_show %}
 	<div id="resilience" class="tab" style="visibility:hidden">
-		<iframe src="output_resilience.html" style="height:100vh"></iframe>
+		<div style="height:100vh; overflow:scroll">
+			<iframe src="output_resilience.html" style="height:100vh"></iframe>
+		</div>
 	</div>
 	{% endif %}
 	<div id="interconnection" class="tab" style="visibility:hidden">
@@ -105,14 +107,7 @@
 		</div>
 	</div>
 	<div id="control" class="tab" style="visibility:hidden">
-		<div style="height:100vh; overflow:scroll">
-			<iframe src="timezcontrol_source_and_gen.csv.plot.html"></iframe>
-			<iframe src="timezcontrol_load.csv.plot.html"></iframe>
-			<iframe src="timezcontrol_control.csv.plot.html"></iframe>
-			<iframe src="timezcontrol_source_and_gen.csv_battery_cycles.plot.html"></iframe>
-			<iframe src="timezcontrol_source_and_gen.csv_fossil_loading.plot.html"></iframe>
-			<iframe src="timezcontrol_source_and_gen.csv_fuel_consumption.plot.html"></iframe>
-		</div>
+		<iframe src="output_control.html" style="height:100vh"></iframe>
 	</div>
 	{% for name, folder in mg_names_and_reopt_folders.items() %}
 	<div id="{{folder}}" class="tab" style="visibility:hidden">

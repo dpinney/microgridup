@@ -172,7 +172,7 @@ def plot_manual_balance_approach(mg_key, outageStart, outageEnd, new_batt_loadsh
 
 	# Plots load traces, gen traces, storage traces.
 	layout = go.Layout(
-		title = f'{mg_key} Generation, Load, and Storage During Outage',
+		title = f'{mg_key} Generation, Load, and Storage in Fully Renewable Microgrid During Outage',
 		xaxis = dict(title = 'Date'),
 		yaxis = dict(title = "kW")
 	)

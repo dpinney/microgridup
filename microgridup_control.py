@@ -570,16 +570,20 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 	os.chdir(curr_dir)
 	# Write final output file.
 	output_slug = '''	
-		<style type="text/css">
-			iframe {width:100%;height:600px}
-			* {font-family:sans-serif}
-		</style>
-		<iframe src="timezcontrol_source_and_gen.csv.plot.html"></iframe>
-		<iframe src="timezcontrol_load.csv.plot.html"></iframe>
-		<iframe src="timezcontrol_control.csv.plot.html"></iframe>
-		<iframe src="timezcontrol_source_and_gen.csv_battery_cycles.plot.html"></iframe>
-		<iframe src="timezcontrol_source_and_gen.csv_fossil_loading.plot.html"></iframe>
-		<iframe src="timezcontrol_source_and_gen.csv_fuel_consumption.plot.html"></iframe>'''
+		<head>
+			<style type="text/css">
+				* {font-family:sans-serif}
+				iframe {width:100%; height:600px; border-color:gray; border-style:solid; border-width:1px 0px 0px 0px}
+			</style>
+		</head>
+		<body style="margin:0px">
+			<iframe src="timezcontrol_source_and_gen.csv.plot.html"></iframe>
+			<iframe src="timezcontrol_load.csv.plot.html"></iframe>
+			<iframe src="timezcontrol_control.csv.plot.html"></iframe>
+			<iframe src="timezcontrol_source_and_gen.csv_battery_cycles.plot.html"></iframe>
+			<iframe src="timezcontrol_source_and_gen.csv_fossil_loading.plot.html"></iframe>
+			<iframe src="timezcontrol_source_and_gen.csv_fuel_consumption.plot.html"></iframe>
+		</body>'''
 	print(f'Control microgrids count {len(microgrids)} and renewable count {len(rengen_fnames)}')
 	for rengen_name in rengen_fnames:
 		# insert renewable manual balance plots.

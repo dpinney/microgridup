@@ -5,6 +5,8 @@
 	<style type="text/css">
 		iframe {width:100%;height:600px}
 		* {font-family:sans-serif}
+		.tab {position:fixed; top:40px; left:0px; width:100%; height:100vh; visibility:hidden; border:0px}
+		#loading {width:100%; height:100%; top:0px; left:0px; position:fixed; display:block; z-index:99; background-color:rgba(0,0,0,0.5); text-align:center; line-height:60vh; font-size:80pt; font-family:Helvetica,Arial,Sans-Serif; text-shadow:0px 0px 5px white}
 	</style>
 	<script>
 		function openTab(tabName) {
@@ -15,14 +17,10 @@
 		}
 		window.onload = function(){ document.getElementById("loading").style.display = "none" }
 	</script>
-	<style type="text/css">
-		.tab {position:fixed; top:40px; left:0px; width:100%; height:100vh; visibility:hidden; border:0px}
-		#loading {width:100%; height:100%; top:0px; left:0px; position:fixed; display:block; z-index:99; background-color:rgba(0,0,0,0.5); text-align:center; line-height:60vh; font-size:80pt; font-family:Helvetica,Arial,Sans-Serif; text-shadow:0px 0px 5px white}
-	</style>
 </head>
 <body style="margin:0px; height:40px">
 	<div id="loading">Loading</div>
-	<div style="height:40px; width:100%; background:black; line-height:40px; padding-left:10px">
+	<div style="height:40px; background:black; line-height:40px; padding-left:10px">
 		<p style="color:white; margin:0px">
 			<a style="color:white; text-decoration:none" href="/"><b>MicrogridUP</b></a> &raquo; {{model_name}}
 			<button onclick="openTab('overview')">Overview</button>
@@ -44,7 +42,6 @@
 		<pre style="width:95%; white-space:pre-wrap">{{inputs}}</pre>
 		<h3>User Warnings</h3>
 		<pre style="width:95%; white-space:pre-wrap">{{warnings}}</pre>
-		<!-- formatted below for a dict of lists -->
 		<h3>Overview of Microgrid Results</h3>
 		<table style="margin-bottom:40px">
 			{% for k,v in summary.items() %}

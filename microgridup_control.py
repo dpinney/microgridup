@@ -582,8 +582,6 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 	# make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Voltage Source Output", "Average hourly kW", vsource_ratings=big_gen_ratings)
 	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], 2019, microgrids, dssTree, "Tap Position", "PU")
 	make_chart(f'{FPREFIX}_source_and_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Generator Output", "Average Hourly kW", batt_cycle_chart=True, fossil_loading_chart=True, vsource_ratings=big_gen_ratings, rengen_mgs=rengen_mgs)
-	# Undo directory change.
-	os.chdir(curr_dir)
 	# Write final output file.
 	output_slug = '''	
 		<head>
@@ -606,3 +604,5 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		output_slug = output_slug + f'<iframe src="{rengen_name}"></iframe>'
 	with open('output_control.html','w') as outFile:
 		outFile.write(output_slug)
+	# Undo directory change.
+	os.chdir(curr_dir)

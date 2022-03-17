@@ -144,7 +144,7 @@ def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTre
 		dssTree[batt_loadshape_idx]['mult'] = str(final_batt_loadshape).replace(" ","")
 	return dssTree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw
 
-def plot_manual_balance_approach(mg_key, outageStart, outageEnd, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw):
+def plot_manual_balance_approach(mg_key, year, outageStart, outageEnd, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw):
 	# Creates plot of manually constructed battery activity, load, and renewable generation (all cumulative).
 	lengthOfOutage = outageEnd - outageStart
 	data = []
@@ -155,10 +155,12 @@ def plot_manual_balance_approach(mg_key, outageStart, outageEnd, new_batt_loadsh
 	rengen_during_outage_post_curtailment = [x-y for x,y in zip(all_rengen_shapes[outageStart:outageEnd],total_surplus)]
 	all_rengen_shapes = list(all_rengen_shapes[:outageStart]) + rengen_during_outage_post_curtailment + list(all_rengen_shapes[outageEnd:])
 	gen_and_storage_shape = [x-y for x,y in zip(all_rengen_shapes,storage_shape)]
+	# According to Matt – rengen should be negative. Generation is negative, load is positive.
+	rengen_shapes_for_plot = [-1 * x for x in all_rengen_shapes]
 
 	y_axis_names = ["All loads loadshapes (kW)","All renewable generators loadshapes (kW)","All storage shapes (kW)","Generation and storage (added together)"]
-	plotting_variables = [all_loads_shapes_kw[outageStart:outageEnd], all_rengen_shapes[outageStart:outageEnd], storage_shape[outageStart:outageEnd], gen_and_storage_shape[outageStart:outageEnd]]
-	start_time = pd.Timestamp("2019-01-01") + pd.Timedelta(hours=outageStart)
+	plotting_variables = [all_loads_shapes_kw[outageStart:outageEnd], rengen_shapes_for_plot[outageStart:outageEnd], storage_shape[outageStart:outageEnd], gen_and_storage_shape[outageStart:outageEnd]]
+	start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outageStart)
 	for idx in range(len(plotting_variables)):
 		# Traces for gen, load, storage.
 		trace = go.Scatter(
@@ -306,20 +308,26 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 
 			# If battery_ and not null values, count battery cycles.
 			if "battery_" in ob_name and not this_series[y_name].isnull().values.any():
-				batt_kwh_input_output = sum(abs(this_series[y_name]))
+				if rengen_mgs and legend_group in rengen_mgs:
+					curr_series_list = list(this_series[y_name])
+					outage_portion = storage_proportional_loadshapes[legend_group][ob_name.split("-")[1]]
+					all_batt_loadshapes = curr_series_list[:outageStart] + outage_portion + curr_series_list[outageEnd:]
+					batt_kwh_input_output = sum([abs(x) for x in all_batt_loadshapes])
+				else:
+					batt_kwh_input_output = sum(abs(this_series[y_name]))
 				batt_kwh_rating = batt_kwh_ratings[ob_name.split("-")[1]]
 				cycles = batt_kwh_input_output / (2 * float(batt_kwh_rating)) 
 				batt_cycles[f"{ob_name}_{y_name}"] = cycles
 
-			# Flag loads that don't fall within ansi bands. Also continue HACK.
+			# Flag loads that don't fall within ansi bands.
 			if "_load" in csvName:
 				if (this_series[y_name] > 1.1).any() or (this_series[y_name] < 0.9).any():
 					unreasonable_voltages[f"{ob_name}_{y_name}"] = ob_name
 
 			# Traces for gen, load, control. 
 			name = ob_name + '_' + y_name
-			if name in unreasonable_voltages:
-				name = '[BAD]_' + name
+			# if name in unreasonable_voltages:
+				# name = '[BAD]_' + name
 			if "mongenerator" in ob_name:
 				y_axis = this_series[y_name] * -1
 				# if not this_series[y_name].isnull().values.any():
@@ -337,13 +345,15 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 				if "monload-" in ob_name:
 					splice = rengen_mgs[legend_group]["Generic loadshape (kw)"]
 					y_axis = list(y_axis[:outageStart]) + splice + list(y_axis[outageEnd:])
-				legend_group = f"{legend_group} – Manual Balance Approach used during outage"
+				plot_legend_group = f"{legend_group} – Manual Balance Approach used during outage"
+			else:
+				plot_legend_group = legend_group
 			if not this_series[y_name].isnull().values.any():
 				trace = go.Scatter(
 					x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
 					y = y_axis,
-					legendgroup=legend_group,
-					legendgrouptitle_text=legend_group,
+					legendgroup=plot_legend_group,
+					legendgrouptitle_text=plot_legend_group,
 					showlegend = True,
 					name = name,
 					hoverlabel = dict(namelength = -1)
@@ -388,7 +398,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 			y = list(batt_cycles.values()) 
 		)
 		new_layout = go.Layout(
-			title = "Battery Cycles",
+			title = "Battery Cycles During Analysis Period",
 			xaxis = dict(title = 'Battery'),
 			yaxis = dict(title = 'Cycles')
 			)
@@ -397,7 +407,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 
 	# Plots for gen, load, control.
 	layout = go.Layout(
-		title = f'{chart_name}',
+		title = f'{chart_name} <br><sup>Dotted black lines indicate outage start and end times</sup>',
 		xaxis = dict(title = 'Date'),
 		yaxis = dict(title = y_axis_name)
 	)
@@ -406,6 +416,12 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 		line_style = {'color':'Red', 'width':3, 'dash':'dashdot'}
 		fig.add_hline(y=0.9, line=line_style)
 		fig.add_hline(y=1.1, line=line_style)
+	# Add outage start and end markers.
+	outage_line_style = {'color':'Black', 'width':1, 'dash':'dot'}
+	start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outageStart)
+	end_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outageStart) + pd.Timedelta(hours=lengthOfOutage)
+	fig.add_vline(x=start_time, line=outage_line_style)
+	fig.add_vline(x=end_time, line=outage_line_style)
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
 def play(pathToDss, workDir, microgrids, faultedLine):
@@ -517,7 +533,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		dssTree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw = do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTree)
 		# Manual Balance Approach plotting call.
 		if manual_balance_approach == True:
-			fname = plot_manual_balance_approach(mg_key, outageStart, outageEnd, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw)
+			fname = plot_manual_balance_approach(mg_key, 2019, outageStart, outageEnd, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw)
 			rengen_fnames.append(fname)
 			rengen_mgs[mg_key] = {"All loads loadshapes during outage (kw)":list(all_loads_shapes_kw[outageStart:outageEnd]),
 			"All rengen loadshapes during outage (kw)":list(all_rengen_shapes[outageStart:outageEnd]),

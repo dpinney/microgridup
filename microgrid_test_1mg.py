@@ -11,6 +11,7 @@ if __name__ == '__main__':
 	FAULTED_LINE = '650632' # Why this line, which is not closing off the genbus from source?
 	QSTS_STEPS = 24*20
 	FOSSIL_BACKUP_PERCENT = 1
+	# OUTAGE_CSV = 'lehigh_random_outages.csv'
 	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth
 	REOPT_INPUTS = {
 		"solar" : "on",

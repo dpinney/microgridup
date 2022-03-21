@@ -155,11 +155,11 @@ def plot_manual_balance_approach(mg_key, year, outageStart, outageEnd, new_batt_
 	rengen_during_outage_post_curtailment = [x-y for x,y in zip(all_rengen_shapes[outageStart:outageEnd],total_surplus)]
 	all_rengen_shapes = list(all_rengen_shapes[:outageStart]) + rengen_during_outage_post_curtailment + list(all_rengen_shapes[outageEnd:])
 	gen_and_storage_shape = [x-y for x,y in zip(all_rengen_shapes,storage_shape)]
-	# According to Matt – rengen should be negative. Generation is negative, load is positive.
-	rengen_shapes_for_plot = [-1 * x for x in all_rengen_shapes]
+	# According to David – storage should be flipped. Discharging is positive. Charging is negative. 
+	storage_shapes_for_plot = [-1 * x for x in storage_shape]
 
 	y_axis_names = ["All loads loadshapes (kW)","All renewable generators loadshapes (kW)","All storage shapes (kW)","Generation and storage (added together)"]
-	plotting_variables = [all_loads_shapes_kw[outageStart:outageEnd], rengen_shapes_for_plot[outageStart:outageEnd], storage_shape[outageStart:outageEnd], gen_and_storage_shape[outageStart:outageEnd]]
+	plotting_variables = [all_loads_shapes_kw[outageStart:outageEnd], all_rengen_shapes[outageStart:outageEnd], storage_shapes_for_plot[outageStart:outageEnd], gen_and_storage_shape[outageStart:outageEnd]]
 	start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outageStart)
 	for idx in range(len(plotting_variables)):
 		# Traces for gen, load, storage.
@@ -326,8 +326,8 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 
 			# Traces for gen, load, control. 
 			name = ob_name + '_' + y_name
-			# if name in unreasonable_voltages:
-				# name = '[BAD]_' + name
+			if name in unreasonable_voltages:
+				name = name + '_[voltage_violation]'
 			if "mongenerator" in ob_name:
 				y_axis = this_series[y_name] * -1
 				# if not this_series[y_name].isnull().values.any():
@@ -595,10 +595,11 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			<iframe src="timezcontrol_load.csv.plot.html"></iframe>
 			<iframe src="timezcontrol_control.csv.plot.html"></iframe>
 			<iframe src="timezcontrol_source_and_gen.csv_battery_cycles.plot.html"></iframe>
-			<iframe src="timezcontrol_source_and_gen.csv_fossil_loading.plot.html"></iframe>
-			<iframe src="timezcontrol_source_and_gen.csv_fuel_consumption.plot.html"></iframe>
 		</body>'''
 	print(f'Control microgrids count {len(microgrids)} and renewable count {len(rengen_fnames)}')
+	if len(microgrids) != len(rengen_fnames):
+		output_slug = output_slug + '''<iframe src="timezcontrol_source_and_gen.csv_fossil_loading.plot.html"></iframe>
+			<iframe src="timezcontrol_source_and_gen.csv_fuel_consumption.plot.html"></iframe>'''
 	for rengen_name in rengen_fnames:
 		# insert renewable manual balance plots.
 		output_slug = output_slug + f'<iframe src="{rengen_name}"></iframe>'

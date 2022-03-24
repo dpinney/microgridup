@@ -44,6 +44,9 @@ def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTre
 			load_loadshapes.append(list_load_loadshape)
 		data = np.array(load_loadshapes)
 		all_loads_shapes_kw = np.sum(data,0)
+	else:
+		print("Error: No loads.")
+		return dssTree, None, None, None, None, None
 
 	# Second, get all renewable generation.
 	all_mg_rengen = [
@@ -61,6 +64,8 @@ def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTre
 			rengen_loadshapes.append(list_rengen_loadshape)
 		data = np.array(rengen_loadshapes)
 		all_rengen_shapes = np.sum(data,0)
+	else:
+		all_rengen_shapes = np.zeros(len(all_loads_shapes_kw))
 	
 	# Third, get battery sizes.
 	batt_obj = [

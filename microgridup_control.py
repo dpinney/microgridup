@@ -24,6 +24,44 @@ from omf.models import flisr
 from omf.solvers.opendss import dssConvert
 from omf.solvers import opendss
 
+def calc_transformer_inrush(dssTransformerDict):
+	# TO DO: figure out if inrushes should be calculated separately for each winding. Current calculates separately but then adds together for one inrush per transformer. 
+	# I(peak) = 1.414 Vm / R(ohms) 
+	inrush = 0
+	for idx in range(len(dssTransformerDict.get('kvs')[1:-1].split(','))):
+		voltage = float(dssTransformerDict.get('kvs')[1:-1].split(',')[idx])
+		resistance = float(dssTransformerDict.get('%rs','[0.0005,0.0005]')[1:-1].split(',')[idx]) * float(dssTransformerDict.get('kvas')[1:-1].split(',')[idx])
+		# TO DO: figure out what to do when transformers don't have a %rs value. Use %loadloss? 
+		inrush += math.sqrt(2) * voltage / resistance 
+	return inrush
+
+def calc_all_transformer_inrush(dssTree):
+	transformer_inrushes = {}
+	for obj in dssTree:
+		if 'transformer.' in obj.get('object',''):
+			inrush = calc_transformer_inrush(obj)
+			transformer_inrushes[obj.get('object')] = inrush
+	return transformer_inrushes
+
+def calc_motor_inrush(dssLoadDict, motor_perc=0.5):
+	voltage = float(dssLoadDict.get('kv'))
+	power = float(dssLoadDict.get('kw'))
+	if dssLoadDict.get('phases') == 3:
+		inrush = power / (math.sqrt(3) * voltage)
+	else:
+		inrush = power / voltage
+		# TO DO: make sure single phase motor loads are calculated the same as three phase loads but without root 3 factor.
+	# I(amps) = P(w) / (sqrt(3)*E(volts))
+	return inrush * motor_perc
+
+def calc_all_motor_inrush(dssTree, motor_perc=0.5):
+	motor_inrushes = {}
+	for obj in dssTree:
+		if 'load.' in obj.get('object',''):
+			inrush = calc_motor_inrush(obj, motor_perc)
+			motor_inrushes[obj.get('object')] = inrush
+	return motor_inrushes
+
 def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTree):
 	# Manually constructs battery loadshapes for outage and reinserts into tree based on a proportional to kWh basis. 
 	gen_bus = mg_values['gen_bus']

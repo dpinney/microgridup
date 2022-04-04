@@ -24,6 +24,26 @@ from omf.models import flisr
 from omf.solvers.opendss import dssConvert
 from omf.solvers import opendss
 
+# def estimate_inrush(set_of_transformers_and_loads) -> loadshape_of_inrush:
+	# Inrush loadshape will likely be very large e.g. 3x normal load and very short e.g. 10 milliseconds.
+	# return
+
+# def calculate_fossil_surge_power(fossil_dss_object) -> (power, duration):
+	# Short burst of power from fossil units that can typically provide 4x or 5x their nameplate output? Need to research. 
+	# return
+
+# def super_cap_size(inrush_loadshape) -> (power,duration):
+	# Mitigation option 1: we tell the user how big their supercapacitor needs to be. (supercaps are like super-high-power, low energy batteries). Figure out max power of loadshape_of_inrush, figure out duration, specify as a super cap (power, duration).
+	# return
+
+def gradual_load_pickup(dssTree, motor_perc=0.5):
+	# Assume some order of switching on, assume none of the inrushes overlap but the steady state powerflows do, calculate max power during this process
+	all_loads = [obj for obj in dssTree if 'load.' in obj.get('object','')]
+	all_loads.sort(key=lambda x:float(x.get('kw')))
+	max_load_kw = all_loads[-1]
+	max_inrush = calc_motor_inrush(max_load_kw, motor_perc=0.5)
+	return max_inrush
+
 def calc_transformer_inrush(dssTransformerDict):
 	# TO DO: figure out if inrushes should be calculated separately for each winding. Current calculates separately but then adds together for one inrush per transformer. 
 	# I(peak) = 1.414 Vm / R(ohms) 

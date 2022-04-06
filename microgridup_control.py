@@ -24,9 +24,15 @@ from omf.models import flisr
 from omf.solvers.opendss import dssConvert
 from omf.solvers import opendss
 
-# def estimate_inrush(set_of_transformers_and_loads) -> loadshape_of_inrush:
+def estimate_inrush(list_of_transformers_and_loads, motor_perc=0.5):
 	# Inrush loadshape will likely be very large e.g. 3x normal load and very short e.g. 10 milliseconds.
-	# return
+	inrush = {}
+	for obj in list_of_transformers_and_loads:
+		if 'transformer.' in obj.get('object',''):
+			inrush[obj.get('object')] = calc_transformer_inrush(obj)
+		elif 'load.' in obj.get('object',''):
+			inrush[obj.get('object','')] = calc_motor_inrush(obj, motor_perc)
+	return sum(inrush.values())
 
 # def calculate_fossil_surge_power(fossil_dss_object) -> (power, duration):
 	# Short burst of power from fossil units that can typically provide 4x or 5x their nameplate output? Need to research. 

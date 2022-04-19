@@ -684,7 +684,6 @@ new object=capacitor.cap_201 phases=3 bus1=bus2038.1.2.3 kv=13.80000 kvar=[50] e
 new object=capacitor.cap_301 phases=3 bus1=bus3079.1.2.3 kv=13.80000 kvar=[50] enabled=true
 makebuslist
 ! redirect busvoltagebases.dss  ! set voltage bases
-set voltagebases=[69,13.8,0.208]
 calcvoltagebases
 ! solve
 ! show quantity=voltages

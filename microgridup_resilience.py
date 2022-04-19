@@ -148,7 +148,7 @@ def main(in_csv, out_csv, mg_supported_loads, in_dss, out_html):
 	))
 	chart_html = '<h1>Outage Timeline, Original and Microgrid</h1>' + fig.to_html(default_height='800px')
 	with open(out_html,'w') as outFile:
-		outFile.write(stats_html + '\n' + chart_html + '\n' + table_html)
+		outFile.write('<style>* {font-family:sans-serif}</style>' + stats_html + '\n' + chart_html + '\n' + table_html)
 
 def customer_outage_cost(csv_path):
 	rows = [x.split(',') for x in open(csv_path).readlines()]

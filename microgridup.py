@@ -1528,7 +1528,7 @@ def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
 	# print(reps)
 	return(reps)
 
-def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, FAULTED_LINE, mg_name, ADD_COST_NAME, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR = False, open_results=True):
+def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, FAULTED_LINE, mg_name, ADD_COST_NAME, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR = False, open_results=True, final_run=False):
 	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_NAME, microgrid, mg_name)
 	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load, mg_name)
 	# to run microgridup with automatic feedback loop to update fossil size, include the following:
@@ -1541,53 +1541,54 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, microgrid)
 	dssConvert.dssToOmd(FULL_NAME, OMD_NAME, RADIUS=0.0002)
-	# Draw the circuit oneline.
-	distNetViz.viz(OMD_NAME, forceLayout=False, outputPath='.', outputName=ONELINE_NAME, open_file=False)
-	# Draw the map.
-	geo.mapOmd(OMD_NAME, MAP_NAME, 'html', openBrowser=False, conversion=False)
-	# Powerflow outputs.
-	print('QSTS with ', FULL_NAME, 'AND CWD IS ', os.getcwd())
-	opendss.newQstsPlot(FULL_NAME,
-		stepSizeInMinutes=60, 
-		numberOfSteps=QSTS_STEPS,
-		keepAllFiles=False,
-		actions={
-			#24*5:'open object=line.671692 term=1',
-			#24*8:'new object=fault.f1 bus1=670.1.2.3 phases=3 r=0 ontime=0.0'
-		},
-		filePrefix='timeseries'
-	)
-	# opendss.voltagePlot(FULL_NAME, PU=True)
-	# opendss.currentPlot(FULL_NAME)
-	#TODO!!!! we're clobbering these outputs each time we run the full workflow. Consider keeping them separate.
-	#HACK: If only analyzing a set of generators with a single phase, remove ['P2(kW)','P3(kW)'] of make_chart('timeseries_gen.csv',...) below
-	make_chart('timeseries_gen.csv', FULL_NAME, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Generator Output", "Average hourly kW")
-	# for timeseries_load, output ANSI Range A service bands (2,520V - 2,340V for 2.4kV and 291V - 263V for 0.277kV)
-	make_chart('timeseries_load.csv', FULL_NAME, 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'], QSTS_STEPS, "Load Voltage", "PU", ansi_bands = True)
-	make_chart('timeseries_source.csv', FULL_NAME, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Voltage Source Output", "Average hourly kW")
-	make_chart('timeseries_control.csv', FULL_NAME, 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS, "Tap Position", "PU")
-	# Perform control sim.
-	microgridup_control.play(FULL_NAME, os.getcwd(), playground_microgrids, FAULTED_LINE)
-	# Generate microgrid control hardware costs.
-	mg_add_cost(ADD_COST_NAME, microgrid, mg_name)	
-	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
-	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
-	# convert mg_list_of_dicts_full to dict of lists for columnar output in output_template.html
-	mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
-	# Create consolidated report per mg.
-	mg_add_cost_dict_of_lists = pd.read_csv(ADD_COST_NAME).to_dict(orient='list')
-	template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
-	out = template.render(
-		summary=mg_dict_of_lists_full,
-		inputs={'circuit':BASE_NAME,'loads':LOAD_NAME, 'Maximum Proportion of critical load to be served by fossil generation':FOSSIL_BACKUP_PERCENT, 'REopt inputs':REOPT_INPUTS,'microgrid':microgrid},
-		added_costs = mg_add_cost_dict_of_lists,
-		mg_names_and_reopt_folders = {mg_name:REOPT_FOLDER_FINAL}
-	)
-	#TODO: have an option where we make the template <iframe srcdoc="{{X}}"> to embed the html and create a single file.
-	with open(BIG_OUT_NAME,'w') as outFile:
-		outFile.write(out)
-	if open_results:
-		os.system(f'open {BIG_OUT_NAME}')
+	if final_run:
+		# Draw the circuit oneline.
+		distNetViz.viz(OMD_NAME, forceLayout=False, outputPath='.', outputName=ONELINE_NAME, open_file=False)
+		# Draw the map.
+		geo.mapOmd(OMD_NAME, MAP_NAME, 'html', openBrowser=False, conversion=False)
+		# Powerflow outputs.
+		print('QSTS with ', FULL_NAME, 'AND CWD IS ', os.getcwd())
+		opendss.newQstsPlot(FULL_NAME,
+			stepSizeInMinutes=60, 
+			numberOfSteps=QSTS_STEPS,
+			keepAllFiles=False,
+			actions={
+				#24*5:'open object=line.671692 term=1',
+				#24*8:'new object=fault.f1 bus1=670.1.2.3 phases=3 r=0 ontime=0.0'
+			},
+			filePrefix='timeseries'
+		)
+		# opendss.voltagePlot(FULL_NAME, PU=True)
+		# opendss.currentPlot(FULL_NAME)
+		#TODO!!!! we're clobbering these outputs each time we run the full workflow. Consider keeping them separate.
+		#HACK: If only analyzing a set of generators with a single phase, remove ['P2(kW)','P3(kW)'] of make_chart('timeseries_gen.csv',...) below
+		make_chart('timeseries_gen.csv', FULL_NAME, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Generator Output", "Average hourly kW")
+		# for timeseries_load, output ANSI Range A service bands (2,520V - 2,340V for 2.4kV and 291V - 263V for 0.277kV)
+		make_chart('timeseries_load.csv', FULL_NAME, 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'], QSTS_STEPS, "Load Voltage", "PU", ansi_bands = True)
+		make_chart('timeseries_source.csv', FULL_NAME, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Voltage Source Output", "Average hourly kW")
+		make_chart('timeseries_control.csv', FULL_NAME, 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS, "Tap Position", "PU")
+		# Perform control sim.
+		microgridup_control.play(FULL_NAME, os.getcwd(), playground_microgrids, FAULTED_LINE)
+		# Generate microgrid control hardware costs.
+		mg_add_cost(ADD_COST_NAME, microgrid, mg_name)	
+		microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
+		mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
+		# convert mg_list_of_dicts_full to dict of lists for columnar output in output_template.html
+		mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
+		# Create consolidated report per mg.
+		mg_add_cost_dict_of_lists = pd.read_csv(ADD_COST_NAME).to_dict(orient='list')
+		template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
+		out = template.render(
+			summary=mg_dict_of_lists_full,
+			inputs={'circuit':BASE_NAME,'loads':LOAD_NAME, 'Maximum Proportion of critical load to be served by fossil generation':FOSSIL_BACKUP_PERCENT, 'REopt inputs':REOPT_INPUTS,'microgrid':microgrid},
+			added_costs = mg_add_cost_dict_of_lists,
+			mg_names_and_reopt_folders = {mg_name:REOPT_FOLDER_FINAL}
+		)
+		#TODO: have an option where we make the template <iframe srcdoc="{{X}}"> to embed the html and create a single file.
+		with open(BIG_OUT_NAME,'w') as outFile:
+			outFile.write(out)
+		if open_results:
+			os.system(f'open {BIG_OUT_NAME}')
 
 def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, DIESEL_SAFETY_FACTOR=False, DELETE_FILES=False, open_results=False, OUTAGE_CSV=None):
 	# CONSTANTS
@@ -1608,7 +1609,10 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		if OUTAGE_CSV:
 			shutil.copyfile(OUTAGE_CSV, f'{MODEL_DIR}/outages.csv')
 		os.system(f'touch {MODEL_DIR}/0running.txt')
-		os.remove("0crashed.txt")
+		try:
+			os.remove("0crashed.txt")
+		except:
+			pass
 	except:
 		print('Rerunning existing analysis. DSS and CSV files not moved.')
 	if DELETE_FILES:
@@ -1646,7 +1650,8 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 			BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
 			new_mg_names = mgs_name_sorted[0:i+1]
 			new_mg_for_control = {name:MICROGRIDS[name] for name in new_mg_names}
-			main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], new_mg_for_control, GEN_NAME, REF_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, FAULTED_LINE, mg_name, f'mg_add_cost_{i}.csv', FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR, open_results=False)
+			final_run = True if i == len(mgs_name_sorted) - 1 else False
+			main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], new_mg_for_control, GEN_NAME, REF_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, FAULTED_LINE, mg_name, f'mg_add_cost_{i}.csv', FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR, open_results=False, final_run=final_run)
 		# Resilience simulation with outages. Optional. Skipped if no OUTAGE_CSV
 		if OUTAGE_CSV:
 			all_microgrid_loads = [x.get('loads',[]) for x in MICROGRIDS.values()]

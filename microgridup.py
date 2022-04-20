@@ -1540,6 +1540,10 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, diesel_total_calc=False)
 	gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, microgrid)
+	# Generate microgrid control hardware costs.
+	mg_add_cost(ADD_COST_NAME, microgrid, mg_name)	
+	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
+	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
 	if final_run:
 		# Make OMD.
 		dssConvert.dssToOmd(FULL_NAME, OMD_NAME, RADIUS=0.0002)
@@ -1561,7 +1565,6 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 		)
 		# opendss.voltagePlot(FULL_NAME, PU=True)
 		# opendss.currentPlot(FULL_NAME)
-		#TODO!!!! we're clobbering these outputs each time we run the full workflow. Consider keeping them separate.
 		#HACK: If only analyzing a set of generators with a single phase, remove ['P2(kW)','P3(kW)'] of make_chart('timeseries_gen.csv',...) below
 		make_chart('timeseries_gen.csv', FULL_NAME, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Generator Output", "Average hourly kW")
 		# for timeseries_load, output ANSI Range A service bands (2,520V - 2,340V for 2.4kV and 291V - 263V for 0.277kV)
@@ -1570,10 +1573,6 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 		make_chart('timeseries_control.csv', FULL_NAME, 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS, "Tap Position", "PU")
 		# Perform control sim.
 		microgridup_control.play(FULL_NAME, os.getcwd(), playground_microgrids, FAULTED_LINE)
-		# Generate microgrid control hardware costs.
-		mg_add_cost(ADD_COST_NAME, microgrid, mg_name)	
-		microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
-		mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
 		# convert mg_list_of_dicts_full to dict of lists for columnar output in output_template.html
 		mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
 		# Create consolidated report per mg.
@@ -1668,9 +1667,6 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		stats = summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV)
 		mg_add_cost_files = [x for x in os.listdir('.') if x.startswith('mg_add_cost_')]
 		mg_add_cost_files.sort()
-		# create an orderedDict of the mg_add_cost_files:
-		# mg_add_cost_dict_of_lists = pd.concat([pd.read_csv(x) for x in mg_add_cost_files]).to_dict(orient='list')
-		# print("mg_add_cost_dict_of_lists:",mg_add_cost_dict_of_lists)
 		# create a row-based list of lists of mg_add_cost_files
 		add_cost_rows = []
 		for file in mg_add_cost_files:

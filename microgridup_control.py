@@ -571,7 +571,12 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			new_bus_name = f'bus_for_lead_gen_{safe_busname}.1.2.3'
 			#NOTE: vsources use line-to-line voltages, so 3 phase gens get sqrt(3) multiplier
 			phase_count = big_gen_ob.get('phases')
-			gen_base_kv = float(big_gen_ob['kv'])
+			gen_base_kv_str = big_gen_ob.get('kv')
+			try:
+				gen_base_kv = float(gen_base_kv_str)
+			except:
+				print(f"HACK: no voltage detected for {vsource_ob_and_name} on {big_gen_bus} so falling back on default 4.16kv")
+				gen_base_kv = 4.16
 			if phase_count == '3':
 				gen_base_kv = gen_base_kv * math.sqrt(3)
 			# Before removing fossil unit, grab kW rating 

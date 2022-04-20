@@ -1,19 +1,17 @@
 from microgridup import *
 import microgridup_gen_mgs as gmg
 
-CIRC_FILE = 'lehigh_base_3mg.dss'
-CRITICAL_LOADS = ['645_hangar','684_command_center', '611_runway','675a_hospital','634a_data_center', '634b_radar', '634c_atc_tower']
-ALGO = 'lukes' #'branch'
-mgs = gmg.mg_group(CIRC_FILE, CRITICAL_LOADS, 'lukes')
-
 if __name__ == '__main__':
 	# Input data.
+	CIRC_FILE = 'lehigh_base_3mg.dss'
+	CRITICAL_LOADS = ['645_hangar','684_command_center', '611_runway','675a_hospital','634a_data_center', '634b_radar', '634c_atc_tower']
 	MODEL_DIR = 'auto3mg'
 	BASE_DSS = 'lehigh_base_3mg.dss'
 	LOAD_CSV = 'lehigh_load.csv'
 	FAULTED_LINE = '670671'
 	QSTS_STEPS = 24*20
 	FOSSIL_BACKUP_PERCENT = .5
+	OUTAGE_CSV = 'lehigh_random_outages.csv'
 	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth 
 	REOPT_INPUTS = {
 		"solar" : "on",
@@ -64,7 +62,8 @@ if __name__ == '__main__':
 		"solarCanExport": True,
 		"dieselOnlyRunsDuringOutage": True
 	}
-	MICROGRIDS = mgs
+	ALGO = 'lukes' #'branch'
+	MICROGRIDS = gmg.mg_group(CIRC_FILE, CRITICAL_LOADS, 'lukes')
 	# MICROGRIDS = {
 	# 	'mg0': {
 	# 		'loads': ['634a_data_center','634b_radar','634c_atc_tower'],
@@ -89,4 +88,4 @@ if __name__ == '__main__':
 	# 	}
 	# }
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True, OUTAGE_CSV=OUTAGE_CSV)

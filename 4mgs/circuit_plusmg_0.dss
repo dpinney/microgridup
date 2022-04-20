@@ -77,8 +77,8 @@ new object=line.632670 phases=3 bus1=632.1.2.3 bus2=670.1.2.3 switch=y linecode=
 new object=line.650632 phases=3 bus1=rg60.1.2.3 bus2=632.1.2.3 switch=y linecode=mtx601 length=2000 units=ft
 new object=line.671680 phases=3 bus1=671.1.2.3 bus2=680.1.2.3 switch=y linecode=mtx601 length=1000 units=ft
 open object=line.671680 term=1
-new object=generator.fossil_634 bus1=634.1 phases=1 kv=0.277 kw=90.28878235652161 xdp=0.27 xdpp=0.2 h=2 yearly=fossil_634_shape
-new object=generator.solar_634 bus1=634.1 phases=1 kv=0.277 kw=191.66639999999995 pf=1 yearly=solar_634_shape
+new object=generator.fossil_634 bus1=634.1 phases=1 kv=0.27712812921102037 kw=90.28878235652161 xdp=0.27 xdpp=0.2 h=2 yearly=fossil_634_shape
+new object=generator.solar_634 bus1=634.1 phases=1 kv=0.27712812921102037 kw=191.66639999999995 pf=1 yearly=solar_634_shape
 makebuslist
 setbusxy bus=sourcebus y=30.285013 x=-84.071493
 setbusxy bus=650 y=30.285013 x=-84.071993

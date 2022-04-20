@@ -1,0 +1,7 @@
+Microgrid,Location,Recommended Upgrade,Cost Estimate ($)
+mg1,mg1,Microgrid Design,100000
+mg1,mg1,Microgrid Controls,100000
+mg1,['632633'],SCADA disconnect switch,50000
+mg1,634a_data_center,AMI disconnect meter,5000
+mg1,634b_radar,AMI disconnect meter,5000
+mg1,634c_atc_tower,AMI disconnect meter,5000

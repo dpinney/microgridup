@@ -38,7 +38,7 @@ def estimate_inrush(list_of_transformers_and_loads, motor_perc=0.5):
 	# Short burst of power from fossil units that can typically provide 4x or 5x their nameplate output? Need to research. 
 	# return
 
-# def super_cap_size(inrush_loadshape) -> (power,duration):
+# def super_cap_size(inrush_loadshape, duration_seconds=1) -> (power,duration):
 	# Mitigation option 1: we tell the user how big their supercapacitor needs to be. (supercaps are like super-high-power, low energy batteries). Figure out max power of loadshape_of_inrush, figure out duration, specify as a super cap (power, duration).
 	# return
 
@@ -46,17 +46,18 @@ def gradual_load_pickup(dssTree, motor_perc=0.5):
 	# Assume some order of switching on, assume none of the inrushes overlap but the steady state powerflows do, calculate max power during this process
 	all_loads = [obj for obj in dssTree if 'load.' in obj.get('object','')]
 	all_loads.sort(key=lambda x:float(x.get('kw')))
-	max_load_kw = all_loads[-1]
-	max_inrush = calc_motor_inrush(max_load_kw, motor_perc=0.5)
-	return max_inrush
+	max_load_obj = all_loads[-1]
+	all_transformer_inrush = calc_all_transformer_inrush(dssTree)
+	max_load_inrush = calc_motor_inrush(max_load_obj, motor_perc=0.5)
+	return max_load_inrush + sum(all_transformer_inrush.values())
 
-def calc_transformer_inrush(dssTransformerDict):
+def calc_transformer_inrush(dssTransformerDict, default_resistance_transformer='[0.55,0.55]'):
 	# TO DO: figure out if inrushes should be calculated separately for each winding. Current calculates separately but then adds together for one inrush per transformer. 
 	# I(peak) = 1.414 Vm / R(ohms) 
 	inrush = 0
 	for idx in range(len(dssTransformerDict.get('kvs')[1:-1].split(','))):
 		voltage = float(dssTransformerDict.get('kvs')[1:-1].split(',')[idx])
-		resistance = float(dssTransformerDict.get('%rs','[0.0005,0.0005]')[1:-1].split(',')[idx]) * float(dssTransformerDict.get('kvas')[1:-1].split(',')[idx])
+		resistance = float(dssTransformerDict.get('%rs',default_resistance_transformer)[1:-1].split(',')[idx]) * float(dssTransformerDict.get('kvas')[1:-1].split(',')[idx])
 		# TO DO: figure out what to do when transformers don't have a %rs value. Use %loadloss? 
 		inrush += math.sqrt(2) * voltage / resistance 
 	return inrush

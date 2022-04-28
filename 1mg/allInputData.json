@@ -94,5 +94,6 @@
         }
     },
     "FAULTED_LINE": "650632",
-    "DIESEL_SAFETY_FACTOR": false
+    "DIESEL_SAFETY_FACTOR": false,
+    "OUTAGE_CSV": "lehigh_random_outages.csv"
 }

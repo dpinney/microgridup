@@ -29,21 +29,39 @@ def plot_inrush_data(dssTree, microgrids, out_html, motor_perc=0.5):
 	data = collections.defaultdict(list)
 	for key in microgrids:
 		data['Microgrid ID'].append(key)
+
+		# # of Interruptions
 		
+		# Expected In-rush (kW)
 		loads = [obj for obj in dssTree if 'load.' in obj.get('object','') and obj.get('object','').split('.')[1] in microgrids[key]['loads']]
 		transformers = [] # TO DO: figure out how to isolate transormers by microgrid
 		expected_inrush = estimate_inrush(loads + transformers, motor_perc)
 		data['Expected In-rush (kW)'].append(expected_inrush)
 
+		# In-rush as % of total generation
+		gen_bus = microgrids[key]['gen_bus']
+		all_generation = [
+		ob for ob in dssTree
+		if ob.get('bus1','x.x').split('.')[0] == gen_bus
+		and 'generator' in ob.get('object')
+		]
+		total_generation = 0
+		for ob in all_generation:
+			total_generation += float(ob.get('kw'))
+		data['In-rush as % of total generation'].append(100*expected_inrush/total_generation)
+
+		# Soft Start load (kW)
+		# Super-cap Sizing
+
 	# Run inrush calculations by microgrid and add to df. 
 	
-	data = {'Microgrid ID':['mg0', 'mg1', 'mg2', 'mg3'],
-	        '# of Interruptions':[0, 0, 0, 0],
-	        'Expected In-rush (kW)':[0,0,0,0],
-	        'In-rush as % of total generation':[0,0,0,0],
-	        'Soft Start load (kW)':[0,0,0,0],
-	        'Super-cap Sizing':[0,0,0,0]
-	        }
+	# data = {'Microgrid ID':['mg0', 'mg1', 'mg2', 'mg3'],
+	#         '# of Interruptions':[0, 0, 0, 0],
+	#         'Expected In-rush (kW)':[0,0,0,0],
+	#         'In-rush as % of total generation':[0,0,0,0],
+	#         'Soft Start load (kW)':[0,0,0,0],
+	#         'Super-cap Sizing':[0,0,0,0]
+	#         }
 	df = pd.DataFrame(data)
 	
 	table_html = '<h1>In-rush Current Report</h1>' + df.to_html()

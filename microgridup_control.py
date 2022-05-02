@@ -24,6 +24,32 @@ from omf.models import flisr
 from omf.solvers.opendss import dssConvert
 from omf.solvers import opendss
 
+def plot_inrush_data(dssTree, microgrids, out_html, motor_perc=0.5):
+	# Divide up transformers and loads by microgrid.
+	data = collections.defaultdict(list)
+	for key in microgrids:
+		data['Microgrid ID'].append(key)
+		
+		loads = [obj for obj in dssTree if 'load.' in obj.get('object','') and obj.get('object','').split('.')[1] in microgrids[key]['loads']]
+		transformers = [] # TO DO: figure out how to isolate transormers by microgrid
+		expected_inrush = estimate_inrush(loads + transformers, motor_perc)
+		data['Expected In-rush (kW)'].append(expected_inrush)
+
+	# Run inrush calculations by microgrid and add to df. 
+	
+	data = {'Microgrid ID':['mg0', 'mg1', 'mg2', 'mg3'],
+	        '# of Interruptions':[0, 0, 0, 0],
+	        'Expected In-rush (kW)':[0,0,0,0],
+	        'In-rush as % of total generation':[0,0,0,0],
+	        'Soft Start load (kW)':[0,0,0,0],
+	        'Super-cap Sizing':[0,0,0,0]
+	        }
+	df = pd.DataFrame(data)
+	
+	table_html = '<h1>In-rush Current Report</h1>' + df.to_html()
+	with open(out_html,'w') as outFile:
+		outFile.write('<style>* {font-family:sans-serif}</style>' + '\n' + table_html)
+
 def estimate_inrush(list_of_transformers_and_loads, motor_perc=0.5):
 	# Inrush loadshape will likely be very large e.g. 3x normal load and very short e.g. 10 milliseconds.
 	inrush = {}

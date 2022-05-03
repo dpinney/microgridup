@@ -795,13 +795,14 @@ def gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL):
 
 	ref_df_builder.to_csv(REF_NAME, index=False)
 
-def mg_add_cost(outputCsvName, microgrid, mg_name):
+def mg_add_cost(outputCsvName, microgrid, mg_name, BASE_NAME):
 	'''Returns a costed csv of all switches and other upgrades needed to allow the microgrid 
 	to operate in islanded mode to support critical loads
 	TO DO: When critical load list references actual load buses instead of kw ratings,
 	use the DSS tree structure to find the location of the load buses and the SCADA disconnect switches'''
 
-	AMI_COST = 5000
+	AMI_COST = 500
+	THREE_PHASE_RELAY_COST = 20000
 	SCADA_COST = 50000
 	MG_CONTROL_COST = 100000
 	MG_DESIGN_COST = 100000
@@ -810,6 +811,8 @@ def mg_add_cost(outputCsvName, microgrid, mg_name):
 	gen_bus_name = mg_ob['gen_bus']
 	mg_loads = mg_ob['loads']
 	switch_name = mg_ob['switch']
+	tree = dssConvert.dssToTree(BASE_NAME)
+	load_map = {x.get('object',''):i for i, x in enumerate(tree)}
 
 	# print out a csv of the 
 	with open(outputCsvName, 'w', newline='') as outcsv:
@@ -821,17 +824,35 @@ def mg_add_cost(outputCsvName, microgrid, mg_name):
 		writer.writerow([mg_name, switch_name, "SCADA disconnect switch", SCADA_COST])
 		if len(mg_loads) > 1: # if the entire microgrid is a single load (100% critical load), there is no need for metering past SCADA
 			for load in mg_loads:
-				writer.writerow([mg_name, load, "AMI disconnect meter", AMI_COST])
-
-			ami_message = 'Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.\n'
-			print(ami_message)
-			if path.exists("user_warnings.txt"):
-				with open("user_warnings.txt", "r+") as myfile:
-					if ami_message not in myfile.read():
-						myfile.write(ami_message)
-			else:
-				with open("user_warnings.txt", "a") as myfile:
-					myfile.write(ami_message)
+				ob = tree[load_map[f'load.{load}']]
+				print("mg_add_cost() ob:", ob)
+				bus_name = ob.get('bus1','')
+				bus_name_list = bus_name.split('.')
+				load_phases = []
+				load_phases = bus_name_list[-(len(bus_name_list)-1):]
+				print("mg_add_cost() load_phases on bus_name: phases", load_phases, "on bus", bus_name)
+				if len(load_phases) > 1:
+					writer.writerow([mg_name, load, "3-phase relay", THREE_PHASE_RELAY_COST])
+					three_phase_message = 'Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.\n'
+					print(three_phase_message)
+					if path.exists("user_warnings.txt"):
+						with open("user_warnings.txt", "r+") as myfile:
+							if three_phase_message not in myfile.read():
+								myfile.write(three_phase_message)
+					else:
+						with open("user_warnings.txt", "a") as myfile:
+							myfile.write(three_phase_message)		
+				else:
+					writer.writerow([mg_name, load, "AMI disconnect meter", AMI_COST])
+					ami_message = 'Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.\n'
+					print(ami_message)
+					if path.exists("user_warnings.txt"):
+						with open("user_warnings.txt", "r+") as myfile:
+							if ami_message not in myfile.read():
+								myfile.write(ami_message)
+					else:
+						with open("user_warnings.txt", "a") as myfile:
+							myfile.write(ami_message)
 
 def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, microgrid):
 	''' insert generation objects into dss.
@@ -1541,7 +1562,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, microgrid)
 	# Generate microgrid control hardware costs.
-	mg_add_cost(ADD_COST_NAME, microgrid, mg_name)	
+	mg_add_cost(ADD_COST_NAME, microgrid, mg_name, BASE_NAME)	
 	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
 	if final_run:

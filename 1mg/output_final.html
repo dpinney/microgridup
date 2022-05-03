@@ -37,7 +37,7 @@
 	</div>
 	<div id="overview" class="tab" style="margin:5px; overflow:scroll; visibility:visible">
 		<h3>Report Generated</h2>
-		<pre style="width:95%; white-space:pre-wrap">2022-04-27 15:31:05.103826</pre>
+		<pre style="width:95%; white-space:pre-wrap">2022-05-03 13:14:25.747628</pre>
 		<h3>Model Inputs</h2>
 		<pre style="width:95%; white-space:pre-wrap">{'MODEL_DIR': '1mg', 'BASE_DSS': 'lehigh_base_1mg.dss', 'LOAD_CSV': 'lehigh_load.csv', 'QSTS_STEPS': 480, 'FOSSIL_BACKUP_PERCENT': 1, 'REOPT_INPUTS': {'solar': 'on', 'wind': 'off', 'battery': 'on', 'year': '2017', 'analysisYears': '25', 'discountRate': '0.083', 'energyCost': '0.12', 'demandCost': '20', 'urdbLabelSwitch': 'off', 'wholesaleCost': '0.034', 'solarCost': '1600', 'windCost': '4989', 'batteryPowerCost': '840', 'batteryCapacityCost': '420', 'batteryPowerCostReplace': '410', 'batteryCapacityCostReplace': '200', 'batteryPowerReplaceYear': '10', 'batteryCapacityReplaceYear': '10', 'dieselGenCost': '1000', 'solarMin': 0, 'windMin': 0, 'batteryPowerMin': 0, 'batteryCapacityMin': 0, 'solarMax': '10000', 'windMax': '1000', 'batteryPowerMax': '10000', 'batteryCapacityMax': '10000', 'dieselMax': '10000', 'solarExisting': 0, 'criticalLoadFactor': '1', 'outageDuration': '48', 'fuelAvailable': '150000', 'genExisting': 0, 'minGenLoading': 0, 'batteryKwExisting': 0, 'batteryKwhExisting': 0, 'windExisting': 0, 'dieselFuelCostGal': 1.5, 'dieselCO2Factor': 24.1, 'dieselOMCostKw': 35, 'dieselOMCostKwh': 0.02, 'value_of_lost_load': '100', 'solarCanCurtail': True, 'solarCanExport': True, 'dieselOnlyRunsDuringOutage': False}, 'MICROGRIDS': {'mg0': {'loads': ['634a_data_center', '634b_radar', '634c_atc_tower', '675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2', '684_command_center', '652_residential', '611_runway', '645_hangar', '646_office'], 'switch': '650632', 'gen_bus': '670', 'gen_obs_existing': ['solar_634_existing', 'solar_675_existing', 'fossil_684_existing', 'fossil_646_existing', 'battery_634_existing', 'battery_684_existing'], 'critical_load_kws': [70, 90, 10, 150, 200, 200, 400, 20, 30, 70, 0, 0]}}, 'FAULTED_LINE': '650632', 'DIESEL_SAFETY_FACTOR': False, 'OUTAGE_CSV': 'lehigh_random_outages.csv'}</pre>
 		<h3>User Warnings</h3>
@@ -45,6 +45,7 @@
 Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
 Pre-existing battery battery_684_existing will not be utilized to support loads in microgrid mg0.
 Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 </pre>
 		<h3>Overview of Microgrid Results</h3>
 		<table style="margin-bottom:40px">
@@ -352,11 +353,11 @@ Supporting critical loads across microgrids assumes an AMI metering system. If n
 					<td>CapEx ($)</td>
 					
 						
-							<td style="text-align:right">5,871,089</td>
+							<td style="text-align:right">5,895,089</td>
 						
 					
 						
-							<td style="text-align:right">5,871,089</td>
+							<td style="text-align:right">5,895,089</td>
 						
 					
 				</tr>
@@ -365,11 +366,11 @@ Supporting critical loads across microgrids assumes an AMI metering system. If n
 					<td>CapEx after Tax Incentives ($)</td>
 					
 						
-							<td style="text-align:right">3,726,601</td>
+							<td style="text-align:right">3,750,601</td>
 						
 					
 						
-							<td style="text-align:right">3,726,601</td>
+							<td style="text-align:right">3,750,601</td>
 						
 					
 				</tr>
@@ -378,11 +379,11 @@ Supporting critical loads across microgrids assumes an AMI metering system. If n
 					<td>Net Present Value ($)</td>
 					
 						
-							<td style="text-align:right">1,274,295</td>
+							<td style="text-align:right">1,250,295</td>
 						
 					
 						
-							<td style="text-align:right">1,274,295</td>
+							<td style="text-align:right">1,250,295</td>
 						
 					
 				</tr>
@@ -472,7 +473,7 @@ Supporting critical loads across microgrids assumes an AMI metering system. If n
 					
 				
 					
-						<td style="text-align:right">5,000</td>
+						<td style="text-align:right">500</td>
 					
 				
 				</tr>
@@ -492,7 +493,7 @@ Supporting critical loads across microgrids assumes an AMI metering system. If n
 					
 				
 					
-						<td style="text-align:right">5,000</td>
+						<td style="text-align:right">500</td>
 					
 				
 				</tr>
@@ -512,7 +513,7 @@ Supporting critical loads across microgrids assumes an AMI metering system. If n
 					
 				
 					
-						<td style="text-align:right">5,000</td>
+						<td style="text-align:right">500</td>
 					
 				
 				</tr>
@@ -528,11 +529,11 @@ Supporting critical loads across microgrids assumes an AMI metering system. If n
 					
 				
 					
-						<td style="text-align:right">AMI disconnect meter</td>
+						<td style="text-align:right">3-phase relay</td>
 					
 				
 					
-						<td style="text-align:right">5,000</td>
+						<td style="text-align:right">20,000</td>
 					
 				
 				</tr>
@@ -548,11 +549,11 @@ Supporting critical loads across microgrids assumes an AMI metering system. If n
 					
 				
 					
-						<td style="text-align:right">AMI disconnect meter</td>
+						<td style="text-align:right">3-phase relay</td>
 					
 				
 					
-						<td style="text-align:right">5,000</td>
+						<td style="text-align:right">20,000</td>
 					
 				
 				</tr>
@@ -568,11 +569,11 @@ Supporting critical loads across microgrids assumes an AMI metering system. If n
 					
 				
 					
-						<td style="text-align:right">AMI disconnect meter</td>
+						<td style="text-align:right">3-phase relay</td>
 					
 				
 					
-						<td style="text-align:right">5,000</td>
+						<td style="text-align:right">20,000</td>
 					
 				
 				</tr>
@@ -588,11 +589,11 @@ Supporting critical loads across microgrids assumes an AMI metering system. If n
 					
 				
 					
-						<td style="text-align:right">AMI disconnect meter</td>
+						<td style="text-align:right">3-phase relay</td>
 					
 				
 					
-						<td style="text-align:right">5,000</td>
+						<td style="text-align:right">20,000</td>
 					
 				
 				</tr>
@@ -612,7 +613,7 @@ Supporting critical loads across microgrids assumes an AMI metering system. If n
 					
 				
 					
-						<td style="text-align:right">5,000</td>
+						<td style="text-align:right">500</td>
 					
 				
 				</tr>
@@ -632,7 +633,7 @@ Supporting critical loads across microgrids assumes an AMI metering system. If n
 					
 				
 					
-						<td style="text-align:right">5,000</td>
+						<td style="text-align:right">500</td>
 					
 				
 				</tr>
@@ -652,7 +653,7 @@ Supporting critical loads across microgrids assumes an AMI metering system. If n
 					
 				
 					
-						<td style="text-align:right">5,000</td>
+						<td style="text-align:right">500</td>
 					
 				
 				</tr>
@@ -672,7 +673,7 @@ Supporting critical loads across microgrids assumes an AMI metering system. If n
 					
 				
 					
-						<td style="text-align:right">5,000</td>
+						<td style="text-align:right">500</td>
 					
 				
 				</tr>
@@ -692,7 +693,7 @@ Supporting critical loads across microgrids assumes an AMI metering system. If n
 					
 				
 					
-						<td style="text-align:right">5,000</td>
+						<td style="text-align:right">500</td>
 					
 				
 				</tr>
@@ -795,6 +796,8 @@ Supporting critical loads across microgrids assumes an AMI metering system. If n
 			<li><a href='/1mg/./generation.csv'>./generation.csv</a></li>
 			
 			<li><a href='/1mg/./circuit_oneline.html'>./circuit_oneline.html</a></li>
+			
+			<li><a href='/1mg/./output_final.html'>./output_final.html</a></li>
 			
 			<li><a href='/1mg/./timeseries_load.csv'>./timeseries_load.csv</a></li>
 			

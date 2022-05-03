@@ -825,12 +825,12 @@ def mg_add_cost(outputCsvName, microgrid, mg_name, BASE_NAME):
 		if len(mg_loads) > 1: # if the entire microgrid is a single load (100% critical load), there is no need for metering past SCADA
 			for load in mg_loads:
 				ob = tree[load_map[f'load.{load}']]
-				print("mg_add_cost() ob:", ob)
+				# print("mg_add_cost() ob:", ob)
 				bus_name = ob.get('bus1','')
 				bus_name_list = bus_name.split('.')
 				load_phases = []
 				load_phases = bus_name_list[-(len(bus_name_list)-1):]
-				print("mg_add_cost() load_phases on bus_name: phases", load_phases, "on bus", bus_name)
+				# print("mg_add_cost() load_phases on bus_name: phases", load_phases, "on bus", bus_name)
 				if len(load_phases) > 1:
 					writer.writerow([mg_name, load, "3-phase relay", THREE_PHASE_RELAY_COST])
 					three_phase_message = 'Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.\n'

@@ -13,6 +13,7 @@ import plotly
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import math
+import networkx as nx
 
 # OMF imports
 import omf
@@ -23,6 +24,21 @@ from omf.models.__neoMetaModel__ import *
 from omf.models import flisr
 from omf.solvers.opendss import dssConvert
 from omf.solvers import opendss
+
+def get_first_nodes_of_mgs(dssTree, microgrids):
+	nodes = {}
+	for key in microgrids:
+		switch = microgrids[key]['switch']
+		bus2 = [obj.get('bus2') for obj in dssTree if switch in obj.get('object','')]
+		bus2 = bus2[0].split('.')[0]
+		nodes[key] = bus2
+	return nodes
+
+def get_all_mg_elements(dssPath, ancestorNode):
+	G = opendss.dssConvert.dss_to_networkx(dssPath)
+	N = nx.descendants(G, ancestorNode)
+	all_mg_elements = G.subgraph(N)
+	return all_mg_elements
 
 def plot_inrush_data(dssTree, microgrids, out_html, motor_perc=0.5):
 	# Divide up transformers and loads by microgrid.

@@ -34,13 +34,22 @@ def get_first_nodes_of_mgs(dssTree, microgrids):
 		nodes[key] = bus2
 	return nodes
 
-def get_all_mg_elements(dssPath, ancestorNode):
+def get_all_mg_elements(dssPath, microgrids):
+	dssTree = dssConvert.dssToTree(dssPath)
+	first_nodes = get_first_nodes_of_mgs(dssTree, microgrids)
 	G = opendss.dssConvert.dss_to_networkx(dssPath)
-	N = nx.descendants(G, ancestorNode)
-	all_mg_elements = G.subgraph(N)
+	all_mg_elements = {}
+	for key in first_nodes:
+		N = nx.descendants(G, first_nodes[key])
+		# all_mg_elements[key] = G.subgraph(N)
+		all_mg_elements[key] = N
 	return all_mg_elements
 
-def plot_inrush_data(dssTree, microgrids, out_html, motor_perc=0.5):
+def plot_inrush_data(dssPath, microgrids, out_html, motor_perc=0.5):
+	# Grab all elements by mg. 
+	all_mg_elements = get_all_mg_elements(dssPath, microgrids)
+	dssTree = dssConvert.dssToTree(dssPath)
+
 	# Divide up transformers and loads by microgrid.
 	data = collections.defaultdict(list)
 	for key in microgrids:
@@ -50,7 +59,7 @@ def plot_inrush_data(dssTree, microgrids, out_html, motor_perc=0.5):
 		
 		# Expected In-rush (kW)
 		loads = [obj for obj in dssTree if 'load.' in obj.get('object','') and obj.get('object','').split('.')[1] in microgrids[key]['loads']]
-		transformers = [] # TO DO: figure out how to isolate transormers by microgrid
+		transformers = [obj for obj in all_mg_elements[key] if 'transformer' in obj.get('object','')] # TO DO: figure out how to isolate transormers by microgrid
 		expected_inrush = estimate_inrush(loads + transformers, motor_perc)
 		data['Expected In-rush (kW)'].append(expected_inrush)
 

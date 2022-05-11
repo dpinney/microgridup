@@ -88,150 +88,142 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 	''' Generate the microgrid specs with REOpt.
 	SIDE-EFFECTS: generates REOPT_FOLDER'''
 	load_df = pd.read_csv(LOAD_NAME)
-	if not os.path.isdir(REOPT_FOLDER):
-		import omf.models
-		shutil.rmtree(REOPT_FOLDER, ignore_errors=True)
-		omf.models.microgridDesign.new(REOPT_FOLDER)
-		# Get the microgrid total loads
-		mg_load_df = pd.DataFrame()
-		loads = microgrid['loads']
-		mg_load_df['load'] = [0 for x in range(8760)]
-		for load_name in loads:
-			mg_load_df['load'] = mg_load_df['load'] + load_df[load_name]
-		mg_load_df.to_csv(REOPT_FOLDER + '/loadShape.csv', header=False, index=False)
-		# Insert loadshape into /allInputData.json
-		allInputData = json.load(open(REOPT_FOLDER + '/allInputData.json'))
-		allInputData['loadShape'] = open(REOPT_FOLDER + '/loadShape.csv').read()
-		allInputData['fileName'] = 'loadShape.csv'
-
-		# Pulling user defined inputs from REOPT_INPUTS.
-		for key in REOPT_INPUTS:
-			allInputData[key] = REOPT_INPUTS[key]
-
-		# Set the REopt outage to be centered around the max load in the loadshape
-		# TODO: Make it safe for the max to be at begining or end of the year
-		# find max and index of max in mg_load_df['load']
-		max_load = mg_load_df.max()
-		#print("max_load:", max_load)
-		max_load_index = int(mg_load_df.idxmax())
-		#print("max_load_index:", max_load_index)
-		# reset the outage timing such that the length of REOPT_INPUTS falls half before and half after the hour of max load
-		outage_duration = int(REOPT_INPUTS["outageDuration"])
-		if max_load_index + outage_duration/2 > 8760:
-			outage_start_hour = 8760 - outage_duration
-			# REopt seems not to allow an outage on the last hour of the year
-		elif max_load_index - outage_duration/2 < 1:
-			outage_start_hour = 2
-		else:
-			outage_start_hour = max_load_index - outage_duration/2
-		#print("outage_start_hour:", str(int(outage_start_hour)))
-		allInputData['outage_start_hour'] = str(int(outage_start_hour))
-		allInputData['criticalLoadFactor'] = str(critical_load_percent)
-
-		# Pulling coordinates from BASE_NAME.dss into REopt allInputData.json:
-		tree = dssConvert.dssToTree(BASE_NAME)
-		#print(tree)
-		evil_glm = dssConvert.evilDssTreeToGldTree(tree)
-		#print(evil_glm)
-		# using evil_glm to get around the fact that buses in openDSS are created in memory and do not exist in the BASE_NAME dss file
-		for ob in evil_glm.values():
-			ob_name = ob.get('name','')
-			ob_type = ob.get('object','')
-			# pull out long and lat of the gen_bus
-			# if ob_type == "bus" and ob_name == "sourcebus":
-			if ob_type == "bus" and ob_name == microgrid['gen_bus']:
-				ob_lat = ob.get('latitude','')
-				ob_long = ob.get('longitude','')
-				#print('lat:', float(ob_lat), 'long:', float(ob_long))
-				allInputData['latitude'] = float(ob_lat)
-				allInputData['longitude'] = float(ob_long)
-
-		# enable following 5 lines when using gen_existing_ref_shapes()
-		# force REopt to optimize on wind and solar even if not recommended by REopt optimization
-		if allInputData['wind'] == 'on':
-			allInputData['windMin'] = '1'
-		if allInputData['solar'] == 'on':
-			allInputData['solarMin'] = '1'	
-
-		# Workflow to deal with existing generators in the microgrid and analyze for these in REopt
-		# This workflow requires pre-selection of all objects in a given microgrid in microgrids['gen_obs_existing']
-		# Multiple existing gens of any type except batteries are permitted
-		# Pull out and add up kw of all existing generators in the microgrid
-		load_map = {x.get('object',''):i for i, x in enumerate(tree)}
-
-		solar_kw_exist = []
-		fossil_kw_exist = []
-		battery_kw_exist = []
-		battery_kwh_exist = []
-		wind_kw_exist = []
-		gen_obs_existing = microgrid['gen_obs_existing']
-		for gen_ob in gen_obs_existing:
-			if gen_ob.startswith('solar_'):
-				solar_kw_exist.append(float(tree[load_map[f'generator.{gen_ob}']].get('kw')))
-			elif gen_ob.startswith('fossil_'):
-				fossil_kw_exist.append(float(tree[load_map[f'generator.{gen_ob}']].get('kw')))
-			elif gen_ob.startswith('wind_'):
-				wind_kw_exist.append(float(tree[load_map[f'generator.{gen_ob}']].get('kw')))
-			elif gen_ob.startswith('battery_'):
-				battery_kw_exist.append(float(tree[load_map[f'storage.{gen_ob}']].get('kwrated')))
-				battery_kwh_exist.append(float(tree[load_map[f'storage.{gen_ob}']].get('kwhrated')))
-
-		allInputData['genExisting'] = str(sum(fossil_kw_exist))
-		if sum(solar_kw_exist) > 0:
-			allInputData['solarExisting'] = str(sum(solar_kw_exist))
-			allInputData['solar'] = 'on'
-		# do not analyze existing batteries if multiple existing batteries exist
-		if len(battery_kwh_exist) > 1:
-			allInputData['batteryKwExisting'] = 0
-			allInputData['batteryKwhExisting'] = 0
-			# multiple_existing_battery_message = f'More than one existing battery storage asset is specified on microgrid {mg_name}. Configuration of microgrid controller is not assumed to control multiple existing batteries, and thus all existing batteries will be removed from analysis of {mg_name}.\n'
-			# print(multiple_existing_battery_message)
-			# if path.exists("user_warnings.txt"):
-			# 	with open("user_warnings.txt", "r+") as myfile:
-			# 		if multiple_existing_battery_message not in myfile.read():
-			# 			myfile.write(multiple_existing_battery_message)
-			# else:
-			# 	with open("user_warnings.txt", "a") as myfile:
-			# 		myfile.write(multiple_existing_battery_message)
-		elif sum(battery_kwh_exist) > 0:
-			allInputData['batteryKwExisting'] = str(sum(battery_kw_exist))
-			allInputData['batteryPowerMin'] = str(sum(battery_kw_exist))
-			allInputData['batteryKwhExisting'] = str(sum(battery_kwh_exist))
-			allInputData['batteryCapacityMin'] = str(sum(battery_kwh_exist))
-			allInputData['battery'] = 'on'
-		if sum(wind_kw_exist) > 0:
-			allInputData['windExisting'] = str(sum(wind_kw_exist))
-			allInputData['windMin'] = str(sum(wind_kw_exist))
-			allInputData['wind'] = 'on' #failsafe to include wind if found in base_dss
-			 # To Do: update logic if windMin, windExisting and other generation variables are enabled to be set by the user as inputs
-		
-		#To Do: Test that dieselMax = 0 is passed to REopt if both fossil_max_kw and sum(fossil_kw_exist) == 0
-		# Set max fossil kw used to support critical load
-		fossil_max_kw = set_fossil_max_kw(FOSSIL_BACKUP_PERCENT, max_crit_load)
-		# print("reopt_gen_mg_specs.fossil_max_kw:", fossil_max_kw)
-		if fossil_max_kw <= sum(fossil_kw_exist):
-			allInputData['dieselMax'] = str(sum(fossil_kw_exist))	
-		elif fossil_max_kw > sum(fossil_kw_exist):
-			allInputData['dieselMax'] = fossil_max_kw
-		# print("allInputData['dieselMax']:", allInputData['dieselMax'])
-		# print("allInputData['genExisting']:", allInputData['genExisting'])
-
-		# enable following 9 lines when using gen_existing_ref_shapes()
-		# if not already turned on, set solar and wind on to 1 kw to provide loadshapes for existing gen in make_full_dss()
-		if allInputData['wind'] == 'off':
-			allInputData['wind'] = 'on'
-			allInputData['windMax'] = '1'
-			allInputData['windMin'] = '1'
-		if allInputData['solar'] == 'off':
-			allInputData['solar'] = 'on'
-			allInputData['solarMax'] = '1'
-			allInputData['solarMin'] = '1'
-
-		# run REopt via microgridDesign
-		with open(REOPT_FOLDER + '/allInputData.json','w') as outfile:
-			json.dump(allInputData, outfile, indent=4)
-		omf.models.__neoMetaModel__.runForeground(REOPT_FOLDER)
-		omf.models.__neoMetaModel__.renderTemplateToFile(REOPT_FOLDER)
+	if os.path.isdir(REOPT_FOLDER):
+		# cached results detected, exit.
+		return None
+	import omf.models
+	shutil.rmtree(REOPT_FOLDER, ignore_errors=True)
+	omf.models.microgridDesign.new(REOPT_FOLDER)
+	# Get the microgrid total loads
+	mg_load_df = pd.DataFrame()
+	loads = microgrid['loads']
+	mg_load_df['load'] = [0 for x in range(8760)]
+	for load_name in loads:
+		mg_load_df['load'] = mg_load_df['load'] + load_df[load_name]
+	mg_load_df.to_csv(REOPT_FOLDER + '/loadShape.csv', header=False, index=False)
+	# Insert loadshape into /allInputData.json
+	allInputData = json.load(open(REOPT_FOLDER + '/allInputData.json'))
+	allInputData['loadShape'] = open(REOPT_FOLDER + '/loadShape.csv').read()
+	allInputData['fileName'] = 'loadShape.csv'
+	# Pulling user defined inputs from REOPT_INPUTS.
+	for key in REOPT_INPUTS:
+		allInputData[key] = REOPT_INPUTS[key]
+	# Set the REopt outage to be centered around the max load in the loadshape
+	# TODO: Make it safe for the max to be at begining or end of the year
+	# find max and index of max in mg_load_df['load']
+	max_load = mg_load_df.max()
+	#print("max_load:", max_load)
+	max_load_index = int(mg_load_df.idxmax())
+	#print("max_load_index:", max_load_index)
+	# reset the outage timing such that the length of REOPT_INPUTS falls half before and half after the hour of max load
+	outage_duration = int(REOPT_INPUTS["outageDuration"])
+	if max_load_index + outage_duration/2 > 8760:
+		outage_start_hour = 8760 - outage_duration
+		# REopt seems not to allow an outage on the last hour of the year
+	elif max_load_index - outage_duration/2 < 1:
+		outage_start_hour = 2
+	else:
+		outage_start_hour = max_load_index - outage_duration/2
+	#print("outage_start_hour:", str(int(outage_start_hour)))
+	allInputData['outage_start_hour'] = str(int(outage_start_hour))
+	allInputData['criticalLoadFactor'] = str(critical_load_percent)
+	# Pulling coordinates from BASE_NAME.dss into REopt allInputData.json:
+	tree = dssConvert.dssToTree(BASE_NAME)
+	#print(tree)
+	evil_glm = dssConvert.evilDssTreeToGldTree(tree)
+	#print(evil_glm)
+	# using evil_glm to get around the fact that buses in openDSS are created in memory and do not exist in the BASE_NAME dss file
+	for ob in evil_glm.values():
+		ob_name = ob.get('name','')
+		ob_type = ob.get('object','')
+		# pull out long and lat of the gen_bus
+		# if ob_type == "bus" and ob_name == "sourcebus":
+		if ob_type == "bus" and ob_name == microgrid['gen_bus']:
+			ob_lat = ob.get('latitude','')
+			ob_long = ob.get('longitude','')
+			#print('lat:', float(ob_lat), 'long:', float(ob_long))
+			allInputData['latitude'] = float(ob_lat)
+			allInputData['longitude'] = float(ob_long)
+	# enable following 5 lines when using gen_existing_ref_shapes()
+	# force REopt to optimize on wind and solar even if not recommended by REopt optimization
+	if allInputData['wind'] == 'on':
+		allInputData['windMin'] = '1'
+	if allInputData['solar'] == 'on':
+		allInputData['solarMin'] = '1'	
+	# Workflow to deal with existing generators in the microgrid and analyze for these in REopt
+	# This workflow requires pre-selection of all objects in a given microgrid in microgrids['gen_obs_existing']
+	# Multiple existing gens of any type except batteries are permitted
+	# Pull out and add up kw of all existing generators in the microgrid
+	load_map = {x.get('object',''):i for i, x in enumerate(tree)}
+	solar_kw_exist = []
+	fossil_kw_exist = []
+	battery_kw_exist = []
+	battery_kwh_exist = []
+	wind_kw_exist = []
+	gen_obs_existing = microgrid['gen_obs_existing']
+	for gen_ob in gen_obs_existing:
+		if gen_ob.startswith('solar_'):
+			solar_kw_exist.append(float(tree[load_map[f'generator.{gen_ob}']].get('kw')))
+		elif gen_ob.startswith('fossil_'):
+			fossil_kw_exist.append(float(tree[load_map[f'generator.{gen_ob}']].get('kw')))
+		elif gen_ob.startswith('wind_'):
+			wind_kw_exist.append(float(tree[load_map[f'generator.{gen_ob}']].get('kw')))
+		elif gen_ob.startswith('battery_'):
+			battery_kw_exist.append(float(tree[load_map[f'storage.{gen_ob}']].get('kwrated')))
+			battery_kwh_exist.append(float(tree[load_map[f'storage.{gen_ob}']].get('kwhrated')))
+	allInputData['genExisting'] = str(sum(fossil_kw_exist))
+	if sum(solar_kw_exist) > 0:
+		allInputData['solarExisting'] = str(sum(solar_kw_exist))
+		allInputData['solar'] = 'on'
+	# do not analyze existing batteries if multiple existing batteries exist
+	if len(battery_kwh_exist) > 1:
+		allInputData['batteryKwExisting'] = 0
+		allInputData['batteryKwhExisting'] = 0
+		# multiple_existing_battery_message = f'More than one existing battery storage asset is specified on microgrid {mg_name}. Configuration of microgrid controller is not assumed to control multiple existing batteries, and thus all existing batteries will be removed from analysis of {mg_name}.\n'
+		# print(multiple_existing_battery_message)
+		# if path.exists("user_warnings.txt"):
+		# 	with open("user_warnings.txt", "r+") as myfile:
+		# 		if multiple_existing_battery_message not in myfile.read():
+		# 			myfile.write(multiple_existing_battery_message)
+		# else:
+		# 	with open("user_warnings.txt", "a") as myfile:
+		# 		myfile.write(multiple_existing_battery_message)
+	elif sum(battery_kwh_exist) > 0:
+		allInputData['batteryKwExisting'] = str(sum(battery_kw_exist))
+		allInputData['batteryPowerMin'] = str(sum(battery_kw_exist))
+		allInputData['batteryKwhExisting'] = str(sum(battery_kwh_exist))
+		allInputData['batteryCapacityMin'] = str(sum(battery_kwh_exist))
+		allInputData['battery'] = 'on'
+	if sum(wind_kw_exist) > 0:
+		allInputData['windExisting'] = str(sum(wind_kw_exist))
+		allInputData['windMin'] = str(sum(wind_kw_exist))
+		allInputData['wind'] = 'on' #failsafe to include wind if found in base_dss
+		 # To Do: update logic if windMin, windExisting and other generation variables are enabled to be set by the user as inputs
+	#To Do: Test that dieselMax = 0 is passed to REopt if both fossil_max_kw and sum(fossil_kw_exist) == 0
+	# Set max fossil kw used to support critical load
+	fossil_max_kw = set_fossil_max_kw(FOSSIL_BACKUP_PERCENT, max_crit_load)
+	# print("reopt_gen_mg_specs.fossil_max_kw:", fossil_max_kw)
+	if fossil_max_kw <= sum(fossil_kw_exist):
+		allInputData['dieselMax'] = str(sum(fossil_kw_exist))	
+	elif fossil_max_kw > sum(fossil_kw_exist):
+		allInputData['dieselMax'] = fossil_max_kw
+	# print("allInputData['dieselMax']:", allInputData['dieselMax'])
+	# print("allInputData['genExisting']:", allInputData['genExisting'])
+	# enable following 9 lines when using gen_existing_ref_shapes()
+	# if not already turned on, set solar and wind on to 1 kw to provide loadshapes for existing gen in make_full_dss()
+	if allInputData['wind'] == 'off':
+		allInputData['wind'] = 'on'
+		allInputData['windMax'] = '1'
+		allInputData['windMin'] = '1'
+	if allInputData['solar'] == 'off':
+		allInputData['solar'] = 'on'
+		allInputData['solarMax'] = '1'
+		allInputData['solarMin'] = '1'
+	# run REopt via microgridDesign
+	with open(REOPT_FOLDER + '/allInputData.json','w') as outfile:
+		json.dump(allInputData, outfile, indent=4)
+	omf.models.__neoMetaModel__.runForeground(REOPT_FOLDER)
+	omf.models.__neoMetaModel__.renderTemplateToFile(REOPT_FOLDER)
 
 def max_net_load(inputName, REOPT_FOLDER):
 	''' Calculate max net load needing to be covered by fossil 
@@ -326,174 +318,6 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 		'battery_pow_total':battery_pow_total, 'battery_pow_existing':battery_pow_existing, 'battery_pow_new':battery_pow_new})
 	# print("gen_sizes:",gen_sizes)
 	return gen_sizes #dictionary of all gen sizes
-
-def feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, microgrid, critical_load_percent, diesel_total_calc=False):
-	'''Update max and min generator sizes based on get_gen_ob_from_reopt() and rerun REopt
-	SIDE-EFFECTS: generates second REOPT_FOLDER'''
-	load_df = pd.read_csv(LOAD_NAME)
-	if not os.path.isdir(REOPT_FOLDER_FINAL):
-		import omf.models
-		shutil.rmtree(REOPT_FOLDER_FINAL, ignore_errors=True)
-		omf.models.microgridDesign.new(REOPT_FOLDER_FINAL)
-		# Get the microgrid total loads
-		mg_load_df = pd.DataFrame()
-		loads = microgrid['loads']
-		mg_load_df['load'] = [0 for x in range(8760)]
-		for load_name in loads:
-			mg_load_df['load'] = mg_load_df['load'] + load_df[load_name]
-		mg_load_df.to_csv(REOPT_FOLDER_FINAL + '/loadShape.csv', header=False, index=False)
-		# Insert loadshape into /allInputData.json
-		allInputData = json.load(open(REOPT_FOLDER_FINAL + '/allInputData.json'))
-		allInputData['loadShape'] = open(REOPT_FOLDER_FINAL + '/loadShape.csv').read()
-		allInputData['fileName'] = 'loadShape.csv'
-
-		# Pulling user defined inputs from REOPT_INPUTS.
-		for key in REOPT_INPUTS:
-			allInputData[key] = REOPT_INPUTS[key]
-
-		# Set the REopt outage to be centered around the max load in the loadshape
-		# TODO: Make it safe for the max to be at begining or end of the year
-		# find max and index of max in mg_load_df['load']
-		max_load = mg_load_df.max()
-		#print("max_load:", max_load)
-		max_load_index = int(mg_load_df.idxmax())
-		#print("max_load_index:", max_load_index)
-		# reset the outage timing such that the length of REOPT_INPUTS falls half before and half after the hour of max load
-		outage_duration = int(REOPT_INPUTS["outageDuration"])
-		if max_load_index + outage_duration/2 > 8760:
-			outage_start_hour = 8760 - outage_duration
-			# REopt seems not to allow an outage on the last hour of the year
-		elif max_load_index - outage_duration/2 < 1:
-			outage_start_hour = 2
-		else:
-			outage_start_hour = max_load_index - outage_duration/2
-		# print("outage_start_hour:", str(int(outage_start_hour)))
-		allInputData['outage_start_hour'] = str(int(outage_start_hour))
-		allInputData['criticalLoadFactor'] = str(critical_load_percent)
-
-		# Pulling coordinates from BASE_NAME.dss into REopt allInputData.json:
-		tree = dssConvert.dssToTree(BASE_NAME)
-		#print(tree)
-		evil_glm = dssConvert.evilDssTreeToGldTree(tree)
-		#print(evil_glm)
-		# using evil_glm to get around the fact that buses in openDSS are created in memory and do not exist in the BASE_NAME dss file
-		for ob in evil_glm.values():
-			ob_name = ob.get('name','')
-			ob_type = ob.get('object','')
-			# pull out long and lat of the gen_bus
-			# if ob_type == "bus" and ob_name == "sourcebus":
-			if ob_type == "bus" and ob_name == microgrid['gen_bus']:
-				ob_lat = ob.get('latitude','')
-				ob_long = ob.get('longitude','')
-				#print('lat:', float(ob_lat), 'long:', float(ob_long))
-				allInputData['latitude'] = float(ob_lat)
-				allInputData['longitude'] = float(ob_long)
-
-		# Update all generator specifications in the microgrid to match outputs of REOPT_FOLDER_BASE
-		gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER_BASE, diesel_total_calc=False)
-		# HACK: comment out the next two lines to turn up Solar quickly for Picatinny analysis
-		solar_size_total = gen_sizes.get('solar_size_total')
-		solar_size_new = gen_sizes.get('solar_size_new')
-		solar_size_existing = gen_sizes.get('solar_size_existing')
-		fossil_size_total = gen_sizes.get('fossil_size_total')
-		fossil_size_new = gen_sizes.get('fossil_size_new')
-		fossil_size_existing = gen_sizes.get('fossil_size_existing')
-		wind_size_total = gen_sizes.get('wind_size_total')
-		wind_size_new = gen_sizes.get('wind_size_new')
-		wind_size_existing = gen_sizes.get('wind_size_existing')
-		battery_cap_total = gen_sizes.get('battery_cap_total')
-		battery_cap_new = gen_sizes.get('battery_cap_new')
-		battery_cap_existing = gen_sizes.get('battery_cap_existing')
-		battery_pow_total = gen_sizes.get('battery_pow_total')
-		battery_pow_new = gen_sizes.get('battery_pow_new')
-		battery_pow_existing = gen_sizes.get('battery_pow_existing')
-
-		# print("feedback_reopt_gen_values.fossil_size_total start:", fossil_size_total)
-		if fossil_size_total > 0:
-			allInputData['dieselMax'] = fossil_size_total
-			allInputData['dieselMin'] = fossil_size_total
-			allInputData['genExisting'] = fossil_size_existing
-		# handle peculiar logic of solar_size_total from REopt when using gen_existing_ref_shapes()
-		# TODO: check on updates to solar outputs from REopt, assuming they align Solar output behavior to be similar to wind, battery, etc
-		if solar_size_total == 1:
-			allInputData['solarMax'] = 0
-			allInputData['solar'] = 'off'
-			# Allow 1kw extra kw of fossil to make sure no infeasible solution during final run of REopt for this mg
-			fossil_size_total += 1
-			# allInputData['dieselMax'] = fossil_size_total
-			# allInputData['dieselMin'] = fossil_size_total + 1
-		elif solar_size_total - solar_size_existing == 1:
-			allInputData['solarMin'] = 0
-			allInputData['solarMax'] = 0
-			allInputData['solarExisting'] = solar_size_existing
-			allInputData['solar'] = 'on'
-		elif solar_size_total > 1: 
-			allInputData['solarMin'] = solar_size_total - solar_size_existing
-			allInputData['solarMax'] = solar_size_total - solar_size_existing
-			allInputData['solarExisting'] = solar_size_existing
-			allInputData['solar'] = 'on'
-		# if additional battery power is recommended by REopt, remove existing batteries and add in new battery
-		# ignore tiny battery recommendations (<1 kw) from REopt
-		if battery_pow_new > 0:
-			allInputData['batteryPowerMin'] = battery_pow_total
-			allInputData['batteryPowerMax'] = battery_pow_total
-			allInputData['batteryKwExisting'] = 0
-			# If recommended battery power is larger than existing, then let rerun of REopt suggest the best capacity of the battery instead of tying it to the original existing kwh
-			allInputData['batteryCapacityMin'] = 0
-			allInputData['batteryCapacityMax'] = 100000
-			allInputData['batteryKwhExisting'] = 0
-			allInputData['battery'] = 'on'
-		# if only additional energy storage (kWh) is recommended, add a battery of same power as existing battery with the recommended additional kWh
-		# ignore tiny battery recommendations (<1 kw) from REopt
-		elif battery_cap_new > 0:
-			allInputData['batteryPowerMin'] = battery_pow_existing
-			allInputData['batteryPowerMax'] = battery_pow_existing
-			allInputData['batteryKwExisting'] = battery_pow_existing
-			allInputData['batteryCapacityMin'] = battery_cap_total
-			allInputData['batteryCapacityMax'] = battery_cap_total
-			allInputData['batteryKwhExisting'] = battery_cap_existing
-			allInputData['battery'] = 'on'
-		# if no new battery storage is recommended, keep existing if it exists
-		# Warning: logic for batteries affects behavior of loadshape generation in gen_existing_ref_shapes()
-		elif battery_cap_existing > 0:
-			allInputData['batteryPowerMin'] = battery_pow_existing
-			allInputData['batteryPowerMax'] = battery_pow_existing
-			allInputData['batteryKwExisting'] = battery_pow_existing
-			allInputData['batteryCapacityMin'] = battery_cap_existing
-			allInputData['batteryCapacityMax'] = battery_cap_existing
-			allInputData['batteryKwhExisting'] = battery_cap_existing
-			allInputData['battery'] = 'on'
-		# handle tiny battery recommendations from REopt that can cause mgUp to fail
-		# elif battery_pow_new < 1 or battery_cap_new < 1:
-		# 	allInputData['batteryPowerMin'] = 0
-		# 	allInputData['batteryPowerMax'] = 0
-		# 	allInputData['batteryKwExisting'] = 0
-		# 	allInputData['batteryCapacityMin'] = 0
-		# 	allInputData['batteryCapacityMax'] = 0
-		# 	allInputData['batteryKwhExisting'] = 0
-		# 	allInputData['battery'] = 'off'
-
-		if wind_size_total > 0 and wind_size_total != 1: # enable this dual condition when using gen_existing_ref_shapes()
-			allInputData['windMin'] = wind_size_total
-			allInputData['windMax'] = wind_size_total
-			allInputData['windExisting'] = wind_size_existing
-			allInputData['wind'] = 'on' #failsafe to include wind if found in base_dss
-		elif wind_size_total == 1: # enable the elif condition when using gen_existing_ref_shapes()
-			allInputData['windMax'] = 0
-			allInputData['wind'] = 'off'
-			# Allow 1kw extra of fossil to make sure no infeasible solution during final run of REopt for this mg
-			fossil_size_total += 1
-		# make sure to set dieselMax so that default is not used.
-		# print("feedback_reopt_gen_values.fossil_size_total final:", fossil_size_total)
-		allInputData['dieselMax'] = fossil_size_total
-
-			#allInputData['dieselMin'] = fossil_size_total + 1
-
-		# run REopt via microgridDesign
-		with open(REOPT_FOLDER_FINAL + '/allInputData.json','w') as outfile:
-			json.dump(allInputData, outfile, indent=4)
-		omf.models.__neoMetaModel__.runForeground(REOPT_FOLDER_FINAL)
-		omf.models.__neoMetaModel__.renderTemplateToFile(REOPT_FOLDER_FINAL)
 
 def mg_phase_and_kv(BASE_NAME, microgrid, mg_name):
 	'''Returns a dict with the phases at the gen_bus and kv 
@@ -760,39 +584,20 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	gen_df_builder.to_csv(GEN_NAME, index=False)
 	return gen_obs
 
-def gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL):
+
+def gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_FINAL):
 	'''Create new generator 1kw reference loadshapes for existing gen located outside of the microgrid in analysis. 
 	To run this effectively when not running feedback_reopt_gen_values(), specify REOPT_FOLDER_BASE for both of the final arguments
 	SIDE EFFECTS: creates REF_NAME generator reference shape'''
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER_FINAL, diesel_total_calc=False)
 	reopt_final_out = json.load(open(REOPT_FOLDER_FINAL + '/allOutputData.json'))
-	reopt_base_out = json.load(open(REOPT_FOLDER_BASE + '/allOutputData.json'))
-	#reopt_final_out = json.load(open(REOPT_FOLDER_FINAL + '/allOutputData.json'))
-	mg_num = 1
 	ref_df_builder = pd.DataFrame()
-
 	solar_size_total = gen_sizes.get('solar_size_total')
-	# if solar was enabled by user, take shape from REOPT_FOLDER_FINAL and normalize by solar_size_total
-	if solar_size_total > 0 and solar_size_total != 1:
-		ref_df_builder['solar_ref_shape'] = pd.Series(reopt_final_out.get(f'powerPV{mg_num}'))/solar_size_total
-		# print('solar_1')
-	# if solar was not enabled by user, take shape from REOPT_FOLDER_BASE
-	elif reopt_base_out.get(f'sizePV{mg_num}') == 1:
-		ref_df_builder['solar_ref_shape'] = pd.Series(reopt_base_out.get(f'powerPV{mg_num}'))
-		# print('solar_2')
-	# print('solar_ref_shape', ref_df_builder['solar_ref_shape'].head(20))
-	
 	wind_size_total = gen_sizes.get('wind_size_total')
+	# if solar was enabled by user, take shape from REOPT_FOLDER_FINAL and normalize by solar_size_total
+	ref_df_builder['solar_ref_shape'] = pd.Series(reopt_final_out.get(f'powerPV1'))/solar_size_total
 	# if wind was enabled by user, take shape from REOPT_FOLDER_FINAL and normalize by wind_size_total
-	if wind_size_total > 0 and wind_size_total != 1:
-		ref_df_builder['wind_ref_shape'] = pd.Series(reopt_final_out.get(f'powerWind{mg_num}'))/wind_size_total
-		# print('wind_1')
-	# if wind was not enabled by user, take shape from REOPT_FOLDER_BASE
-	elif reopt_base_out.get(f'sizeWind{mg_num}') == 1:
-		ref_df_builder['wind_ref_shape'] = pd.Series(reopt_base_out.get(f'powerWind{mg_num}'))
-		# print('wind_2')
-	# print('wind_ref_shape', ref_df_builder['wind_ref_shape'].head(20))
-
+	ref_df_builder['wind_ref_shape'] = pd.Series(reopt_final_out.get(f'powerWind1'))/wind_size_total
 	ref_df_builder.to_csv(REF_NAME, index=False)
 
 def mg_add_cost(outputCsvName, microgrid, mg_name, BASE_NAME):
@@ -1549,17 +1354,11 @@ def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
 	# print(reps)
 	return(reps)
 
-def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, FAULTED_LINE, mg_name, ADD_COST_NAME, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR = False, open_results=True, final_run=False):
+def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, FAULTED_LINE, mg_name, ADD_COST_NAME, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR = False, open_results=True, final_run=False):
 	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_NAME, microgrid, mg_name)
-	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load, mg_name)
-	# to run microgridup with automatic feedback loop to update fossil size, include the following:
-	# net_load = max_net_load('/allOutputData.json', REOPT_FOLDER_BASE)
-	# diesel_total_calc = diesel_sizing('/allOutputData.json',REOPT_FOLDER_BASE, DIESEL_SAFETY_FACTOR, net_load)
-	feedback_reopt_gen_values(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL, microgrid, critical_load_percent, diesel_total_calc=False )
-	# to run microgridup without automated fossil updates nor feedback loop, specify REOPT_FOLDER_BASE instead of REOPT_FOLDER_FINAL in build_new_gen_ob_and_shape(), microgrid_report_csv(), and microgrid_report_list_of_dicts(), the last argument of gen_existing_ref_shapes() and out = template.render() below, as well as reopt_folders to pull from _final_ in full()
-	# to run mgup with automated fossil updates, change the references back to REOPT_FOLDER_FINAL
+	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_FINAL, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load, mg_name)
 	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, diesel_total_calc=False)
-	gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_BASE, REOPT_FOLDER_FINAL)
+	gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_FINAL)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, microgrid)
 	# Generate microgrid control hardware costs.
 	mg_add_cost(ADD_COST_NAME, microgrid, mg_name, BASE_NAME)	
@@ -1672,7 +1471,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 			new_mg_names = mgs_name_sorted[0:i+1]
 			new_mg_for_control = {name:MICROGRIDS[name] for name in new_mg_names}
 			final_run = True if i == len(mgs_name_sorted) - 1 else False
-			main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], new_mg_for_control, GEN_NAME, REF_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_base_{i}', f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, FAULTED_LINE, mg_name, f'mg_add_cost_{i}.csv', FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR, open_results=False, final_run=final_run)
+			main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], new_mg_for_control, GEN_NAME, REF_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, FAULTED_LINE, mg_name, f'mg_add_cost_{i}.csv', FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR, open_results=False, final_run=final_run)
 		# Resilience simulation with outages. Optional. Skipped if no OUTAGE_CSV
 		if OUTAGE_CSV:
 			all_microgrid_loads = [x.get('loads',[]) for x in MICROGRIDS.values()]

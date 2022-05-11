@@ -71,7 +71,6 @@ def set_fossil_max_kw(FOSSIL_BACKUP_PERCENT, max_crit_load):
 	TODO: Test assumption that setting 'dieselMax' 
 	in microgridDesign does not override behavior 
 	of 'genExisting' in reopt_gen_mg_specs()'''
-	
 	# to run REopt without fossil backup
 	if FOSSIL_BACKUP_PERCENT == 0:
 		fossil_max_kw = 0
@@ -225,43 +224,6 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 	omf.models.__neoMetaModel__.runForeground(REOPT_FOLDER)
 	omf.models.__neoMetaModel__.renderTemplateToFile(REOPT_FOLDER)
 
-def max_net_load(inputName, REOPT_FOLDER):
-	''' Calculate max net load needing to be covered by fossil 
-	generation in an outage. This method assumes only solar, wind and fossil generation 
-	when islanded from main grid, with no support from battery in order to model 
-	the worst case long term outage. '''
-	reopt_out = json.load(open(REOPT_FOLDER + inputName))
-	mg_num = 1
-	load_df = pd.DataFrame()
-	load_df['total_load'] = pd.Series(reopt_out.get(f'load{mg_num}', np.zeros(8760)))
-	load_df['solar_shape'] = pd.Series(reopt_out.get(f'powerPV{mg_num}', np.zeros(8760)))
-	load_df['wind_shape'] = pd.Series(reopt_out.get(f'powerWind{mg_num}', np.zeros(8760)))
-	load_df['net_load'] = load_df['total_load']-load_df['solar_shape']-load_df['wind_shape']
-	# max load in loadshape
-	max_total_load = max(load_df['total_load'])
-	# max net load not covered by solar or wind; Equivalent to fossil size needed for uninterupted power throughout the year
-	max_net_load = max(load_df['net_load'])
-	# diesel size recommended by REopt
-	# diesel_REopt = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
-	# print("Max total load for", REOPT_FOLDER, ":", max_total_load)
-	# print("Max load needed to be supported by diesel for", REOPT_FOLDER, ":", max_net_load)
-	# print("% more kW diesel needed than recommended by REopt for", REOPT_FOLDER, ":", round(100*(max_net_load - diesel_REopt)/diesel_REopt))
-	return max_net_load
-
-def diesel_sizing(inputName, REOPT_FOLDER, DIESEL_SAFETY_FACTOR, max_net_load):
-	''' Calculate total diesel kW needed to meet max net load at all hours of the year
-	plus a user-inputted design safety factor'''
-	'''Currently deprecated without active call to DIESEL_SAFETY_FACTOR; Update references to fossil upon reintegration'''
-	reopt_out = json.load(open(REOPT_FOLDER + inputName))
-	mg_num = 1
-	diesel_total_REopt = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
-	if max_net_load >= diesel_total_REopt:
-		diesel_total_calc = max_net_load*(1+DIESEL_SAFETY_FACTOR)
-	elif max_net_load < diesel_total_REopt:
-		diesel_total_calc = diesel_total_REopt*(1+DIESEL_SAFETY_FACTOR)
-	# print(diesel_total_calc,"kW diesel_total_calc is", round(100*(diesel_total_calc-diesel_total_REopt)/diesel_total_REopt), "% more kW diesel than recommended by REopt for", REOPT_FOLDER)
-	return diesel_total_calc
-
 def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 	''' Get generator objects from REopt. Calculate new gen sizes, using updated fossil size 
 	from diesel_total_calc if True. Returns all gens in a dictionary.
@@ -393,7 +355,6 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	SIDE EFFECTS: creates GEN_NAME generator shape
 	TODO: To implement multiple same-type existing generators within a single microgrid, 
 	will need to implement searching the tree of FULL_NAME to find kw ratings of existing gens'''
-
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER)
 	# print("build_new_gen_ob_and_shape() gen_sizes into OpenDSS:", gen_sizes)
 	reopt_out = json.load(open(REOPT_FOLDER + '/allOutputData.json'))
@@ -407,7 +368,6 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	phase_and_kv = mg_phase_and_kv(BASE_NAME, microgrid, mg_name)
 	tree = dssConvert.dssToTree(BASE_NAME)
 	gen_map = {x.get('object',''):i for i, x in enumerate(tree)}\
-	
 	# Build new solar gen objects and loadshapes
 	solar_size_total = gen_sizes.get('solar_size_total')
 	solar_size_new = gen_sizes.get('solar_size_new')
@@ -431,7 +391,6 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 				# get kw rating for this generator from the DSS tree
 				gen_kw = float(tree[gen_map[f'generator.{gen_ob_existing}']].get('kw',''))
 				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerPV{mg_num}'))/solar_size_total*gen_kw 
-	
 	# Build new fossil gen objects and loadshapes
 	fossil_size_total = gen_sizes.get('fossil_size_total')
 	fossil_size_new = gen_sizes.get('fossil_size_new')
@@ -463,7 +422,6 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 				gen_kw = float(tree[gen_map[f'generator.{gen_ob_existing}']].get('kw',''))
 				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerDiesel{mg_num}'))/fossil_size_total*gen_kw
 				# gen_df_builder[f'{gen_ob_existing}'] = pd.Series(np.zeros(8760)) # insert an array of zeros for the fossil generation shape to simulate no outage
-	
 	# Build new wind gen objects and loadshapes
 	wind_size_total = gen_sizes.get('wind_size_total')
 	wind_size_new = gen_sizes.get('wind_size_new')
@@ -486,7 +444,6 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 			if gen_ob_existing.startswith('wind_'):
 				gen_kw = float(tree[gen_map[f'generator.{gen_ob_existing}']].get('kw',''))
 				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(reopt_out.get(f'powerWind{mg_num}'))/wind_size_total*gen_kw
-
 	# calculate battery loadshape (serving load - charging load)
 	battery_cap_total = gen_sizes.get('battery_cap_total')
 	battery_cap_new = gen_sizes.get('battery_cap_new')
@@ -556,7 +513,6 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 		# 0-1 scale the power output loadshape to the total power, and multiply by the ratio of new energy storage kwh over the total storage kwh
 		# in dispmode=follow, OpenDSS takes in a 0-1 loadshape and auto scales it by the kwrated
 		gen_df_builder[f'battery_{gen_bus_name}'] = battery_load/battery_pow_total*battery_cap_new/battery_cap_total
-	
 	# build loadshapes for existing battery generation from BASE_NAME
 	for gen_ob_existing in gen_obs_existing:
 		# print("build_new_gen() storage 2", gen_ob_existing)
@@ -580,10 +536,8 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 			else:
 	 			# print("build_new_gen() storage 6", gen_ob_existing)
 	 			gen_df_builder[f'{gen_ob_existing}'] = battery_load/battery_pow_total
-
 	gen_df_builder.to_csv(GEN_NAME, index=False)
 	return gen_obs
-
 
 def gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_FINAL):
 	'''Create new generator 1kw reference loadshapes for existing gen located outside of the microgrid in analysis. 
@@ -605,20 +559,17 @@ def mg_add_cost(outputCsvName, microgrid, mg_name, BASE_NAME):
 	to operate in islanded mode to support critical loads
 	TO DO: When critical load list references actual load buses instead of kw ratings,
 	use the DSS tree structure to find the location of the load buses and the SCADA disconnect switches'''
-
 	AMI_COST = 500
 	THREE_PHASE_RELAY_COST = 20000
 	SCADA_COST = 50000
 	MG_CONTROL_COST = 100000
 	MG_DESIGN_COST = 100000
-
 	mg_ob = microgrid
 	gen_bus_name = mg_ob['gen_bus']
 	mg_loads = mg_ob['loads']
 	switch_name = mg_ob['switch']
 	tree = dssConvert.dssToTree(BASE_NAME)
 	load_map = {x.get('object',''):i for i, x in enumerate(tree)}
-
 	# print out a csv of the 
 	with open(outputCsvName, 'w', newline='') as outcsv:
 		writer = csv.writer(outcsv)
@@ -687,8 +638,6 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 	shape_insert_list = {}
 	ob_deletion_list = []
 	# print("tree:", tree)
-
-
 	for i, ob in enumerate(tree):
 		try:
 			# print("ob:", ob)
@@ -903,7 +852,6 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 	for key in shape_insert_list:
 		min_pos = min(shape_insert_list.keys())
 		tree.insert(min_pos, shape_insert_list[key])
-
 	# Delete unused existing battery objects and their loadshapes from the tree
 	load_map = {x.get('object',''):i for i, x in enumerate(tree)}
 	for ob_string in ob_deletion_list:
@@ -916,7 +864,6 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 			j = load_map.get(f'loadshape.{shape_name}')
 			del tree[j]
 			load_map = {x.get('object',''):i for i, x in enumerate(tree)}	
-
 	# Write new DSS file.
 	dssConvert.treeToDss(tree, FULL_NAME)
 

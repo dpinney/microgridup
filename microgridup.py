@@ -1301,7 +1301,7 @@ def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
 	# print(reps)
 	return(reps)
 
-def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, FAULTED_LINE, mg_name, ADD_COST_NAME, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR = False, open_results=True, final_run=False):
+def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, FAULTED_LINE, mg_name, ADD_COST_NAME, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR = False, final_run=False):
 	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_NAME, microgrid, mg_name)
 	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_FINAL, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load, mg_name)
 	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, diesel_total_calc=False)
@@ -1344,18 +1344,6 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 		mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
 		# Create consolidated report per mg.
 		mg_add_cost_dict_of_lists = pd.read_csv(ADD_COST_NAME).to_dict(orient='list')
-		template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
-		out = template.render(
-			summary=mg_dict_of_lists_full,
-			inputs={'circuit':BASE_NAME,'loads':LOAD_NAME, 'Maximum Proportion of critical load to be served by fossil generation':FOSSIL_BACKUP_PERCENT, 'REopt inputs':REOPT_INPUTS,'microgrid':microgrid},
-			added_costs = mg_add_cost_dict_of_lists,
-			mg_names_and_reopt_folders = {mg_name:REOPT_FOLDER_FINAL}
-		)
-		#TODO: have an option where we make the template <iframe srcdoc="{{X}}"> to embed the html and create a single file.
-		with open(BIG_OUT_NAME,'w') as outFile:
-			outFile.write(out)
-		if open_results:
-			os.system(f'open {BIG_OUT_NAME}')
 
 def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, DIESEL_SAFETY_FACTOR=False, DELETE_FILES=False, open_results=False, OUTAGE_CSV=None):
 	# CONSTANTS
@@ -1418,7 +1406,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 			new_mg_names = mgs_name_sorted[0:i+1]
 			new_mg_for_control = {name:MICROGRIDS[name] for name in new_mg_names}
 			final_run = True if i == len(mgs_name_sorted) - 1 else False
-			main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], new_mg_for_control, GEN_NAME, REF_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, FAULTED_LINE, mg_name, f'mg_add_cost_{i}.csv', FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR, open_results=False, final_run=final_run)
+			main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], new_mg_for_control, GEN_NAME, REF_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, FAULTED_LINE, mg_name, f'mg_add_cost_{i}.csv', FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR, final_run=final_run)
 		# Resilience simulation with outages. Optional. Skipped if no OUTAGE_CSV
 		if OUTAGE_CSV:
 			all_microgrid_loads = [x.get('loads',[]) for x in MICROGRIDS.values()]
@@ -1447,18 +1435,25 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		if os.path.exists("user_warnings.txt"):
 			with open("user_warnings.txt") as myfile:
 				warnings = myfile.read()
-		template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
 		# generate file map
 		mg_names = list(MICROGRIDS.keys())
 		names_and_folders = {x[0]:x[1] for x in zip(mg_names, reopt_folders)}
-		out = template.render(
-			now=current_time,
+		# Write out overview iframe
+		over_template = j2.Template(open(f'{MGU_FOLDER}/template_overview.html').read())
+		over = over_template.render(
 			summary=stats,
-			inputs=inputs, #TODO: Make the inputs clearer and maybe at the bottom, showing only the appropriate keys from MICROGRIDS as necessary
+			add_cost_rows = add_cost_rows,
 			warnings = warnings,
+			now=current_time,
+			inputs=inputs, #TODO: Make the inputs clearer and maybe at the bottom, showing only the appropriate keys from MICROGRIDS as necessary
+		)
+		with open('overview.html', 'w') as overfile:
+			overfile.write(over)
+		# Write full output
+		template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
+		out = template.render(
 			raw_files = _walkTree('.'),
 			model_name = MODEL_DIR,
-			add_cost_rows = add_cost_rows,
 			mg_names_and_reopt_folders = names_and_folders,
 			resilience_show = (OUTAGE_CSV is not None)
 		)

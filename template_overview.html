@@ -1,0 +1,66 @@
+<head>
+	<title>Overview</title>
+	<style type="text/css">
+		* {
+			font-family:sans-serif
+		}
+		.over_block {
+			break-inside: avoid-column;
+			width:100%;
+		}
+		body {
+			column-width: 600px; /*make it whatever you want the min column size, max size will be around 2x this number.*/
+			margin-right: 12px; /*lets the right hand side breathe, make it about 3% of the column-width*/
+		}
+		h3 {
+			margin-bottom: 11px;
+		}
+		pre {
+			width: 95%;
+			white-space: pre-wrap;
+			margin-top: 0px;
+		}
+	</style>
+</head>
+<body>
+	<div class="over_block">
+		<h3>Report Generated</h3>
+		<pre>{{now}}</pre>
+	</div>
+	<div class="over_block">
+		<h3>Model Inputs</h3>
+		<pre>{{inputs}}</pre>
+	</div>
+	<div class="over_block">
+		<h3>User Warnings</h3>
+		<pre>{{warnings}}</pre>
+	</div>
+	<div class="over_block">
+		<h3>Overview of Microgrid Results</h3>
+		<table>
+			{% for k,v in summary.items() %}
+			<tr>
+				<td>{{ k }}</td>{% for v_i in v %}
+				{% if v_i is string %}<td style="text-align:right">{{ v_i }}</td>
+				{% elif v_i is not none %}<td style="text-align:right">{{ '{:,}'.format(v_i) }}</td>
+				{% else %}<td style="text-align:right">{{ v_i }}</td>{% endif %}
+			{% endfor %}</tr>{% endfor %}
+		</table>
+	</div>
+	<div class="over_block">
+		<h3>Distribution Upgrades needed to create Microgrids</h3>
+		<table>
+			<tr>
+				<th>Microgrid</th>
+				<th>Location</th>
+				<th>Recommended Upgrade</th>
+				<th>Cost Estimate ($)</th>
+			</tr>{% for row in add_cost_rows %}
+			<tr>{% for col_value in row %}
+				{% if col_value is string %}<td style="text-align:right">{{ col_value }}</td>
+				{% elif col_value is not none %}<td style="text-align:right">{{ '{:,}'.format(col_value) }}</td>
+				{% else %}<td style="text-align:right">{{ col_value }}</td>{% endif %}
+			{% endfor %}</tr>{% endfor %}
+		</table>
+	</div>
+</body>

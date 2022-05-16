@@ -1,5 +1,5 @@
 redirect circuit_control.dss
-set datapath="/Users/matt2/Documents/NRECA/MicrogridUp/microgridup/1mg"
+set datapath="/Users/dpinney/gdrive/LATERBASE/NRECA/MICROGRIDUP (MGU) ESTCP FY2020/del2.2.1K - Requirements and Specifications/microgridup mgu test system lehigh/1mg"
 set maxcontroliter=1000
 calcvoltagebases
 new object=monitor.monvsource-source element=vsource.source terminal=1 mode=0
@@ -29,6 +29,7 @@ new object=monitor.mongenerator-fossil_646_existing element=generator.fossil_646
 new object=monitor.moncapacitor-cap1 element=capacitor.cap1 terminal=1 mode=6
 new object=monitor.moncapacitor-cap2 element=capacitor.cap2 terminal=1 mode=6
 new object=monitor.mongenerator-battery_670 element=storage.battery_670 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-wind_670 element=generator.wind_670 terminal=1 mode=1 ppolar=no
 new object=monitor.monvsource-lead_gen_670_1_2_3 element=vsource.lead_gen_670_1_2_3 terminal=1 mode=0
 new object=monitor.mongenerator-solar_670 element=generator.solar_670 terminal=1 mode=1 ppolar=no
 set mode=yearly stepsize=60m 
@@ -387,5 +388,6 @@ export monitors monitorname=mongenerator-fossil_646_existing
 export monitors monitorname=moncapacitor-cap1
 export monitors monitorname=moncapacitor-cap2
 export monitors monitorname=mongenerator-battery_670
+export monitors monitorname=mongenerator-wind_670
 export monitors monitorname=monvsource-lead_gen_670_1_2_3
 export monitors monitorname=mongenerator-solar_670

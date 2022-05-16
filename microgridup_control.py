@@ -68,7 +68,13 @@ def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, moto
 		loads = [obj for obj in dssTree if 'load.' in obj.get('object','') and obj.get('object','').split('.')[1] in microgrids[key]['loads']]
 		transformers = [obj for obj in dssTree if 'transformer.' in obj.get('object','') and obj.get('object','').split('.')[1] in all_mg_elements[key]]
 		expected_inrush = estimate_inrush(loads + transformers, motor_perc)
-		data['Expected In-rush (kW)'].append(expected_inrush)
+		data['Expected In-rush (kW)'].append(sum(expected_inrush.values()))
+
+		# Expected In-rush (kW) from transformers
+		data['In-rush (kW) from transformers'].append(sum([expected_inrush[ob] for ob in expected_inrush if 'transformer' in ob]))
+
+		# Expected In-rush (kW) from loads
+		data['Expected In-rush (kW) from loads'].append(sum([expected_inrush[ob] for ob in expected_inrush if 'load' in ob]))
 
 		# In-rush as % of total generation
 		gen_bus = microgrids[key]['gen_bus']
@@ -76,13 +82,13 @@ def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, moto
 		total_generation = 0
 		for ob in all_generation:
 			total_generation += float(ob.get('kw'))
-		data['In-rush as % of total generation'].append(100*expected_inrush/total_generation)
+		data['In-rush as % of total generation'].append(100*sum(expected_inrush.values())/total_generation)
 
 		# Soft Start load (kW)
 		data['Soft Start load (kW)'].append(gradual_load_pickup(dssTree, loads, motor_perc))
 
 		# Super-cap Sizing
-		data['Super-cap Sizing ($)'].append(super_cap_size(expected_inrush))
+		data['Super-cap Sizing ($)'].append(super_cap_size(sum(expected_inrush.values())))
 
 		# Total fossil surge. Send total fossil kW power per mg to function, return product after multiplication by surge factor. 
 		fossilGens = [ob for ob in dssTree if ob.get('bus1','x.x').split('.')[0] == gen_bus and 'generator.fossil' in ob.get('object','')]
@@ -101,7 +107,7 @@ def estimate_inrush(list_of_transformers_and_loads, motor_perc=0.5):
 			inrush[obj.get('object')] = calc_transformer_inrush(obj)
 		elif 'load.' in obj.get('object',''):
 			inrush[obj.get('object','')] = calc_motor_inrush(obj, motor_perc)
-	return sum(inrush.values())
+	return inrush
 
 def calculate_fossil_surge_power(fossilGens, surgeFactor=2.5):
 	# Short burst of power from fossil units. Need a total fossil surge display = 2.5 x total fossil unit power on the microgrid.

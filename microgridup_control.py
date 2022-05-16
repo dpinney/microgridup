@@ -45,7 +45,7 @@ def get_all_mg_elements(dssPath, microgrids):
 		all_mg_elements[key] = N
 	return all_mg_elements
 
-def plot_inrush_data(dssPath, microgrids, out_html, motor_perc=0.5):
+def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, motor_perc=0.5):
 	# Grab all elements by mg. 
 	all_mg_elements = get_all_mg_elements(dssPath, microgrids)
 	dssTree = dssConvert.dssToTree(dssPath)
@@ -55,11 +55,18 @@ def plot_inrush_data(dssPath, microgrids, out_html, motor_perc=0.5):
 	for key in microgrids:
 		data['Microgrid ID'].append(key)
 
-		# # of Interruptions
+		# # of Interruptions --> Number of times gen drops to zero during sim.
+		dssTree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw = do_manual_balance_approach(outageStart, outageEnd, key, microgrids[key], dssTree)
+		# Stole a few lines from plot_mba_approach().
+		new_batt_loadshape = list(new_batt_loadshape)
+		cumulative_existing_batt_shapes = list(cumulative_existing_batt_shapes)
+		storage_shape = cumulative_existing_batt_shapes[:outageStart] + new_batt_loadshape + cumulative_existing_batt_shapes[outageEnd:]
+		gen_and_storage_shape = [x-y for x,y in zip(all_rengen_shapes,storage_shape)]
+		data['# of Interruptions'].append(len(count_interruptions_rengenmg(outageStart, outageEnd, all_loads_shapes_kw, gen_and_storage_shape)))
 		
 		# Expected In-rush (kW)
 		loads = [obj for obj in dssTree if 'load.' in obj.get('object','') and obj.get('object','').split('.')[1] in microgrids[key]['loads']]
-		transformers = [obj for obj in all_mg_elements[key] if 'transformer' in obj.get('object','')] # TO DO: figure out how to isolate transormers by microgrid
+		transformers = [obj for obj in dssTree if 'transformer.' in obj.get('obejct','') and obj.get('object','').split[1] in all_mg_elements[key]]
 		expected_inrush = estimate_inrush(loads + transformers, motor_perc)
 		data['Expected In-rush (kW)'].append(expected_inrush)
 
@@ -76,6 +83,8 @@ def plot_inrush_data(dssPath, microgrids, out_html, motor_perc=0.5):
 		data['In-rush as % of total generation'].append(100*expected_inrush/total_generation)
 
 		# Soft Start load (kW)
+		data['Soft Start load (kW)'].append(gradual_load_pickup(dssTree, loads, motor_perc))
+
 		# Super-cap Sizing
 
 	# Run inrush calculations by microgrid and add to df. 
@@ -111,11 +120,11 @@ def estimate_inrush(list_of_transformers_and_loads, motor_perc=0.5):
 	# Mitigation option 1: we tell the user how big their supercapacitor needs to be. (supercaps are like super-high-power, low energy batteries). Figure out max power of loadshape_of_inrush, figure out duration, specify as a super cap (power, duration).
 	# return
 
-def gradual_load_pickup(dssTree, motor_perc=0.5):
-	# Assume some order of switching on, assume none of the inrushes overlap but the steady state powerflows do, calculate max power during this process
-	all_loads = [obj for obj in dssTree if 'load.' in obj.get('object','')]
-	all_loads.sort(key=lambda x:float(x.get('kw')))
-	max_load_obj = all_loads[-1]
+def gradual_load_pickup(dssTree, loads, motor_perc=0.5):
+	# Assume some order of switching on, assume none of the inrushes overlap but the steady state powerflows do, calculate max power during this process.
+	# Assume all transformers must be powered when 1 mg is powered.
+	loads.sort(key=lambda x:float(x.get('kw')))
+	max_load_obj = loads[-1]
 	all_transformer_inrush = calc_all_transformer_inrush(dssTree)
 	max_load_inrush = calc_motor_inrush(max_load_obj, motor_perc=0.5)
 	return max_load_inrush + sum(all_transformer_inrush.values())
@@ -157,6 +166,26 @@ def calc_all_motor_inrush(dssTree, motor_perc=0.5):
 			inrush = calc_motor_inrush(obj, motor_perc)
 			motor_inrushes[obj.get('object')] = inrush
 	return motor_inrushes
+
+def count_interruptions_rengenmg(outageStart, outageEnd, all_loads_shapes_kw, gen_and_storage_shape):
+	# Count instances where gen_and_storage_shape fail to align with all_loads_shapes_kw.
+	lengthOfOutage = outageEnd - outageStart
+	demand = all_loads_shapes_kw[outageStart:outageEnd]
+	supply = gen_and_storage_shape[outageStart:outageEnd]
+
+	interruptions = []
+	iS, iE = 0, 0
+	idx = 0
+	while idx < lengthOfOutage:
+		if supply[idx] < demand[idx]:
+			iS = idx
+			while supply[idx] < demand[idx]:
+				idx += 1
+			iE = idx
+			interruptions.append((iS,iE))
+		else:
+			idx += 1
+	return interruptions
 
 def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTree):
 	# Manually constructs battery loadshapes for outage and reinserts into tree based on a proportional to kWh basis. 

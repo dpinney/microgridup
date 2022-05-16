@@ -66,7 +66,7 @@ def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, moto
 		
 		# Expected In-rush (kW)
 		loads = [obj for obj in dssTree if 'load.' in obj.get('object','') and obj.get('object','').split('.')[1] in microgrids[key]['loads']]
-		transformers = [obj for obj in dssTree if 'transformer.' in obj.get('obejct','') and obj.get('object','').split[1] in all_mg_elements[key]]
+		transformers = [obj for obj in dssTree if 'transformer.' in obj.get('object','') and obj.get('object','').split[1] in all_mg_elements[key]]
 		expected_inrush = estimate_inrush(loads + transformers, motor_perc)
 		data['Expected In-rush (kW)'].append(expected_inrush)
 
@@ -86,16 +86,13 @@ def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, moto
 		data['Soft Start load (kW)'].append(gradual_load_pickup(dssTree, loads, motor_perc))
 
 		# Super-cap Sizing
+		data['Super-cap Sizing ($)'].append(super_cap_size(expected_inrush))
 
-	# Run inrush calculations by microgrid and add to df. 
+		# Total fossil surge. Send total fossil kW power per mg to function, return product after multiplication by surge factor. 
+		# fossilGens = [obj for obj in dssTree if 'generator.fossil' in obj.get('object','') and obj.get('object','').split[1] in all_mg_elements[key]]
+		fossilGens = [obj for obj in dssTree if 'generator.fossil' in obj.get('object','') and ob.get('bus1','x.x').split('.')[0] == gen_bus]
+		data['Total fossil surge (kW)'].append(calculate_fossil_surge_power(fossilGens))
 	
-	# data = {'Microgrid ID':['mg0', 'mg1', 'mg2', 'mg3'],
-	#         '# of Interruptions':[0, 0, 0, 0],
-	#         'Expected In-rush (kW)':[0,0,0,0],
-	#         'In-rush as % of total generation':[0,0,0,0],
-	#         'Soft Start load (kW)':[0,0,0,0],
-	#         'Super-cap Sizing':[0,0,0,0]
-	#         }
 	df = pd.DataFrame(data)
 	
 	table_html = '<h1>In-rush Current Report</h1>' + df.to_html()
@@ -112,13 +109,17 @@ def estimate_inrush(list_of_transformers_and_loads, motor_perc=0.5):
 			inrush[obj.get('object','')] = calc_motor_inrush(obj, motor_perc)
 	return sum(inrush.values())
 
-# def calculate_fossil_surge_power(fossil_dss_object) -> (power, duration):
-	# Short burst of power from fossil units that can typically provide 4x or 5x their nameplate output? Need to research. 
-	# return
+def calculate_fossil_surge_power(fossilGens, surgeFactor=2.5):
+	# Short burst of power from fossil units. Need a total fossil surge display = 2.5 x total fossil unit power on the microgrid.
+	total_kW = 0
+	for obj in fossilGens:
+		total_kW += obj.get('kw','')
+	return total_kW * surgeFactor
 
-# def super_cap_size(inrush_loadshape, duration_seconds=1) -> (power,duration):
-	# Mitigation option 1: we tell the user how big their supercapacitor needs to be. (supercaps are like super-high-power, low energy batteries). Figure out max power of loadshape_of_inrush, figure out duration, specify as a super cap (power, duration).
-	# return
+def super_cap_size(magnitude_kw, p=2.5):
+	# Assume price of $2.50/Watt. Ignore duration for now. Return price. f(m) = p * magnitude
+	p_kw = p * 1000
+	return magnitude_kw * p_kw
 
 def gradual_load_pickup(dssTree, loads, motor_perc=0.5):
 	# Assume some order of switching on, assume none of the inrushes overlap but the steady state powerflows do, calculate max power during this process.
@@ -179,7 +180,7 @@ def count_interruptions_rengenmg(outageStart, outageEnd, all_loads_shapes_kw, ge
 	while idx < lengthOfOutage:
 		if supply[idx] < demand[idx]:
 			iS = idx
-			while supply[idx] < demand[idx]:
+			while idx < lengthOfOutage and supply[idx] < demand[idx]:
 				idx += 1
 			iE = idx
 			interruptions.append((iS,iE))

@@ -41,11 +41,17 @@ def get_all_mg_elements(dssPath, microgrids):
 	all_mg_elements = {}
 	for key in first_nodes:
 		N = nx.descendants(G, first_nodes[key])
+		transformers = set()
+		for obj in dssTree:
+			if 'transformer.' in obj.get('object',''):
+				buses = obj.get('buses')[1:-1].split(',')
+				if (buses[0].split('.')[0] in N or buses[0].split('.')[0] in first_nodes[key]) and buses[1].split('.')[0] in N:
+					transformers.add(obj.get('object').split('.')[1])
 		# all_mg_elements[key] = G.subgraph(N)
-		all_mg_elements[key] = N
+		all_mg_elements[key] = N.union(transformers)
 	return all_mg_elements
 
-def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, motor_perc=0.5):
+def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, vsourceRatings, motor_perc=0.5):
 	# Grab all elements by mg. 
 	all_mg_elements = get_all_mg_elements(dssPath, microgrids)
 	dssTree = dssConvert.dssToTree(dssPath)
@@ -92,7 +98,7 @@ def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, moto
 
 		# Total fossil surge. Send total fossil kW power per mg to function, return product after multiplication by surge factor. 
 		fossilGens = [ob for ob in dssTree if ob.get('bus1','x.x').split('.')[0] == gen_bus and 'generator.fossil' in ob.get('object','')]
-		data['Total fossil surge (kW)'].append(calculate_fossil_surge_power(fossilGens))
+		data['Total fossil surge (kW)'].append(calculate_fossil_surge_power(fossilGens, vsourceRatings, gen_bus))
 	
 	df = pd.DataFrame(data)
 	
@@ -109,11 +115,14 @@ def estimate_inrush(list_of_transformers_and_loads, motor_perc=0.5):
 			inrush[obj.get('object','')] = calc_motor_inrush(obj, motor_perc)
 	return inrush
 
-def calculate_fossil_surge_power(fossilGens, surgeFactor=2.5):
+def calculate_fossil_surge_power(fossilGens, vsourceRatings, gen_bus, surgeFactor=2.5):
 	# Short burst of power from fossil units. Need a total fossil surge display = 2.5 x total fossil unit power on the microgrid.
 	total_kW = 0
 	for obj in fossilGens:
 		total_kW += float(obj.get('kw',''))
+	for obj in vsourceRatings:
+		if gen_bus in obj:
+			total_kW += float(vsourceRatings[obj])
 	return total_kW * surgeFactor
 
 def super_cap_size(magnitude_kw, p=2.5):
@@ -137,7 +146,6 @@ def calc_transformer_inrush(dssTransformerDict, default_resistance_transformer='
 	for idx in range(len(dssTransformerDict.get('kvs')[1:-1].split(','))):
 		voltage = float(dssTransformerDict.get('kvs')[1:-1].split(',')[idx])
 		resistance = float(dssTransformerDict.get('%rs',default_resistance_transformer)[1:-1].split(',')[idx]) * float(dssTransformerDict.get('kvas')[1:-1].split(',')[idx])
-		# TO DO: figure out what to do when transformers don't have a %rs value. Use %loadloss? 
 		inrush += math.sqrt(2) * voltage / resistance 
 	return inrush
 
@@ -713,7 +721,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			"All rengen loadshapes during outage (kw)":list(all_rengen_shapes[outageStart:outageEnd]),
 			"Cumulative battery loadshape during outage (kw)":list(new_batt_loadshape),
 			"Surplus rengen":total_surplus}
-	# print("big_gen_ratings",big_gen_ratings)
+	print("big_gen_ratings",big_gen_ratings)
 	# print("rengen_mgs",rengen_mgs)
 	# Additional calcv to make sure the simulation runs.
 	actions[outageStart] += f'calcv\n'
@@ -756,6 +764,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 	# make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Voltage Source Output", "Average hourly kW", vsource_ratings=big_gen_ratings)
 	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], 2019, microgrids, dssTree, "Tap Position", "PU")
 	make_chart(f'{FPREFIX}_source_and_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Generator Output", "Average Hourly kW", batt_cycle_chart=True, fossil_loading_chart=True, vsource_ratings=big_gen_ratings, rengen_mgs=rengen_mgs)
+	plot_inrush_data(pathToDss, microgrids, f'{FPREFIX}_inrush_plot.html', outageStart, outageEnd, vsourceRatings=big_gen_ratings)
 	# Write final output file.
 	output_slug = '''	
 		<head>
@@ -777,6 +786,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 	for rengen_name in rengen_fnames:
 		# insert renewable manual balance plots.
 		output_slug = output_slug + f'<iframe src="{rengen_name}"></iframe>'
+	output_slug = output_slug + '<iframe src="timezcontrol_inrush_plot.html"></iframe>'
 	with open('output_control.html','w') as outFile:
 		outFile.write(output_slug)
 	# Undo directory change.

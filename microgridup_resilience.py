@@ -11,6 +11,7 @@ import omf
 import csv
 import pandas as pd
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import os
 from omf.models.microgridControl import customerCost1, utilityOutageTable
 
@@ -72,7 +73,7 @@ def gen_supported_csv(in_path, out_path, mg_supported_loads, tree):
 
 def main(in_csv, out_csv, mg_supported_loads, in_dss, out_html):
 	''' Output for resilience before/after microgrid deployment. '''
-	# Generate general statistics.
+	# Generate resilience statistics SAIDI/SAIFI/etc.
 	tree = dssConvert.dssToTree(in_dss)
 	load_count = len([x for x in tree if x.get('object','').startswith('load.')])
 	print('LOAD COUNT', load_count)
@@ -81,36 +82,26 @@ def main(in_csv, out_csv, mg_supported_loads, in_dss, out_html):
 	new_df = pd.read_csv(out_csv)
 	out_stats_raw = stats(raw_df, '200', str(load_count)) #interuption of less than '200' seconds considered momentary.
 	out_stats_new = stats(new_df, '200', str(load_count))
-	stats_html = f'''
-		<h1>Original and Adjusted Resilience Metrics</h1>
-		<table>
-		<tr>
-			<th></th>
-			<th>SAIDI</th>
-			<th>SAIFI</th>
-			<th>CAIDI</th>
-			<th>ASAI</th>
-			<th>MAIFI</th>
-		</tr>
-		<tr>
-			<td>Current</td>
-			<td>{round(out_stats_raw[0],1)}</td>
-			<td>{round(out_stats_raw[1],3)}</td>
-			<td>{round(out_stats_raw[2],3)}</td>
-			<td>{round(out_stats_raw[3],4)}</td>
-			<td>{round(out_stats_raw[4],3)}</td>
-		</tr>
-		<tr>
-			<td>Microgrid</td>
-			<td>{round(out_stats_new[0],1)}</td>
-			<td>{round(out_stats_new[1],3)}</td>
-			<td>{round(out_stats_new[2],3)}</td>
-			<td>{round(out_stats_new[3],4)}</td>
-			<td>{round(out_stats_new[4],3)}</td>
-		</tr>
-		</table>
-	'''
-	# Load outage table and calculate derived metrics.
+	stats_labels = ['SAIDI','SAIFI','CAIDI','ASAI','MAIFI']
+	legend_spec = {'orientation':'h', 'xanchor':'left'}#, 'x':0, 'y':-0.2}
+	stats_fig = go.Figure(
+		data=[
+			go.Bar(
+				name = 'Without Microgrid',
+				x=stats_labels,
+				y=[round(x,3) for x in out_stats_raw],
+			), go.Bar(
+				name='Microgrid',
+				x=stats_labels,
+				y=[round(x,3) for x in out_stats_new],
+			)
+		]
+	)
+	stats_fig.update_layout(
+		title = 'Original and Adjusted Resilience Metrics',
+		legend = legend_spec
+	)
+	# Generate outage table
 	df_init = pd.read_csv(in_csv) 
 	df_with_mg = pd.read_csv(out_csv)
 	df_with_mg = df_with_mg.rename(columns={
@@ -124,8 +115,8 @@ def main(in_csv, out_csv, mg_supported_loads, in_dss, out_html):
 	df_full['Microgrid Meter Count'] = [0 if str(x).lower() == "nan" else len(str(x).split()) for x in df_full['Microgrid Meters Affected']]
 	df_full['Customer Outage Minutes'] = [x[0]*x[1] for x in zip(df_full['Meter Count'],df_full['Duration_min'])]
 	df_full['Microgrid Customer Outage Minutes'] = [x[0]*x[1] for x in zip(df_full['Microgrid Meter Count'],df_full['Microgrid Duration_min'])]
-	#TODO: better table styling https://pandas.pydata.org/pandas-docs/version/0.23/generated/pandas.DataFrame.to_html.html
 	table_html = '<h1>Full Outage History and Microgrid Adjustments</h1>' + df_full.to_html()
+	# Generate 
 	fig = go.Figure(
 		data=[
 			go.Bar(
@@ -139,16 +130,16 @@ def main(in_csv, out_csv, mg_supported_loads, in_dss, out_html):
 			)
 		]
 	)
-	fig.update_layout(legend=dict(
-		orientation="h",
-		yanchor="bottom",
-		y=1.02,
-		xanchor="right",
-		x=1
-	))
-	chart_html = '<h1>Outage Timeline, Original and Microgrid</h1>' + fig.to_html(default_height='800px')
+	fig.update_layout(
+		title = 'Outage Timeline, Original and Microgrid',
+		legend = legend_spec
+	)
+	chart_html = fig.to_html(default_height='600px')
+	stats_chart_html = stats_fig.to_html(default_height='300px')
+	style_string = '<head><style>* {font-family:sans-serif}; .dataframe{width:100%; border-collapse:collapse}</style></head>'
+	# TODO: fix table styling, transition to jinja2 template.
 	with open(out_html,'w') as outFile:
-		outFile.write('<style>* {font-family:sans-serif}</style>' + stats_html + '\n' + chart_html + '\n' + table_html)
+		outFile.write(style_string + '\n' + stats_chart_html + '\n' + chart_html + '\n' + table_html)
 
 def customer_outage_cost(csv_path):
 	rows = [x.split(',') for x in open(csv_path).readlines()]
@@ -169,7 +160,7 @@ def utility_outage_cost_TEST():
 def _tests():
 	_many_random_outages(100, 'lehigh_random_outages999.csv', 'lehigh_base_phased.dss')
 	utility_outage_cost_TEST()
-	customer_outage_cost(f'{omf.omfDir}/static/testFiles/customerInfo.csv')
+	# customer_outage_cost(f'{omf.omfDir}/static/testFiles/customerInfo.csv')
 	main('lehigh_random_outages.csv', 'lehigh_random_outages_ADJUSTED.csv', ['634a_data_center','634b_radar','634c_atc_tower','675a_hospital','675b_residential1','675c_residential1','692_warehouse2'], 'lehigh_base_phased.dss', 'zoutput.html')
 	os.system('open zoutput.html')
 

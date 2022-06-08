@@ -62,8 +62,8 @@ if __name__ == '__main__':
 		"solarCanExport": True,
 		"dieselOnlyRunsDuringOutage": True
 	}
-	ALGO = 'lukes' #'branch'
-	MICROGRIDS = gmg.mg_group(CIRC_FILE, CRITICAL_LOADS, 'lukes')
+	ALGO = 'branch' #'branch'
+	MICROGRIDS = gmg.mg_group(CIRC_FILE, CRITICAL_LOADS, 'branch')
 	# MICROGRIDS = {
 	# 	'mg0': {
 	# 		'loads': ['634a_data_center','634b_radar','634c_atc_tower'],

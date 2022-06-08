@@ -29,6 +29,8 @@ def get_first_nodes_of_mgs(dssTree, microgrids):
 	nodes = {}
 	for key in microgrids:
 		switch = microgrids[key]['switch']
+		if type(switch) is list:
+			switch = switch[0]
 		bus2 = [obj.get('bus2') for obj in dssTree if switch in obj.get('object','')]
 		bus2 = bus2[0].split('.')[0]
 		nodes[key] = bus2
@@ -41,11 +43,17 @@ def get_all_mg_elements(dssPath, microgrids):
 	all_mg_elements = {}
 	for key in first_nodes:
 		N = nx.descendants(G, first_nodes[key])
+		transformers = set()
+		for obj in dssTree:
+			if 'transformer.' in obj.get('object',''):
+				buses = obj.get('buses')[1:-1].split(',')
+				if (buses[0].split('.')[0] in N or buses[0].split('.')[0] in first_nodes[key]) and buses[1].split('.')[0] in N:
+					transformers.add(obj.get('object').split('.')[1])
 		# all_mg_elements[key] = G.subgraph(N)
-		all_mg_elements[key] = N
+		all_mg_elements[key] = N.union(transformers)
 	return all_mg_elements
 
-def plot_inrush_data(dssPath, microgrids, out_html, motor_perc=0.5):
+def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, vsourceRatings, motor_perc=0.5):
 	# Grab all elements by mg. 
 	all_mg_elements = get_all_mg_elements(dssPath, microgrids)
 	dssTree = dssConvert.dssToTree(dssPath)
@@ -55,38 +63,45 @@ def plot_inrush_data(dssPath, microgrids, out_html, motor_perc=0.5):
 	for key in microgrids:
 		data['Microgrid ID'].append(key)
 
-		# # of Interruptions
+		# # of Interruptions --> Number of times gen drops to zero during sim.
+		dssTree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw = do_manual_balance_approach(outageStart, outageEnd, key, microgrids[key], dssTree)
+		# Stole a few lines from plot_mba_approach().
+		new_batt_loadshape = list(new_batt_loadshape)
+		cumulative_existing_batt_shapes = list(cumulative_existing_batt_shapes)
+		storage_shape = cumulative_existing_batt_shapes[:outageStart] + new_batt_loadshape + cumulative_existing_batt_shapes[outageEnd:]
+		gen_and_storage_shape = [x-y for x,y in zip(all_rengen_shapes,storage_shape)]
+		data['# of Interruptions'].append(len(count_interruptions_rengenmg(outageStart, outageEnd, all_loads_shapes_kw, gen_and_storage_shape)))
 		
 		# Expected In-rush (kW)
 		loads = [obj for obj in dssTree if 'load.' in obj.get('object','') and obj.get('object','').split('.')[1] in microgrids[key]['loads']]
-		transformers = [obj for obj in all_mg_elements[key] if 'transformer' in obj.get('object','')] # TO DO: figure out how to isolate transormers by microgrid
+		transformers = [obj for obj in dssTree if 'transformer.' in obj.get('object','') and obj.get('object','').split('.')[1] in all_mg_elements[key]]
 		expected_inrush = estimate_inrush(loads + transformers, motor_perc)
-		data['Expected In-rush (kW)'].append(expected_inrush)
+		data['Expected In-rush (kW)'].append(sum(expected_inrush.values()))
+
+		# Expected In-rush (kW) from transformers
+		data['In-rush (kW) from transformers'].append(sum([expected_inrush[ob] for ob in expected_inrush if 'transformer' in ob]))
+
+		# Expected In-rush (kW) from loads
+		data['Expected In-rush (kW) from loads'].append(sum([expected_inrush[ob] for ob in expected_inrush if 'load' in ob]))
 
 		# In-rush as % of total generation
 		gen_bus = microgrids[key]['gen_bus']
-		all_generation = [
-		ob for ob in dssTree
-		if ob.get('bus1','x.x').split('.')[0] == gen_bus
-		and 'generator' in ob.get('object')
-		]
+		all_generation = [ob for ob in dssTree if ob.get('bus1','x.x').split('.')[0] == gen_bus and 'generator' in ob.get('object')]
 		total_generation = 0
 		for ob in all_generation:
 			total_generation += float(ob.get('kw'))
-		data['In-rush as % of total generation'].append(100*expected_inrush/total_generation)
+		data['In-rush as % of total generation'].append(100*sum(expected_inrush.values())/total_generation)
 
 		# Soft Start load (kW)
-		# Super-cap Sizing
+		data['Soft Start load (kW)'].append(gradual_load_pickup(dssTree, loads, motor_perc))
 
-	# Run inrush calculations by microgrid and add to df. 
+		# Super-cap Sizing
+		data['Super-cap Sizing ($)'].append(super_cap_size(sum(expected_inrush.values())))
+
+		# Total fossil surge. Send total fossil kW power per mg to function, return product after multiplication by surge factor. 
+		fossilGens = [ob for ob in dssTree if ob.get('bus1','x.x').split('.')[0] == gen_bus and 'generator.fossil' in ob.get('object','')]
+		data['Total fossil surge (kW)'].append(calculate_fossil_surge_power(fossilGens, vsourceRatings, gen_bus))
 	
-	# data = {'Microgrid ID':['mg0', 'mg1', 'mg2', 'mg3'],
-	#         '# of Interruptions':[0, 0, 0, 0],
-	#         'Expected In-rush (kW)':[0,0,0,0],
-	#         'In-rush as % of total generation':[0,0,0,0],
-	#         'Soft Start load (kW)':[0,0,0,0],
-	#         'Super-cap Sizing':[0,0,0,0]
-	#         }
 	df = pd.DataFrame(data)
 	
 	table_html = '<h1>In-rush Current Report</h1>' + df.to_html()
@@ -94,28 +109,34 @@ def plot_inrush_data(dssPath, microgrids, out_html, motor_perc=0.5):
 		outFile.write('<style>* {font-family:sans-serif}</style>' + '\n' + table_html)
 
 def estimate_inrush(list_of_transformers_and_loads, motor_perc=0.5):
-	# Inrush loadshape will likely be very large e.g. 3x normal load and very short e.g. 10 milliseconds.
 	inrush = {}
 	for obj in list_of_transformers_and_loads:
 		if 'transformer.' in obj.get('object',''):
 			inrush[obj.get('object')] = calc_transformer_inrush(obj)
 		elif 'load.' in obj.get('object',''):
 			inrush[obj.get('object','')] = calc_motor_inrush(obj, motor_perc)
-	return sum(inrush.values())
+	return inrush
 
-# def calculate_fossil_surge_power(fossil_dss_object) -> (power, duration):
-	# Short burst of power from fossil units that can typically provide 4x or 5x their nameplate output? Need to research. 
-	# return
+def calculate_fossil_surge_power(fossilGens, vsourceRatings, gen_bus, surgeFactor=2.5):
+	# Short burst of power from fossil units. Need a total fossil surge display = 2.5 x total fossil unit power on the microgrid.
+	total_kW = 0
+	for obj in fossilGens:
+		total_kW += float(obj.get('kw',''))
+	for obj in vsourceRatings:
+		if gen_bus in obj:
+			total_kW += float(vsourceRatings[obj])
+	return total_kW * surgeFactor
 
-# def super_cap_size(inrush_loadshape, duration_seconds=1) -> (power,duration):
-	# Mitigation option 1: we tell the user how big their supercapacitor needs to be. (supercaps are like super-high-power, low energy batteries). Figure out max power of loadshape_of_inrush, figure out duration, specify as a super cap (power, duration).
-	# return
+def super_cap_size(magnitude_kw, p=2.5):
+	# Assume price of $2.50/Watt. Ignore duration for now. Return price. f(m) = p * magnitude
+	p_kw = p * 1000
+	return magnitude_kw * p_kw
 
-def gradual_load_pickup(dssTree, motor_perc=0.5):
-	# Assume some order of switching on, assume none of the inrushes overlap but the steady state powerflows do, calculate max power during this process
-	all_loads = [obj for obj in dssTree if 'load.' in obj.get('object','')]
-	all_loads.sort(key=lambda x:float(x.get('kw')))
-	max_load_obj = all_loads[-1]
+def gradual_load_pickup(dssTree, loads, motor_perc=0.5):
+	# Assume some order of switching on, assume none of the inrushes overlap but the steady state powerflows do, calculate max power during this process.
+	# Assume all transformers must be powered when 1 mg is powered.
+	loads.sort(key=lambda x:float(x.get('kw')))
+	max_load_obj = loads[-1]
 	all_transformer_inrush = calc_all_transformer_inrush(dssTree)
 	max_load_inrush = calc_motor_inrush(max_load_obj, motor_perc=0.5)
 	return max_load_inrush + sum(all_transformer_inrush.values())
@@ -127,7 +148,6 @@ def calc_transformer_inrush(dssTransformerDict, default_resistance_transformer='
 	for idx in range(len(dssTransformerDict.get('kvs')[1:-1].split(','))):
 		voltage = float(dssTransformerDict.get('kvs')[1:-1].split(',')[idx])
 		resistance = float(dssTransformerDict.get('%rs',default_resistance_transformer)[1:-1].split(',')[idx]) * float(dssTransformerDict.get('kvas')[1:-1].split(',')[idx])
-		# TO DO: figure out what to do when transformers don't have a %rs value. Use %loadloss? 
 		inrush += math.sqrt(2) * voltage / resistance 
 	return inrush
 
@@ -157,6 +177,26 @@ def calc_all_motor_inrush(dssTree, motor_perc=0.5):
 			inrush = calc_motor_inrush(obj, motor_perc)
 			motor_inrushes[obj.get('object')] = inrush
 	return motor_inrushes
+
+def count_interruptions_rengenmg(outageStart, outageEnd, all_loads_shapes_kw, gen_and_storage_shape):
+	# Count instances where gen_and_storage_shape fail to align with all_loads_shapes_kw.
+	lengthOfOutage = outageEnd - outageStart
+	demand = all_loads_shapes_kw[outageStart:outageEnd]
+	supply = gen_and_storage_shape[outageStart:outageEnd]
+
+	interruptions = []
+	iS, iE = 0, 0
+	idx = 0
+	while idx < lengthOfOutage:
+		if supply[idx] < demand[idx]:
+			iS = idx
+			while idx < lengthOfOutage and supply[idx] < demand[idx]:
+				idx += 1
+			iE = idx
+			interruptions.append((iS,iE))
+		else:
+			idx += 1
+	return interruptions
 
 def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTree):
 	# Manually constructs battery loadshapes for outage and reinserts into tree based on a proportional to kWh basis. 
@@ -683,7 +723,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			"All rengen loadshapes during outage (kw)":list(all_rengen_shapes[outageStart:outageEnd]),
 			"Cumulative battery loadshape during outage (kw)":list(new_batt_loadshape),
 			"Surplus rengen":total_surplus}
-	# print("big_gen_ratings",big_gen_ratings)
+	print("big_gen_ratings",big_gen_ratings)
 	# print("rengen_mgs",rengen_mgs)
 	# Additional calcv to make sure the simulation runs.
 	actions[outageStart] += f'calcv\n'
@@ -726,6 +766,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 	# make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Voltage Source Output", "Average hourly kW", vsource_ratings=big_gen_ratings)
 	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], 2019, microgrids, dssTree, "Tap Position", "PU")
 	make_chart(f'{FPREFIX}_source_and_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Generator Output", "Average Hourly kW", batt_cycle_chart=True, fossil_loading_chart=True, vsource_ratings=big_gen_ratings, rengen_mgs=rengen_mgs)
+	plot_inrush_data(pathToDss, microgrids, f'{FPREFIX}_inrush_plot.html', outageStart, outageEnd, vsourceRatings=big_gen_ratings)
 	# Write final output file.
 	output_slug = '''	
 		<head>
@@ -747,6 +788,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 	for rengen_name in rengen_fnames:
 		# insert renewable manual balance plots.
 		output_slug = output_slug + f'<iframe src="{rengen_name}"></iframe>'
+	output_slug = output_slug + '<iframe src="timezcontrol_inrush_plot.html"></iframe>'
 	with open('output_control.html','w') as outFile:
 		outFile.write(output_slug)
 	# Undo directory change.

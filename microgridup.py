@@ -49,7 +49,6 @@ def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
 		mg_load_df['load'] = mg_load_df['load'] + load_df[load_name]
 	max_load = float(mg_load_df.max())
 	# print("max_load:", max_load)
-
 	# TO DO: select specific critical loads from circuit.dss if meta data on max kw or loadshapes exist for those loads
 	# add up all max kws from critical loads to support during an outage
 	max_crit_load = sum(microgrid['critical_load_kws'])
@@ -59,7 +58,6 @@ def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
 		print(warning_message)
 		with open("user_warnings.txt", "a") as myfile:
 			myfile.write(warning_message)
-
 	critical_load_percent = max_crit_load/max_load
 	# print('critical_load_percent:',critical_load_percent)
 	return critical_load_percent, max_crit_load
@@ -308,7 +306,6 @@ def mg_phase_and_kv(BASE_NAME, microgrid, mg_name):
 		# append all new load_kv's to the list
 		if load_kv not in gen_bus_kv_list:
 			gen_bus_kv_list.append(load_kv)
-
 	if len(gen_bus_kv_list) > 1:
 		gen_bus_kv_message = f'More than one load voltage is specified on microgrid {mg_name}. Check Oneline diagram to verify that phases and voltages of {mg_loads} are correctly supported by gen_bus {gen_bus_name}.\n'
 		print(gen_bus_kv_message)
@@ -320,7 +317,6 @@ def mg_phase_and_kv(BASE_NAME, microgrid, mg_name):
 			with open("user_warnings.txt", "a") as myfile:
 				myfile.write(gen_bus_kv_message)
 	# print("gen_bus_kv_list:",gen_bus_kv_list)
-
 	out_dict = {}
 	out_dict['gen_bus'] = gen_bus_name
 	load_phase_list.sort()
@@ -328,13 +324,10 @@ def mg_phase_and_kv(BASE_NAME, microgrid, mg_name):
 	if load_phase_list[0] == '0':
 		load_phase_list = load_phase_list[1:]
 		print("load_phase_list after removal of ground phase:", load_phase_list)
-
 	out_dict['phases'] = load_phase_list
-	
 	# Kv selection method prior to January 2022:
 	# Choose the maximum voltage based upon the phases that are supported, assuming all phases in mg can be supported from gen_bus and that existing tranformers will handle any kv change
 	# out_dict['kv'] = max(gen_bus_kv_list)
-
 	# Retrieve the calculated line to neutral kv from the gen_bus itself (January 2022):
 	kv_mappings = opendss.get_bus_kv_mappings(BASE_NAME)
 	# print('kv_mappings:',kv_mappings)
@@ -343,10 +336,8 @@ def mg_phase_and_kv(BASE_NAME, microgrid, mg_name):
 	# if len(load_phase_list) == 3:
 	# 	gen_bus_kv = gen_bus_kv * math.sqrt(3)
 	# TODO: match up the calculated kv at the gen_bus with the appropriate line to neutral or line to line kv from voltagebases from the BASE_NAME dss file so that PU voltages compute accurately
-
 	out_dict['kv'] = gen_bus_kv
 	print('mg_phase_and_kv out_dict:', out_dict)
-
 	return out_dict
 	
 def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_name, diesel_total_calc=False):

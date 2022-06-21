@@ -53,9 +53,16 @@ def get_all_mg_elements(dssPath, microgrids):
 		all_mg_elements[key] = N.union(transformers)
 	return all_mg_elements
 
+def convert_to_json(all_mg_elements):
+	json = {}
+	for key in all_mg_elements:
+		json[key] = list(all_mg_elements[key])
+	return json
+
 def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, vsourceRatings, motor_perc=0.5):
 	# Grab all elements by mg. 
 	all_mg_elements = get_all_mg_elements(dssPath, microgrids)
+	print('JSON compatible representation of all_mg_elements (for jinja-ing into the circuit map):',convert_to_json(all_mg_elements))
 	dssTree = dssConvert.dssToTree(dssPath)
 
 	# Divide up transformers and loads by microgrid.
@@ -493,6 +500,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 					all_batt_loadshapes = curr_series_list[:outageStart] + outage_portion + curr_series_list[outageEnd:]
 					batt_kwh_input_output = sum([abs(x) for x in all_batt_loadshapes])
 				else:
+					print('this_series[y_name]',this_series[y_name])
 					batt_kwh_input_output = sum(abs(this_series[y_name]))
 				batt_kwh_rating = batt_kwh_ratings[ob_name.split("-")[1]]
 				cycles = batt_kwh_input_output / (2 * float(batt_kwh_rating)) 

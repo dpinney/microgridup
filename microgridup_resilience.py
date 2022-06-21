@@ -136,7 +136,7 @@ def main(in_csv, out_csv, mg_supported_loads, in_dss, out_html):
 	)
 	chart_html = fig.to_html(default_height='600px')
 	stats_chart_html = stats_fig.to_html(default_height='300px')
-	style_string = '<head><style>* {font-family:sans-serif}; .dataframe{width:100%; border-collapse:collapse}</style></head>'
+	style_string = '<head><style>* {font-family:sans-serif}; .dataframe {width:100%; border-collapse:collapse; overflow-x:scroll}</style></head>'
 	# TODO: fix table styling, transition to jinja2 template.
 	with open(out_html,'w') as outFile:
 		outFile.write(style_string + '\n' + stats_chart_html + '\n' + chart_html + '\n' + table_html)

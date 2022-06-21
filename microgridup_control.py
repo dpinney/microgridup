@@ -17,11 +17,6 @@ import networkx as nx
 
 # OMF imports
 import omf
-from omf import geo
-from omf import distNetViz
-from omf.models import __neoMetaModel__
-from omf.models.__neoMetaModel__ import *
-from omf.models import flisr
 from omf.solvers.opendss import dssConvert
 from omf.solvers import opendss
 

@@ -12,6 +12,7 @@ import json
 import pandas as pd
 import numpy as np
 import plotly
+import plotly.graph_objects as go
 import csv
 import jinja2 as j2
 import re
@@ -867,7 +868,6 @@ def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_st
 	gen_data = pd.read_csv(csvName)
 	tree = dssConvert.dssToTree(circuitFilePath)
 	data = []
-
 	for ob_name in set(gen_data[category_name]):
 		# csv_column_headers = y_list
 		# search the tree of the updated circuit to find the phases associate with ob_name
@@ -891,7 +891,6 @@ def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_st
 				hoverlabel = dict(namelength = -1)
 			)
 			data.append(trace)
-
 	layout = plotly.graph_objs.Layout(
 		#title = f'{csvName} Output',
 		title = chart_name,
@@ -911,7 +910,6 @@ def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_st
  			x0=date, y0=1.05, x1=date+datetime.timedelta(hours=qsts_steps), y1=1.05,
  			line=dict(color="Red", width=3, dash="dashdot")
 		)
-
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
 def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False):
@@ -947,17 +945,17 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 	with open(outputCsvName, 'w', newline='') as outcsv:
 		writer = csv.writer(outcsv)
 		writer.writerow(["Microgrid Name", "Generation Bus", "Minimum 1 hr Load (kW)", "Average 1 hr Load (kW)",
-							"Average Daytime 1 hr Load (kW)", 
-							"Maximum 1 hr Load (kW)", "Maximum 1 hr Critical Load (kW)", 
-							"Existing Fossil Generation (kW)", "New Fossil Generation (kW)",
-							# "Diesel Fuel Used During Outage (gal)", 
-							"Existing Solar (kW)", "New Solar (kW)", 
-							"Existing Battery Power (kW)", "Existing Battery Energy Storage (kWh)", "New Battery Power (kW)",
-							"New Battery Energy Storage (kWh)", "Existing Wind (kW)", "New Wind (kW)", 
-							"Total Generation on Microgrid (kW)", "Renewable Generation (% of Annual kWh)", "Emissions (Yr 1 Tons CO2)", 
-							"Emissions Reduction (Yr 1 % CO2)", "Average Outage Survived (h)",
-							"O+M Costs (Yr 1 $ before tax)",
-							"CapEx ($)", "CapEx after Tax Incentives ($)", "Net Present Value ($)"])
+			"Average Daytime 1 hr Load (kW)", 
+			"Maximum 1 hr Load (kW)", "Maximum 1 hr Critical Load (kW)", 
+			"Existing Fossil Generation (kW)", "New Fossil Generation (kW)",
+			# "Diesel Fuel Used During Outage (gal)", 
+			"Existing Solar (kW)", "New Solar (kW)", 
+			"Existing Battery Power (kW)", "Existing Battery Energy Storage (kWh)", "New Battery Power (kW)",
+			"New Battery Energy Storage (kWh)", "Existing Wind (kW)", "New Wind (kW)", 
+			"Total Generation on Microgrid (kW)", "Renewable Generation (% of Annual kWh)", "Emissions (Yr 1 Tons CO2)", 
+			"Emissions Reduction (Yr 1 % CO2)", "Average Outage Survived (h)",
+			"O+M Costs (Yr 1 $ before tax)",
+			"CapEx ($)", "CapEx after Tax Incentives ($)", "Net Present Value ($)"])
 		mg_num = 1 # mg_num refers to the dict key suffix in allOutputData.json from reopt folder
 		mg_ob = microgrid
 		gen_bus_name = mg_ob['gen_bus']
@@ -1002,38 +1000,37 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		# TODO: Once incentive structure is finalized, update NPV and cap_ex_after_incentives calculation to include depreciation over time if appropriate
 		# economic outcomes with the capital costs of existing wind and batteries deducted:
 		npv_existing_gen_adj = npv \
-								+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) * .82 \
-								+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-								+ battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-battery_replacement_year) \
-								+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-								+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
+			+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) * .82 \
+			+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
+			+ battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-battery_replacement_year) \
+			+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+			+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 		cap_ex_existing_gen_adj = cap_ex \
-								- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
-								- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-								- battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-battery_replacement_year) \
-								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-								- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
+			- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
+			- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
+			- battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-battery_replacement_year) \
+			- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+			- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 		#TODO: UPDATE cap_ex_after_incentives_existing_gen_adj in 2022 to erase the 18% cost reduction for wind above 100kW as it will have ended
 		# TODO: Update the cap_ex_after_incentives_existing_gen_adj with ITC if it becomes available for batteries
 		cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives \
-								- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0)*.82 \
-								- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-								- battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-battery_replacement_year) \
-								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-								- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
+			- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0)*.82 \
+			- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
+			- battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-battery_replacement_year) \
+			- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+			- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 		year_one_OM = reopt_out.get(f'yearOneOMCostsBeforeTax{mg_num}', 0.0)
 		# When an existing battery and new battery are suggested by the model, need to add back in the existing inverter cost:
 		if battery_pow_new == battery_pow_existing and battery_pow_existing != 0: 
 			npv_existing_gen_adj = npv_existing_gen_adj \
-								- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-								- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
+				- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+				- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 			cap_ex_existing_gen_adj = cap_ex_existing_gen_adj \
-								+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-								+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
+				+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+				+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 			cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives_existing_gen_adj \
-								+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-								+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
-
+				+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+				+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 		# take away the 1kw fossil gen cost if necessary
 		if fossil_output_one_kw == True:
 			cap_ex_existing_gen_adj = cap_ex_existing_gen_adj - 1*reopt_out.get(f'dieselGenCost{mg_num}', 0.0)
@@ -1167,35 +1164,34 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	inverter_replacement_year = reopt_out.get(f'batteryPowerReplaceYear{mg_num}', 0.0)
 	discount_rate = reopt_out.get(f'discountRate{mg_num}', 0.0)
 	npv_existing_gen_adj = npv \
-							+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) * .82 \
-							+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-							+ battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-battery_replacement_year) \
-							+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-							+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
+		+ wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) * .82 \
+		+ battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
+		+ battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-battery_replacement_year) \
+		+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+		+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 	cap_ex_existing_gen_adj = cap_ex \
-							- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
-							- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-							- battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-battery_replacement_year) \
-							- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-							- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
+		- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
+		- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
+		- battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-battery_replacement_year) \
+		- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+		- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 	cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives \
-							- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
-							- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
-							- battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-battery_replacement_year) \
-							- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-							- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
+		- wind_size_existing * reopt_out.get(f'windCost{mg_num}', 0.0) \
+		- battery_cap_existing * reopt_out.get(f'batteryCapacityCost{mg_num}', 0.0) \
+		- battery_cap_existing * reopt_out.get(f'batteryCapacityCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-battery_replacement_year) \
+		- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+		- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 	# When an existing battery and new battery are suggested by the model, need to add back in the existing inverter cost
 	if battery_pow_new == battery_pow_existing and battery_pow_existing != 0: 
 		npv_existing_gen_adj = npv_existing_gen_adj \
-							- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-							- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
+			- battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+			- battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 		cap_ex_existing_gen_adj = cap_ex_existing_gen_adj \
-							+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-							+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
+			+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+			+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 		cap_ex_after_incentives_existing_gen_adj = cap_ex_after_incentives_existing_gen_adj \
-							+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
-							+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
-
+			+ battery_pow_existing * reopt_out.get(f'batteryPowerCost{mg_num}', 0.0) \
+			+ battery_pow_existing * reopt_out.get(f'batteryPowerCostReplace{mg_num}', 0.0) * ((1+discount_rate)**-inverter_replacement_year)
 	year_one_OM = reopt_out.get(f'yearOneOMCostsBeforeTax{mg_num}', 0.0)
 	if fossil_output_one_kw == True:
 		cap_ex_existing_gen_adj = cap_ex_existing_gen_adj - 1*reopt_out.get(f'dieselGenCost{mg_num}', 0.0)
@@ -1213,7 +1209,6 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	mg_dict["CapEx after Tax Incentives ($)"] = f'{round(cap_ex_after_incentives_existing_gen_adj):,}'
 	# mg_dict["CapEx after Tax Incentives ($)"] = f'{round(cap_ex_after_incentives):,}'
 	# mg_dict["NPV ($)"] = f'{round(npv):,}'
-
 	list_of_mg_dict.append(mg_dict)
 	# print("list_of_mg_dict:", list_of_mg_dict)
 	return(list_of_mg_dict)
@@ -1286,6 +1281,117 @@ def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
 		reps['Average Outage Survived (h)'].append(None)
 	# print(reps)
 	return reps
+
+def summary_charts(stats):
+	''' Generate HTML for summary overview charts. '''
+	# Global chart material
+	column_labels = stats['Microgrid Name']
+	legend_spec = {'orientation':'h', 'xanchor':'left'}#, 'x':0, 'y':-0.2}
+	chart_height = '400px'
+	# Load and Generation Chart
+	gen_load_fig = go.Figure(
+		data=[
+			go.Bar(
+				name = 'Peak Load',
+				x=column_labels,
+				y=stats['Maximum 1 hr Load (kW)'],
+			), go.Bar(
+				name='Peak Crit. Load',
+				x=column_labels,
+				y=stats['Maximum 1 hr Critical Load (kW)'],
+			), go.Bar(
+				name='Total Generation',
+				x=column_labels,
+				y=stats['Total Generation on Microgrid (kW)'],
+			)
+		]
+	)
+	gen_load_fig.update_layout(
+		title = 'Microgrid Load and Generation',
+		legend = legend_spec,
+		yaxis = {'ticksuffix': " kW"}
+	)
+	gen_load_html = gen_load_fig.to_html(default_height=chart_height)
+	# Renewable versus fossil chart.
+	gen_mix_fig = go.Figure(
+		data=[
+			go.Bar(
+				name = 'Existing Solar',
+				x=column_labels,
+				y=stats['Existing Solar (kW)'],
+				visible='legendonly'
+			), go.Bar(
+				name='New Solar',
+				x=column_labels,
+				y=stats['New Solar (kW)'],
+			), go.Bar(
+				name='Existing Wind',
+				x=column_labels,
+				y=stats['Existing Wind (kW)'],
+				visible='legendonly'
+			), go.Bar(
+				name='New Wind',
+				x=column_labels,
+				y=stats['New Wind (kW)'],
+			), go.Bar(
+				name='Existing Storage (kWh)',
+				x=column_labels,
+				y=stats['Existing Battery Energy Storage (kWh)'],
+				visible='legendonly'
+			), go.Bar(
+				name='New Storage',
+				x=column_labels,
+				y=stats['New Battery Energy Storage (kWh)'],
+			), go.Bar(
+				name='Existing Fossil',
+				x=column_labels,
+				y=stats['Existing Fossil Generation (kW)'],
+				visible='legendonly'
+			), go.Bar(
+				name='New Fossil',
+				x=column_labels,
+				y=stats['New Fossil Generation (kW)'],
+			)
+		]
+	)
+	gen_mix_fig.update_layout(
+		title = 'Microgrid Generation Mix, Existing and New',
+		legend = legend_spec,
+		yaxis = {'ticksuffix': " kW/kWh"}
+	)
+	gen_mix_html = gen_mix_fig.to_html(default_height=chart_height)
+	# Financial Summary
+	money_summary_fig = go.Figure(
+		data=[
+			go.Bar(
+				name = 'Net Present Value',
+				x=column_labels,
+				y=stats['Net Present Value ($)'],
+			), go.Bar(
+				name='O+M Costs (Y1 before tax)',
+				x=column_labels,
+				y=stats['O+M Costs (Yr 1 $ before tax)'],
+				visible='legendonly'
+			), go.Bar(
+				name='CapEx',
+				x=column_labels,
+				y=stats['CapEx ($)'],
+				visible='legendonly'
+			), go.Bar(
+				name='CapEx After Tax Incentives',
+				x=column_labels,
+				y=stats['CapEx after Tax Incentives ($)'],
+			)
+		]
+	)
+	money_summary_fig.update_layout(
+		title = 'Financial Summary',
+		legend = legend_spec,
+		yaxis = {'tickprefix': "$"}
+	)
+	money_summary_html = money_summary_fig.to_html(default_height=chart_height)
+	all_html = money_summary_html + gen_load_html + gen_mix_html
+	return all_html
 
 def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, FAULTED_LINE, mg_name, ADD_COST_NAME, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR = False, final_run=False):
 	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_NAME, microgrid, mg_name)
@@ -1424,9 +1530,12 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		# generate file map
 		mg_names = list(MICROGRIDS.keys())
 		names_and_folders = {x[0]:x[1] for x in zip(mg_names, reopt_folders)}
+		# generate a decent chart of additional generation.
+		chart_html = summary_charts(stats)
 		# Write out overview iframe
 		over_template = j2.Template(open(f'{MGU_FOLDER}/template_overview.html').read())
 		over = over_template.render(
+			chart_html=chart_html,
 			summary=stats,
 			add_cost_rows = add_cost_rows,
 			warnings = warnings,

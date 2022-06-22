@@ -20,13 +20,23 @@
 			white-space: pre-wrap;
 			margin-top: 0px;
 		}
+		th {
+			font-size:8pt;
+		}
+		#tablediv {
+			width: 98vw;
+			margin-top: 10px;
+			margin-bottom: 10px;
+			overflow-x: scroll
+		}
 	</style>
 </head>
 <body>
-	<div style="width:100vw; margin-bottom:10px; overflow-x:scroll">
+	{{chart_html}}
+	<div id="tablediv">
 		<h3>Overview of Microgrid Results</h3>
 		<table>
-			{% for k in summary.keys() %} <th style="font-size:8pt">{{k}}</th>{% endfor %}
+			{% for k in summary.keys() %} <th>{{k}}</th>{% endfor %}
 			{% for i in range(summary["Microgrid Name"] | length) %}
 				<tr>
 					{% for k in summary.keys() %}

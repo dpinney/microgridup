@@ -221,7 +221,7 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 	with open(REOPT_FOLDER + '/allInputData.json','w') as outfile:
 		json.dump(allInputData, outfile, indent=4)
 	omf.models.__neoMetaModel__.runForeground(REOPT_FOLDER)
-	omf.models.__neoMetaModel__.renderTemplateToFile(REOPT_FOLDER)
+	# omf.models.__neoMetaModel__.renderTemplateToFile(REOPT_FOLDER) # deprecated in favor of clean new design.
 
 def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 	''' Get generator objects from REopt. Calculate new gen sizes, using updated fossil size 
@@ -1393,6 +1393,102 @@ def summary_charts(stats):
 	all_html = money_summary_html + gen_load_html + gen_mix_html
 	return all_html
 
+def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
+	''' Generate a clean microgridDesign output with edge-to-edge design. '''
+	# Globals
+	all_html = ''
+	legend_spec = {'orientation':'h', 'xanchor':'left'}#, 'x':0, 'y':-0.2}
+	allOutData = json.load(open(allOutDataPath))
+	# Make timeseries charts
+	plotlyData = {
+		'Generation Serving Load':'powerGenerationData1',
+		'Solar Generation Detail':'solarData1',
+		'Wind Generation Detail':'windData1',
+		'Fossil Generation Detail':'dieselData1',
+		'Storage Charge Source':'batteryData1',
+		'Storage State of Charge':'batteryChargeData1' }
+	# Sometimes missing, so only add if available.
+	if 'resilienceData1' in allOutData:
+		plotlyData['Resilience Overview'] = 'resilienceData1'
+	if 'resilienceProbData1' in allOutData:
+		plotlyData['Outage Survival Probability'] = 'resilienceProbData1'
+	for k,v in plotlyData.items():
+		chart_data = json.loads(allOutData[v])
+		fig = go.Figure(chart_data)
+		fig.update_layout(
+			title = k,
+			legend = legend_spec
+		)
+		fig_html = fig.to_html(default_height='600px')
+		all_html = all_html + fig_html
+	# Make generation overview chart
+	gen_data = {
+		"Average Load (kWh)": allOutData["avgLoad1"],
+		"Solar Total (kW)": allOutData["sizePVRounded1"],
+		"Wind Total (kW)": allOutData["sizeWindRounded1"],
+		"Storage Total (kW)": allOutData["powerBatteryRounded1"],
+		"Storage Total (kWh)": allOutData["capacityBatteryRounded1"],
+		"Fossil Total (kW)": allOutData["sizeDieselRounded1"],
+		"Fossil Fuel Used in Outage (kGal diesel equiv.)": allOutData["fuelUsedDieselRounded1"] / 1000.0}
+	generation_fig = go.Figure(
+		data=[
+			go.Bar(
+				name = 'Without Microgrid',
+				x=list(gen_data.keys()),
+				y=list(gen_data.values()),
+			)
+		]
+	)
+	generation_fig.update_layout(
+		title = 'Generation Overview',
+		legend = legend_spec
+	)
+	generation_fig_html = generation_fig.to_html(default_height='600px')
+	all_html = generation_fig_html + all_html
+	# Make financial overview chart
+	fin_data_bau = {
+		'Demand Cost ($)':allOutData["demandCostBAU1"],
+		'Energy Cost ($)':allOutData["energyCostBAU1"],
+		'Total Cost ($)':allOutData["totalCostBAU1"],
+		'Avg. Outage Survived (H)': None}
+	fin_data_microgrid = {
+		'Demand Cost ($)':allOutData["demandCost1"],
+		'Energy Cost ($)':allOutData["energyCost1"],
+		'Total Cost ($)':allOutData["totalCost1"],
+		'Avg. Outage Survived (H)': allOutData.get("avgOutage1",None) }
+	fin_fig = go.Figure(
+		data=[
+			go.Bar(
+				name = 'Business as Usual',
+				x=list(fin_data_bau.keys()),
+				y=list(fin_data_bau.values()),
+			),
+			go.Bar(
+				name = 'With Microgrid',
+				x=list(fin_data_microgrid.keys()),
+				y=list(fin_data_microgrid.values()),
+			)
+		]
+	)
+	fin_fig.update_layout(
+		title = 'Lifetime Financial Comparison Overview',
+		legend = legend_spec
+	)
+	fin_fig_html = fin_fig.to_html(default_height='600px')
+	all_html = fin_fig_html + all_html
+	# Nice input display
+	allInputData = json.load(open(allInputDataPath))
+	allInputData['loadShape'] = 'From File'
+	allInputData['criticalLoadShape'] = 'From File'
+	# Templating.
+	mgd_template = j2.Template(open(f'{MGU_FOLDER}/template_microgridDesign.html').read())
+	mgd = mgd_template.render(
+		chart_html=all_html,
+		allInputData=allInputData
+	)
+	with open(outputPath, 'w') as outFile:
+		outFile.write(mgd)
+
 def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, FAULTED_LINE, mg_name, ADD_COST_NAME, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR = False, final_run=False):
 	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_NAME, microgrid, mg_name)
 	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_FINAL, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load, mg_name)
@@ -1403,6 +1499,8 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 	mg_add_cost(ADD_COST_NAME, microgrid, mg_name, BASE_NAME)	
 	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
+	# Generate a nice microgrid design output.
+	microgrid_design_output(REOPT_FOLDER_FINAL + '/allOutputData.json', REOPT_FOLDER_FINAL + '/allInputData.json', REOPT_FOLDER_FINAL + '/cleanMicrogridDesign.html')
 	if final_run:
 		# Make OMD.
 		dssConvert.dssToOmd(FULL_NAME, OMD_NAME, RADIUS=0.0002)

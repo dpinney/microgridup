@@ -62,7 +62,7 @@ if __name__ == '__main__':
 		"solarCanExport": True,
 		"dieselOnlyRunsDuringOutage": True
 	}
-	ALGO = 'branch' #'branch'
+	ALGO = 'branch' #'lukes'
 	MICROGRIDS = gmg.mg_group(CIRC_FILE, CRITICAL_LOADS, 'branch')
 	# MICROGRIDS = {
 	# 	'mg0': {

@@ -1490,6 +1490,7 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 		outFile.write(mgd)
 
 def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, FAULTED_LINE, mg_name, ADD_COST_NAME, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR = False, final_run=False):
+	''' Add a single microgrid to a microgrid plan. '''
 	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_NAME, microgrid, mg_name)
 	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_FINAL, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load, mg_name)
 	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, diesel_total_calc=False)
@@ -1536,7 +1537,8 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 		mg_add_cost_dict_of_lists = pd.read_csv(ADD_COST_NAME).to_dict(orient='list')
 
 def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, DIESEL_SAFETY_FACTOR=False, DELETE_FILES=False, open_results=False, OUTAGE_CSV=None):
-	# CONSTANTS
+	''' Generate a full microgrid plan for the given inputs. '''
+	# Constants
 	MODEL_DSS = 'circuit.dss'
 	MODEL_LOAD_CSV = 'loads.csv'
 	GEN_NAME = 'generation.csv'

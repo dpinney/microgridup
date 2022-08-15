@@ -38,6 +38,7 @@ def get_all_mg_elements(dssPath, microgrids):
 	all_mg_elements = {}
 	for key in first_nodes:
 		N = nx.descendants(G, first_nodes[key])
+		N.add(first_nodes[key])
 		transformers = set()
 		for obj in dssTree:
 			if 'transformer.' in obj.get('object',''):
@@ -46,6 +47,7 @@ def get_all_mg_elements(dssPath, microgrids):
 					transformers.add(obj.get('object').split('.')[1])
 		# all_mg_elements[key] = G.subgraph(N)
 		all_mg_elements[key] = N.union(transformers)
+	# print('all_mg_elements',all_mg_elements, 'first_nodes',first_nodes)
 	return all_mg_elements
 
 def convert_to_json(all_mg_elements):
@@ -106,7 +108,7 @@ def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, vsou
 	
 	df = pd.DataFrame(data)
 	
-	table_html = '<h1>In-rush Current Report</h1>' + df.to_html()
+	table_html = '<h1>In-rush Current Report</h1>' + df.to_html(justify='left').replace('border="1"','border="0"')
 	with open(out_html,'w') as outFile:
 		outFile.write('<style>* {font-family:sans-serif}</style>' + '\n' + table_html)
 

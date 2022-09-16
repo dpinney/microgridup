@@ -1,9 +1,11 @@
 from omf.solvers import opendss
 import networkx as nx
 from pprint import pprint as pp
+from collections import defaultdict
 
 # Auto gen some microgrid descriptions.
 # See experiments with networkx here: https://colab.research.google.com/drive/1RZyD6pRIdRAT-V2sBB0nPKVIvZP_RGHw
+# New colab with updated experiments: https://colab.research.google.com/drive/1j_u30UdnhaRovtG6Odhe_ivDKwBlc5qY?usp=sharing
 
 # Test inputs
 CIRC_FILE = 'lehigh_base_3mg.dss'
@@ -15,8 +17,153 @@ def nx_get_branches(G):
 	'All branchy boys'
 	return [(n,G.out_degree(n)) for n in G.nodes() if G.out_degree(n) > 1]
 
+# Helper function to remove cycles and loops from a graph using hacky topological sort because nx_topological_sort breaks on cycles.
+def remove_loops(G):
+	# Delete edges to all parents except the first in topological order.
+	order = []
+	for k,v in nx.dfs_successors(G).items():
+		if k not in order:
+			order.append(k)
+		for v_ in v:
+			if v_ not in order:
+				order.append(v_)
+	for node in order: 
+		parents = list(G.predecessors(node))
+		if len(parents) > 1:
+			ordered_parents = [x for x in order if x in parents]
+			for idx in range(1,len(ordered_parents)):
+				G.remove_edge(ordered_parents[idx],node)
+	return G
+
+# Used by both bottom up and critical load algorithms.
+def only_child(G, mgs):
+	for key in list(mgs.keys()):
+		parent = list(G.predecessors(key))
+		if not parent:
+			continue
+		if len(parent) > 1:
+			continue 
+		siblings = list(G.successors(parent[0]))
+		while parent and len(siblings) == 1:
+			mgs[parent[-1]].append(siblings[0])
+			mgs[parent[-1]].extend(mgs[siblings[0]])
+			del mgs[siblings[0]]
+			parent = list(G.predecessors(parent[0]))
+			if not parent:
+				continue
+			if len(parent) > 1:
+				break
+			siblings = list(G.successors(parent[0]))
+	return mgs
+
+# Used by both bottom up and critical load algorithms.
+def loop_buster(G, mgs):
+	bustworthy_nodes = set()
+	def helper(node, isKey):
+		bustworthy_nodes.add(node)
+		# We have a loop on our hands. 
+		lca = nx.lowest_common_ancestor(G, parents[0], parents[1]) # Assumption: only need to find LCA of two parents. TO DO: verify this assumption.
+		lca_succs = list(nx.nodes(nx.dfs_tree(G, lca)))
+		mgs[parents[0]].append(node)
+		mgs[parents[0]].extend(mgs[node])
+		mgs[parents[1]].extend([])
+		if isKey:
+			del mgs[node]
+		new_keys = [x for x in nx.topological_sort(G) if x in list(mgs.keys())] 
+		for k in new_keys:
+			if k in lca_succs:
+				vals = mgs[k]
+				pointer = k
+				while pointer != lca: 
+					vals.append(pointer)
+					new_parents = list(G.predecessors(pointer))
+					if len(new_parents) > 1:
+						break 
+					pointer = new_parents[0]
+				mgs[lca].extend(vals)
+				del mgs[k]
+	# If a node has multiple parents, must find lowest common ancestor and make this node new key in mgs.
+	keys = [x for x in nx.topological_sort(G) if x in list(mgs.keys())]
+	for key in keys:
+		parents = list(G.predecessors(key))
+		if len(parents) > 1:
+			helper(key, True)
+	# Did we miss any loops in the new values? 
+	for value in list(mgs.values()):
+		for node in value:
+			parents = list(G.predecessors(node))
+			if len(parents) > 1 and node not in bustworthy_nodes:
+				helper(node, False)
+	return mgs
+
+# Used by the bottom up algorithm.
+def relatable_siblings(G, mgs):
+	items = [x for x in nx.topological_sort(G) if x in list(mgs.keys())]
+	for key in items:
+		if key not in mgs:
+			continue
+		parent = list(G.predecessors(key))
+		if len(parent) > 1:
+			continue
+		siblings = list(G.successors(parent[0]))
+		if all(sibling in mgs for sibling in siblings):
+			# Merge microgrids 
+			for sibling in siblings:
+				mgs[parent[0]].append(sibling)
+				mgs[parent[0]].extend(mgs[sibling]) 
+				del mgs[sibling]
+	return mgs
+
+# Used by the critical load algorithm.
+def merge_mgs(G, mgs):
+	'''
+	Check to see if parent is a key in a microgrid.
+	Check to see if parent is a value in a microgrid.
+	Check to see if parent is parent of other most ancestral node.
+	Check to see if parent has no successors in any other mg.
+	'''
+	items = [x for x in nx.topological_sort(G) if x in list(mgs.keys())]
+	for k in items:
+		if k not in mgs.keys():
+			continue
+	parent = list(G.predecessors(k))
+	if not parent:
+		continue
+	parent = parent[0]
+	inValues = [key for key, value in mgs.items() if parent in value]
+	otherParent = [key for key, value in mgs.items() if list(G.predecessors(key)) == [parent] and key != k]
+	otherKeys = [key for key, value in mgs.items() if key in list(nx.nodes(nx.dfs_tree(G, parent))) and key != k]
+	otherValues = [key for key, value in mgs.items() if (set(value) & set(list(nx.nodes(nx.dfs_tree(G, parent))))) and key != k]
+	otherMgs = otherKeys + otherValues    
+	if parent in mgs.keys() or inValues:
+		# If the parent is already in a microgrid, merge with existing microgrid.
+		if inValues: 
+			mgs[inValues[0]].append(k)
+			mgs[inValues[0]].extend(mgs[k])
+			del mgs[k]
+		else:
+			mgs[parent].append(k)
+			mgs[parent].extend(mgs[k]) 
+			del mgs[k]
+	elif otherParent:
+		# Else if parent is also the parent of a different microgrid’s most ancestral node, annex parent and merge microgrids.
+		mgs[parent].append(k)
+		mgs[parent].append(otherParent[0])
+		mgs[parent].extend(mgs[k])
+		mgs[parent].extend(mgs[otherParent[0]])
+		del mgs[k]
+		del mgs[otherParent[0]]
+	elif not otherMgs:
+		# Else if parent has no successors in any other microgrid, annex parent.
+		mgs[parent].append(k)
+		mgs[parent].extend(mgs[k])
+		del mgs[k]
+	return mgs
+
 def nx_group_branch(G, i_branch=0):
 	'Create graph subgroups at branch point i_branch (topological order).'
+	if not nx.is_tree(G):
+		G = remove_loops(G)
 	tree_root = list(nx.topological_sort(G))[0]
 	edges_in_order = nx.DiGraph(nx.algorithms.traversal.breadth_first_search.bfs_edges(G, tree_root))
 	bbl = nx_get_branches(edges_in_order)
@@ -27,9 +174,63 @@ def nx_group_branch(G, i_branch=0):
 
 def nx_group_lukes(G, size, node_weight=None, edge_weight=None):
 	'Partition the graph using Lukes algorithm into pieces of [size] nodes.'
+	if not nx.is_tree(G):
+		G = remove_loops(G)
 	tree_root = list(nx.topological_sort(G))[0]
 	G_topo_order = nx.DiGraph(nx.algorithms.traversal.breadth_first_search.bfs_edges(G, tree_root))
 	return nx.algorithms.community.lukes.lukes_partitioning(G_topo_order, size, node_weight=node_weight, edge_weight=edge_weight)
+
+def nx_bottom_up_branch(G):
+	'Form all microgrid combinations starting with leaves and working up to source maintaining single points of connection for each.'
+	if not nx.is_tree(G):
+		G = remove_loops(G)
+	# Find leaves.
+	end_nodes = [[x] for x in G.nodes() if G.out_degree(x)==0 and G.in_degree(x)!=0]
+	mgs = defaultdict(list)
+	for node in end_nodes:
+		mgs[node[-1]] = []
+	mgs = only_child(G, mgs)
+	parts = defaultdict(list)
+	for key in mgs:
+		parts[0].append([key])
+		parts[0][-1].extend(mgs[key])
+	counter = 1
+	while len(mgs) > 1:
+		mgs = loop_buster(G, mgs)
+		mgs = relatable_siblings(G, mgs)
+		mgs = only_child(G, mgs)
+		for key in mgs: 
+			parts[counter].append([key])
+			parts[counter][-1].extend(mgs[key])
+		counter += 1
+	return parts 
+
+def nx_critical_load_branch(G, criticalLoads):
+	'Form all microgrid combinations prioritizing only critical loads and single points of connection.'
+	if not nx.is_tree(G):
+		G = remove_loops(G)
+	# Find all critical loads. They get a microgrid each. Output.
+	critical_nodes = [[x] for x in G.nodes() if x in criticalLoads]
+	top_down = list(nx.topological_sort(G))
+	mgs = defaultdict(list)
+	for node in critical_nodes:
+		mgs[node[-1]] = []
+	# Include as many parents and parents of parents etc. in microgrid such that these parents have no other children.
+	mgs = only_child(G, mgs)
+	parts = defaultdict(list)
+	for key in mgs:
+		parts[0].append([key])
+		parts[0][-1].extend(mgs[key])
+	counter = 1
+	while len(mgs) > 1:
+		mgs = loop_buster(G, mgs)
+		mgs = merge_mgs(G, mgs)
+		mgs = only_child(G, mgs)
+		for key in mgs: 
+			parts[counter].append([key])
+			parts[counter][-1].extend(mgs[key])
+		counter += 1
+	return parts 
 
 def nx_get_parent(G, n):
 	preds = G.predecessors(n)
@@ -67,6 +268,8 @@ def mg_group(circ_path, crit_loads, algo, algo_params={}):
 		MG_GROUPS = nx_group_lukes(G, algo_params.get('size',default_size))
 	elif algo == 'branch':
 		MG_GROUPS = nx_group_branch(G, i_branch=algo_params.get('i_branch',0))
+	elif algo == 'bottomUp':
+		MG
 	else:
 		print('Invalid algorithm. algo must be "branch" or "lukes". No mgs generated.')
 		return {}

@@ -33,6 +33,9 @@ def remove_loops(G):
 			ordered_parents = [x for x in order if x in parents]
 			for idx in range(1,len(ordered_parents)):
 				G.remove_edge(ordered_parents[idx],node)
+		# Origin shouldn't have any parents
+		# elif node == order[0] and len(parents) == 1:
+			# G.remove_edge(parents[0],node)
 	return G
 
 # Used by both bottom up and critical load algorithms.
@@ -57,7 +60,7 @@ def only_child(G, mgs):
 	return mgs
 
 # Used by both bottom up and critical load algorithms.
-def loop_buster(G, mgs):
+def loop_avoider(G, mgs):
 	bustworthy_nodes = set()
 	def helper(node, isKey):
 		bustworthy_nodes.add(node)
@@ -182,7 +185,9 @@ def nx_group_lukes(G, size, node_weight=None, edge_weight=None):
 
 def nx_bottom_up_branch(G):
 	'Form all microgrid combinations starting with leaves and working up to source maintaining single points of connection for each.'
-	if not nx.is_tree(G):
+	try:
+		list(nx.topological_sort(G))
+	except nx.NetworkXUnfeasible:
 		G = remove_loops(G)
 	# Find leaves.
 	end_nodes = [[x] for x in G.nodes() if G.out_degree(x)==0 and G.in_degree(x)!=0]
@@ -196,7 +201,7 @@ def nx_bottom_up_branch(G):
 		parts[0][-1].extend(mgs[key])
 	counter = 1
 	while len(mgs) > 1:
-		mgs = loop_buster(G, mgs)
+		mgs = loop_avoider(G, mgs)
 		mgs = relatable_siblings(G, mgs)
 		mgs = only_child(G, mgs)
 		for key in mgs: 
@@ -207,12 +212,13 @@ def nx_bottom_up_branch(G):
 
 def nx_critical_load_branch(G, criticalLoads):
 	'Form all microgrid combinations prioritizing only critical loads and single points of connection.'
-	if not nx.is_tree(G):
-		G = remove_loops(G)
 	# Find all critical loads. They get a microgrid each. Output.
 	critical_nodes = [[x] for x in G.nodes() if x in criticalLoads]
-	top_down = list(nx.topological_sort(G))
-	mgs = defaultdict(list)
+	try:
+		top_down = list(nx.topological_sort(G))
+	except nx.NetworkXUnfeasible:
+		G = remove_loops(G)
+		top_down = list(nx.topological_sort(G))	mgs = defaultdict(list)
 	for node in critical_nodes:
 		mgs[node[-1]] = []
 	# Include as many parents and parents of parents etc. in microgrid such that these parents have no other children.
@@ -223,7 +229,7 @@ def nx_critical_load_branch(G, criticalLoads):
 		parts[0][-1].extend(mgs[key])
 	counter = 1
 	while len(mgs) > 1:
-		mgs = loop_buster(G, mgs)
+		mgs = loop_avoider(G, mgs)
 		mgs = merge_mgs(G, mgs)
 		mgs = only_child(G, mgs)
 		for key in mgs: 
@@ -254,7 +260,7 @@ def get_edge_name(fr, to, omd_list):
 
 def mg_group(circ_path, crit_loads, algo, algo_params={}):
 	'''Generate a group of mgs from circ_path with crit_loads
-	algo must be one of ["lukes", "branch"]
+	algo must be one of ["lukes", "branch", "bottomUp", "criticalLoads"]
 	lukes algo params is 'size':int giving size of each mg.
 	branch algo params is 'i_branch': giving which branch in the tree to split on.'''
 	# Load data
@@ -269,7 +275,11 @@ def mg_group(circ_path, crit_loads, algo, algo_params={}):
 	elif algo == 'branch':
 		MG_GROUPS = nx_group_branch(G, i_branch=algo_params.get('i_branch',0))
 	elif algo == 'bottomUp':
-		MG
+		MG_GROUPS = nx_bottom_up_branch(G)
+		MG_GROUPS = MG_GROUPS[len(MG_GROUPS//2)] # TO DO: decide which configuration to use. 
+	elif algo == 'criticalLoads':
+		MG_GROUPS = nx_critical_load_branch(G, CRITICAL_LOADS)
+		MG_GROUPS = MG_GROUPS[len(MG_GROUPS//2)] # TO DO: decide which configuration to use. 
 	else:
 		print('Invalid algorithm. algo must be "branch" or "lukes". No mgs generated.')
 		return {}

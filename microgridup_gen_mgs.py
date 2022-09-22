@@ -33,7 +33,7 @@ def remove_loops(G):
 			ordered_parents = [x for x in order if x in parents]
 			for idx in range(1,len(ordered_parents)):
 				G.remove_edge(ordered_parents[idx],node)
-		# Origin shouldn't have any parents
+		# Origin shouldn't have any parents. TO DO: Figure out why this sometimes breaks circuits with cycles to the source.
 		# elif node == order[0] and len(parents) == 1:
 			# G.remove_edge(parents[0],node)
 	return G
@@ -91,7 +91,7 @@ def loop_avoider(G, mgs):
 		parents = list(G.predecessors(key))
 		if len(parents) > 1:
 			helper(key, True)
-	# Did we miss any loops in the new values? 
+	# Did we miss any loops in the new values?
 	for value in list(mgs.values()):
 		for node in value:
 			parents = list(G.predecessors(node))
@@ -119,12 +119,12 @@ def relatable_siblings(G, mgs):
 
 # Used by the critical load algorithm.
 def merge_mgs(G, mgs):
-	'''
-	Check to see if parent is a key in a microgrid.
-	Check to see if parent is a value in a microgrid.
-	Check to see if parent is parent of other most ancestral node.
-	Check to see if parent has no successors in any other mg.
-	'''
+'''
+Check to see if parent is a key in a microgrid.
+Check to see if parent is a value in a microgrid.
+Check to see if parent is parent of other most ancestral node.
+Check to see if parent has no successors in any other mg.
+'''
 	items = [x for x in nx.topological_sort(G) if x in list(mgs.keys())]
 	for k in items:
 		if k not in mgs.keys():
@@ -208,7 +208,7 @@ def nx_bottom_up_branch(G):
 			parts[counter].append([key])
 			parts[counter][-1].extend(mgs[key])
 		counter += 1
-	return parts 
+	return parts
 
 def nx_critical_load_branch(G, criticalLoads):
 	'Form all microgrid combinations prioritizing only critical loads and single points of connection.'
@@ -233,11 +233,11 @@ def nx_critical_load_branch(G, criticalLoads):
 		mgs = loop_avoider(G, mgs)
 		mgs = merge_mgs(G, mgs)
 		mgs = only_child(G, mgs)
-		for key in mgs: 
+		for key in mgs:
 			parts[counter].append([key])
 			parts[counter][-1].extend(mgs[key])
 		counter += 1
-	return parts 
+	return parts
 
 def nx_get_parent(G, n):
 	preds = G.predecessors(n)

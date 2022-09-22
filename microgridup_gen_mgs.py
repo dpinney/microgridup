@@ -119,12 +119,12 @@ def relatable_siblings(G, mgs):
 
 # Used by the critical load algorithm.
 def merge_mgs(G, mgs):
-'''
-Check to see if parent is a key in a microgrid.
-Check to see if parent is a value in a microgrid.
-Check to see if parent is parent of other most ancestral node.
-Check to see if parent has no successors in any other mg.
-'''
+	'''
+	Check to see if parent is a key in a microgrid.
+	Check to see if parent is a value in a microgrid.
+	Check to see if parent is parent of other most ancestral node.
+	Check to see if parent has no successors in any other mg.
+	'''
 	items = [x for x in nx.topological_sort(G) if x in list(mgs.keys())]
 	for k in items:
 		if k not in mgs.keys():

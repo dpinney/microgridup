@@ -130,37 +130,37 @@ Check to see if parent has no successors in any other mg.
 		if k not in mgs.keys():
 			continue
 		parent = list(G.predecessors(k))
-	if not parent:
-		continue
-	parent = parent[0]
-	inValues = [key for key, value in mgs.items() if parent in value]
-	otherParent = [key for key, value in mgs.items() if list(G.predecessors(key)) == [parent] and key != k]
-	otherKeys = [key for key, value in mgs.items() if key in list(nx.nodes(nx.dfs_tree(G, parent))) and key != k]
-	otherValues = [key for key, value in mgs.items() if (set(value) & set(list(nx.nodes(nx.dfs_tree(G, parent))))) and key != k]
-	otherMgs = otherKeys + otherValues
-	if parent in mgs.keys() or inValues:
-		# If the parent is already in a microgrid, merge with existing microgrid.
-		if inValues: 
-			mgs[inValues[0]].append(k)
-			mgs[inValues[0]].extend(mgs[k])
-			del mgs[k]
-		else:
+		if not parent:
+			continue
+		parent = parent[0]
+		inValues = [key for key, value in mgs.items() if parent in value]
+		otherParent = [key for key, value in mgs.items() if list(G.predecessors(key)) == [parent] and key != k]
+		otherKeys = [key for key, value in mgs.items() if key in list(nx.nodes(nx.dfs_tree(G, parent))) and key != k]
+		otherValues = [key for key, value in mgs.items() if (set(value) & set(list(nx.nodes(nx.dfs_tree(G, parent))))) and key != k]
+		otherMgs = otherKeys + otherValues
+		if parent in mgs.keys() or inValues:
+			# If the parent is already in a microgrid, merge with existing microgrid.
+			if inValues: 
+				mgs[inValues[0]].append(k)
+				mgs[inValues[0]].extend(mgs[k])
+				del mgs[k]
+			else:
+				mgs[parent].append(k)
+				mgs[parent].extend(mgs[k]) 
+				del mgs[k]
+		elif otherParent:
+			# Else if parent is also the parent of a different microgrid’s most ancestral node, annex parent and merge microgrids.
 			mgs[parent].append(k)
-			mgs[parent].extend(mgs[k]) 
+			mgs[parent].append(otherParent[0])
+			mgs[parent].extend(mgs[k])
+			mgs[parent].extend(mgs[otherParent[0]])
 			del mgs[k]
-	elif otherParent:
-		# Else if parent is also the parent of a different microgrid’s most ancestral node, annex parent and merge microgrids.
-		mgs[parent].append(k)
-		mgs[parent].append(otherParent[0])
-		mgs[parent].extend(mgs[k])
-		mgs[parent].extend(mgs[otherParent[0]])
-		del mgs[k]
-		del mgs[otherParent[0]]
-	elif not otherMgs:
-		# Else if parent has no successors in any other microgrid, annex parent.
-		mgs[parent].append(k)
-		mgs[parent].extend(mgs[k])
-		del mgs[k]
+			del mgs[otherParent[0]]
+		elif not otherMgs:
+			# Else if parent has no successors in any other microgrid, annex parent.
+			mgs[parent].append(k)
+			mgs[parent].extend(mgs[k])
+			del mgs[k]
 	return mgs
 
 def nx_group_branch(G, i_branch=0):

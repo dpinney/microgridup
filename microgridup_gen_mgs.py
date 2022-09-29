@@ -183,7 +183,7 @@ def nx_group_lukes(G, size, node_weight=None, edge_weight=None):
 	G_topo_order = nx.DiGraph(nx.algorithms.traversal.breadth_first_search.bfs_edges(G, tree_root))
 	return nx.algorithms.community.lukes.lukes_partitioning(G_topo_order, size, node_weight=node_weight, edge_weight=edge_weight)
 
-def nx_bottom_up_branch(G):
+def nx_bottom_up_branch(G, num_mgs=5, large_or_small='large'):
 	'Form all microgrid combinations starting with leaves and working up to source maintaining single points of connection for each.'
 	try:
 		list(nx.topological_sort(G))
@@ -204,13 +204,17 @@ def nx_bottom_up_branch(G):
 		mgs = loop_avoider(G, mgs)
 		mgs = relatable_siblings(G, mgs)
 		mgs = only_child(G, mgs)
+		if len(mgs) < num_mgs:
+			break
 		for key in mgs: 
 			parts[counter].append([key])
 			parts[counter][-1].extend(mgs[key])
 		counter += 1
-	return parts
+		if len(mgs) == num_mgs and large_or_small == 'small':
+			break
+	return parts[len(parts)-1]
 
-def nx_critical_load_branch(G, criticalLoads):
+def nx_critical_load_branch(G, criticalLoads, num_mgs=3, large_or_small='large'):
 	'Form all microgrid combinations prioritizing only critical loads and single points of connection.'
 	# Find all critical loads. They get a microgrid each. Output.
 	critical_nodes = [[x] for x in G.nodes() if x in criticalLoads]
@@ -233,11 +237,15 @@ def nx_critical_load_branch(G, criticalLoads):
 		mgs = loop_avoider(G, mgs)
 		mgs = merge_mgs(G, mgs)
 		mgs = only_child(G, mgs)
+		if len(mgs) < num_mgs:
+			break
 		for key in mgs:
 			parts[counter].append([key])
 			parts[counter][-1].extend(mgs[key])
 		counter += 1
-	return parts
+		if len(mgs) == num_mgs and large_or_small == 'small':
+			break
+	return parts[len(parts)-1]
 
 def nx_get_parent(G, n):
 	preds = G.predecessors(n)
@@ -276,11 +284,9 @@ def mg_group(circ_path, crit_loads, algo, algo_params={}):
 	elif algo == 'branch':
 		MG_GROUPS = nx_group_branch(G, i_branch=algo_params.get('i_branch',0))
 	elif algo == 'bottomUp':
-		MG_GROUPS = nx_bottom_up_branch(G)
-		MG_GROUPS = MG_GROUPS[len(MG_GROUPS//2)] # TO DO: decide which configuration to use. 
+		MG_GROUPS = nx_bottom_up_branch(G, num_mgs=5, large_or_small='large')
 	elif algo == 'criticalLoads':
-		MG_GROUPS = nx_critical_load_branch(G, CRITICAL_LOADS)
-		MG_GROUPS = MG_GROUPS[len(MG_GROUPS//2)] # TO DO: decide which configuration to use. 
+		MG_GROUPS = nx_critical_load_branch(G, CRITICAL_LOADS, num_mgs=3, large_or_small='large')
 	else:
 		print('Invalid algorithm. algo must be "branch" or "lukes". No mgs generated.')
 		return {}

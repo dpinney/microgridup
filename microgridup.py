@@ -526,8 +526,8 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 				gen_df_builder[f'{gen_ob_existing}'] = battery_load/battery_pow_total*battery_cap_existing/battery_cap_total #batt_kwh
 			# if no new battery has been built, existing battery takes the full battery load, using 0-1 scale
 			else:
-	 			# print("build_new_gen() storage 6", gen_ob_existing)
-	 			gen_df_builder[f'{gen_ob_existing}'] = battery_load/battery_pow_total
+				# print("build_new_gen() storage 6", gen_ob_existing)
+				gen_df_builder[f'{gen_ob_existing}'] = battery_load/battery_pow_total
 	gen_df_builder.to_csv(GEN_NAME, index=False)
 	return gen_obs
 

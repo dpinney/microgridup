@@ -1,6 +1,7 @@
 /* SEMANTIC ELEMENTS */
 :root {
-    --headingDivHeight: 3rem;
+    /* Heading div was moved into top nav */
+    /*--headingDivHeight: 3rem;*/
     --mobileToDesktopBreakpointWidth: 977px;
     --sideNavWidth: 272px;
     --sideNavTransitionTime: 0.3s;
@@ -18,14 +19,10 @@
 }
 body {
     margin: 0;
+    background: white;
 }
 body.loading {
     overflow-y: hidden;
-}
-span.span--sectionTitle {
-    font-family: sans-serif;
-    font-size: 2rem;
-    padding-left: 1rem;
 }
 header {
     height: var(--topNavHeight);
@@ -39,7 +36,8 @@ header span {
 iframe {
     border: 0;
     width: 100%;
-    height: calc(99vh - var(--topNavHeight) - var(--headingDivHeight));
+    height: calc(99.5vh - var(--topNavHeight));
+    /*height: calc(99vh - var(--topNavHeight) - var(--headingDivHeight));*/
 }
 main {
     height: calc(100% - var(--topNavHeight));
@@ -48,16 +46,22 @@ main {
 main.loading {
     padding: initial;
 }
+/* No longer used
 div.div--spanDisplay {
     align-items: center;
     display: flex;
     height: var(--headingDivHeight);
-}
+} */
 section.hidden {
     display: none;
 }
 section.loading {
     visibility: hidden;
+}
+span.span--sectionTitle {
+    font-family: sans-serif;
+    font-size: 2rem;
+    padding-left: 1rem;
 }
 /* TOP NAV */
 nav.js-nav--topNav {
@@ -73,6 +77,7 @@ nav.js-nav--topNav a {
 nav.js-nav--topNav button {
     border: 0;
     background-color: transparent;
+    cursor: pointer;
     padding: 14px;
     width: var(--topNavHeight);
 }
@@ -88,7 +93,6 @@ nav.js-nav--topNav div {
 /* TOP NAV SVGS */
 nav.js-nav--topNav svg {
     fill: white;
-    cursor: pointer;
 }
 /* SIDE NAV */
 nav.js-nav--sideNav {
@@ -110,6 +114,7 @@ nav.js-nav--sideNav.open {
 /* SIDE NAV BUTTONS */
 nav.js-nav--sideNav button {
     /*background-clip: content-box;*/
+    align-items: center;
     background-color: white;
     box-shadow: inset -1px 0px darkgray;
     border: 0;
@@ -120,14 +125,15 @@ nav.js-nav--sideNav button {
     padding: 0;
     width: 100%;
 }
-nav.js-nav--sideNav button:focus {
-    /*background-clip: content-box;*/
-    box-shadow: inset 0 0 0 1px darkgray;
-}
 nav.js-nav--sideNav button:hover {
     background-color: lightgray;
 }
-nav.js-nav--sideNav button:focus > span {
+/* Safari workaround for missing :focus implementation */
+nav.js-nav--sideNav button.focused {
+    /*background-clip: content-box;*/
+    box-shadow: inset 0 0 0 1px darkgray;
+}
+nav.js-nav--sideNav button.focused > span {
     font-weight: bold;
 }
 /* SIDE NAV COVER */
@@ -137,7 +143,7 @@ div.js-div--sideNavCover {
 div.js-div--sideNavCover.loading {
     align-items: center;
     background-color: rgba(189, 189, 189, 0.6);
-    display: block flex;
+    display: flex;
     height: 100%;
     justify-content: space-around; 
     position: fixed;
@@ -180,8 +186,43 @@ div.js-div--buttonContainer > div.js-div--buttonContainer > button > span {
 nav.js-nav--sideNav svg {
     transform: rotate(0deg);
     transition: transform 0.25s ease;
+    transform-box: fill-box;
+    transform-origin: center;
 }
 nav.js-nav--sideNav svg.rotated {
     transform: rotate(90deg);
-    transition: transform 0.25s ease;
+}
+/* HOMEPAGE */
+div.box {
+    width:300px;
+    height:300px;
+    background:white;
+    border:1px black solid;
+    display:inline-block;
+    text-align:left;
+    margin:5px;
+    padding:5px;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+    background: black;
+}
+div.box a {
+    color: mediumseagreen;
+    font-family: sans-serif;
+    text-decoration: none;
+}
+/*div.box p {
+    margin: 0;
+}*/
+div.box a:visited {
+    color: seagreen;
+    text-decoration: none;
+}
+#container {
+    display:inline;
+    width:auto;
+    float:left;
+    text-align:center;
+    font-size:25px;
 }

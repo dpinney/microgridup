@@ -2,39 +2,7 @@
 <html>
 <head>
 	<title>MicrogridUP &raquo; Home</title>
-	<link rel='stylesheet' href='/template.css'/>
-	<style type="text/css">
-		* {
-			margin:0;
-			padding:0;
-			border:0;
-			font-family:sans-serif
-		}
-		div.box {
-			width:300px;
-			height:300px;
-			background:white;
-			border:1px black solid;
-			display:inline-block;
-			text-align:left;
-			margin:5px;
-			padding:5px;
-			overflow: hidden;
-			border-radius: 8px;
-			box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
-			background: black;
-		}
-		#container {
-			display:inline;
-			width:auto;
-			float:left;
-			text-align:center;
-			font-size:25px;
-		}
-		body {
-			background:white;
-		}
-	</style>
+	<link rel='stylesheet' href='/main.css'/>
 	<script type="text/javascript">
 	function duplicate(analysis) {
 		var new_name = prompt('Name for the duplicate?', '');
@@ -57,14 +25,30 @@
 	</script>
 </head>
 <body>
-	<div style="height:40px; width:100%; background:black; line-height:40px; padding-left:10px; margin-bottom:10px">
-		<p style="color:white"><a style="color:white; text-decoration:none" href="/"><b>MicrogridUP</b></a> &raquo; Home</p>
-	</div>
-	<div id='container'>
-		{% for analysis in analyses %}
-		<div class='box'><p><a style="font-size:40px" href='load/{{analysis}}'>{{analysis}}</a> <br> <a href='javascript:duplicate("{{analysis}}")'>[dup]</a> <a href='edit/{{analysis}}'>[edit]</a> <a href='delete/{{analysis}}'>[del]</a></p></div>
-		{% endfor %}
-		<div class='box' style="border:1px black dashed"><a href='/new' style="font-size:50px">+</a></div>
-	</div>
+    <header>
+        <nav class="js-nav--topNav">
+            <div>
+                <a href="/">
+                    <span class="span--sectionTitle">MicrogridUp &raquo; Home</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <div id='container'>
+            {% for analysis in analyses %}
+            <div class='box'>
+                <a style="font-size:40px" href='load/{{analysis}}'>{{analysis}}</a>
+                <br>
+                <a href='javascript:duplicate("{{analysis}}")'>[dup]</a>
+                <a href='edit/{{analysis}}'>[edit]</a>
+                <a href='delete/{{analysis}}'>[del]</a>
+            </div>
+            {% endfor %}
+            <div class='box' style="border:1px black dashed">
+                <a href='/new' style="font-size:50px">+</a>
+            </div>
+        </div>
+    </main>
 </body>
 </html>

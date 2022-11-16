@@ -21,9 +21,25 @@ function setupSideNav() {
             }
         });
     }
-    // - Connect side nav buttons to sections
     const sections = document.getElementsByTagName('section');
-    for (let btn of document.getElementsByClassName('js-nav--sideNav')[0].getElementsByTagName('button')) {
+    const buttons = document.getElementsByClassName('js-nav--sideNav')[0].getElementsByTagName('button');
+    for (let btn of buttons) {
+        btn.addEventListener('click', function() {
+            // - Add a class to buttons when clicked. Required for Safari because it doesn't implement the CSS :focus pseudo-class correctly
+            for (let b of buttons) {
+                if (b !== btn) {
+                    b.classList.remove('focused');
+                } else if (!b.classList.contains('focused')) {
+                    b.classList.add('focused'); 
+                }
+            }
+            // - Change page title
+            const buttonText = btn.dataset.content;
+            if (buttonText !== undefined) {
+                document.getElementsByClassName('js-nav--topNav')[0].getElementsByClassName('span--sectionTitle')[1].textContent = buttonText;
+            }
+        });
+        // - Connect side nav buttons to sections
         const section = document.querySelector(`section[data-content='${btn.dataset.content}']`)
         if (section !== null) {
             btn.addEventListener('click', function() {
@@ -68,7 +84,7 @@ function loadPage() {
         document.getElementsByTagName('body')[0].classList.remove('loading');
         document.getElementsByTagName('main')[0].classList.remove('loading');
         // - Section start with visibility: hidden; to load, then switch to display: none; to only show one section at a time
-        const overviewSection = document.querySelector('section[data-content=overview]');
+        const overviewSection = document.querySelector('section[data-content=Overview]');
         for (let sec of document.getElementsByTagName('section')) {
             if (sec !== overviewSection) {
                 sec.classList.add('hidden');

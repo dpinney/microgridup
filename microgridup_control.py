@@ -777,7 +777,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		<head>
 			<style type="text/css">
 				* {font-family:sans-serif}
-				iframe {width:100%; height:600px; border-color:gray; border-style:solid; border-width:1px 0px 0px 0px}
+				iframe {width:100%; height:600px; border:0;}
 			</style>
 		</head>
 		<body style="margin:0px">

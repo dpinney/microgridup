@@ -223,7 +223,7 @@ def nx_critical_load_branch(G, criticalLoads, num_mgs=3, large_or_small='large')
 	except nx.NetworkXUnfeasible:
 		G = remove_loops(G)
 		top_down = list(nx.topological_sort(G))
-		mgs = defaultdict(list)
+	mgs = defaultdict(list)
 	for node in critical_nodes:
 		mgs[node[-1]] = []
 	# Include as many parents and parents of parents etc. in microgrid such that these parents have no other children.
@@ -277,6 +277,7 @@ def mg_group(circ_path, crit_loads, algo, algo_params={}):
 	# print(list(G.edges()))
 	omd = opendss.dssConvert.dssToOmd(circ_path, None, write_out=False)
 	omd_list = list(omd.values())
+	print('omd_list',omd_list)
 	# Generate microgrids
 	if algo == 'lukes':
 		default_size = int(len(G.nodes())/3)
@@ -288,7 +289,7 @@ def mg_group(circ_path, crit_loads, algo, algo_params={}):
 	elif algo == 'criticalLoads':
 		MG_GROUPS = nx_critical_load_branch(G, CRITICAL_LOADS, num_mgs=3, large_or_small='large')
 	else:
-		print('Invalid algorithm. algo must be "branch" or "lukes". No mgs generated.')
+		print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", or "criticalLoads". No mgs generated.')
 		return {}
 	all_mgs = [
 		(M_ID, MG_GROUP, MG_GROUP[0], nx_out_edges(G, MG_GROUP))

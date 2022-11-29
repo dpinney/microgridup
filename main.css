@@ -63,6 +63,9 @@ span.span--sectionTitle {
     font-size: 2rem;
     padding-left: 1rem;
 }
+div > span.span--sectionTitle:nth-child(2) {
+    padding-left: .5rem;
+}
 /* TOP NAV */
 nav.js-nav--topNav {
     background: black;

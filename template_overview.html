@@ -1,82 +1,86 @@
-<head>
-	<title>Overview</title>
-	<style type="text/css">
-		* {
-			font-family:sans-serif
-		}
-		.over_block {
-			break-inside: avoid-column;
-			width:100%;
-		}
-		#grid {
-			column-width: 700px; /*make it whatever you want the min column size, max size will be around 2x this number.*/
-			margin-right: 12px; /*lets the right hand side breathe, make it about 3% of the column-width*/
-		}
-		h3 {
-			margin-bottom: 11px;
-		}
-		pre {
-			width: 95%;
-			white-space: pre-wrap;
-			margin-top: 0px;
-		}
-		th {
-			font-size:8pt;
-		}
-		#tablediv {
-			width: 98vw;
-			margin-top: 10px;
-			margin-bottom: 10px;
-			overflow-x: scroll
-		}
-	</style>
-</head>
-<body>
-	{{chart_html}}
-	<div id="tablediv">
-		<h3>Overview of Microgrid Results</h3>
-		<table>
-			{% for k in summary.keys() %} <th>{{k}}</th>{% endfor %}
-			{% for i in range(summary["Microgrid Name"] | length) %}
-				<tr>
-					{% for k in summary.keys() %}
-						{% if summary[k][i] is string %}<td style="text-align:right">{{ summary[k][i] }}</td>
-						{% elif summary[k][i] is not none %}<td style="text-align:right">{{ '{:,}'.format(summary[k][i]) }}</td>
-						{% else %}<td style="text-align:right">{{ summary[k][i] }}</td>
-						{% endif %}
-					{% endfor %}
-				</tr>
-			{% endfor %}
-		</table>
-	</div>
-	<div id="grid">
-		<div class="over_block">
-			<h3>Report Generated</h3>
-			<pre>{{now}}</pre>
-		</div>
-		<div class="over_block">
-			<h3>Model Inputs</h3>
-			<pre>{{inputs}}</pre>
-		</div>
-		<div class="over_block">
-			<h3>User Warnings</h3>
-			<pre>{{warnings}}</pre>
-		</div>
-		<div class="over_block">
-			<h3>Distribution Upgrades needed to create Microgrids</h3>
-			<table>
-				<tr>
-					<th>Microgrid</th>
-					<th>Location</th>
-					<th>Recommended Upgrade</th>
-					<th>Cost Estimate ($)</th>
-				</tr>{% for row in add_cost_rows %}
-				<tr>{% for col_value in row %}
-					{% if col_value is string %}<td style="text-align:right">{{ col_value }}</td>
-					{% elif col_value is not none %}<td style="text-align:right">{{ '{:,}'.format(col_value) }}</td>
-					{% else %}<td style="text-align:right">{{ col_value }}</td>{% endif %}
-				{% endfor %}</tr>{% endfor %}
-			</table>
-		</div>
-	</div>
-</body>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Overview</title>
+        <style type="text/css">
+            * {
+                font-family:sans-serif
+            }
+            .over_block {
+                break-inside: avoid-column;
+                width:100%;
+            }
+            #grid {
+                column-width: 700px; /*make it whatever you want the min column size, max size will be around 2x this number.*/
+                margin-right: 12px; /*lets the right hand side breathe, make it about 3% of the column-width*/
+            }
+            h3 {
+                margin-bottom: 11px;
+            }
+            pre {
+                width: 95%;
+                white-space: pre-wrap;
+                margin-top: 0px;
+            }
+            th {
+                font-size:8pt;
+            }
+            #tablediv {
+                width: 98vw;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                overflow-x: scroll
+            }
+        </style>
+    </head>
+    <body>
+        {{chart_html}}
+        <div id="tablediv">
+            <h3>Overview of Microgrid Results</h3>
+            <table>
+                {% for k in summary.keys() %} <th>{{k}}</th>{% endfor %}
+                {% for i in range(summary["Microgrid Name"] | length) %}
+                    <tr>
+                        {% for k in summary.keys() %}
+                            {% if summary[k][i] is string %}<td style="text-align:right">{{ summary[k][i] }}</td>
+                            {% elif summary[k][i] is not none %}<td style="text-align:right">{{ '{:,}'.format(summary[k][i]) }}</td>
+                            {% else %}<td style="text-align:right">{{ summary[k][i] }}</td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div id="grid">
+            <div class="over_block">
+                <h3>Report Generated</h3>
+                <pre>{{now}}</pre>
+            </div>
+            <div class="over_block">
+                <h3>Model Inputs</h3>
+                <pre>{{inputs}}</pre>
+            </div>
+            <div class="over_block">
+                <h3>User Warnings</h3>
+                <pre>{{warnings}}</pre>
+            </div>
+            <div class="over_block">
+                <h3>Distribution Upgrades needed to create Microgrids</h3>
+                <table>
+                    <tr>
+                        <th>Microgrid</th>
+                        <th>Location</th>
+                        <th>Recommended Upgrade</th>
+                        <th>Cost Estimate ($)</th>
+                    </tr>{% for row in add_cost_rows %}
+                    <tr>{% for col_value in row %}
+                        {% if col_value is string %}<td style="text-align:right">{{ col_value }}</td>
+                        {% elif col_value is not none %}<td style="text-align:right">{{ '{:,}'.format(col_value) }}</td>
+                        {% else %}<td style="text-align:right">{{ col_value }}</td>{% endif %}
+                    {% endfor %}</tr>{% endfor %}
+                </table>
+            </div>
+        </div>
+    </body>
+</html>

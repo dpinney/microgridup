@@ -1,54 +1,54 @@
 <!DOCTYPE html>
-<html>
-<head>
-	<title>MicrogridUP &raquo; Home</title>
-	<link rel='stylesheet' href='/main.css'/>
-	<script type="text/javascript">
-	function duplicate(analysis) {
-		var new_name = prompt('Name for the duplicate?', '');
-		var xhr = new XMLHttpRequest();
-		xhr.onreadystatechange = function() {
-			if (xhr.readyState == XMLHttpRequest.DONE) {
-				alert(xhr.responseText);
-				location.reload();
-			};
-		};
-		xhr.open('POST', '/duplicate', true);
-		xhr.setRequestHeader('Content-Type', 'application/json');
-		var contents = JSON.stringify({
-			'analysis':analysis,
-			'new_name':new_name
-		});
-		xhr.send(contents);
-		alert(contents);
-	}
-	</script>
-</head>
-<body>
-    <header>
-        <nav class="js-nav--topNav">
-            <div>
-                <a href="/">
-                    <span class="span--sectionTitle">MicrogridUp &raquo; Home</span>
-                </a>
+<html lang="en">
+    <head>
+        <title>MicrogridUP &raquo; Home</title>
+        <link rel='stylesheet' href='/main.css'/>
+        <script type="text/javascript">
+        function duplicate(analysis) {
+            var new_name = prompt('Name for the duplicate?', '');
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    alert(xhr.responseText);
+                    location.reload();
+                };
+            };
+            xhr.open('POST', '/duplicate', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            var contents = JSON.stringify({
+                'analysis':analysis,
+                'new_name':new_name
+            });
+            xhr.send(contents);
+            alert(contents);
+        }
+        </script>
+    </head>
+    <body>
+        <header>
+            <nav class="js-nav--topNav">
+                <div>
+                    <a href="/">
+                        <span class="span--sectionTitle">MicrogridUp &raquo; Home</span>
+                    </a>
+                </div>
+            </nav>
+        </header>
+        <main>
+            <div id='container'>
+                {% for analysis in analyses %}
+                <div class='box'>
+                    <a style="font-size:40px" href='load/{{analysis}}'>{{analysis}}</a>
+                    <br>
+                    <a href='javascript:duplicate("{{analysis}}")'>[dup]</a>
+                    <a href='edit/{{analysis}}'>[edit]</a>
+                    <a href='delete/{{analysis}}'>[del]</a>
+                </div>
+                {% endfor %}
+                <div class='box' style="border:1px black dashed">
+                    <a href='/new' style="font-size:50px">+</a>
+                </div>
             </div>
-        </nav>
-    </header>
-    <main>
-        <div id='container'>
-            {% for analysis in analyses %}
-            <div class='box'>
-                <a style="font-size:40px" href='load/{{analysis}}'>{{analysis}}</a>
-                <br>
-                <a href='javascript:duplicate("{{analysis}}")'>[dup]</a>
-                <a href='edit/{{analysis}}'>[edit]</a>
-                <a href='delete/{{analysis}}'>[del]</a>
-            </div>
-            {% endfor %}
-            <div class='box' style="border:1px black dashed">
-                <a href='/new' style="font-size:50px">+</a>
-            </div>
-        </div>
-    </main>
-</body>
+        </main>
+    </body>
 </html>

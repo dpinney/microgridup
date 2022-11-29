@@ -124,8 +124,8 @@ nav.js-nav--sideNav button {
     cursor: pointer;
     display: flex;
     justify-content: space-between;
-    height: 4em;
-    padding: 0;
+    height: 6em;
+    padding: 10px 0 10px 0;
     width: 100%;
 }
 nav.js-nav--sideNav button:hover {

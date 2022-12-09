@@ -118,14 +118,20 @@
 		.dropdown-content div:hover {background-color: #ddd; cursor: pointer;}
 		.dropdown:hover .dropdown-content {display: block;}
 		.dropdown:hover .dropbtn {background-color: #3e8e41;}
-		.sub {
+		.substation {
 		    padding-left: 0px;
+		    list-style: none;
 		}
-		.feeder {
-			padding-left: 10px;
+		#elements .feeder {
+			padding-left: 40px;
+			list-style: none;
 		}
-		.load, .solar, .battery, .wind, .diesel {
-			padding-left: 20px;
+		#elements .load, .solar, .battery, .wind, .diesel {
+			padding-left: 80px;
+			list-style: none;
+		}
+		#elements li i {
+			cursor:pointer;
 		}
 	</style>
 </head>
@@ -183,16 +189,22 @@
 		</div>
 
 		<div id="circuitCreator" class="desc">
-			<!-- Maybe let's make the magic happen here instead. -->
+			<dialog id="dialog">
+				<div id="dialogText"></div>
+				<select></select>
+				<button type="cancel" onclick="window.dialog.close();">Cancel</button>
+				<button type="submit">Submit</button>
+			</dialog>
+
+
 			<ul id="elements">
-				<li class="sub" data-editable>Substation (click to rename)</li>
-				<li class="feeder" data-editable>Feeder (click to rename)</li>
-				<li class="load" data-editable>Load (click to rename)</li>
-				<li class="solar" data-editable>Solar (click to rename)</li>
-				<li class="battery" data-editable>Battery (click to rename)</li>
-				<li class="diesel" data-editable>Diesel (click to rename)</li>
+				<li class="substation" data-editable><i class="fa fa-minus-square"></i> Substation: (click to name)</li>
+				<li class="feeder" data-editable><i class="fa fa-minus-square"></i> Feeder: (click to name)</li>
+				<li class="load" data-editable><i class="fa fa-minus-square"></i> Load: (click to name)</li>
+				<li class="solar" data-editable><i class="fa fa-minus-square"></i> Solar: (click to name)</li>
+				<li class="battery" data-editable><i class="fa fa-minus-square"></i> Battery: (click to name)</li>
+				<li class="diesel" data-editable><i class="fa fa-minus-square"></i> Diesel: (click to name)</li>
 			</ul>
-			<!-- <button id="newItem">Add new element</button> -->
 			<div class="dropdown">
 				<button class="dropbtn">Add element</button>
 				<div class="dropdown-content">
@@ -205,7 +217,6 @@
 				    <div id="newDiesel" role="button" tabindex="0">Diesel</div>
 				</div>
 			</div>
-			<button id="backspace">Remove last element</button>
 			<button id="toDss">Submit circuit</button>
 		</div>
 
@@ -475,41 +486,82 @@
         // Editable text for circuit widget.
         $('body').on('click', '[data-editable]', function(){
         	var $og = $(this);
-        	var $input = $('<input/>').val( $og.text() ).addClass( $og.attr("class") ).select();
+        	var $input = $('<input/>').val( $og.text() ).addClass( $og.attr('class') ).select();
         	$og.replaceWith( $input );
+			// Ensure element type remains uneditable in circuit widget.
+	    	var base = $og.attr('class').charAt(0).toUpperCase() + $og.attr('class').slice(1) + ': ';
+	    	var regex = new RegExp("^" + base, "i");
+	    	$('#elements input').on("input", function(ev) {
+				var query = $(this).val();
+				if (!regex.test(query)) {
+					ev.preventDefault();
+					$(this).val(base);
+				}
+			});
+			// Save on click or enter key press.
         	var save = function(){
-        		var $p = $('<li data-editable />').text( $input.val() ).addClass( $og.attr("class") );
+        		var $p = $('<li data-editable />').html('<i class="fa fa-minus-square"></i> ' + $input.val() ).addClass( $og.attr("class") );
         		$input.replaceWith( $p );
         	};
-        	$input.one('blur', save).focus();
+        	$input.on('blur keypress', function(e) {
+        		if (e.type == 'blur' || e.keyCode == 13) {
+        			save();
+        		}
+        	}).focus();
         });
 
-        // Remove last element in circuit widget.
-        $("#circuitCreator").on('click', '#backspace', function () {
-        	$('#elements li:last-child').remove();        	
+        // Delete elements with click of icon in circuit widget. Delete all downstream elements as well.
+        $('body').on('click', '#elements li i', function(){
+        	var type = $(this).parent($('li')).attr('class');
+        	var downstream = {
+        		'substation':['feeder','load','wind','solar','battery','diesel'],
+        		'feeder':['load','wind','solar','battery','diesel']
+        	}
+        	// Warn user that downstream nodes will be deleted if they proceed.
+        	if (type in downstream && $(this).parent($('li')).next('li').length > 0) {
+        		if (downstream[type].includes($(this).parent($('li')).next('li').attr('class'))) {
+		    		if (confirm("All elements on the substation/feeder to be deleted will also be deleted. Continue?") == false) {
+		    			return
+		    		} 
+					delete_these = downstream[type]
+					while ($(this).parent($('li')).next('li').length > 0 && delete_these.includes($(this).parent($('li')).next('li').attr('class'))) {
+						$(this).parent($('li')).next('li').remove();
+					}
+        		}
+        	}
+        	$(this).parent($('li')).remove();
         });
 
-        // Add specific new elements to circuit widget.
-        $('#newSub').on( "click", function() {
-        	$("#elements").append('<li class="sub" data-editable>New substation (click to rename)</li>');
-        }); 
-        $('#newFeeder').on( "click", function() {
-        	$("#elements").append('<li class="feeder" data-editable>New feeder (click to rename)</li>');
-        }); 
-        $('#newLoad').on( "click", function() {
-        	$("#elements").append('<li class="load" data-editable>New load (click to rename)</li>');
+        // Either add a new substation to the bottom or open up dialog.
+        $('#newSub, #newFeeder, #newLoad, #newSolar, #newWind, #newBattery, #newDiesel').on('click', function() {
+        	$('#dialog select').empty();
+        	$('#dialogText').removeClass();
+        	let type = $(this).attr('id');
+        	let map = {'newSub':['substation'],'newFeeder':['feeder','substation'],'newLoad':['load','feeder'],'newSolar':['solar','feeder'],'newWind':['wind','feeder'],'newBattery':['battery','feeder'],'newDiesel':['diesel','feeder']}
+        	let name = ' '+map[type][0].charAt(0).toUpperCase()+map[type][0].slice(1)+': (click to name)'
+        	if (type === 'newSub') {
+        		$("#elements").append('<li class="substation" data-editable><i class="fa fa-minus-square"></i>'+name+'</li>');
+        	} else {
+        		var all = $("#elements ." + map[type][1]).map(function() {
+        			let idx = this.innerHTML.indexOf(': ') + 2;
+        		    return this.innerHTML.slice(idx);
+        		}).get();
+        		$("#dialogText").text("To which "+map[type][1]+" would you like to add a "+map[type][0]+"?").addClass(map[type][0]+' '+map[type][1]);
+        		for (let idx = 0; idx < all.length; idx++) {
+        			$('#dialog select').append(`<option value="${all[idx]}">${all[idx]}</option>`);
+        		}
+        		window.dialog.showModal();
+        	}
         });
-        $('#newSolar').on( "click", function() {
-        	$("#elements").append('<li class="solar" data-editable>New solar (click to rename)</li>');
-        }); 
-        $('#newWind').on( "click", function() {
-        	$("#elements").append('<li class="wind" data-editable>New wind (click to rename)</li>');
-        });
-        $('#newBattery').on( "click", function() {
-        	$("#elements").append('<li class="battery" data-editable>New battery (click to rename)</li>');
-        });
-        $('#newDiesel').on( "click", function() {
-        	$("#elements").append('<li class="diesel" data-editable>New diesel (click to rename)</li>');
+        // Close dialog and add non-substation element.
+        $('#dialog button[type="submit"]').on('click', function() {
+        	window.dialog.close()
+        	let parentName = $('#dialog select').val();
+        	let type = $('#dialogText').attr('class').split(' ')[0];
+        	let parentType = $('#dialogText').attr('class').split(' ')[1];
+        	let child = ' '+type.charAt(0).toUpperCase()+type.slice(1)+': (click to name)';
+        	let parent = ' '+parentType.charAt(0).toUpperCase()+parentType.slice(1)+': '+parentName;
+        	$('<li class="'+type+'" data-editable><i class="fa fa-minus-square"></i>'+child+'</li>').insertAfter('#elements li:contains('+parent+')')
         });
 
         // Create DSS from manually built circuit. Get loads.
@@ -518,9 +570,11 @@
         		// First, convert to list. Then, convert to JSON.
         		var list = [];
         		$('#elements li').each(function(idx, item){
+        			var fullName = item.textContent;
+        			var startIdx = fullName.indexOf(':') + 2;
         		    list.push({
         		        class: $(item).attr('class'),
-        		        text: item.textContent
+        		        text: fullName.slice(startIdx)
         		    });
         		});
         		json = JSON.stringify(list, null, "  ");

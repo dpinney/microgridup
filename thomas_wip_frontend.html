@@ -6,12 +6,12 @@
 	<script src="https://kit.fontawesome.com/92028f16c4.js" crossorigin="anonymous"></script>
 	<style type="text/css">
 		body {
-			margin:0;
+			margin-left:0;
 			padding:0;
 			border:0;
 			font-family:sans-serif;
 		}
-		h3 {
+		h3, h5, p {
 			margin-bottom:7px;
 			margin-left: 5px;
 		}
@@ -22,9 +22,9 @@
 			border-radius: 4px;
 			margin: 4px 2px 4px 2px;
 		}
-		#holder {
+		form {
 			width: 100%;
-			margin-left: 4px;
+			margin-left: 5px;
 		}
 		button, input[type='submit'], label.fileButton {
 			width:auto;
@@ -139,28 +139,105 @@
 	<div style="height:40px; width:100%; background:black; line-height:40px; padding-left:10px;">
 		<p style="color:white; margin:0px"><a style="color:white; text-decoration:none" href="/"><b>MicrogridUP</b></a> &raquo; New</p>
 	</div>
-	<div id='stepOne' class='step'>
-		<h3>Step 1: Select your technologies</h3>
-		<div class="chunk">
-			<label for="solar">Solar</label>
-			<input type="checkbox" name="solar" id="solar" />
-		</div>
-		<div class="chunk">
-			<label for="battery">Battery</label>
-			<input type="checkbox" name="battery" id="battery" />
-		</div>
-		<div class="chunk">
-			<label for="fossil">Fossil</label>
-			<input type="checkbox" name="fossil" id="fossil" />
-		</div>
-		<div class="chunk">
-			<label for="wind">Wind</label>
-			<input type="checkbox" name="wind" id="wind" />
-		</div>
-	</div>
 
-	<div id='stepTwo' class='step'>
-		<h3>Step 2: Add a circuit</h3>
+	<div id='stepOne' class='step'>
+		<h3>Step 1: Input model information</h3>
+		<form id="modelInfoForm">
+			<h5>Site and Energy Provider</h5>
+			<div class="chunk">
+				<label class="tooltip" for="MODEL_DIR">Model Name<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+				<input type="text" name="MODEL_DIR" value="{{in_data.MODEL_DIR}}" />
+			</div>
+			<div class="chunk">
+				<label class="tooltip" for="latlon">Location<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+				<input type="text" name="latlong" placeholder="Enter decimal latitude" />
+				<input type="text" name="latlong" placeholder="Enter decimal longitude" />
+			</div>
+			<div class="chunk">
+				<label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+				<input type="text" name="QSTS_STEPS" value="{{in_data.QSTS_STEPS}}" />
+			</div>
+			<div>
+				<i class="fa fa-plus-square"></i>
+				<a href="javascript:void(0)" class="toggle show">Optional inputs</a>
+				<div style="display:none">
+					<div class="chunk">
+						<label class="tooltip" for="energyCost">Energy Cost ($/kWh)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+						<input type="text" name="energyCost" value="0.12" />
+					</div>
+					<div class="chunk">
+						<label class="tooltip" for="wholesaleCost">Wholesale Cost ($/kWh)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+						<input type="text" name="wholesaleCost" value="0.034" />
+					</div>
+					<div class="chunk">
+						<label class="tooltip" for="demandCost">Demand Cost ($/kW)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+						<input type="text" name="demandCost" value="20" />
+					</div>
+				</div>		
+			</div>
+			<h5>Load Profile</h5>
+			{% if 'LOAD_CSV' in in_data %}
+			<div class="chunk">
+				<label class="tooltip" for="LOAD_CSV_NAME">Load Data (.csv)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+				<input type="text" name="LOAD_CSV_NAME" value="{{in_data.LOAD_CSV}}" readonly />
+			</div>
+			{% else %}
+			<div class="chunk">
+				<label class="tooltip" for="LOAD_CSV">Load Data (.csv)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+				<input type="file" name="LOAD_CSV" />
+			</div>
+			{% endif %}
+			<div class="chunk">
+				<label class="tooltip" for="criticalLoadFactor">Critical Load Factor (% as decimal)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+				<input type="text" name="criticalLoadFactor" value="1" />
+			</div>
+			<div class="chunk">
+				<label class="tooltip" for="year">Year<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+				<input type="text" name="year" value="2017" />
+			</div>
+			<div>
+				<i class="fa fa-plus-square"></i>
+				<a href="javascript:void(0)" class="toggle show">Optional inputs</a>
+				<div style="display:none">
+				</div>		
+			</div>
+			<h5>Resilience</h5>
+			<div class="chunk">
+				<label class="tooltip" for="FAULTED_LINE">Outage Location(s)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+				<input type="text" name="FAULTED_LINE" value="{{in_data.FAULTED_LINE}}" />
+			</div>
+			<div class="chunk">
+				<label class="tooltip" for="outageDuration">Outage Duration (hours)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+				<input type="text" name="outageDuration" value="48" />
+			</div>
+			<div>
+				<i class="fa fa-plus-square"></i>
+				<a href="javascript:void(0)" class="toggle show">Optional inputs</a>
+				<div style="display:none;">
+					<div class="chunk">
+						<label class="tooltip" for="DIESEL_SAFETY_FACTOR">Fossil Safety Margin (%)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+						<input type="text" name="DIESEL_SAFETY_FACTOR" value="{{in_data.DIESEL_SAFETY_FACTOR}}" />
+					</div>
+					<div class="chunk">
+						<label class="tooltip" for="FOSSIL_BACKUP_PERCENT">Allowed Fossil (% as decimal)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+						<input type="text" name="FOSSIL_BACKUP_PERCENT" value="{{in_data.FOSSIL_BACKUP_PERCENT}}" />
+					</div>
+				</div>
+			</div>
+			<h5>Financial</h5>
+			<div class="chunk">
+				<label class="tooltip" for="value_of_lost_load">Value of Lost Load ($/kWh)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+				<input type="text" name="value_of_lost_load" value="1" />
+			</div>
+			<div>
+				<i class="fa fa-plus-square"></i>
+				<a href="javascript:void(0)" class="toggle show">Optional inputs</a>
+				<div style="display:none">
+				</div>		
+			</div>
+		</form>
+
+		<h3>Step 2: Specify existing circuit</h3>
 		<p>Please select your circuit creation method:</p>
 		<input type="radio" id="upload" name="circuit" value="Upload" />
 		<label for="upload">Upload circuit from file</label><br>
@@ -193,7 +270,7 @@
 				<div id="dialogText"></div>
 				<select></select>
 				<button type="cancel" onclick="window.dialog.close();">Cancel</button>
-				<button type="submit">Submit</button>
+				<button type="button">Submit</button>
 			</dialog>
 
 
@@ -217,7 +294,7 @@
 				    <div id="newDiesel" role="button" tabindex="0">Diesel</div>
 				</div>
 			</div>
-			<button id="toDss">Submit circuit</button>
+			<button id="toDss" type="button">Submit circuit</button>
 		</div>
 
 		<div id="critLoads">
@@ -226,7 +303,7 @@
 	</div>
 
 	<div id="partionPreviewer" class="step">
-		<h3>Step 3: Partition into microgrids</h3>
+		<h3>Step 3: Partition circuit into microgrids</h3>
 		<div class="chunk">
 			<label class="tooltip" for="MG_DEF_METHOD">Microgrid Definition Method<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 			<select id="partitionMethod" name="MG_DEF_METHOD" style="margin-right:6px">
@@ -237,7 +314,7 @@
 				<option value="bottomUp" {% if in_data.MG_DEF_METHOD == 'bottom-up' %}selected{% endif %}>Bottom-Up</option>
 				<option value="criticalLoads" {% if in_data.MG_DEF_METHOD == 'critical_loads' %}selected{% endif %}>Critical Loads</option>
 			</select></br>
-			<input id="previewPartitions" type="submit" value="Preview partitions" />
+			<button id="previewPartitions" type="button">Preview partitions</button>
 			<div id="partitionsPreview">
 			</div>
 			<form id="partitionManually" style="display: none;">
@@ -250,101 +327,26 @@
 		</div>
 	</div>
 
-	<div class="step">
-		<h3>Step 4: Set technology parameters</h3>
-		<div id="holder">
-			<h5>Site and Utility</h5>
+	<div id='techSelect' class='step'>
+		<h3>Step 4: Select technologies to be used in microgrids</h3>
+		<form id="techParamForm">
 			<div class="chunk">
-				<label class="tooltip" for="MODEL_DIR">Model Name<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
-				<input type="text" name="MODEL_DIR" value="{{in_data.MODEL_DIR}}" />
-			</div>
-			<div class="chunk">
-				<label class="tooltip" for="latlon">Location<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
-				<input type="text" name="latlong" placeholder="Enter approx. latitude" />
-				<input type="text" name="latlong" placeholder="Enter approx. longitude" />
-			</div>
-			<div>
-				<i class="fa fa-plus-square"></i>
-				<a href="javascript:void(0)" class="toggle show">Optional inputs</a>
-				<div style="display:none">
-					<div class="chunk">
-						<label class="tooltip" for="energyCost">Energy Cost<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
-						<input type="text" name="energyCost" value="0.12" />
-					</div>
-					<div class="chunk">
-						<label class="tooltip" for="wholesaleCost">Wholesale Cost<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
-						<input type="text" name="wholesaleCost" value="0.034" />
-					</div>
-				</div>		
-			</div>
-			<h5>Load Profile</h5>
-			{% if 'LOAD_CSV' in in_data %}
-			<div class="chunk">
-				<label class="tooltip" for="LOAD_CSV_NAME">Load Data (.csv)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
-				<input type="text" name="LOAD_CSV_NAME" value="{{in_data.LOAD_CSV}}" readonly />
-			</div>
-			{% else %}
-			<div class="chunk">
-				<label class="tooltip" for="LOAD_CSV">Load Data (.csv)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
-				<input type="file" name="LOAD_CSV" />
-			</div>
-			{% endif %}
-			<div class="chunk">
-				<label class="tooltip" for="year">Year<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
-				<input type="text" name="year" value="2017" />
-			</div>
-			<div>
-				<i class="fa fa-plus-square"></i>
-				<a href="javascript:void(0)" class="toggle show">Optional inputs</a>
-				<div style="display:none">
-				</div>		
-			</div>
-			<h5>Resilience</h5>
-			<div class="chunk">
-				<label class="tooltip" for="FAULTED_LINE">Outage Location(s)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
-				<input type="text" name="FAULTED_LINE" value="{{in_data.FAULTED_LINE}}" />
+				<label for="solar">Solar</label>
+				<input type="checkbox" name="solar" id="solar" />
 			</div>
 			<div class="chunk">
-				<label class="tooltip" for="outageDuration">Outage Duration<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
-				<input type="text" name="outageDuration" value="48" />
-			</div>
-			<div>
-				<i class="fa fa-plus-square"></i>
-				<a href="javascript:void(0)" class="toggle show">Optional inputs</a>
-				<div style="display:none;">
-					<div class="chunk">
-						<label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
-						<input type="text" name="QSTS_STEPS" value="{{in_data.QSTS_STEPS}}" />
-					</div>
-					<div class="chunk">
-						<label class="tooltip" for="DIESEL_SAFETY_FACTOR">Fossil Safety Margin (%)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
-						<input type="text" name="DIESEL_SAFETY_FACTOR" value="{{in_data.DIESEL_SAFETY_FACTOR}}" />
-					</div>
-					<div class="chunk">
-						<label class="tooltip" for="FOSSIL_BACKUP_PERCENT">Allowed Fossil (%)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
-						<input type="text" name="FOSSIL_BACKUP_PERCENT" value="{{in_data.FOSSIL_BACKUP_PERCENT}}" />
-					</div>
-					<div class="chunk">
-						<label class="tooltip" for="criticalLoadFactor">Critical Load Factor<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
-						<input type="text" name="criticalLoadFactor" value="1" />
-					</div>
-				</div>
-			</div>
-			<h5>Financial</h5>
-			<div class="chunk">
-				<label class="tooltip" for="demandCost">Demand Cost<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
-				<input type="text" name="demandCost" value="20" />
+				<label for="battery">Battery</label>
+				<input type="checkbox" name="battery" id="battery" />
 			</div>
 			<div class="chunk">
-				<label class="tooltip" for="value_of_lost_load">Value of Lost Load<<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span>/label>
-				<input type="text" name="value_of_lost_load" value="1" />
+				<label for="fossil">Fossil</label>
+				<input type="checkbox" name="fossil" id="fossil" />
 			</div>
-			<div>
-				<i class="fa fa-plus-square"></i>
-				<a href="javascript:void(0)" class="toggle show">Optional inputs</a>
-				<div style="display:none">
-				</div>		
+			<div class="chunk">
+				<label for="wind">Wind</label>
+				<input type="checkbox" name="wind" id="wind" />
 			</div>
+
 			<div id="solarDiv" style="display:none">
 				<h5>Solar</h5>
 				<div class="chunk">
@@ -356,107 +358,107 @@
 					<input type="checkbox" name="solarCanExport" value="true" checked />
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="solarCost">Solar Cost<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="solarCost">Solar Cost ($/kW)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="solarCost" value="1600" />
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="solarExisting">Solar Existing<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="solarExisting">Solar Existing (kW)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="solarExisting" value="0" />
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="solarMax">Solar Max<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="solarMax">Solar Max (kW)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="solarMax" value="100000" />
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="solarMin">Solar Min<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="solarMin">Solar Min (kW)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="solarMin" value="0" />
 				</div>
 			</div>
 			<div id="batteryDiv" style="display:none">
 				<h5>Battery</h5>
 				<div class="chunk">
-					<label class="tooltip" for="batteryCapacityCost">Battery Capacity Cost<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="batteryCapacityCost">Battery Capacity Cost ($/kWh)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="batteryCapacityCost" value="420" />
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="batteryCapacityMax">Battery Capacity Max<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="batteryCapacityMax">Battery Capacity Max (kWh)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="batteryCapacityMax" value="1000000" />
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="batteryCapacityMin">Battery Capacity Min<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="batteryCapacityMin">Battery Capacity Min (kWh)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="batteryCapacityMin" value="0" />
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="batteryKwExisting">Battery kW Existing<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
-					<input type="text" name="batteryKwExisting" value="0" />
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="batteryKwhExisting">Battery kWh Existing<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="batteryKwhExisting">Battery Capacity Existing (kWh)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="batteryKwhExisting" value="0" />
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="batteryPowerCost">Battery Power Cost<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="batteryPowerCost">Battery Power Cost ($/kW)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="batteryPowerCost" value="840" />
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="batteryPowerMax">Battery Power Max<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="batteryPowerMax">Battery Power Max (kW)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="batteryPowerMax" value="1000000" />
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="batteryPowerMin">Battery Power Min<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="batteryPowerMin">Battery Power Min (kW)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="batteryPowerMin" value="0" />
+				</div>
+				<div class="chunk">
+					<label class="tooltip" for="batteryKwExisting">Battery Power Existing (kW)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<input type="text" name="batteryKwExisting" value="0" />
 				</div>
 			</div>
 			<div id=fossilDiv style="display:none">
 				<h5>Fossil</h5>
 				<div class="chunk">
-					<label class="tooltip" for="dieselGenCost">Diesel Gen Cost<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="dieselGenCost">Diesel Gen Cost ($/kW)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="dieselGenCost" value="500" />
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="dieselMax">Diesel Max<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="dieselMax">Diesel Max (kW)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="dieselMax" value="1000000" />
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="fuelAvailable">Fuel Available<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="fuelAvailable">Fuel Available (Gal)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="fuelAvailable" value="50000" />
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="genExisting">Gen Existing<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="genExisting">Gen Existing (kW)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="genExisting" value="0" />
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="minGenLoading">Min Gen Loading<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="minGenLoading">Min Gen Loading (% as decimal)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="minGenLoading" value="0.3" />
 				</div>
 			</div>
 			<div id="windDiv" style="display:none">
 				<h5>Wind</h5>
 				<div class="chunk">
-					<label class="tooltip" for="windCost">Wind Cost<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="windCost">Wind Cost ($/kW)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="windCost" value="4989" />
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="windExisting">Wind Existing<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="windExisting">Wind Existing (kW)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="windExisting" value="0" />
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="windMax">Wind Max<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="windMax">Wind Max (kW)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="windMax" value="100000" />
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="windMin">Wind Min<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+					<label class="tooltip" for="windMin">Wind Min (kW)<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 					<input type="text" name="windMin" value="0" />
 				</div>
 			</div>
 
 			<br>
-			<input type="submit" value="Run model" />
-		</div>	
+			<input id="submitEverything" type="submit" value="Run model" />
+		</form>	
 	</div>	
 
 	<script type="text/javascript">
-		var stepTwoComplete = false;
+		var stepOneComplete = false;
 
         // Enable technology checkboxes.
         $('[name="battery"]').change(function() {
@@ -554,7 +556,7 @@
         	}
         });
         // Close dialog and add non-substation element.
-        $('#dialog button[type="submit"]').on('click', function() {
+        $('#dialog button[type="button"]').on('click', function() {
         	window.dialog.close()
         	let parentName = $('#dialog select').val();
         	let type = $('#dialogText').attr('class').split(' ')[0];
@@ -586,7 +588,7 @@
         			contentType:'application/json',
         			data:json,
         			success: function(data) {
-        				stepTwoComplete = true;
+        				stepOneComplete = true;
         			    const loads = JSON.parse(data);
         			    $('#critLoads').empty();
         			    $('#critLoads').append('<p>Please select all critical loads:</p>')
@@ -620,7 +622,7 @@
                     cache: false,
                     processData: false,
                     success: function(data) {
-                    	stepTwoComplete = true;
+                    	stepOneComplete = true;
                         const loads = JSON.parse(data);
                         $('#critLoads').empty();
                         $('#critLoads').append('<p>Please select all critical loads:</p>')
@@ -644,7 +646,7 @@
 
         // Manual partitioning dynamic dropdown creation. 
         $('#makeDropdowns').on('click', function() {
-        	if (stepTwoComplete === false) {
+        	if (stepOneComplete === false) {
         		alert('Please complete step 2.')
         		return
         	}
@@ -678,7 +680,7 @@
 	  	// Grab partitioning preview.
 		$(function() {
 	  		$('#previewPartitions').click(function() {
-	  			if (stepTwoComplete === false) {
+	  			if (stepOneComplete === false) {
 	  				alert('Please complete step 2.')
 	  				return
 	  			}

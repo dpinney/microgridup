@@ -28,11 +28,12 @@ def newGui():
 def jsonToDss():
 	# Convert to DSS and return loads.
 	elements = request.get_json()
+	print('elements',elements)
 	dssString = 'clear \nset defaultbasefrequency=60 \n'
 	for ob in elements:
 		obType = ob['class']
 		obName = ob['text']
-		if obType == 'sub':
+		if obType == 'substation':
 			dssString += f'new object=vsource.{obName.replace(" ","")} basekv=4.16 pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001 \n'
 		elif obType == 'feeder':
 			dssString += f'new object=transformer.{obName.replace(" ","")} phases=3 windings=2 xhl=2 conns=[wye,wye] kvs=[4.16,0.480] kvas=[500,500] %rs=[0.55,0.55] xht=1 xlt=1 \n'
@@ -107,6 +108,57 @@ def previewPartitions():
 	pic_IObytes.seek(0)
 	pic_hash = base64.b64encode(pic_IObytes.read())
 	return pic_hash
+
+
+@app.route('/run', methods=["POST"])
+def run():
+	print('request.form',request.form)
+	print('request.form.to_dict()',request.form.to_dict())
+	# return
+	model_dir = request.form['MODEL_DIR']
+	if 'BASE_DSS_NAME' in request.form and 'LOAD_CSV_NAME' in flask.request.form:
+		# editing an existing model
+		dss_path = f'{_myDir}/{model_dir}/circuit.dss'
+		csv_path = f'{_myDir}/{model_dir}/loads.csv'
+		all_files = 'Using Existing Files'
+	else:
+		# new files uploaded
+		all_files = request.files
+		# Save the files.
+		if not os.path.isdir(f'{_myDir}/uploads'):
+			os.mkdir(f'{_myDir}/uploads')
+		dss_file = all_files['BASE_DSS']
+		dss_file.save(f'{_myDir}/uploads/BASE_DSS_{model_dir}')
+		csv_file = all_files['LOAD_CSV']
+		csv_file.save(f'{_myDir}/uploads/LOAD_CSV_{model_dir}')
+		dss_path = f'{_myDir}/uploads/BASE_DSS_{model_dir}'
+		csv_path = f'{_myDir}/uploads/LOAD_CSV_{model_dir}'
+	# Handle arguments to our main function.
+	crit_loads = request.form['CRITICAL_LOADS'].split(',')
+	mg_method = request.form['MG_DEF_METHOD']
+	if mg_method == 'manual':
+		microgrids = json.loads(flask.request.form['MICROGRIDS'])
+	elif mg_method == 'lukes':
+		microgrids = microgridup_gen_mgs.mg_group(dss_path, crit_loads, 'lukes')
+	elif mg_method == 'branch':
+		microgrids = microgridup_gen_mgs.mg_group(dss_path, crit_loads, 'branch')
+	mgu_args = [
+		flask.request.form['MODEL_DIR'],
+		dss_path,
+		csv_path,
+		float(request.form['QSTS_STEPS']),
+		float(request.form['FOSSIL_BACKUP_PERCENT']),
+		json.loads(request.form['REOPT_INPUTS']),
+		microgrids,
+		request.form['FAULTED_LINE']
+	]
+	# Kickoff the run
+	new_proc = multiprocessing.Process(target=microgridup.full, args=mgu_args)
+	new_proc.start()
+	# Redirect to home after waiting a little for the file creation to happen.
+	time.sleep(3)
+	return redirect(f'/')
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

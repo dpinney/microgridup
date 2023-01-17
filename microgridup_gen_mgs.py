@@ -267,7 +267,7 @@ def get_edge_name(fr, to, omd_list):
 	edges = [ob.get('name') for ob in omd_list if ob.get('from') == fr and ob.get('to') == to]
 	return None if len(edges) == 0 else edges[0]
 
-def mg_group(circ_path, crit_loads, algo, algo_params={}):
+def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 	'''Generate a group of mgs from circ_path with crit_loads
 	algo must be one of ["lukes", "branch", "bottomUp", "criticalLoads"]
 	lukes algo params is 'size':int giving size of each mg.

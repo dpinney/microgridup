@@ -1,16 +1,19 @@
+import multiprocessing
 import os
 from pprint import pprint as pp
+import time
 import networkx as nx
-import pygraphviz
+import microgridup
 from matplotlib import pyplot as plt
 import base64
 import io 
 import json
-from flask import Flask, flash, request, redirect, url_for, render_template
+from flask import Flask, flash, request, redirect, render_template, jsonify
 from werkzeug.utils import secure_filename
 from omf.solvers.opendss import dssConvert
-from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch
+from microgridup_gen_mgs import mg_group, nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch
 _myDir = os.path.abspath(os.path.dirname(__file__))
+print('_myDir',_myDir)
 
 UPLOAD_FOLDER = _myDir
 ALLOWED_EXTENSIONS = {'dss'}
@@ -55,24 +58,25 @@ def jsonToDss():
 
 @app.route('/uploadajax', methods = ['GET','POST'])
 def upload_file():
-    if request.method == 'POST':
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
-        file = request.files['file']
-        # If the user does not select a file, the browser submits an empty file without a filename.
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            print(filename)
-            loads = getLoads(file.filename)
-            print('dumps',json.dumps(loads))
-            return json.dumps(loads)
-    return ''
+	if request.method == 'POST':
+		# check if the post request has the file part
+		if 'file' not in request.files:
+			flash('No file part')
+			return redirect(request.url)
+		file = request.files['file']
+		# If the user does not select a file, the browser submits an empty file without a filename.
+		if file.filename == '':
+			flash('No selected file')
+			return redirect(request.url)
+		if file and allowed_file(file.filename):
+			filename = secure_filename(file.filename)
+			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+			print('filename',filename)
+			loads = getLoads(file.filename)
+			print('dumps',json.dumps(loads))
+			print('jsonify(loads=loads, filename=filename)',jsonify(loads=loads, filename=file.filename))
+			return jsonify(loads=loads, filename=filename)
+	return ''
 
 @app.route('/previewPartitions', methods = ['GET','POST'])
 def previewPartitions():
@@ -109,14 +113,13 @@ def previewPartitions():
 	pic_hash = base64.b64encode(pic_IObytes.read())
 	return pic_hash
 
-
 @app.route('/run', methods=["POST"])
 def run():
-	print('request.form',request.form)
+	print('request.files',request.files)
 	print('request.form.to_dict()',request.form.to_dict())
-	# return
 	model_dir = request.form['MODEL_DIR']
-	if 'BASE_DSS_NAME' in request.form and 'LOAD_CSV_NAME' in flask.request.form:
+	if 'BASE_DSS_NAME' in request.form and 'LOAD_CSV_NAME' in request.form:
+		print('we are editing an existing model')
 		# editing an existing model
 		dss_path = f'{_myDir}/{model_dir}/circuit.dss'
 		csv_path = f'{_myDir}/{model_dir}/loads.csv'
@@ -127,28 +130,100 @@ def run():
 		# Save the files.
 		if not os.path.isdir(f'{_myDir}/uploads'):
 			os.mkdir(f'{_myDir}/uploads')
+		# Note: Uploaded circuit stored separately.
+		'''
 		dss_file = all_files['BASE_DSS']
 		dss_file.save(f'{_myDir}/uploads/BASE_DSS_{model_dir}')
+		'''
 		csv_file = all_files['LOAD_CSV']
 		csv_file.save(f'{_myDir}/uploads/LOAD_CSV_{model_dir}')
 		dss_path = f'{_myDir}/uploads/BASE_DSS_{model_dir}'
 		csv_path = f'{_myDir}/uploads/LOAD_CSV_{model_dir}'
 	# Handle arguments to our main function.
-	crit_loads = request.form['CRITICAL_LOADS'].split(',')
+	crit_loads = json.loads(request.form['CRITICAL_LOADS'])
 	mg_method = request.form['MG_DEF_METHOD']
 	if mg_method == 'manual':
-		microgrids = json.loads(flask.request.form['MICROGRIDS'])
+		microgrids = json.loads(request.form['MICROGRIDS'])
 	elif mg_method == 'lukes':
-		microgrids = microgridup_gen_mgs.mg_group(dss_path, crit_loads, 'lukes')
+		microgrids = mg_group(dss_path, crit_loads, 'lukes')
 	elif mg_method == 'branch':
-		microgrids = microgridup_gen_mgs.mg_group(dss_path, crit_loads, 'branch')
+		microgrids = mg_group(dss_path, crit_loads, 'branch')
+	elif mg_method == 'bottomUp':
+		microgrids = mg_group(dss_path, crit_loads, 'bottomUp')
+	elif mg_method == 'criticalLoads':
+		microgrids = mg_group(dss_path, crit_loads, 'criticalLoads')
+	# Form REOPT_INPUTS. TODO: Handle uploaded CSVs for HISTORICAL_OUTAGES and criticalLoadShapeFile.
+	REOPT_INPUTS = {
+		'latitude':request.form['latitude'],
+		'longitude':request.form['longitude'],
+		'energyCost':request.form['energyCost'],
+		'wholesaleCost':request.form['wholesaleCost'],
+		'demandCost':request.form['demandCost'],
+		'solarCanCurtail':request.form['solarCanCurtail'],
+		'solarCanExport':request.form['solarCanExport'],
+		'urdbLabelSwitch':request.form['urdbLabelSwitch'],
+		'urdbLabel':request.form['urdbLabel'],
+		'criticalLoadFactor':request.form['criticalLoadFactor'],
+		'year':request.form['year'],
+		'analysisYears':request.form['analysisYears'],
+		'outageDuration':request.form['outageDuration'],
+		'DIESEL_SAFETY_FACTOR':request.form['DIESEL_SAFETY_FACTOR'],
+		'outage_start_hour':request.form['outage_start_hour'],
+		'userCriticalLoadShape':request.form['userCriticalLoadShape'],
+		'value_of_lost_load':request.form['value_of_lost_load'],
+		'omCostEscalator':request.form['omCostEscalator'],
+		'discountRate':request.form['discountRate'],
+
+		'solar':request.form['solar'],
+		'battery':request.form['battery'],
+		'fossil':request.form['fossil'],
+		'wind':request.form['wind'],
+		'solarCost':request.form['solarCost'],
+		'solarExisting':request.form['solarExisting'],
+		'solarMax':request.form['solarMax'],
+		'solarMin':request.form['solarMin'],
+		'solarMacrsOptionYears':request.form['solarMacrsOptionYears'],
+		'solarItcPercent':request.form['solarItcPercent'],
+		'batteryCapacityCost':request.form['batteryCapacityCost'],
+		'batteryCapacityMax':request.form['batteryCapacityMax'],
+		'batteryCapacityMin':request.form['batteryCapacityMin'],
+		'batteryKwhExisting':request.form['batteryKwhExisting'],
+		'batteryPowerCost':request.form['batteryPowerCost'],
+		'batteryPowerMax':request.form['batteryPowerMax'],
+		'batteryKwExisting':request.form['batteryKwExisting'],
+		'batteryMacrsOptionYears':request.form['batteryMacrsOptionYears'],
+		'batteryItcPercent':request.form['batteryItcPercent'],
+		'batteryPowerCostReplace':request.form['batteryPowerCostReplace'],
+		'batteryCapacityCostReplace':request.form['batteryCapacityCostReplace'],
+		'batteryPowerReplaceYear':request.form['batteryPowerReplaceYear'],
+		'batteryCapacityReplaceYear':request.form['batteryCapacityReplaceYear'],
+		'dieselGenCost':request.form['dieselGenCost'],
+		'dieselMax':request.form['dieselMax'],
+		'dieselMin':request.form['dieselMin'],
+		'fuelAvailable':request.form['fuelAvailable'],
+		'genExisting':request.form['genExisting'],
+		'minGenLoading':request.form['minGenLoading'],
+		'dieselFuelCostGal':request.form['dieselFuelCostGal'],
+		'dieselCO2Factor':request.form['dieselCO2Factor'],
+		'dieselOMCostKw':request.form['dieselOMCostKw'],
+		'dieselOMCostKwh':request.form['dieselOMCostKwh'],
+		'dieselOnlyRunsDuringOutage':request.form['dieselOnlyRunsDuringOutage'],
+		'dieselMacrsOptionYears':request.form['dieselMacrsOptionYears'],
+		'windCost':request.form['windCost'],
+		'windExisting':request.form['windExisting'],
+		'windMax':request.form['windMax'],
+		'windMin':request.form['windMin'],
+		'windMacrsOptionYears':request.form['windMacrsOptionYears'],
+		'windItcPercent':request.form['windItcPercent'],
+	}
+	print('REOPT_INPUTS',REOPT_INPUTS)
 	mgu_args = [
-		flask.request.form['MODEL_DIR'],
+		request.form['MODEL_DIR'],
 		dss_path,
 		csv_path,
 		float(request.form['QSTS_STEPS']),
 		float(request.form['FOSSIL_BACKUP_PERCENT']),
-		json.loads(request.form['REOPT_INPUTS']),
+		REOPT_INPUTS,
 		microgrids,
 		request.form['FAULTED_LINE']
 	]

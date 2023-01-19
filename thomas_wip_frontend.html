@@ -724,15 +724,23 @@
         		});
         		json = JSON.stringify(list, null, "  ");
         		console.log(json)
+
+				// TODO: Add MODEL_DIR to json.
+				const form_data = new FormData();
+				form_data.append('json',json);
+				var model_dir = $('input[name="MODEL_DIR"]').val()
+				form_data.append('MODEL_DIR',model_dir)
+
         		// Next, make AJAX POST to backend. 
         		$.ajax({
         			url:'/jsonToDss',
         			type:'POST',
-        			contentType:'application/json',
-        			data:json,
+        			contentType: false,
+        			data: form_data,
+					processData : false,
         			success: function(data) {
         				introInfoComplete = true;
-        			    const loads = JSON.parse(data);
+        			    const loads = data.loads;
         			    $('#critLoads').empty();
         			    $('#critLoads').append('<p>Please select all critical loads:</p>')
         			    $('#dropDowns').empty();
@@ -749,7 +757,7 @@
         			    	$('#criticalLoadsSelect').append('<p>No loads to select from.</p>')
         			    }
 						// Set filename.
-						filename = 'creation.dss'
+						filename = data.filename;
         			}
         		});
         	})
@@ -759,9 +767,11 @@
         $(function() {
             $('#upload-file-btn').click(function() {
                 var form_data = new FormData($('#upload-file')[0]);
+				var model_dir = $('input[name="MODEL_DIR"]').val()
+				form_data.append('MODEL_DIR',model_dir)
                 $.ajax({
                     type: 'POST',
-                    url: '/uploadajax',
+                    url: '/uploadDss',
                     data: form_data,
                     contentType: false,
                     cache: false,
@@ -787,9 +797,7 @@
 						
 						// Set filename.
 						filename = data.filename;
-						console.log('We uploaded a circuit and here is the filename.');
-						console.log(filename);
-                    }
+					}
                 });
             });
         });
@@ -900,7 +908,12 @@
 						form1.append(pair[0], pair[1]);
 					}
 				// Append BASE_DSS as either uploaded file or creation.dss.
-				form1.append('BASE_DSS', filename);
+				// form1.append('BASE_DSS', filename);
+				var fileStringArray = [ filename ];
+				var fileName = filename;
+				var blobAttrs = { type: 'application/octet-stream' };
+				var file = new File(fileStringArray, fileName, blobAttrs);
+				form1.append('BASE_DSS', file, file.name);
 				// Append CRITICAL_LOADS.
 				critLoads = new Array();
 	  			$('#criticalLoadsSelect label').each(function() {

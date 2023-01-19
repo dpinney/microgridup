@@ -13,7 +13,6 @@ from werkzeug.utils import secure_filename
 from omf.solvers.opendss import dssConvert
 from microgridup_gen_mgs import mg_group, nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch
 _myDir = os.path.abspath(os.path.dirname(__file__))
-print('_myDir',_myDir)
 
 UPLOAD_FOLDER = _myDir
 ALLOWED_EXTENSIONS = {'dss'}
@@ -29,9 +28,9 @@ def newGui():
 
 @app.route('/jsonToDss', methods=['GET','POST'])
 def jsonToDss():
+	model_dir = request.form['MODEL_DIR']
 	# Convert to DSS and return loads.
-	elements = request.get_json()
-	print('elements',elements)
+	elements = json.loads(request.form['json'])
 	dssString = 'clear \nset defaultbasefrequency=60 \n'
 	for ob in elements:
 		obType = ob['class']
@@ -51,15 +50,19 @@ def jsonToDss():
 		elif obType == 'diesel':
 			dssString += f'new object=generator.{obName.replace(" ","")} phases=1 kw=81 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 \n'	
 	dssString += 'set voltagebases=[115,4.16,0.48]\ncalcvoltagebases'
-	with open("creation.dss", "w") as outFile:
+	if not os.path.isdir(f'{_myDir}/uploads'):
+		os.mkdir(f'{_myDir}/uploads')
+	# file.save(f'{_myDir}/uploads/BASE_DSS_{model_dir}')
+	with open(f'{_myDir}/uploads/BASE_DSS_{model_dir}', "w") as outFile:
 		outFile.writelines(dssString)
-	loads = getLoads('creation.dss')
-	return json.dumps(loads)
+	loads = getLoads(f'{_myDir}/uploads/BASE_DSS_{model_dir}')
+	return jsonify(loads=loads, filename=f'{_myDir}/uploads/BASE_DSS_{model_dir}')
 
-@app.route('/uploadajax', methods = ['GET','POST'])
-def upload_file():
+@app.route('/uploadDss', methods = ['GET','POST'])
+def uploadDss():
 	if request.method == 'POST':
 		# check if the post request has the file part
+		model_dir = request.form['MODEL_DIR']
 		if 'file' not in request.files:
 			flash('No file part')
 			return redirect(request.url)
@@ -70,12 +73,12 @@ def upload_file():
 			return redirect(request.url)
 		if file and allowed_file(file.filename):
 			filename = secure_filename(file.filename)
-			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-			print('filename',filename)
+			# file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+			if not os.path.isdir(f'{_myDir}/uploads'):
+				os.mkdir(f'{_myDir}/uploads')
+			file.save(f'{_myDir}/uploads/BASE_DSS_{model_dir}')
 			loads = getLoads(file.filename)
-			print('dumps',json.dumps(loads))
-			print('jsonify(loads=loads, filename=filename)',jsonify(loads=loads, filename=file.filename))
-			return jsonify(loads=loads, filename=filename)
+			return jsonify(loads=loads, filename=f'{_myDir}/uploads/BASE_DSS_{model_dir}')
 	return ''
 
 @app.route('/previewPartitions', methods = ['GET','POST'])
@@ -115,8 +118,6 @@ def previewPartitions():
 
 @app.route('/run', methods=["POST"])
 def run():
-	print('request.files',request.files)
-	print('request.form.to_dict()',request.form.to_dict())
 	model_dir = request.form['MODEL_DIR']
 	if 'BASE_DSS_NAME' in request.form and 'LOAD_CSV_NAME' in request.form:
 		print('we are editing an existing model')
@@ -127,14 +128,13 @@ def run():
 	else:
 		# new files uploaded
 		all_files = request.files
+		print('all_files',all_files)
 		# Save the files.
 		if not os.path.isdir(f'{_myDir}/uploads'):
 			os.mkdir(f'{_myDir}/uploads')
 		# Note: Uploaded circuit stored separately.
-		'''
-		dss_file = all_files['BASE_DSS']
-		dss_file.save(f'{_myDir}/uploads/BASE_DSS_{model_dir}')
-		'''
+		# dss_file = all_files['BASE_DSS']
+		# dss_file.save(f'{_myDir}/uploads/BASE_DSS_{model_dir}')
 		csv_file = all_files['LOAD_CSV']
 		csv_file.save(f'{_myDir}/uploads/LOAD_CSV_{model_dir}')
 		dss_path = f'{_myDir}/uploads/BASE_DSS_{model_dir}'
@@ -152,7 +152,7 @@ def run():
 		microgrids = mg_group(dss_path, crit_loads, 'bottomUp')
 	elif mg_method == 'criticalLoads':
 		microgrids = mg_group(dss_path, crit_loads, 'criticalLoads')
-	# Form REOPT_INPUTS. TODO: Handle uploaded CSVs for HISTORICAL_OUTAGES and criticalLoadShapeFile.
+	# Form REOPT_INPUTS. TODO: Handle uploaded CSVs for HISTORICAL_OUTAGES and criticalLoadShapeFile. Put both in models folder.    
 	REOPT_INPUTS = {
 		'latitude':request.form['latitude'],
 		'longitude':request.form['longitude'],
@@ -216,7 +216,6 @@ def run():
 		'windMacrsOptionYears':request.form['windMacrsOptionYears'],
 		'windItcPercent':request.form['windItcPercent'],
 	}
-	print('REOPT_INPUTS',REOPT_INPUTS)
 	mgu_args = [
 		request.form['MODEL_DIR'],
 		dss_path,
@@ -256,10 +255,8 @@ def nice_pos(G):
 	return nx.drawing.nx_agraph.graphviz_layout(G, prog="twopi", args="")
 
 def getLoads(path):
-	print('path',path)
 	tree = dssConvert.dssToTree(path)
 	loads = [obj.get('object','').split('.')[1] for obj in tree if 'load.' in obj.get('object','')]
-	print('loads',loads)
 	return loads
 
 if __name__ == "__main__":

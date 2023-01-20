@@ -14,11 +14,9 @@ from omf.solvers.opendss import dssConvert
 from microgridup_gen_mgs import mg_group, nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch
 _myDir = os.path.abspath(os.path.dirname(__file__))
 
-UPLOAD_FOLDER = _myDir
 ALLOWED_EXTENSIONS = {'dss'}
 
 app = Flask(__name__, static_folder='', template_folder='') #TODO: we cannot make these folders the root.
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/')
 def newGui():
@@ -52,7 +50,6 @@ def jsonToDss():
 	dssString += 'set voltagebases=[115,4.16,0.48]\ncalcvoltagebases'
 	if not os.path.isdir(f'{_myDir}/uploads'):
 		os.mkdir(f'{_myDir}/uploads')
-	# file.save(f'{_myDir}/uploads/BASE_DSS_{model_dir}')
 	with open(f'{_myDir}/uploads/BASE_DSS_{model_dir}', "w") as outFile:
 		outFile.writelines(dssString)
 	loads = getLoads(f'{_myDir}/uploads/BASE_DSS_{model_dir}')
@@ -73,7 +70,6 @@ def uploadDss():
 			return redirect(request.url)
 		if file and allowed_file(file.filename):
 			filename = secure_filename(file.filename)
-			# file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 			if not os.path.isdir(f'{_myDir}/uploads'):
 				os.mkdir(f'{_myDir}/uploads')
 			file.save(f'{_myDir}/uploads/BASE_DSS_{model_dir}')
@@ -126,7 +122,7 @@ def run():
 		csv_path = f'{_myDir}/{model_dir}/loads.csv'
 		all_files = 'Using Existing Files'
 	else:
-		# new files uploaded
+		# new files uploaded. 
 		all_files = request.files
 		print('all_files',all_files)
 		# Save the files.
@@ -139,6 +135,13 @@ def run():
 		csv_file.save(f'{_myDir}/uploads/LOAD_CSV_{model_dir}')
 		dss_path = f'{_myDir}/uploads/BASE_DSS_{model_dir}'
 		csv_path = f'{_myDir}/uploads/LOAD_CSV_{model_dir}'
+		# Handle uploaded CSVs for HISTORICAL_OUTAGES and criticalLoadShapeFile. Put both in models folder.    
+		HISTORICAL_OUTAGES = all_files['HISTORICAL_OUTAGES']
+		HISTORICAL_OUTAGES.save(f'{_myDir}/HISTORICAL_OUTAGES_{model_dir}')
+		HISTORICAL_OUTAGES_path = f'{_myDir}/HISTORICAL_OUTAGES_{model_dir}'
+		criticalLoadShapeFile = all_files['criticalLoadShapeFile']
+		criticalLoadShapeFile.save(f'{_myDir}/criticalLoadShapeFile_{model_dir}')
+		criticalLoadShapeFile_path = f'{_myDir}/criticalLoadShapeFile_{model_dir}'
 	# Handle arguments to our main function.
 	crit_loads = json.loads(request.form['CRITICAL_LOADS'])
 	mg_method = request.form['MG_DEF_METHOD']
@@ -152,7 +155,7 @@ def run():
 		microgrids = mg_group(dss_path, crit_loads, 'bottomUp')
 	elif mg_method == 'criticalLoads':
 		microgrids = mg_group(dss_path, crit_loads, 'criticalLoads')
-	# Form REOPT_INPUTS. TODO: Handle uploaded CSVs for HISTORICAL_OUTAGES and criticalLoadShapeFile. Put both in models folder.    
+	# Form REOPT_INPUTS. 
 	REOPT_INPUTS = {
 		'latitude':request.form['latitude'],
 		'longitude':request.form['longitude'],

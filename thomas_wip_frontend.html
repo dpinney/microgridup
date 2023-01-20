@@ -212,7 +212,7 @@
 			{% else %}
 			<div class="chunk">
 				<label class="tooltip" for="LOAD_CSV">Load Data (.csv)<span class="classic">Please enter the name of a .csv file representing the hourly load shape.</span></label>
-				<input type="file" name="LOAD_CSV" />
+				<input type="file" name="LOAD_CSV" id="LOAD_CSV"/>
 			</div>
 			{% endif %}
 			<div class="chunk">
@@ -600,7 +600,7 @@
 	</div>	
 
 	<script type="text/javascript">
-		var introInfoComplete = false;
+		var circuitIsSpecified = false;
 		var filename = '';
 
         // Enable technology checkboxes.
@@ -712,6 +712,11 @@
         // Create DSS from manually built circuit. Get loads.
         $(function() {
         	$('#toDss').click(function() {
+				// Do not proceed if model has no name.
+				if ($('input[name="MODEL_DIR"]').val() === '') {
+					alert('Please specify a model name.')
+					return 
+				}
         		// First, convert to list. Then, convert to JSON.
         		var list = [];
         		$('#elements li').each(function(idx, item){
@@ -739,7 +744,7 @@
         			data: form_data,
 					processData : false,
         			success: function(data) {
-        				introInfoComplete = true;
+        				circuitIsSpecified = true;
         			    const loads = data.loads;
         			    $('#critLoads').empty();
         			    $('#critLoads').append('<p>Please select all critical loads:</p>')
@@ -758,6 +763,8 @@
         			    }
 						// Set filename.
 						filename = data.filename;
+						// Make directory uneditable. 
+						$('input[name="MODEL_DIR"]').prop("disabled", true);						
         			}
         		});
         	})
@@ -766,6 +773,11 @@
         // Upload DSS circuit. Get loads.
         $(function() {
             $('#upload-file-btn').click(function() {
+				// Do not proceed if model has no name.
+				if ($('input[name="MODEL_DIR"]').val() === '') {
+					alert('Please specify a model name.')
+					return 
+				}
                 var form_data = new FormData($('#upload-file')[0]);
 				var model_dir = $('input[name="MODEL_DIR"]').val()
 				form_data.append('MODEL_DIR',model_dir)
@@ -777,7 +789,7 @@
                     cache: false,
                     processData: false,
                     success: function(data) {
-                    	introInfoComplete = true;
+                    	circuitIsSpecified = true;
                         const loads = data.loads;
                         $('#critLoads').empty();
                         $('#critLoads').append('<p>Please select all critical loads:</p>')
@@ -797,6 +809,8 @@
 						
 						// Set filename.
 						filename = data.filename;
+						// Make directory uneditable. 
+						$('input[name="MODEL_DIR"]').prop("disabled", true);
 					}
                 });
             });
@@ -804,7 +818,7 @@
 
         // Manual partitioning dynamic dropdown creation. 
         $('#makeDropdowns').on('click', function() {
-        	if (introInfoComplete === false) {
+        	if (circuitIsSpecified === false) {
         		alert('Please complete step 2.')
         		return
         	}
@@ -838,7 +852,7 @@
 	  	// Grab partitioning preview.
 		$(function() {
 	  		$('#previewPartitions').click(function() {
-	  			if (introInfoComplete === false) {
+	  			if (circuitIsSpecified === false) {
 	  				alert('Please complete step 2.')
 	  				return
 	  			}
@@ -902,6 +916,21 @@
 		// Submit everything. 
 		$(function() {
 	  		$('#submitEverything').click(function() {
+				// Do not proceed if no circuit is specified.
+				if (filename === '') {
+					alert('Please specify a circuit.')
+					return 
+				}
+				// Do not proceed if no loads are specified.
+				if ($('#LOAD_CSV')[0].files.length === 0) {
+					alert('Please specify load data.')
+					return 
+				}
+				// Do not proceed if no partition method is specified.
+				if ($( "#partitionMethod option:selected" ).val() === '') {
+					alert('Please specify a partitioning method.')
+					return 
+				}
 				var form1 = new FormData(document.getElementById("modelInfoForm"));
       			var form2 = new FormData(document.getElementById("techParamForm"));
 				for (var pair of form2.entries()) {

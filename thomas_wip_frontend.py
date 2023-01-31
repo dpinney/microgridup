@@ -1,5 +1,7 @@
 import multiprocessing
 import os
+import shutil
+import platform
 from pprint import pprint as pp
 import time
 import networkx as nx
@@ -12,17 +14,58 @@ from flask import Flask, flash, request, redirect, render_template, jsonify
 from werkzeug.utils import secure_filename
 from omf.solvers.opendss import dssConvert
 from microgridup_gen_mgs import mg_group, nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch
+
 _myDir = os.path.abspath(os.path.dirname(__file__))
 
 ALLOWED_EXTENSIONS = {'dss'}
 
 app = Flask(__name__, static_folder='', template_folder='') #TODO: we cannot make these folders the root.
 
+def list_analyses():
+	return [x for x in os.listdir(_myDir) if os.path.isdir(x) and os.path.isfile(f'{x}/circuit.dss')] #TODO: fix this gross hack.
+
 @app.route('/')
+def home():
+	analyses = list_analyses()
+	return render_template('template_home.html', analyses=analyses)
+
+@app.route('/load/<analysis>')
+def load(analysis):
+	ana_files = os.listdir(analysis)
+	if '0crashed.txt' in ana_files:
+		return 'Model Crashed. Please delete and recreate.'
+	elif '0running.txt' in ana_files:
+		return 'Model Running. Please reload to check for completion.'
+	elif 'output_final.html' in ana_files:
+		return redirect(f'/{analysis}/output_final.html')
+	else:
+		return 'Model is in an inconsistent state. Please delete and recreate.'
+
+@app.route('/edit/<analysis>')
+def edit(analysis):
+	try:
+		with open(f'{_myDir}/{analysis}/allInputData.json') as in_data_file:
+			in_data = json.load(in_data_file)
+	except:
+		in_data = None
+	return render_template('thomas_wip_frontend.html', in_data=in_data)
+
+@app.route('/new')
 def newGui():
 	with open(f'{_myDir}/lehigh_3mg_inputs.json') as default_in_file:
 		default_in = json.load(default_in_file)
 	return render_template('thomas_wip_frontend.html', in_data=default_in)
+
+@app.route('/duplicate', methods=["POST"])
+def duplicate():
+	analysis = request.json.get('analysis', None)
+	new_name = request.json.get('new_name', None)
+	analyses = list_analyses()
+	if (analysis not in analyses) or (new_name in analyses):
+		return 'Duplication failed. Analysis does not exist or the new name is invalid.'
+	else:
+		shutil.copytree(analysis, new_name)
+		return f'Successfully duplicated {analysis} as {new_name}.'
 
 @app.route('/jsonToDss', methods=['GET','POST'])
 def jsonToDss():
@@ -114,6 +157,7 @@ def previewPartitions():
 
 @app.route('/run', methods=["POST"])
 def run():
+	print('request.form',request.form)
 	model_dir = request.form['MODEL_DIR']
 	if 'BASE_DSS_NAME' in request.form and 'LOAD_CSV_NAME' in request.form:
 		print('we are editing an existing model')
@@ -146,7 +190,8 @@ def run():
 	crit_loads = json.loads(request.form['CRITICAL_LOADS'])
 	mg_method = request.form['MG_DEF_METHOD']
 	if mg_method == 'manual':
-		microgrids = json.loads(request.form['MICROGRIDS'])
+		pairings = json.loads(request.form['MICROGRIDS'])
+		microgrids = mg_group(dss_path, crit_loads, 'manual', pairings)	
 	elif mg_method == 'lukes':
 		microgrids = mg_group(dss_path, crit_loads, 'lukes')
 	elif mg_method == 'branch':
@@ -262,5 +307,11 @@ def getLoads(path):
 	loads = [obj.get('object','').split('.')[1] for obj in tree if 'load.' in obj.get('object','')]
 	return loads
 
+# if __name__ == "__main__":
+# 	app.run(debug=True)
+
 if __name__ == "__main__":
-	app.run(debug=True)
+	if platform.system() == "Darwin":  # MacOS
+		os.environ['NO_PROXY'] = '*' # Workaround for macOS proxy behavior
+		multiprocessing.set_start_method('forkserver') # Workaround for Catalina exec/fork behavior
+	app.run(debug=True, host="0.0.0.0")

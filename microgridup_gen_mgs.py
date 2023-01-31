@@ -173,6 +173,7 @@ def nx_group_branch(G, i_branch=0):
 	first_branch = bbl[i_branch][0]
 	succs = list(G.successors(first_branch))
 	parts = [list(nx.algorithms.traversal.depth_first_search.dfs_tree(G, x).nodes()) for x in succs]
+	print('branch parts',parts)
 	return parts
 
 def nx_group_lukes(G, size, node_weight=None, edge_weight=None):
@@ -267,6 +268,16 @@ def get_edge_name(fr, to, omd_list):
 	edges = [ob.get('name') for ob in omd_list if ob.get('from') == fr and ob.get('to') == to]
 	return None if len(edges) == 0 else edges[0]
 
+def manual_groups(pairings):
+	'Reformat partitions to be compatible with MG_GROUPS.'
+	dd = defaultdict(list)
+	for pair in pairings:
+		dd[pair[0]].append(pair[1])
+	parts = []
+	for mg in dd:
+		parts.append(dd[mg])
+	return parts
+
 def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 	'''Generate a group of mgs from circ_path with crit_loads
 	algo must be one of ["lukes", "branch", "bottomUp", "criticalLoads"]
@@ -277,7 +288,7 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 	# print(list(G.edges()))
 	omd = opendss.dssConvert.dssToOmd(circ_path, None, write_out=False)
 	omd_list = list(omd.values())
-	print('omd_list',omd_list)
+	# print('omd_list',omd_list)
 	# Generate microgrids
 	if algo == 'lukes':
 		default_size = int(len(G.nodes())/3)
@@ -288,6 +299,8 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 		MG_GROUPS = nx_bottom_up_branch(G, num_mgs=5, large_or_small='large')
 	elif algo == 'criticalLoads':
 		MG_GROUPS = nx_critical_load_branch(G, CRITICAL_LOADS, num_mgs=3, large_or_small='large')
+	elif algo == 'manual':
+		MG_GROUPS = manual_groups(algo_params)
 	else:
 		print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", or "criticalLoads". No mgs generated.')
 		return {}

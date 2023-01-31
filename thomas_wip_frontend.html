@@ -730,7 +730,7 @@
         		json = JSON.stringify(list, null, "  ");
         		console.log(json)
 
-				// TODO: Add MODEL_DIR to json.
+				// Add MODEL_DIR to json.
 				const form_data = new FormData();
 				form_data.append('json',json);
 				var model_dir = $('input[name="MODEL_DIR"]').val()
@@ -764,7 +764,7 @@
 						// Set filename.
 						filename = data.filename;
 						// Make directory uneditable. 
-						$('input[name="MODEL_DIR"]').prop("disabled", true);						
+						$('input[name="MODEL_DIR"]').prop("readonly", true);						
         			}
         		});
         	})
@@ -810,14 +810,14 @@
 						// Set filename.
 						filename = data.filename;
 						// Make directory uneditable. 
-						$('input[name="MODEL_DIR"]').prop("disabled", true);
+						$('input[name="MODEL_DIR"]').prop("readonly", true);
 					}
                 });
             });
         });
 
         // Manual partitioning dynamic dropdown creation. 
-        $('#makeDropdowns').on('click', function() {
+        $('#makeDropdowns').on('click keypress', function() {
         	if (circuitIsSpecified === false) {
         		alert('Please complete step 2.')
         		return
@@ -835,6 +835,13 @@
         	});
         	$('#dropDowns').show();
         })
+		// Also call above function if user presses enter.
+		$('#mgQuantity').keypress(function(e){
+    		if (e.which === 13) {
+				e.preventDefault();
+				$('#makeDropdowns').click();
+			}
+		});
 
         // Hide/show manual partitioning div. 
         $('#partitionMethod').change(function() {
@@ -937,7 +944,6 @@
 						form1.append(pair[0], pair[1]);
 					}
 				// Append BASE_DSS as either uploaded file or creation.dss.
-				// form1.append('BASE_DSS', filename);
 				var fileStringArray = [ filename ];
 				var fileName = filename;
 				var blobAttrs = { type: 'application/octet-stream' };
@@ -952,9 +958,21 @@
 	  				}
 	  			});
 				form1.append('CRITICAL_LOADS',JSON.stringify(critLoads));
-				// Append MG_DEF_METHOD. TODO: If manual is selected, append a 'MICROGRIDS' value.
+				// Append MG_DEF_METHOD. 
 				var method = $( "#partitionMethod option:selected" ).val();
 				form1.append('MG_DEF_METHOD',method);
+
+				// If manual is selected, append a 'MICROGRIDS' value.
+				var MICROGRIDS = []
+				$('#dropDowns label').each( function() {
+					var load = $(this).text().split(' ')[1]
+					var mg = $(this).find(':selected').text()
+					MICROGRIDS.push([mg,load]);
+				} )
+				console.log('MICROGRIDS');
+				console.log(MICROGRIDS);
+				form1.append('MICROGRIDS',JSON.stringify(MICROGRIDS));
+
 				$.ajax({
 					url: '/run',
 					type: 'POST',

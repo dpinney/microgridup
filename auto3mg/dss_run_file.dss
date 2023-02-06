@@ -27,27 +27,28 @@ new object=monitor.mongenerator-battery_634_existing element=storage.battery_634
 new object=monitor.mongenerator-fossil_675_existing element=generator.fossil_675_existing terminal=1 mode=1 ppolar=no
 new object=monitor.moncapacitor-cap1 element=capacitor.cap1 terminal=1 mode=6
 new object=monitor.moncapacitor-cap2 element=capacitor.cap2 terminal=1 mode=6
-new object=monitor.mongenerator-battery_646_office element=storage.battery_646_office terminal=1 mode=1 ppolar=no
-new object=monitor.monvsource-lead_gen_646_office_1_2_3 element=vsource.lead_gen_646_office_1_2_3 terminal=1 mode=0
-new object=monitor.mongenerator-solar_646_office element=generator.solar_646_office terminal=1 mode=1 ppolar=no
-new object=monitor.mongenerator-battery_solar_634_existing element=storage.battery_solar_634_existing terminal=1 mode=1 ppolar=no
-new object=monitor.monvsource-lead_gen_solar_634_existing_1 element=vsource.lead_gen_solar_634_existing_1 terminal=1 mode=0
-new object=monitor.mongenerator-solar_solar_634_existing element=generator.solar_solar_634_existing terminal=1 mode=1 ppolar=no
-new object=monitor.mongenerator-battery_cap2 element=storage.battery_cap2 terminal=1 mode=1 ppolar=no
-new object=monitor.mongenerator-solar_cap2 element=generator.solar_cap2 terminal=1 mode=1 ppolar=no
-new object=monitor.mongenerator-battery_675c_residential1 element=storage.battery_675c_residential1 terminal=1 mode=1 ppolar=no
-new object=monitor.monvsource-lead_gen_675c_residential1_1_2_3 element=vsource.lead_gen_675c_residential1_1_2_3 terminal=1 mode=0
-new object=monitor.mongenerator-solar_675c_residential1 element=generator.solar_675c_residential1 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-battery_633 element=storage.battery_633 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-wind_633 element=generator.wind_633 terminal=1 mode=1 ppolar=no
+new object=monitor.monvsource-lead_gen_633_1 element=vsource.lead_gen_633_1 terminal=1 mode=0
+new object=monitor.mongenerator-solar_633 element=generator.solar_633 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-battery_645 element=storage.battery_645 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-wind_645 element=generator.wind_645 terminal=1 mode=1 ppolar=no
+new object=monitor.monvsource-lead_gen_645_2 element=vsource.lead_gen_645_2 terminal=1 mode=0
+new object=monitor.mongenerator-solar_645 element=generator.solar_645 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-battery_670 element=storage.battery_670 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-wind_670 element=generator.wind_670 terminal=1 mode=1 ppolar=no
+new object=monitor.monvsource-lead_gen_670_1_2_3 element=vsource.lead_gen_670_1_2_3 terminal=1 mode=0
+new object=monitor.mongenerator-solar_670 element=generator.solar_670 terminal=1 mode=1 ppolar=no
 set mode=yearly stepsize=60m 
 set number=1
 
-				open line.line_for_lead_gen_646_office_1_2_3
+				open line.line_for_lead_gen_633_1
 				calcv
 			
-				open line.line_for_lead_gen_solar_634_existing_1
+				open line.line_for_lead_gen_645_2
 				calcv
 			
-				open line.line_for_lead_gen_675c_residential1_1_2_3
+				open line.line_for_lead_gen_670_1_2_3
 				calcv
 			solve
 solve
@@ -113,29 +114,25 @@ solve
 		open object=line.670671 term=2
 		open object=line.670671 term=3
 	
-			open object=line.['670671', '632633'] term=1
-			open object=line.['670671', '632633'] term=2
-			open object=line.['670671', '632633'] term=3
-		
-				close line.line_for_lead_gen_646_office_1_2_3
-				calcv
-			
 			open object=line.['632633'] term=1
 			open object=line.['632633'] term=2
 			open object=line.['632633'] term=3
 		
-				close line.line_for_lead_gen_solar_634_existing_1
+				close line.line_for_lead_gen_633_1
 				calcv
 			
-			open object=line.['670671', '692675'] term=1
-			open object=line.['670671', '692675'] term=2
-			open object=line.['670671', '692675'] term=3
+			open object=line.['632645'] term=1
+			open object=line.['632645'] term=2
+			open object=line.['632645'] term=3
 		
-			open object=line.['692675'] term=1
-			open object=line.['692675'] term=2
-			open object=line.['692675'] term=3
+				close line.line_for_lead_gen_645_2
+				calcv
+			
+			open object=line.['632670'] term=1
+			open object=line.['632670'] term=2
+			open object=line.['632670'] term=3
 		
-				close line.line_for_lead_gen_675c_residential1_1_2_3
+				close line.line_for_lead_gen_670_1_2_3
 				calcv
 			calcv
 solve
@@ -263,29 +260,25 @@ solve
 		close object=line.670671 term=2
 		close object=line.670671 term=3
 	
-			close object=line.['670671', '632633'] term=1
-			close object=line.['670671', '632633'] term=2
-			close object=line.['670671', '632633'] term=3
-		
-				open line.line_for_lead_gen_646_office_1_2_3
-				calcv
-			
 			close object=line.['632633'] term=1
 			close object=line.['632633'] term=2
 			close object=line.['632633'] term=3
 		
-				open line.line_for_lead_gen_solar_634_existing_1
+				open line.line_for_lead_gen_633_1
 				calcv
 			
-			close object=line.['670671', '692675'] term=1
-			close object=line.['670671', '692675'] term=2
-			close object=line.['670671', '692675'] term=3
+			close object=line.['632645'] term=1
+			close object=line.['632645'] term=2
+			close object=line.['632645'] term=3
 		
-			close object=line.['692675'] term=1
-			close object=line.['692675'] term=2
-			close object=line.['692675'] term=3
+				open line.line_for_lead_gen_645_2
+				calcv
+			
+			close object=line.['632670'] term=1
+			close object=line.['632670'] term=2
+			close object=line.['632670'] term=3
 		
-				open line.line_for_lead_gen_675c_residential1_1_2_3
+				open line.line_for_lead_gen_670_1_2_3
 				calcv
 			calcv
 solve
@@ -434,14 +427,15 @@ export monitors monitorname=mongenerator-battery_634_existing
 export monitors monitorname=mongenerator-fossil_675_existing
 export monitors monitorname=moncapacitor-cap1
 export monitors monitorname=moncapacitor-cap2
-export monitors monitorname=mongenerator-battery_646_office
-export monitors monitorname=monvsource-lead_gen_646_office_1_2_3
-export monitors monitorname=mongenerator-solar_646_office
-export monitors monitorname=mongenerator-battery_solar_634_existing
-export monitors monitorname=monvsource-lead_gen_solar_634_existing_1
-export monitors monitorname=mongenerator-solar_solar_634_existing
-export monitors monitorname=mongenerator-battery_cap2
-export monitors monitorname=mongenerator-solar_cap2
-export monitors monitorname=mongenerator-battery_675c_residential1
-export monitors monitorname=monvsource-lead_gen_675c_residential1_1_2_3
-export monitors monitorname=mongenerator-solar_675c_residential1
+export monitors monitorname=mongenerator-battery_633
+export monitors monitorname=mongenerator-wind_633
+export monitors monitorname=monvsource-lead_gen_633_1
+export monitors monitorname=mongenerator-solar_633
+export monitors monitorname=mongenerator-battery_645
+export monitors monitorname=mongenerator-wind_645
+export monitors monitorname=monvsource-lead_gen_645_2
+export monitors monitorname=mongenerator-solar_645
+export monitors monitorname=mongenerator-battery_670
+export monitors monitorname=mongenerator-wind_670
+export monitors monitorname=monvsource-lead_gen_670_1_2_3
+export monitors monitorname=mongenerator-solar_670

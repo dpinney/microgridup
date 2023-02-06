@@ -54,31 +54,6 @@
     "MICROGRIDS": {
         "mg0": {
             "loads": [
-                "645_hangar",
-                "646_office",
-                "670a_residential2",
-                "670b_residential2",
-                "670c_residential2"
-            ],
-            "switch": [
-                "670671",
-                "632633"
-            ],
-            "gen_bus": "646_office",
-            "gen_obs_existing": [],
-            "critical_load_kws": [
-                170.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "max_potential": "700",
-            "max_potential_diesel": "1000000",
-            "battery_capacity": "10000"
-        },
-        "mg1": {
-            "loads": [
                 "634a_data_center",
                 "634b_radar",
                 "634c_atc_tower"
@@ -86,7 +61,7 @@
             "switch": [
                 "632633"
             ],
-            "gen_bus": "solar_634_existing",
+            "gen_bus": "633",
             "gen_obs_existing": [
                 "solar_634_existing"
             ],
@@ -99,22 +74,17 @@
             "max_potential_diesel": "1000000",
             "battery_capacity": "10000"
         },
-        "mg2": {
+        "mg1": {
             "loads": [
-                "684_command_center",
-                "692_warehouse2",
-                "611_runway",
-                "652_residential"
+                "645_hangar",
+                "646_office"
             ],
             "switch": [
-                "670671",
-                "692675"
+                "632645"
             ],
-            "gen_bus": "cap2",
+            "gen_bus": "645",
             "gen_obs_existing": [],
             "critical_load_kws": [
-                1155.0,
-                0.0,
                 170.0,
                 0.0
             ],
@@ -122,21 +92,35 @@
             "max_potential_diesel": "1000000",
             "battery_capacity": "10000"
         },
-        "mg3": {
+        "mg2": {
             "loads": [
+                "684_command_center",
+                "692_warehouse2",
                 "675a_hospital",
                 "675b_residential1",
-                "675c_residential1"
+                "675c_residential1",
+                "611_runway",
+                "652_residential",
+                "670a_residential2",
+                "670b_residential2",
+                "670c_residential2"
             ],
             "switch": [
-                "692675"
+                "632670"
             ],
-            "gen_bus": "675c_residential1",
+            "gen_bus": "670",
             "gen_obs_existing": [
                 "fossil_675_existing"
             ],
             "critical_load_kws": [
+                1155.0,
+                0.0,
                 485.0,
+                0.0,
+                0.0,
+                170.0,
+                0.0,
+                0.0,
                 0.0,
                 0.0
             ],

@@ -185,15 +185,18 @@ def count_interruptions_rengenmg(outageStart, outageEnd, all_loads_shapes_kw, ge
 	interruptions = []
 	iS, iE = 0, 0
 	idx = 0
-	while idx < lengthOfOutage:
-		if supply[idx] < demand[idx]:
-			iS = idx
-			while idx < lengthOfOutage and supply[idx] < demand[idx]:
+	try: #HACK: not working for Eglin.
+		while idx < lengthOfOutage:
+			if supply[idx] < demand[idx]:
+				iS = idx
+				while idx < lengthOfOutage and supply[idx] < demand[idx]:
+					idx += 1
+				iE = idx
+				interruptions.append((iS,iE))
+			else:
 				idx += 1
-			iE = idx
-			interruptions.append((iS,iE))
-		else:
-			idx += 1
+	except:
+		pass
 	return interruptions
 
 def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTree):

@@ -232,11 +232,14 @@ def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTre
 	if len(all_mg_rengen) > 0: # i.e. if we have rengen
 		rengen_loadshapes = []
 		for gen_idx in range(len(all_mg_rengen)):
-			# Get loadshapes of all renewable generation.
-			rengen_loadshape_name = all_mg_rengen[gen_idx].get('yearly')
-			rengen_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and rengen_loadshape_name in ob.get("object")]
-			list_rengen_loadshape = [float(shape) for shape in rengen_loadshape[0][1:-1].split(",")]
-			rengen_loadshapes.append(list_rengen_loadshape)
+			try:
+				# Get loadshapes of all renewable generation.
+				rengen_loadshape_name = all_mg_rengen[gen_idx].get('yearly')
+				rengen_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and rengen_loadshape_name in ob.get("object")]
+				list_rengen_loadshape = [float(shape) for shape in rengen_loadshape[0][1:-1].split(",")]
+				rengen_loadshapes.append(list_rengen_loadshape)
+			except:
+				pass#TODO: fix the above to be general. try/except here is a hack to get Picatinny to run.
 		data = np.array(rengen_loadshapes)
 		all_rengen_shapes = np.sum(data,0)
 	else:

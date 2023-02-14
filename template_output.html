@@ -237,6 +237,14 @@
             text-align:center;
             font-size:25px;
         }
+        /* Loading Indicator */
+        #loading_indicator   {
+          animation: fadeInOut 2s linear infinite forwards;
+        }
+        @keyframes fadeInOut {
+          0%,100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
     </style>
   </head>
   <body class="loading">
@@ -363,7 +371,7 @@
             </button>
         </nav>
         <div class="js-div--sideNavCover loading">
-            <span class="span--sectionTitle">Loading...</span>
+            <span id="loading_indicator" class="span--sectionTitle">Loading...</span>
         </div>
         <article>
             <section data-content="Overview">

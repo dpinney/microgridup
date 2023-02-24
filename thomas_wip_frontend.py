@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 import base64
 import io 
 import json
-from flask import Flask, flash, request, redirect, render_template, jsonify
+from flask import Flask, flash, request, redirect, render_template, jsonify, url_for
 from werkzeug.utils import secure_filename
 from omf.solvers.opendss import dssConvert
 from microgridup_gen_mgs import mg_group, nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch
@@ -181,17 +181,22 @@ def run():
 		csv_path = f'{_myDir}/uploads/LOAD_CSV_{model_dir}'
 		# Handle uploaded CSVs for HISTORICAL_OUTAGES and criticalLoadShapeFile. Put both in models folder.    
 		HISTORICAL_OUTAGES = all_files['HISTORICAL_OUTAGES']
-		HISTORICAL_OUTAGES.save(f'{_myDir}/HISTORICAL_OUTAGES_{model_dir}')
-		HISTORICAL_OUTAGES_path = f'{_myDir}/HISTORICAL_OUTAGES_{model_dir}'
+		if HISTORICAL_OUTAGES.filename != '':
+			HISTORICAL_OUTAGES.save(f'{_myDir}/HISTORICAL_OUTAGES_{model_dir}')
+			# HISTORICAL_OUTAGES_path = f'{_myDir}/HISTORICAL_OUTAGES_{model_dir}'
 		criticalLoadShapeFile = all_files['criticalLoadShapeFile']
-		criticalLoadShapeFile.save(f'{_myDir}/criticalLoadShapeFile_{model_dir}')
-		criticalLoadShapeFile_path = f'{_myDir}/criticalLoadShapeFile_{model_dir}'
+		if criticalLoadShapeFile.filename != '':
+			criticalLoadShapeFile.save(f'{_myDir}/criticalLoadShapeFile_{model_dir}')
+			# criticalLoadShapeFile_path = f'{_myDir}/criticalLoadShapeFile_{model_dir}'
 	# Handle arguments to our main function.
 	crit_loads = json.loads(request.form['CRITICAL_LOADS'])
 	mg_method = request.form['MG_DEF_METHOD']
-	if mg_method == 'manual':
+	if mg_method == 'loadGrouping':
 		pairings = json.loads(request.form['MICROGRIDS'])
-		microgrids = mg_group(dss_path, crit_loads, 'manual', pairings)	
+		microgrids = mg_group(dss_path, crit_loads, 'loadGrouping', pairings)	
+	elif mg_method == 'manual':
+		algo_params = json.loads(request.form['MICROGRIDS'])
+		microgrids = mg_group(dss_path, crit_loads, 'manual', algo_params)
 	elif mg_method == 'lukes':
 		microgrids = mg_group(dss_path, crit_loads, 'lukes')
 	elif mg_method == 'branch':
@@ -202,67 +207,68 @@ def run():
 		microgrids = mg_group(dss_path, crit_loads, 'criticalLoads')
 	# Form REOPT_INPUTS. 
 	REOPT_INPUTS = {
-		'latitude':request.form['latitude'],
-		'longitude':request.form['longitude'],
+		# 'latitude':request.form['latitude'],
+		# 'longitude':request.form['longitude'],
 		'energyCost':request.form['energyCost'],
 		'wholesaleCost':request.form['wholesaleCost'],
 		'demandCost':request.form['demandCost'],
-		'solarCanCurtail':request.form['solarCanCurtail'],
-		'solarCanExport':request.form['solarCanExport'],
-		'urdbLabelSwitch':request.form['urdbLabelSwitch'],
-		'urdbLabel':request.form['urdbLabel'],
+		'solarCanCurtail':(request.form['solarCanCurtail'] == 'true'),
+		'solarCanExport':(request.form['solarCanExport'] == 'true'),
+		# 'urdbLabelSwitch':request.form['urdbLabelSwitch'],
+		# 'urdbLabel':request.form['urdbLabel'],
 		'criticalLoadFactor':request.form['criticalLoadFactor'],
 		'year':request.form['year'],
-		'analysisYears':request.form['analysisYears'],
+		# 'analysisYears':request.form['analysisYears'],
 		'outageDuration':request.form['outageDuration'],
-		'DIESEL_SAFETY_FACTOR':request.form['DIESEL_SAFETY_FACTOR'],
-		'outage_start_hour':request.form['outage_start_hour'],
-		'userCriticalLoadShape':request.form['userCriticalLoadShape'],
+		# 'DIESEL_SAFETY_FACTOR':request.form['DIESEL_SAFETY_FACTOR'],
+		# 'outage_start_hour':request.form['outage_start_hour'],
+		# 'userCriticalLoadShape':request.form['userCriticalLoadShape'],
 		'value_of_lost_load':request.form['value_of_lost_load'],
-		'omCostEscalator':request.form['omCostEscalator'],
-		'discountRate':request.form['discountRate'],
+		# 'omCostEscalator':request.form['omCostEscalator'],
+		# 'discountRate':request.form['discountRate'],
 
 		'solar':request.form['solar'],
 		'battery':request.form['battery'],
-		'fossil':request.form['fossil'],
+		# 'fossil':request.form['fossil'],
 		'wind':request.form['wind'],
 		'solarCost':request.form['solarCost'],
 		'solarExisting':request.form['solarExisting'],
 		'solarMax':request.form['solarMax'],
 		'solarMin':request.form['solarMin'],
-		'solarMacrsOptionYears':request.form['solarMacrsOptionYears'],
-		'solarItcPercent':request.form['solarItcPercent'],
+		# 'solarMacrsOptionYears':request.form['solarMacrsOptionYears'],
+		# 'solarItcPercent':request.form['solarItcPercent'],
 		'batteryCapacityCost':request.form['batteryCapacityCost'],
 		'batteryCapacityMax':request.form['batteryCapacityMax'],
 		'batteryCapacityMin':request.form['batteryCapacityMin'],
 		'batteryKwhExisting':request.form['batteryKwhExisting'],
 		'batteryPowerCost':request.form['batteryPowerCost'],
 		'batteryPowerMax':request.form['batteryPowerMax'],
+		'batteryPowerMin':request.form['batteryPowerMin'],
 		'batteryKwExisting':request.form['batteryKwExisting'],
-		'batteryMacrsOptionYears':request.form['batteryMacrsOptionYears'],
-		'batteryItcPercent':request.form['batteryItcPercent'],
-		'batteryPowerCostReplace':request.form['batteryPowerCostReplace'],
-		'batteryCapacityCostReplace':request.form['batteryCapacityCostReplace'],
-		'batteryPowerReplaceYear':request.form['batteryPowerReplaceYear'],
-		'batteryCapacityReplaceYear':request.form['batteryCapacityReplaceYear'],
+		# 'batteryMacrsOptionYears':request.form['batteryMacrsOptionYears'],
+		# 'batteryItcPercent':request.form['batteryItcPercent'],
+		# 'batteryPowerCostReplace':request.form['batteryPowerCostReplace'],
+		# 'batteryCapacityCostReplace':request.form['batteryCapacityCostReplace'],
+		# 'batteryPowerReplaceYear':request.form['batteryPowerReplaceYear'],
+		# 'batteryCapacityReplaceYear':request.form['batteryCapacityReplaceYear'],
 		'dieselGenCost':request.form['dieselGenCost'],
 		'dieselMax':request.form['dieselMax'],
-		'dieselMin':request.form['dieselMin'],
+		# 'dieselMin':request.form['dieselMin'],
 		'fuelAvailable':request.form['fuelAvailable'],
 		'genExisting':request.form['genExisting'],
 		'minGenLoading':request.form['minGenLoading'],
-		'dieselFuelCostGal':request.form['dieselFuelCostGal'],
-		'dieselCO2Factor':request.form['dieselCO2Factor'],
-		'dieselOMCostKw':request.form['dieselOMCostKw'],
-		'dieselOMCostKwh':request.form['dieselOMCostKwh'],
-		'dieselOnlyRunsDuringOutage':request.form['dieselOnlyRunsDuringOutage'],
-		'dieselMacrsOptionYears':request.form['dieselMacrsOptionYears'],
+		# 'dieselFuelCostGal':request.form['dieselFuelCostGal'],
+		# 'dieselCO2Factor':request.form['dieselCO2Factor'],
+		# 'dieselOMCostKw':request.form['dieselOMCostKw'],
+		# 'dieselOMCostKwh':request.form['dieselOMCostKwh'],
+		# 'dieselOnlyRunsDuringOutage':request.form['dieselOnlyRunsDuringOutage'],
+		# 'dieselMacrsOptionYears':request.form['dieselMacrsOptionYears'],
 		'windCost':request.form['windCost'],
 		'windExisting':request.form['windExisting'],
 		'windMax':request.form['windMax'],
 		'windMin':request.form['windMin'],
-		'windMacrsOptionYears':request.form['windMacrsOptionYears'],
-		'windItcPercent':request.form['windItcPercent'],
+		# 'windMacrsOptionYears':request.form['windMacrsOptionYears'],
+		# 'windItcPercent':request.form['windItcPercent'],
 	}
 	mgu_args = [
 		request.form['MODEL_DIR'],
@@ -274,11 +280,12 @@ def run():
 		microgrids,
 		request.form['FAULTED_LINE']
 	]
+	print('thomas gui mgu_args',mgu_args)
 	# Kickoff the run
 	new_proc = multiprocessing.Process(target=microgridup.full, args=mgu_args)
 	new_proc.start()
 	# Redirect to home after waiting a little for the file creation to happen.
-	time.sleep(3)
+	time.sleep(5)
 	return redirect(f'/')
 
 
@@ -306,9 +313,6 @@ def getLoads(path):
 	tree = dssConvert.dssToTree(path)
 	loads = [obj.get('object','').split('.')[1] for obj in tree if 'load.' in obj.get('object','')]
 	return loads
-
-# if __name__ == "__main__":
-# 	app.run(debug=True)
 
 if __name__ == "__main__":
 	if platform.system() == "Darwin":  # MacOS

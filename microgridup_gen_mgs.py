@@ -268,14 +268,24 @@ def get_edge_name(fr, to, omd_list):
 	edges = [ob.get('name') for ob in omd_list if ob.get('from') == fr and ob.get('to') == to]
 	return None if len(edges) == 0 else edges[0]
 
-def manual_groups(pairings):
-	'Reformat partitions to be compatible with MG_GROUPS.'
-	dd = defaultdict(list)
-	for pair in pairings:
-		dd[pair[0]].append(pair[1])
+def manual_groups(G, pairings):
+	# Create reference dict of lcas for each pair of two nodes.
+	tree_root = list(nx.topological_sort(G))[0]
+	lcas = nx.tree_all_pairs_lowest_common_ancestor(G, root=tree_root)
+	lcas = dict(lcas)
+	# Iterate through each MG's loads, comparing LCAs each time to find new overall LCA.
+	mgs = {}
+	pairings.pop('None', None)
+	for mg in pairings:
+		pairs = pairings[mg]
+		cur_lca = lcas.get((pairs[0],pairs[1]),lcas.get((pairs[1],pairs[0])))
+		for idx in range(2,len(pairs)):
+			cur_lca = lcas.get((cur_lca,pairs[idx]),lcas.get((pairs[idx],cur_lca)))
+		mgs[mg] = list(nx.nodes(nx.dfs_tree(G, cur_lca)))
+	# Only return the contents of each MG but do so in order specified by the user.
 	parts = []
-	for mg in dd:
-		parts.append(dd[mg])
+	for idx in range(len(mgs)):
+		parts.append(mgs[f'Mg{idx+1}'])
 	return parts
 
 def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
@@ -285,10 +295,11 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 	branch algo params is 'i_branch': giving which branch in the tree to split on.'''
 	# Load data
 	G = opendss.dssConvert.dss_to_networkx(circ_path)
+	print('G.is_directed()',G.is_directed())
 	# print(list(G.edges()))
 	omd = opendss.dssConvert.dssToOmd(circ_path, None, write_out=False)
 	omd_list = list(omd.values())
-	# print('omd_list',omd_list)
+	print('omd_list',omd_list)
 	# Generate microgrids
 	if algo == 'lukes':
 		default_size = int(len(G.nodes())/3)
@@ -299,16 +310,40 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 		MG_GROUPS = nx_bottom_up_branch(G, num_mgs=5, large_or_small='large')
 	elif algo == 'criticalLoads':
 		MG_GROUPS = nx_critical_load_branch(G, CRITICAL_LOADS, num_mgs=3, large_or_small='large')
+	elif algo == 'loadGrouping':
+		MG_GROUPS = manual_groups(G, algo_params)
 	elif algo == 'manual':
-		MG_GROUPS = manual_groups(algo_params)
+		print('algo_params',algo_params)
+		MG_GROUPS = manual_groups(G, algo_params['pairings'])
+		switch = algo_params['switch']
+		gen_bus = algo_params['gen_bus']
+		all_mgs = [
+			(M_ID, MG_GROUP, MG_GROUP[0], nx_out_edges(G, MG_GROUP))
+			for (M_ID, MG_GROUP) in enumerate([list(x) for x in MG_GROUPS])
+		]
+		print('all_mgs',all_mgs)
+		MG_MINES = {
+			f'mg{M_ID}': {
+				'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
+				'switch': switch[f'Mg{M_ID+1}'],
+				'gen_bus': gen_bus[f'Mg{M_ID+1}'],
+				'gen_obs_existing': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') in ('generator','pvsystem')],
+				'critical_load_kws': [0.0 if ob.get('name') not in CRITICAL_LOADS else float(ob.get('kw','0')) for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
+				'max_potential': '700', #TODO: this and other vars, how to set? Ask Matt.
+				'max_potential_diesel': '1000000',
+				'battery_capacity': '10000'
+			} for (M_ID, MG_GROUP, TREE_ROOT, BORDERS) in all_mgs
+		}
+		return MG_MINES
 	else:
 		print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", or "criticalLoads". No mgs generated.')
 		return {}
+	print('MG_GROUPS',MG_GROUPS)
 	all_mgs = [
 		(M_ID, MG_GROUP, MG_GROUP[0], nx_out_edges(G, MG_GROUP))
 		for (M_ID, MG_GROUP) in enumerate([list(x) for x in MG_GROUPS])
 	]
-	# print(all_mgs)
+	print('all_mgs',all_mgs)
 	MG_MINES = {
 		f'mg{M_ID}': {
 			'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],

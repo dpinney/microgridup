@@ -368,6 +368,7 @@
 			<select id="partitionMethod" name="MG_DEF_METHOD" style="margin-right:6px">
 				<option value="" disabled selected>Select method</option>
 				<option value="manual" {% if in_data.MG_DEF_METHOD == 'manual' %}selected{% endif %}>Manual</option>
+				<option value="loadGrouping" {% if in_data.MG_DEF_METHOD == 'load_grouping' %}selected{% endif %}>Load Grouping</option>
 				<option value="lukes" {% if in_data.MG_DEF_METHOD == 'lukes' %}selected{% endif %}>Lukes</option>
 				<option value="branch" {% if in_data.MG_DEF_METHOD == 'branch' %}selected{% endif %}>Branch</option>
 				<option value="bottomUp" {% if in_data.MG_DEF_METHOD == 'bottom-up' %}selected{% endif %}>Bottom-Up</option>
@@ -391,23 +392,23 @@
 		<form id="techParamForm" enctype="multipart/form-data">
 			<div class="chunk">
 				<label for="solar">Solar</label>
-				<input type="hidden" name="solar" value="off">
 				<input type="checkbox" name="solar" value="on" id="solar" />
+				<input type="hidden" name="solar" value="off">
 			</div>
 			<div class="chunk">
 				<label for="battery">Battery</label>
-				<input type="hidden" name="battery" value="off">
 				<input type="checkbox" name="battery" value="on" id="battery" />
+				<input type="hidden" name="battery" value="off">
 			</div>
 			<div class="chunk">
 				<label for="fossil">Fossil</label>
-				<input type="hidden" name="fossil" value="off">
 				<input type="checkbox" name="fossil" value="on" id="fossil" />
+				<input type="hidden" name="fossil" value="off">
 			</div>
 			<div class="chunk">
 				<label for="wind">Wind</label>
-				<input type="hidden" name="wind" value="off">
 				<input type="checkbox" name="wind" value="on" id="wind" />
+				<input type="hidden" name="wind" value="off">
 			</div>
 
 			<div id="solarDiv" style="display:none">
@@ -817,7 +818,7 @@
         });
 
         // Manual partitioning dynamic dropdown creation. 
-        $('#makeDropdowns').on('click keypress', function() {
+        $('#makeDropdowns').on('click', function() {
         	if (circuitIsSpecified === false) {
         		alert('Please complete step 2.')
         		return
@@ -826,10 +827,26 @@
         		alert('Please input a number.')
         		return
         	}
+			// Manual grouping GUI includes inputs for gen_bus and switch.
+			var numMgs = $('#mgQuantity').val();
+			if ($('#partitionMethod').val() == 'manual') {
+				// Clear existing #switchGenbus if it exists already. 
+				$('#switchGenbus').remove();
+				$('#dropDowns').prepend('<div id="switchGenbus"></div>')
+				for (let i = 0; i < numMgs; i++) {
+					var count = i + 1;
+					$('#switchGenbus').append('<label for="mg' + count + 'Genbus">Mg' + count + ' Gen Bus: </label>');
+					$('#switchGenbus').append('<input id="mg' + count + 'Genbus" type="text"></input>');
+					$('#switchGenbus').append('<label for="mg' + count + 'Switch"> Mg' + count + ' Switch: </label>');
+					$('#switchGenbus').append('<input id="mg' + count + 'Switch" type="text"></input>');
+					$('#switchGenbus').append('<br>');
+				}
+			}
         	$('#dropDowns label select').each(function() {
-        		var numMgs = $('#mgQuantity').val();
+				$(this).empty();
+				$(this).append('<option value="">None</option>')
         		for (let i = 0; i < numMgs; i++) {
-        			var count = i + 1
+        			var count = i + 1;
         			$(this).append('<option value="">Mg' + count + '</option>');
         		}
         	});
@@ -845,15 +862,19 @@
 
         // Hide/show manual partitioning div. 
         $('#partitionMethod').change(function() {
-        	if ($(this).val() == 'manual') {
+        	if ($(this).val() == 'manual' || $(this).val() == 'loadGrouping') {
         	    $('#partitionManually').show();
         	    $('#previewPartitions').hide();
         	    $('#partitionsPreview').empty();
         	}
         	else { 
         		$('#partitionManually').hide();
+				$('#dropDowns').hide();
         		$('#previewPartitions').show();
         	}
+			if ($(this).val() == 'loadGrouping') {
+				$('#switchGenbus').remove();
+			}
         })
 
 	  	// Grab partitioning preview.
@@ -962,13 +983,51 @@
 				var method = $( "#partitionMethod option:selected" ).val();
 				form1.append('MG_DEF_METHOD',method);
 
-				// If manual is selected, append a 'MICROGRIDS' value.
-				var MICROGRIDS = []
+				// Do not proceed if manual is selected and no partitions are created.
+				if ((method === 'manual' && !$('#dropDowns').is(':visible')) || (method === 'loadGrouping' && !$('#dropDowns').is(':visible'))) {
+					alert('Please enter a number of microgrids and press Go.')
+					return
+				}
+				// If manual or loadGrouping is selected, append a 'MICROGRIDS' value.
+				var MICROGRIDS = {}
 				$('#dropDowns label').each( function() {
+					// Skip the Gen Buses and Switches.
+					if (this.hasAttribute('for')) {
+						return true
+					}
+					console.log(this);
 					var load = $(this).text().split(' ')[1]
+					console.log('load');
+					console.log(load);
 					var mg = $(this).find(':selected').text()
-					MICROGRIDS.push([mg,load]);
+					console.log('mg');
+					console.log(mg);
+					if (method === 'loadGrouping') {
+						MICROGRIDS[mg] ??= [];
+						MICROGRIDS[mg].push(load);
+					}
+					else if (method === 'manual') {
+						MICROGRIDS.pairings ??= {};
+						MICROGRIDS.pairings[mg] ??= [];
+						MICROGRIDS['pairings'][mg].push(load); 
+					}
 				} )
+				// If manual is selected, apparent switch and gen_bus values.
+				var counter = 0;
+				$('#switchGenbus input').each( function() {
+					counter = counter + 0.5;
+					var id = $(this).attr('id');
+					var val = $(this).val();
+					var mg = 'Mg' + Math.round(counter);
+					if (id.includes('Genbus')) {
+						MICROGRIDS.gen_bus ??= {};
+						MICROGRIDS.gen_bus[mg] = val;
+					} 
+					else {
+						MICROGRIDS.switch ??= {};
+						MICROGRIDS.switch[mg] = val;
+					}
+				})
 				console.log('MICROGRIDS');
 				console.log(MICROGRIDS);
 				form1.append('MICROGRIDS',JSON.stringify(MICROGRIDS));
@@ -979,8 +1038,8 @@
 					data: form1,
 					processData: false,
 					contentType: false,
-					success: function(response) {
-					console.log('Successful submission.');
+					success: function(data) {
+						window.location.href = '/';
 					}
 				})
 			})

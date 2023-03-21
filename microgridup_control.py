@@ -20,7 +20,7 @@ def get_first_nodes_of_mgs(dssTree, microgrids):
 		switch = microgrids[key]['switch']
 		if type(switch) is list:
 			switch = switch[0]
-		bus2 = [obj.get('bus2') for obj in dssTree if switch in obj.get('object','')]
+		bus2 = [obj.get('bus2') for obj in dssTree if f'line.{switch}' in obj.get('object','')]
 		bus2 = bus2[0].split('.')[0]
 		nodes[key] = bus2
 	return nodes
@@ -269,7 +269,7 @@ def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTre
 	new_batt_loadshape = new_batt_loadshape[outageStart:outageEnd]
 
 	# Option 1: Find battery's starting capacity based on charge and discharge history by the start of the outage.
-	cumulative_existing_batt_shapes = pd.Series()
+	cumulative_existing_batt_shapes = pd.Series(dtype='float64')
 	# Get existing battery's(ies') loadshapes. 
 	for obj in batt_obj:
 		batt_loadshape_name = obj.get("yearly")
@@ -459,8 +459,9 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 			this_series = gen_data[gen_data[category_name] == ob_name]
 
 			# Amass data for fuel consumption chart.
-			if ("lead_gen_" in ob_name or "fossil_" in ob_name) and not this_series[y_name].isnull().values.any(): 
-				additional = sum(abs(this_series[y_name][outageStart:outageEnd])) if "fossil_" in ob_name else sum(this_series[y_name][outageStart:outageEnd])
+			if ("lead_gen_" in ob_name or "fossil_" in ob_name) and not this_series[y_name].isnull().values.any():
+				this_series[y_name] = this_series[y_name].astype(float)
+				additional = sum(abs(this_series[y_name].iloc[outageStart:outageEnd])) if "fossil_" in ob_name else sum(this_series[y_name].iloc[outageStart:outageEnd])
 				fossil_kwh_output += additional
 				fossil_kw_rating = fossil_kw_ratings[ob_name.split("-")[1]] if "fossil_" in ob_name else vsource_ratings[ob_name.split("-")[1]]
 				fossil_loading_average_decimal = additional / (float(fossil_kw_rating) * lengthOfOutage)
@@ -497,7 +498,6 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 					all_batt_loadshapes = curr_series_list[:outageStart] + outage_portion + curr_series_list[outageEnd:]
 					batt_kwh_input_output = sum([abs(x) for x in all_batt_loadshapes])
 				else:
-					print('this_series[y_name]',this_series[y_name])
 					batt_kwh_input_output = sum(abs(this_series[y_name]))
 				batt_kwh_rating = batt_kwh_ratings[ob_name.split("-")[1]]
 				cycles = batt_kwh_input_output / (2 * float(batt_kwh_rating)) 
@@ -728,7 +728,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			"All rengen loadshapes during outage (kw)":list(all_rengen_shapes[outageStart:outageEnd]),
 			"Cumulative battery loadshape during outage (kw)":list(new_batt_loadshape),
 			"Surplus rengen":total_surplus}
-	print("big_gen_ratings",big_gen_ratings)
+	# print("big_gen_ratings",big_gen_ratings)
 	# print("rengen_mgs",rengen_mgs)
 	# Additional calcv to make sure the simulation runs.
 	actions[outageStart] += f'calcv\n'
@@ -769,7 +769,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 	# make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Generator Output", "Average hourly kW", batt_cycle_chart=True)
 	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, dssTree, "Load Voltage", "PU", ansi_bands=True, rengen_mgs=rengen_mgs)
 	# make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Voltage Source Output", "Average hourly kW", vsource_ratings=big_gen_ratings)
-	make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], 2019, microgrids, dssTree, "Tap Position", "PU")
+	# make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], 2019, microgrids, dssTree, "Tap Position", "PU")
 	make_chart(f'{FPREFIX}_source_and_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Generator Output", "Average Hourly kW", batt_cycle_chart=True, fossil_loading_chart=True, vsource_ratings=big_gen_ratings, rengen_mgs=rengen_mgs)
 	plot_inrush_data(pathToDss, microgrids, f'{FPREFIX}_inrush_plot.html', outageStart, outageEnd, vsourceRatings=big_gen_ratings)
 	# Write final output file.

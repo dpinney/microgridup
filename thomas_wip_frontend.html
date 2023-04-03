@@ -150,11 +150,11 @@
 			</div>
 			<div class="chunk">
 				<label class="tooltip" for="latitude">Latitude<span class="classic">Specify the latitude of the load/grid.</span></label>
-				<input type="text" name="latitude" pattern="^\-?\d+\.?\d*?$"/>
+				<input type="text" name="latitude" pattern="^\-?\d+\.?\d*?$" value="39.7817"/>
 			</div>
 			<div class="chunk">
 				<label class="tooltip" for="longitude">Longitude<span class="classic">>Specify the longitude of the load/grid.</span></label>
-				<input type="text" name="longitude" pattern="^\-?\d+\.?\d*?$"/>
+				<input type="text" name="longitude" pattern="^\-?\d+\.?\d*?$" value="-89.6501"/>
 			</div>
 			<div class="chunk">
 				<label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">TO DO: FILL TOOLTIP</span></label>
@@ -329,7 +329,7 @@
 				<div id="dialogText"></div>
 				<select></select>
 				<button type="cancel" onclick="window.dialog.close();">Cancel</button>
-				<button type="button">Submit</button>
+				<button type="button">Confirm</button>
 			</dialog>
 
 
@@ -737,6 +737,12 @@
 				var model_dir = $('input[name="MODEL_DIR"]').val()
 				form_data.append('MODEL_DIR',model_dir)
 
+				// Add latitude and longitude to json.
+				var latitude = $('input[name="latitude"]').val()
+				form_data.append('latitude',latitude)
+				var longitude = $('input[name="longitude"]').val()
+				form_data.append('longitude',longitude)
+
         		// Next, make AJAX POST to backend. 
         		$.ajax({
         			url:'/jsonToDss',
@@ -765,7 +771,9 @@
 						// Set filename.
 						filename = data.filename;
 						// Make directory uneditable. 
-						$('input[name="MODEL_DIR"]').prop("readonly", true);						
+						$('input[name="MODEL_DIR"]').prop("readonly", true);	
+						// Remove manual option from partitioning options because switches and gen_bus are predetermined.
+						$("#partitionMethod option[value='manual']").remove();
         			}
         		});
         	})
@@ -1012,7 +1020,7 @@
 						MICROGRIDS['pairings'][mg].push(load); 
 					}
 				} )
-				// If manual is selected, apparent switch and gen_bus values.
+				// If manual is selected, append switch and gen_bus values.
 				var counter = 0;
 				$('#switchGenbus input').each( function() {
 					counter = counter + 0.5;

@@ -70,26 +70,51 @@ def duplicate():
 @app.route('/jsonToDss', methods=['GET','POST'])
 def jsonToDss():
 	model_dir = request.form['MODEL_DIR']
+	# model_dir = '3mgs_used_wizard'
+	# elements = [{'class': 'substation', 'text': 'sub'}, {'class': 'feeder', 'text': 'regNone'}, {'class': 'load', 'text': '684_command_center'}, {'class': 'load', 'text': '692_warehouse2'}, {'class': 'load', 'text': '611_runway'}, {'class': 'load', 'text': '652_residential'}, {'class': 'load', 'text': '670a_residential2'}, {'class': 'load', 'text': '670b_residential2'}, {'class': 'load', 'text': '670c_residential2'}, {'class': 'feeder', 'text': 'reg0'}, {'class': 'load', 'text': '634a_data_center'}, {'class': 'load', 'text': '634b_radar'}, {'class': 'load', 'text': '634c_atc_tower'}, {'class': 'solar', 'text': 'solar_634_existing'}, {'class': 'battery', 'text': 'battery_634_existing'}, {'class': 'feeder', 'text': 'reg1'}, {'class': 'load', 'text': '675a_hospital'}, {'class': 'load', 'text': '675b_residential1'}, {'class': 'load', 'text': '675c_residential1'}, {'class': 'diesel', 'text': 'fossil_675_existing'}, {'class': 'feeder', 'text': 'reg2'}, {'class': 'load', 'text': '645_hangar'}, {'class': 'load', 'text': '646_office'}]
+	lat = float(request.form['latitude'])
+	# lat = 39.7817
+	lon = float(request.form['longitude'])
+	# lon = -89.6501
+	print('lat',lat)
+	print('lon',lon)
+
 	# Convert to DSS and return loads.
 	elements = json.loads(request.form['json'])
-	dssString = 'clear \nset defaultbasefrequency=60 \n'
+	print('elements',elements)
+	dssString = f'clear \nset defaultbasefrequency=60 \nnew object=circuit.{model_dir} \n'
+	# Name substation bus after substation itself. Name gen bus after the feeder. Having parent/child connections could be a useful shortcut + add robustness.
+	lastSub, lastFeeder = None, None
+	busList = []
 	for ob in elements:
 		obType = ob['class']
 		obName = ob['text']
 		if obType == 'substation':
-			dssString += f'new object=vsource.{obName.replace(" ","")} basekv=4.16 pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001 \n'
+			lastSub = obName.replace(' ','')
+			dssString += f'new object=vsource.{lastSub} basekv=115 bus1={lastSub}_bus.1.2.3 pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001 \n'
+			busList.append(f'{lastSub}_bus')
 		elif obType == 'feeder':
-			dssString += f'new object=transformer.{obName.replace(" ","")} phases=3 windings=2 xhl=2 conns=[wye,wye] kvs=[4.16,0.480] kvas=[500,500] %rs=[0.55,0.55] xht=1 xlt=1 \n'
+			# Add a feeder, a gen_bus, and a capacitor.
+			lastFeeder = obName.replace(' ','')
+			dssString += f'new object=line.{lastFeeder} phases=3 bus1={lastSub}_bus.1.2.3 bus2={lastFeeder}_end.1.2.3 length=1333 units=ft \nnew object=capacitor.{lastFeeder} bus1={lastFeeder}_end.1.2.3 phases=3 kvar=600 kv=2.4 \n'
+			busList.append(f'{lastFeeder}_end')
 		elif obType == 'load':
-			dssString += f'new object=load.{obName.replace(" ","")} phases=1 conn=wye model=1 kv=2.4 kw=1155 kvar=660 \n'
+			dssString += f'new object=load.{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 conn=wye model=1 kv=2.4 kw=1155 kvar=660 \n'
 		elif obType == 'solar':
-			dssString += f'new object=generator.{obName.replace(" ","")} phases=3 kv=2.4 kw=800 pf=1 \n'
+			dssString += f'new object=generator.{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 kv=0.277 kw=440 pf=1 \n'
 		elif obType == 'wind':
-			dssString += f'new object=generator.{obName.replace(" ","")} phases=1 kv=2.4 kw=50 pf=1 \n'
+			dssString += f'new object=generator.{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 kv=0.277 kw=200 pf=1 \n'
 		elif obType == 'battery':
-			dssString += f'new object=storage.{obName.replace(" ","")} phases=1 kv=2.4 kwrated=20 kwhstored=100 kwhrated=100 dispmode=follow %charge=100 %discharge=100 %effcharge=96 %effdischarge=96 %idlingkw=0 \n'
+			dssString += f'new object=storage.{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 kv=0.277 kwrated=79 kwhstored=307 kwhrated=307 dispmode=follow %charge=100 %discharge=100 %effcharge=96 %effdischarge=96 %idlingkw=0 \n'
 		elif obType == 'diesel':
-			dssString += f'new object=generator.{obName.replace(" ","")} phases=1 kw=81 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 \n'	
+			dssString += f'new object=generator.{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 kw=265 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 \n'	
+	
+	dssString += 'makebuslist \n'
+	# TO DO: Find a more elegant networkx solution for scattering nodes around a sub_bus.
+	for bus in busList:
+		dssString += f'setbusxy bus={bus} y={lat} x={lon} \n'
+		lat += 0.0005
+		lon += 0.0005
 	dssString += 'set voltagebases=[115,4.16,0.48]\ncalcvoltagebases'
 	if not os.path.isdir(f'{_myDir}/uploads'):
 		os.mkdir(f'{_myDir}/uploads')
@@ -182,17 +207,19 @@ def run():
 		# Handle uploaded CSVs for HISTORICAL_OUTAGES and criticalLoadShapeFile. Put both in models folder.    
 		HISTORICAL_OUTAGES = all_files['HISTORICAL_OUTAGES']
 		if HISTORICAL_OUTAGES.filename != '':
-			HISTORICAL_OUTAGES.save(f'{_myDir}/HISTORICAL_OUTAGES_{model_dir}')
-			# HISTORICAL_OUTAGES_path = f'{_myDir}/HISTORICAL_OUTAGES_{model_dir}'
+			HISTORICAL_OUTAGES.save(f'{_myDir}/uploads/HISTORICAL_OUTAGES_{model_dir}')
+			# HISTORICAL_OUTAGES_path = f'{_myDir}/uploads/HISTORICAL_OUTAGES_{model_dir}'
 		criticalLoadShapeFile = all_files['criticalLoadShapeFile']
 		if criticalLoadShapeFile.filename != '':
-			criticalLoadShapeFile.save(f'{_myDir}/criticalLoadShapeFile_{model_dir}')
-			# criticalLoadShapeFile_path = f'{_myDir}/criticalLoadShapeFile_{model_dir}'
+			criticalLoadShapeFile.save(f'{_myDir}/uploads/criticalLoadShapeFile_{model_dir}')
+			# criticalLoadShapeFile_path = f'{_myDir}/uploads/criticalLoadShapeFile_{model_dir}'
 	# Handle arguments to our main function.
 	crit_loads = json.loads(request.form['CRITICAL_LOADS'])
+	print('crit_loads',crit_loads)
 	mg_method = request.form['MG_DEF_METHOD']
 	if mg_method == 'loadGrouping':
 		pairings = json.loads(request.form['MICROGRIDS'])
+		print('pairings',pairings)
 		microgrids = mg_group(dss_path, crit_loads, 'loadGrouping', pairings)	
 	elif mg_method == 'manual':
 		algo_params = json.loads(request.form['MICROGRIDS'])
@@ -318,4 +345,11 @@ if __name__ == "__main__":
 	if platform.system() == "Darwin":  # MacOS
 		os.environ['NO_PROXY'] = '*' # Workaround for macOS proxy behavior
 		multiprocessing.set_start_method('forkserver') # Workaround for Catalina exec/fork behavior
+
+		# mgu_args = ['3mgs_used_wizard', '/Users/thomasjankovic/microgridup/uploads/BASE_DSS_3mgs_used_wizard', '/Users/thomasjankovic/microgridup/uploads/LOAD_CSV_3mgs_used_wizard', 480.0, 0.5, {'energyCost': '0.12', 'wholesaleCost': '0.034', 'demandCost': '20', 'solarCanCurtail': True, 'solarCanExport': True, 'criticalLoadFactor': '1', 'year': '2017', 'outageDuration': '48', 'value_of_lost_load': '1', 'solar': 'on', 'battery': 'on', 'wind': 'off', 'solarCost': '1600', 'solarExisting': '0', 'solarMax': '100000', 'solarMin': '0', 'batteryCapacityCost': '420', 'batteryCapacityMax': '1000000', 'batteryCapacityMin': '0', 'batteryKwhExisting': '0', 'batteryPowerCost': '840', 'batteryPowerMax': '1000000', 'batteryPowerMin': '0', 'batteryKwExisting': '0', 'dieselGenCost': '500', 'dieselMax': '1000000', 'fuelAvailable': '50000', 'genExisting': '0', 'minGenLoading': '0.3', 'windCost': '4989', 'windExisting': '0', 'windMax': '100000', 'windMin': '0'}, {'mg0': {'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'switch': ['reg0'], 'gen_bus': 'reg0_end', 'gen_obs_existing': ['solar_634_existing'], 'critical_load_kws': [1155.0, 1155.0, 1155.0], 'max_potential': '700', 'max_potential_diesel': '1000000', 'battery_capacity': '10000'}, 'mg1': {'loads': ['675a_hospital', '675b_residential1', '675c_residential1'], 'switch': ['reg1'], 'gen_bus': 'reg1_end', 'gen_obs_existing': ['fossil_675_existing'], 'critical_load_kws': [1155.0, 1155.0, 1155.0], 'max_potential': '700', 'max_potential_diesel': '1000000', 'battery_capacity': '10000'}, 'mg2': {'loads': ['645_hangar', '646_office'], 'switch': ['reg2'], 'gen_bus': 'reg2_end', 'gen_obs_existing': [], 'critical_load_kws': [1155.0, 1155.0], 'max_potential': '700', 'max_potential_diesel': '1000000', 'battery_capacity': '10000'}}, '670671']
+		# new_proc = multiprocessing.Process(target=microgridup.full, args=mgu_args)
+		# new_proc.start()
+		# microgridup.full(mgu_args[0],mgu_args[1], mgu_args[2], mgu_args[3], mgu_args[4], mgu_args[5], mgu_args[6], mgu_args[7])
+
+		# jsonToDss()
 	app.run(debug=True, host="0.0.0.0")

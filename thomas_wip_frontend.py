@@ -77,10 +77,6 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 		lon = float(request.form['longitude'])
 	if not elements:
 		elements = json.loads(request.form['json'])
-	print('model_dir',model_dir)
-	print('lat',lat)
-	print('lon',lon)
-	print('elements',elements)
 
 	# Convert to DSS and return loads.
 	dssString = f'clear \nset defaultbasefrequency=60 \nnew object=circuit.{model_dir} \n'
@@ -110,18 +106,9 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 		elif obType == 'diesel':
 			dssString += f'new object=generator.{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 kw=265 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 \n'	
 	
-	# Write dssString to file to convert it to a networkx graph.
-	# if not os.path.isdir(f'{_myDir}/uploads'):
-	# 	os.mkdir(f'{_myDir}/uploads')
-
-
+	# Convert dssString to a networkx graph.
 	tree = dssConvert.dssToTree(dssString, is_path=False)
 	G = dssConvert.dss_to_networkx('', tree=tree)
-
-
-
-	# with open(f'{_myDir}/uploads/BASE_DSS_{model_dir}', "w") as outFile:
-		# outFile.writelines(dssString)
 
 	# Set twopi layout to custom coordinates.
 	G = dssConvert.dss_to_networkx(f'{_myDir}/uploads/BASE_DSS_{model_dir}')

@@ -19,7 +19,7 @@ def get_first_nodes_of_mgs(dssTree, microgrids):
 	for key in microgrids:
 		switch = microgrids[key]['switch']
 		if type(switch) is list:
-			switch = switch[0]
+			switch = switch[-1]
 		bus2 = [obj.get('bus2') for obj in dssTree if f'line.{switch}' in obj.get('object','')]
 		bus2 = bus2[0].split('.')[0]
 		nodes[key] = bus2
@@ -457,6 +457,10 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 		for y_name in y_list: 
 			# print(f"this is the normal function! ob_name = {ob_name} and y_name = {y_name}")
 			this_series = gen_data[gen_data[category_name] == ob_name]
+			
+			# Clean up series. 
+			this_series[y_name] = pd.to_numeric(this_series[y_name], errors='coerce')
+			this_series[y_name] = this_series[y_name].fillna(0)
 
 			# Amass data for fuel consumption chart.
 			if ("lead_gen_" in ob_name or "fossil_" in ob_name) and not this_series[y_name].isnull().values.any():
@@ -522,13 +526,13 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 			if rengen_mgs and legend_group in rengen_mgs:
 				if "mongenerator-wind" in ob_name or "mongenerator-solar" in ob_name:
 					splice = rengen_proportional_loadshapes[legend_group][ob_name.split("-")[1]]
-					y_axis = list(y_axis[:outageStart]) + splice + list(y_axis[outageEnd:])
+					y_axis = list(y_axis.iloc[:outageStart]) + splice + list(y_axis.iloc[outageEnd:])
 				if "mongenerator-battery" in ob_name:
 					splice = storage_proportional_loadshapes[legend_group][ob_name.split("-")[1]]
-					y_axis = list(y_axis[:outageStart]) + splice + list(y_axis[outageEnd:])
+					y_axis = list(y_axis.iloc[:outageStart]) + splice + list(y_axis.iloc[outageEnd:])
 				if "monload-" in ob_name:
 					splice = rengen_mgs[legend_group]["Generic loadshape (kw)"]
-					y_axis = list(y_axis[:outageStart]) + splice + list(y_axis[outageEnd:])
+					y_axis = list(y_axis.iloc[:outageStart]) + splice + list(y_axis.iloc[outageEnd:])
 				plot_legend_group = f"{legend_group} – Manual Balance Approach used during outage"
 			else:
 				plot_legend_group = legend_group

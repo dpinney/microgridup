@@ -173,7 +173,6 @@ def nx_group_branch(G, i_branch=0):
 	first_branch = bbl[i_branch][0]
 	succs = list(G.successors(first_branch))
 	parts = [list(nx.algorithms.traversal.depth_first_search.dfs_tree(G, x).nodes()) for x in succs]
-	print('branch parts',parts)
 	return parts
 
 def nx_group_lukes(G, size, node_weight=None, edge_weight=None):
@@ -184,7 +183,7 @@ def nx_group_lukes(G, size, node_weight=None, edge_weight=None):
 	G_topo_order = nx.DiGraph(nx.algorithms.traversal.breadth_first_search.bfs_edges(G, tree_root))
 	return nx.algorithms.community.lukes.lukes_partitioning(G_topo_order, size, node_weight=node_weight, edge_weight=edge_weight)
 
-def nx_bottom_up_branch(G, num_mgs=5, large_or_small='large'):
+def nx_bottom_up_branch(G, num_mgs=3, large_or_small='large'):
 	'Form all microgrid combinations starting with leaves and working up to source maintaining single points of connection for each.'
 	try:
 		list(nx.topological_sort(G))
@@ -295,11 +294,8 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 	branch algo params is 'i_branch': giving which branch in the tree to split on.'''
 	# Load data
 	G = opendss.dssConvert.dss_to_networkx(circ_path)
-	print('G.is_directed()',G.is_directed())
-	# print(list(G.edges()))
 	omd = opendss.dssConvert.dssToOmd(circ_path, None, write_out=False)
 	omd_list = list(omd.values())
-	print('omd_list',omd_list)
 	# Generate microgrids
 	if algo == 'lukes':
 		default_size = int(len(G.nodes())/3)
@@ -307,13 +303,12 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 	elif algo == 'branch':
 		MG_GROUPS = nx_group_branch(G, i_branch=algo_params.get('i_branch',0))
 	elif algo == 'bottomUp':
-		MG_GROUPS = nx_bottom_up_branch(G, num_mgs=5, large_or_small='large')
+		MG_GROUPS = nx_bottom_up_branch(G, num_mgs=algo_params.get('num_mgs',3), large_or_small='large')
 	elif algo == 'criticalLoads':
-		MG_GROUPS = nx_critical_load_branch(G, CRITICAL_LOADS, num_mgs=3, large_or_small='large')
+		MG_GROUPS = nx_critical_load_branch(G, CRITICAL_LOADS, num_mgs=algo_params.get('num_mgs',3), large_or_small='large')
 	elif algo == 'loadGrouping':
 		MG_GROUPS = manual_groups(G, algo_params)
 	elif algo == 'manual':
-		print('algo_params',algo_params)
 		MG_GROUPS = manual_groups(G, algo_params['pairings'])
 		switch = algo_params['switch']
 		gen_bus = algo_params['gen_bus']
@@ -321,7 +316,6 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 			(M_ID, MG_GROUP, MG_GROUP[0], nx_out_edges(G, MG_GROUP))
 			for (M_ID, MG_GROUP) in enumerate([list(x) for x in MG_GROUPS])
 		]
-		print('all_mgs',all_mgs)
 		MG_MINES = {
 			f'mg{M_ID}': {
 				'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
@@ -338,12 +332,10 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 	else:
 		print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", or "criticalLoads". No mgs generated.')
 		return {}
-	print('MG_GROUPS',MG_GROUPS)
 	all_mgs = [
 		(M_ID, MG_GROUP, MG_GROUP[0], nx_out_edges(G, MG_GROUP))
 		for (M_ID, MG_GROUP) in enumerate([list(x) for x in MG_GROUPS])
 	]
-	print('all_mgs',all_mgs)
 	MG_MINES = {
 		f'mg{M_ID}': {
 			'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],

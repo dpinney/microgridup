@@ -111,7 +111,8 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 	G = dssConvert.dss_to_networkx('', tree=tree)
 
 	# Set twopi layout to custom coordinates.
-	G = dssConvert.dss_to_networkx(f'{_myDir}/uploads/BASE_DSS_{model_dir}')
+	dssFilePath = f'{_myDir}/uploads/BASE_DSS_{model_dir}'
+	G = dssConvert.dss_to_networkx(dssFilePath)
 	pos = nx.drawing.nx_agraph.graphviz_layout(G, prog="twopi", args="")
 
 	# Define the scale
@@ -132,13 +133,15 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 
 	if not os.path.isdir(f'{_myDir}/uploads'):
 		os.mkdir(f'{_myDir}/uploads')
-	with open(f'{_myDir}/uploads/BASE_DSS_{model_dir}', "w") as outFile:
+	with open(dssFilePath, "w") as outFile:
 		outFile.writelines(dssString)
-	loads = getLoads(f'{_myDir}/uploads/BASE_DSS_{model_dir}')
+	loads = getLoads(dssFilePath)
 	if not test_run:
-		return jsonify(loads=loads, filename=f'{_myDir}/uploads/BASE_DSS_{model_dir}')
+		t = dssConvert.dssToTree(dssFilePath)
+		return jsonify(loads=loads, filename=dssFilePath)
 	else:
-		return print('Test run of jsonToDss() complete.')
+		print(f'Test run of jsonToDss() for {model_dir} complete.')
+		return dssFilePath
 
 @app.route('/uploadDss', methods = ['GET','POST'])
 def uploadDss():
@@ -241,9 +244,9 @@ def run():
 	elif mg_method == 'branch':
 		microgrids = mg_group(dss_path, crit_loads, 'branch')
 	elif mg_method == 'bottomUp':
-		microgrids = mg_group(dss_path, crit_loads, 'bottomUp', algo_params=MGQUANT)
+		microgrids = mg_group(dss_path, crit_loads, 'bottomUp', algo_params={'num_mgs':MGQUANT})
 	elif mg_method == 'criticalLoads':
-		microgrids = mg_group(dss_path, crit_loads, 'criticalLoads', algo_params=MGQUANT)
+		microgrids = mg_group(dss_path, crit_loads, 'criticalLoads', algo_params={'num_mgs':MGQUANT})
 	# Form REOPT_INPUTS. 
 	REOPT_INPUTS = {
 		# 'latitude':request.form['latitude'],

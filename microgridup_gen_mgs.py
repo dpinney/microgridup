@@ -62,6 +62,7 @@ def only_child(G, mgs):
 # Used by both bottom up and critical load algorithms.
 def loop_avoider(G, mgs):
 	bustworthy_nodes = set()
+	
 	def helper(node, isKey):
 		bustworthy_nodes.add(node)
 		# We have a loop on our hands. 
@@ -85,6 +86,7 @@ def loop_avoider(G, mgs):
 					pointer = new_parents[0]
 				mgs[lca].extend(vals)
 				del mgs[k]
+
 	# If a node has multiple parents, must find lowest common ancestor and make this node new key in mgs.
 	keys = [x for x in nx.topological_sort(G) if x in list(mgs.keys())]
 	for key in keys:
@@ -288,6 +290,10 @@ def manual_groups(G, pairings):
 	return parts
 
 def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
+	# print('circ_path',circ_path)
+	# print('CRITICAL_LOADS',CRITICAL_LOADS)
+	# print('algo',algo)
+	# print('algo_params',algo_params)
 	'''Generate a group of mgs from circ_path with crit_loads
 	algo must be one of ["lukes", "branch", "bottomUp", "criticalLoads"]
 	lukes algo params is 'size':int giving size of each mg.

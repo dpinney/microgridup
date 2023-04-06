@@ -6,6 +6,7 @@
 	<script src="https://kit.fontawesome.com/92028f16c4.js" crossorigin="anonymous"></script>
 	<style type="text/css">
 		body {
+			margin-top: 0px;
 			margin-left:0;
 			padding:0;
 			border:0;
@@ -22,6 +23,9 @@
 			border-radius: 4px;
 			margin: 4px 2px 4px 2px;
 		}
+		#stepThree {
+			margin-left: 5px;
+		}
 		form {
 			width: 100%;
 			margin-left: 5px;
@@ -29,6 +33,7 @@
 		button, input[type='submit'], label.fileButton {
 			width:auto;
 			padding: 9px;
+			margin-left: 5px;
 			margin-right:3px;
 			font-size:small;
 			background:seagreen;
@@ -363,7 +368,7 @@
 
 	<div id="partionPreviewer" class="step">
 		<h3>Step 3: Partition circuit into microgrids</h3>
-		<div class="chunk">
+		<div id="stepThree" class="chunk">
 			<label class="tooltip" for="MG_DEF_METHOD">Microgrid Definition Method<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
 			<select id="partitionMethod" name="MG_DEF_METHOD" style="margin-right:6px">
 				<option value="" disabled selected>Select method</option>

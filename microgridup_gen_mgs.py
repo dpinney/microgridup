@@ -262,6 +262,7 @@ def nx_out_edges(G, sub_nodes):
 		out_succ = [(n,x) for x in G.successors(n) if x not in mg1]
 		out_edges.extend(out_succ)
 		out_edges.extend(out_preds)
+	out_edges.sort()
 	return out_edges
 
 def get_edge_name(fr, to, omd_list):
@@ -290,10 +291,27 @@ def manual_groups(G, pairings):
 	return parts
 
 def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
-	# print('circ_path',circ_path)
-	# print('CRITICAL_LOADS',CRITICAL_LOADS)
-	# print('algo',algo)
-	# print('algo_params',algo_params)
+	def helper(MG_GROUPS, switch, gen_bus):
+		all_mgs = [
+			(M_ID, MG_GROUP, MG_GROUP[0], nx_out_edges(G, MG_GROUP))
+			for (M_ID, MG_GROUP) in enumerate([list(x) for x in MG_GROUPS])
+		]
+		MG_MINES = {}
+		for idx in range(len(all_mgs)):
+			M_ID, MG_GROUP, TREE_ROOT, BORDERS = all_mgs[idx] 
+			this_switch = switch[f'Mg{M_ID+1}'] if switch else [get_edge_name(swedge[0], swedge[1], omd_list) for swedge in BORDERS]
+			this_gen_bus = gen_bus[f'Mg{M_ID+1}'] if gen_bus else TREE_ROOT
+			MG_MINES[f'mg{M_ID}'] = {
+				'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
+				'switch': this_switch,
+				'gen_bus': this_gen_bus,
+				'gen_obs_existing': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') in ('generator','pvsystem')],
+				'critical_load_kws': [0.0 if ob.get('name') not in CRITICAL_LOADS else float(ob.get('kw','0')) for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
+				'max_potential': '700', #TODO: this and other vars, how to set? Ask Matt.
+				'max_potential_diesel': '1000000',
+				'battery_capacity': '10000'
+			}
+		return MG_MINES
 	'''Generate a group of mgs from circ_path with crit_loads
 	algo must be one of ["lukes", "branch", "bottomUp", "criticalLoads"]
 	lukes algo params is 'size':int giving size of each mg.
@@ -303,6 +321,7 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 	omd = opendss.dssConvert.dssToOmd(circ_path, None, write_out=False)
 	omd_list = list(omd.values())
 	# Generate microgrids
+	switch, gen_bus = None, None
 	if algo == 'lukes':
 		default_size = int(len(G.nodes())/3)
 		MG_GROUPS = nx_group_lukes(G, algo_params.get('size',default_size))
@@ -318,42 +337,10 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 		MG_GROUPS = manual_groups(G, algo_params['pairings'])
 		switch = algo_params['switch']
 		gen_bus = algo_params['gen_bus']
-		all_mgs = [
-			(M_ID, MG_GROUP, MG_GROUP[0], nx_out_edges(G, MG_GROUP))
-			for (M_ID, MG_GROUP) in enumerate([list(x) for x in MG_GROUPS])
-		]
-		MG_MINES = {
-			f'mg{M_ID}': {
-				'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
-				'switch': switch[f'Mg{M_ID+1}'],
-				'gen_bus': gen_bus[f'Mg{M_ID+1}'],
-				'gen_obs_existing': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') in ('generator','pvsystem')],
-				'critical_load_kws': [0.0 if ob.get('name') not in CRITICAL_LOADS else float(ob.get('kw','0')) for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
-				'max_potential': '700', #TODO: this and other vars, how to set? Ask Matt.
-				'max_potential_diesel': '1000000',
-				'battery_capacity': '10000'
-			} for (M_ID, MG_GROUP, TREE_ROOT, BORDERS) in all_mgs
-		}
-		return MG_MINES
 	else:
 		print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", or "criticalLoads". No mgs generated.')
 		return {}
-	all_mgs = [
-		(M_ID, MG_GROUP, MG_GROUP[0], nx_out_edges(G, MG_GROUP))
-		for (M_ID, MG_GROUP) in enumerate([list(x) for x in MG_GROUPS])
-	]
-	MG_MINES = {
-		f'mg{M_ID}': {
-			'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
-			'switch': [get_edge_name(swedge[0], swedge[1], omd_list) for swedge in BORDERS],
-			'gen_bus': TREE_ROOT,
-			'gen_obs_existing': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') in ('generator','pvsystem')],
-			'critical_load_kws': [0.0 if ob.get('name') not in CRITICAL_LOADS else float(ob.get('kw','0')) for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
-			'max_potential': '700', #TODO: this and other vars, how to set? Ask Matt.
-			'max_potential_diesel': '1000000',
-			'battery_capacity': '10000'
-		} for (M_ID, MG_GROUP, TREE_ROOT, BORDERS) in all_mgs
-	}
+	MG_MINES = helper(MG_GROUPS, switch, gen_bus)
 	return MG_MINES
 
 if __name__ == '__main__':

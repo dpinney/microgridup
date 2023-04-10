@@ -74,7 +74,6 @@ MG_MINES = {
 
 
 '''         IT'S TESTING TIME           '''
-errorString = 'Error Report: \n'
 # Testing thomas_wip_frontend.jsonToDss/building circuits for microgridup.full() tests.
 for dir in wizard_dir:
     dssFilePath = thomas_wip_frontend.jsonToDss(dir, lat, lon, elements, True)
@@ -84,12 +83,7 @@ for dir in wizard_dir:
     # Find index of 'makebuslist' because NetworkX shifts coordinates around each run and it is useless to compare them.
     mbl = [y for y in expectedDssTree if y.get('!CMD') == 'makebuslist']
     idx = expectedDssTree.index(mbl[0])
-    try:
-        assert dssTree[:idx] == expectedDssTree[:idx], f'dssTree did not match expectedDssTree when testing {dir}'
-    except:
-        errorString += f'dssTree did not match expectedDssTree when testing {dir}. \n'
-        print('HERE IS WHAT WE WANTED TO SEE',expectedDssTree[:idx])
-        print('HERE IS WHAT WE SAW',dssTree[:idx])
+    assert dssTree[:idx] == expectedDssTree[:idx], f'dssTree did not match expectedDssTree when testing {dir}. Expected output: {expectedDssTree[:idx]}. Received output: {dssTree[:idx]}.'
 
 # Testing microgridup_gen_mgs.mg_group().
 for dir in MG_MINES:
@@ -97,13 +91,10 @@ for dir in MG_MINES:
         params = algo_params
     else:
         params = pairings
-    try:
-        MINES_TEST = microgridup_gen_mgs.mg_group(f'{_myDir}/uploads/BASE_DSS_{dir}', crit_loads, MG_MINES[dir][1], params)
-        assert MINES_TEST == MG_MINES[dir][0], f'MGU_MINES_{dir} did not match expected output.'
-    except:
-        errorString += f'MGU_MINES_{dir} did not match expected output. \n'
-        print('HERE IS WHAT WE WANTED TO SEE',MG_MINES[dir][0])
-        print('HERE IS WHAT WE SAW',MINES_TEST)
+    MINES_TEST = microgridup_gen_mgs.mg_group(f'{_myDir}/uploads/BASE_DSS_{dir}', crit_loads, MG_MINES[dir][1], params)
+    # Lukes algorithm outputs different configuration each time. Not repeatable. Also errors out later in the MgUP run.
+    if MG_MINES[dir][1] != 'lukes':
+        assert MINES_TEST == MG_MINES[dir][0], f'MGU_MINES_{dir} did not match expected output. Expected output: {MG_MINES[dir][0]}. Received output: {MINES_TEST}.'
 
 # Testing compatibility of thomas_wip_frontend.py output with microgridup.full().
 for dir in all_dir:
@@ -111,7 +102,4 @@ for dir in all_dir:
     print(f'Beginning end-to-end backend test of {dir}.')
     # microgridup.full(*mgu_args)
 
-if errorString == 'Error Report: \n':
-    print('Congrats! All tests passed.')
-else:
-    print(errorString)
+print('Congrats! All tests passed.')

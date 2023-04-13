@@ -48,13 +48,11 @@ def only_child(G, mgs):
 			continue 
 		siblings = list(G.successors(parent[0]))
 		while parent and len(siblings) == 1:
-			mgs[parent[-1]].append(siblings[0])
-			mgs[parent[-1]].extend(mgs[siblings[0]])
+			mgs[parent[0]].append(siblings[0])
+			mgs[parent[0]].extend(mgs[siblings[0]])
 			del mgs[siblings[0]]
 			parent = list(G.predecessors(parent[0]))
-			if not parent:
-				continue
-			if len(parent) > 1:
+			if not parent or len(parent) > 1:
 				break
 			siblings = list(G.successors(parent[0]))
 	return mgs

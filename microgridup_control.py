@@ -19,8 +19,11 @@ def get_first_nodes_of_mgs(dssTree, microgrids):
 	for key in microgrids:
 		switch = microgrids[key]['switch']
 		if type(switch) is list:
-			switch = switch[-1]
+			switch = switch[-1] if switch[-1] else switch[0]
 		bus2 = [obj.get('bus2') for obj in dssTree if f'line.{switch}' in obj.get('object','')]
+		if not bus2:
+			bus2 = [obj.get('buses') for obj in dssTree if f'transformer.{switch}' in obj.get('object','')]
+			bus2 = [bus2[0][1:-1].split(',')[1]]
 		bus2 = bus2[0].split('.')[0]
 		nodes[key] = bus2
 	return nodes

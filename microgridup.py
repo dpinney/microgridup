@@ -60,6 +60,9 @@ def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
 		with open("user_warnings.txt", "a") as myfile:
 			myfile.write(warning_message)
 	critical_load_percent = max_crit_load/max_load
+	if critical_load_percent > 2:
+		print(f'This critical load percent of {critical_load_percent} is over 2.0, the maximum allowed. Setting critical load percent to 2.0.\n')
+		critical_load_percent = 2.0
 	# print('critical_load_percent:',critical_load_percent)
 	return critical_load_percent, max_crit_load
 
@@ -228,7 +231,9 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 	from diesel_total_calc if True. Returns all gens in a dictionary.
 	TODO: To implement multiple same-type existing generators within a single microgrid, 
 	will need to implement searching the tree of FULL_NAME to find kw ratings of existing gens'''
-	reopt_out = json.load(open(REOPT_FOLDER + '/allOutputData.json'))
+	with open(REOPT_FOLDER + '/allOutputData.json') as file: 
+		reopt_out = json.load(file)
+	# reopt_out = json.load(open(REOPT_FOLDER + '/allOutputData.json'))
 	mg_num = 1
 	gen_sizes = {}
 	'''	Notes: Existing solar and diesel are supported natively in REopt.
@@ -349,7 +354,9 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	will need to implement searching the tree of FULL_NAME to find kw ratings of existing gens'''
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER)
 	# print("build_new_gen_ob_and_shape() gen_sizes into OpenDSS:", gen_sizes)
-	reopt_out = json.load(open(REOPT_FOLDER + '/allOutputData.json'))
+	with open(REOPT_FOLDER + '/allOutputData.json') as file:
+		reopt_out = json.load(file)		
+	# reopt_out = json.load(open(REOPT_FOLDER + '/allOutputData.json'))
 	gen_df_builder = pd.DataFrame()
 	gen_obs = []
 	mg_num = 1
@@ -536,7 +543,9 @@ def gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_FINAL):
 	To run this effectively when not running feedback_reopt_gen_values(), specify REOPT_FOLDER_BASE for both of the final arguments
 	SIDE EFFECTS: creates REF_NAME generator reference shape'''
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER_FINAL, diesel_total_calc=False)
-	reopt_final_out = json.load(open(REOPT_FOLDER_FINAL + '/allOutputData.json'))
+	with open(REOPT_FOLDER_FINAL + '/allOutputData.json') as file:
+		reopt_final_out = json.load(file)	
+	# reopt_final_out = json.load(open(REOPT_FOLDER_FINAL + '/allOutputData.json'))
 	ref_df_builder = pd.DataFrame()
 	solar_size_total = gen_sizes.get('solar_size_total')
 	wind_size_total = gen_sizes.get('wind_size_total')
@@ -914,7 +923,9 @@ def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_st
 
 def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False):
 	''' Generate a report on each microgrid '''
-	reopt_out = json.load(open(REOPT_FOLDER + inputName))
+	with open(REOPT_FOLDER + inputName) as file:
+		reopt_out = json.load(file)
+	# reopt_out = json.load(open(REOPT_FOLDER + inputName))
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False)
 	print("microgrid_report_csv() gen_sizes into CSV report:", gen_sizes)
 	solar_size_total = gen_sizes.get('solar_size_total')
@@ -1063,7 +1074,9 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 
 def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False):
 	''' Generate a dictionary report for each key for all microgrids. '''
-	reopt_out = json.load(open(REOPT_FOLDER + inputName))
+	with open(REOPT_FOLDER + inputName) as file:
+		reopt_out = json.load(file)
+	# reopt_out = json.load(open(REOPT_FOLDER + inputName))
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False)
 	solar_size_total = gen_sizes.get('solar_size_total')
 	solar_size_new = gen_sizes.get('solar_size_new')
@@ -1398,7 +1411,9 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	# Globals
 	all_html = ''
 	legend_spec = {'orientation':'h', 'xanchor':'left'}#, 'x':0, 'y':-0.2}
-	allOutData = json.load(open(allOutDataPath))
+	with open(allOutDataPath) as file:
+		allOutData = json.load(file)	
+	# allOutData = json.load(open(allOutDataPath))
 	# Make timeseries charts
 	plotlyData = {
 		'Generation Serving Load':'powerGenerationData1',
@@ -1477,11 +1492,15 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	fin_fig_html = fin_fig.to_html(default_height='600px')
 	all_html = fin_fig_html + all_html
 	# Nice input display
-	allInputData = json.load(open(allInputDataPath))
+	with open(allInputDataPath) as file:
+		allInputData = json.load(file)	
+	# allInputData = json.load(open(allInputDataPath))
 	allInputData['loadShape'] = 'From File'
 	allInputData['criticalLoadShape'] = 'From File'
 	# Templating.
-	mgd_template = j2.Template(open(f'{MGU_FOLDER}/template_microgridDesign.html').read())
+	with open(f'{MGU_FOLDER}/template_microgridDesign.html') as file:
+		mgd_template = j2.Template(file.read())
+	# mgd_template = j2.Template(open(f'{MGU_FOLDER}/template_microgridDesign.html').read())
 	mgd = mgd_template.render(
 		chart_html=all_html,
 		allInputData=allInputData
@@ -1636,7 +1655,9 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		# generate a decent chart of additional generation.
 		chart_html = summary_charts(stats)
 		# Write out overview iframe
-		over_template = j2.Template(open(f'{MGU_FOLDER}/template_overview.html').read())
+		with open(f'{MGU_FOLDER}/template_overview.html') as file:
+			over_template = j2.Template(file.read())
+		# over_template = j2.Template(open(f'{MGU_FOLDER}/template_overview.html').read())
 		over = over_template.render(
 			chart_html=chart_html,
 			summary=stats,
@@ -1648,7 +1669,9 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		with open('overview.html', 'w') as overfile:
 			overfile.write(over)
 		# Write full output
-		template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
+		with open(f'{MGU_FOLDER}/template_output.html') as file:
+			template = j2.Template(file.read())
+		# template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
 		out = template.render(
 			raw_files = _walkTree('.'),
 			model_name = MODEL_DIR,

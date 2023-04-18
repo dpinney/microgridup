@@ -16,9 +16,7 @@ Unit tests for microgridup_gen_mgs, microgridup_gui.jsonToDss, end to end tests 
 
 import os
 from collections import OrderedDict
-import microgridup_gen_mgs
-import microgridup_gui
-import microgridup
+import microgridup_gen_mgs, microgridup_gui, microgridup_control, microgridup
 from omf.solvers.opendss import dssConvert
 
 _myDir = os.path.abspath(os.path.dirname(__file__))
@@ -97,8 +95,17 @@ for dir in MG_MINES:
     if MG_MINES[dir][1] != 'lukes':
         assert MINES_TEST == MG_MINES[dir][0], f'MGU_MINES_{dir} did not match expected output.\nExpected output: {MG_MINES[dir][0]}.\nReceived output: {MINES_TEST}.'
 
+# Testing microgridup_control.play()
+FAULTED_LINE = 670671
+for dir in all_dir:
+    if 'lukes' in dir:
+        continue # NOTE: Remove this statement if support for lukes (multiple points of connection) is added.
+    final_run_count = len(MG_MINES[dir][0]) - 1 # FULL_NAME is based on the count of the microgrid in the final run.
+    print(f'---------------------------------------------------------\nRunning test of microgridup_control.play() on {dir}.\n---------------------------------------------------------')
+    microgridup_control.play(f'circuit_plusmg_{final_run_count}.dss', f'{_myDir}/{dir}', MG_MINES[dir][0], FAULTED_LINE)
+
 # Testing compatibility of microgridup_gui.py output with microgridup.full().
 for dir in all_dir:
     mgu_args = [dir, f'{_myDir}/uploads/BASE_DSS_{dir}', f'{_myDir}/uploads/LOAD_CSV_{dir}', 480.0, 0.5, REOPT_INPUTS, MG_MINES[dir][0], '670671']
-    print(f'----------------------------------------\nBeginning end-to-end backend test of {dir}.\n----------------------------------------')
+    print(f'---------------------------------------------------------\nBeginning end-to-end backend test of {dir}.\n---------------------------------------------------------')
     microgridup.full(*mgu_args)

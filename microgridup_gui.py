@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import multiprocessing
 import os
 import shutil
@@ -353,7 +354,29 @@ def getLoads(path):
 	loads = [obj.get('object','').split('.')[1] for obj in tree if 'load.' in obj.get('object','')]
 	return loads
 
+def _tests():
+	lat = 39.7817
+	lon = -89.6501
+	with open('test_params.json') as file:
+		test_params = json.load(file)
+	MG_MINES = test_params['MG_MINES']
+	wizard_dir = [dir for dir in MG_MINES if 'wizard' in dir]
+	elements = test_params['elements']
+	templateDssTree = test_params['templateDssTree']
+	# Testing jsonToDss().
+	for dir in wizard_dir:
+		dssFilePath = jsonToDss(dir, lat, lon, elements, True)
+		dssTree = dssConvert.dssToTree(dssFilePath)
+		expectedDssTree = templateDssTree
+		expectedDssTree[2] = OrderedDict([('!CMD', 'new'), ('object', f'circuit.{dir.lower()}')])
+		# Find index of 'makebuslist' because NetworkX shifts coordinates around each run and it is useless to compare them.
+		mbl = [y for y in expectedDssTree if y.get('!CMD') == 'makebuslist']
+		idx = expectedDssTree.index(mbl[0])
+		assert dssTree[:idx] == expectedDssTree[:idx], f'dssTree did not match expectedDssTree when testing {dir}.\nExpected output: {expectedDssTree[:idx]}.\nReceived output: {dssTree[:idx]}.'
+	return print('Ran all tests for for microgridup_gui.py.')
+
 if __name__ == "__main__":
+	# _tests()
 	if platform.system() == "Darwin":  # MacOS
 		os.environ['NO_PROXY'] = '*' # Workaround for macOS proxy behavior
 		multiprocessing.set_start_method('forkserver') # Workaround for Catalina exec/fork behavior

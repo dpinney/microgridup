@@ -1,7 +1,9 @@
+import json
+import os
 from omf.solvers import opendss
 import networkx as nx
 from pprint import pprint as pp
-from collections import defaultdict
+from collections import OrderedDict, defaultdict
 
 # Auto gen some microgrid descriptions.
 # See experiments with networkx here: https://colab.research.google.com/drive/1RZyD6pRIdRAT-V2sBB0nPKVIvZP_RGHw
@@ -341,6 +343,24 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 	MG_MINES = helper(MG_GROUPS, switch, gen_bus)
 	return MG_MINES
 
+def _tests():
+	_myDir = os.path.abspath(os.path.dirname(__file__))
+	with open('test_params.json') as file:
+		test_params = json.load(file)
+	MG_MINES = test_params['MG_MINES']
+	algo_params = test_params['algo_params']
+	crit_loads = test_params['crit_loads']
+	# Testing microgridup_gen_mgs.mg_group().
+	for dir in MG_MINES:
+		if MG_MINES[dir][1] == 'manual':
+			params = algo_params
+		else:
+			params = algo_params['pairings']
+		MINES_TEST = mg_group(f'{_myDir}/uploads/BASE_DSS_{dir}', crit_loads, MG_MINES[dir][1], params)
+		# Lukes algorithm outputs different configuration each time. Not repeatable. Also errors out later in the MgUP run.
+		if MG_MINES[dir][1] != 'lukes':
+			assert MINES_TEST == MG_MINES[dir][0], f'MGU_MINES_{dir} did not match expected output.\nExpected output: {MG_MINES[dir][0]}.\nReceived output: {MINES_TEST}.'
+	return print('Ran all tests for microgridup_gen_mgs.py.')
+
 if __name__ == '__main__':
-	mgs = mg_group(CIRC_FILE, CRITICAL_LOADS, 'lukes')
-	pp(mgs)
+	_tests()

@@ -1695,10 +1695,12 @@ def _tests():
 		test_params = json.load(file)
 	MG_MINES = test_params['MG_MINES']
 	REOPT_INPUTS = test_params['REOPT_INPUTS']
+	QSTS_STEPS = 480.0
+	FOSSIL_BACKUP_PERCENT = 0.5
 	FAULTED_LINE = '670671'
 	# Test of full().
 	for dir in MG_MINES:
-		mgu_args = [dir, f'{_myDir}/uploads/BASE_DSS_{dir}', f'{_myDir}/uploads/LOAD_CSV_{dir}', 480.0, 0.5, REOPT_INPUTS, MG_MINES[dir][0], FAULTED_LINE]
+		mgu_args = [dir, f'{_myDir}/uploads/BASE_DSS_{dir}', f'{_myDir}/uploads/LOAD_CSV_{dir}', QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MG_MINES[dir][0], FAULTED_LINE]
 		print(f'---------------------------------------------------------\nBeginning end-to-end backend test of {dir}.\n---------------------------------------------------------')
 		full(*mgu_args)
 	return print('Ran all tests for microgridup.py.')

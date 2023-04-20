@@ -1,20 +1,12 @@
-from collections import OrderedDict
-import multiprocessing
-import os
-import shutil
-import platform
-from pprint import pprint as pp
-import time
+import base64, io, json, multiprocessing, os, platform, shutil, time
 import networkx as nx
-import microgridup
+from collections import OrderedDict
 from matplotlib import pyplot as plt
-import base64
-import io 
-import json
-from flask import Flask, flash, request, redirect, render_template, jsonify, url_for
+from flask import Flask, flash, request, redirect, render_template, jsonify
 from werkzeug.utils import secure_filename
 from omf.solvers.opendss import dssConvert
 from microgridup_gen_mgs import mg_group, nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch
+from microgridup import full
 
 _myDir = os.path.abspath(os.path.dirname(__file__))
 
@@ -322,7 +314,7 @@ def run():
 		request.form['FAULTED_LINE']
 	]
 	# Kickoff the run
-	new_proc = multiprocessing.Process(target=microgridup.full, args=mgu_args)
+	new_proc = multiprocessing.Process(target=full, args=mgu_args)
 	new_proc.start()
 	# Redirect to home after waiting a little for the file creation to happen.
 	time.sleep(5)

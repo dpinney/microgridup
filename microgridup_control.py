@@ -1,18 +1,11 @@
-import json
-import os, csv, math
+import os, csv, math, json
 import pandas as pd
 import numpy as np
-import collections
-import scipy.stats as st
-import plotly
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-import math
 import networkx as nx
+from collections import defaultdict
+from plotly import graph_objects, offline, subplots
 
 # OMF imports
-import omf
-from omf.solvers.opendss import dssConvert
 from omf.solvers import opendss
 
 def get_first_nodes_of_mgs(dssTree, microgrids):
@@ -30,7 +23,7 @@ def get_first_nodes_of_mgs(dssTree, microgrids):
 	return nodes
 
 def get_all_mg_elements(dssPath, microgrids):
-	dssTree = dssConvert.dssToTree(dssPath)
+	dssTree = opendss.dssConvert.dssToTree(dssPath)
 	first_nodes = get_first_nodes_of_mgs(dssTree, microgrids)
 	G = opendss.dssConvert.dss_to_networkx(dssPath)
 	all_mg_elements = {}
@@ -58,10 +51,10 @@ def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, vsou
 	# Grab all elements by mg. 
 	all_mg_elements = get_all_mg_elements(dssPath, microgrids)
 	print('JSON compatible representation of all_mg_elements (for jinja-ing into the circuit map):',convert_to_json(all_mg_elements))
-	dssTree = dssConvert.dssToTree(dssPath)
+	dssTree = opendss.dssConvert.dssToTree(dssPath)
 
 	# Divide up transformers and loads by microgrid.
-	data = collections.defaultdict(list)
+	data = defaultdict(list)
 	for key in microgrids:
 		data['Microgrid ID'].append(key)
 
@@ -350,7 +343,7 @@ def plot_manual_balance_approach(mg_key, year, outageStart, outageEnd, new_batt_
 	start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outageStart)
 	for idx in range(len(plotting_variables)):
 		# Traces for gen, load, storage.
-		trace = go.Scatter(
+		trace = graph_objects.Scatter(
 			x = pd.to_datetime(range(lengthOfOutage), unit = 'h', origin = start_time), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
 			y = plotting_variables[idx],
 			showlegend = True,
@@ -360,14 +353,14 @@ def plot_manual_balance_approach(mg_key, year, outageStart, outageEnd, new_batt_
 		data.append(trace)
 
 	# Plots load traces, gen traces, storage traces.
-	layout = go.Layout(
+	layout = graph_objects.Layout(
 		title = f'{mg_key} Generation, Load, and Storage in Fully Renewable Microgrid During Outage',
 		xaxis = dict(title = 'Date'),
 		yaxis = dict(title = "kW")
 	)
-	fig = plotly.graph_objs.Figure(data, layout)
+	fig = graph_objects.Figure(data, layout)
 	out_name = f'{mg_key}_gen_load_storage.plot.html'
-	plotly.offline.plot(fig, filename=out_name, auto_open=False)
+	offline.plot(fig, filename=out_name, auto_open=False)
 	return out_name
 
 def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_name, y_axis_name, ansi_bands=False, batt_cycle_chart=False, fossil_loading_chart=False, vsource_ratings=None, rengen_mgs=None):
@@ -487,7 +480,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 					mmbtu_dict[legend_group] = mmbtu_consumption_outage
 				# Make fossil loading percentages traces.
 				fossil_percent_loading = [(x / float(fossil_kw_rating)) * -100 for x in this_series[y_name]] if "fossil_" in ob_name else [(x / float(fossil_kw_rating)) * 100 for x in this_series[y_name]]
-				fossil_trace = go.Scatter(
+				fossil_trace = graph_objects.Scatter(
 					x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
 					y = fossil_percent_loading,
 					legendgroup=legend_group,
@@ -541,7 +534,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 			else:
 				plot_legend_group = legend_group
 			if not this_series[y_name].isnull().values.any():
-				trace = go.Scatter(
+				trace = graph_objects.Scatter(
 					x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
 					y = y_axis,
 					legendgroup=plot_legend_group,
@@ -554,13 +547,13 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 	
 	# Make fossil genset loading plot. 
 	if fossil_loading_chart == True:
-		new_layout = go.Layout(
+		new_layout = graph_objects.Layout(
 			title = f"Fossil Genset Loading Percentage ({csvName})",
 			xaxis = dict(title = 'Date'),
 			yaxis = dict(title = 'Fossil Percent Loading')
 			)
-		fossil_fig = plotly.graph_objs.Figure(fossil_traces, new_layout)
-		plotly.offline.plot(fossil_fig, filename=f'{csvName}_fossil_loading.plot.html', auto_open=False)
+		fossil_fig = graph_objects.Figure(fossil_traces, new_layout)
+		offline.plot(fossil_fig, filename=f'{csvName}_fossil_loading.plot.html', auto_open=False)
 
 		# Calculate total fossil genset consumption and make fossil fuel consumption chart. 
 		fossil_kwh_output = "{:e}".format(fossil_kwh_output)
@@ -570,9 +563,9 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 		diesel_dict = dict(sorted(diesel_dict.items()))
 		mmbtu_dict = dict(sorted(mmbtu_dict.items()))
 
-		fig = make_subplots(shared_xaxes=True, specs=[[{"secondary_y": True}]])
-		fig.add_trace(go.Bar(x = list(diesel_dict.keys()), y = list(diesel_dict.values()), name="Diesel"), secondary_y=False)
-		fig.add_trace(go.Bar(x = list(mmbtu_dict.keys()), y = list(mmbtu_dict.values()), name="Gas"), secondary_y=True)
+		fig = subplots.make_subplots(shared_xaxes=True, specs=[[{"secondary_y": True}]])
+		fig.add_trace(graph_objects.Bar(x = list(diesel_dict.keys()), y = list(diesel_dict.values()), name="Diesel"), secondary_y=False)
+		fig.add_trace(graph_objects.Bar(x = list(mmbtu_dict.keys()), y = list(mmbtu_dict.values()), name="Gas"), secondary_y=True)
 		fig.update_layout(
 		    title_text = f"Diesel and Natural Gas Equivalent Consumption During Outage By Microgrid<br><sup>Total Consumption in Gallons of Diesel = {total_gal_diesel} || Total Consumption in MMBTU Natural Gas = {total_mmbtu_gas}|| Total Ouput in kWh = {fossil_kwh_output}</sup>"
 		)
@@ -580,30 +573,30 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 		fig.update_yaxes(title_text="Gallons of Diesel Equivalent Consumed During Outage", secondary_y=False)
 		fig.update_yaxes(title_text="MMBTU of Natural Gas Equivalent Consumed During Outage", secondary_y=True)
 
-		plotly.offline.plot(fig, filename=f'{csvName}_fuel_consumption.plot.html', auto_open=False)
+		offline.plot(fig, filename=f'{csvName}_fuel_consumption.plot.html', auto_open=False)
 
 	# Make battery cycles bar chart.
 	if batt_cycle_chart == True:
 		batt_cycles = dict(sorted(batt_cycles.items()))
-		new_trace = go.Bar(
+		new_trace = graph_objects.Bar(
 			x = list(batt_cycles.keys()), 
 			y = list(batt_cycles.values()) 
 		)
-		new_layout = go.Layout(
+		new_layout = graph_objects.Layout(
 			title = "Battery Cycles During Analysis Period",
 			xaxis = dict(title = 'Battery'),
 			yaxis = dict(title = 'Cycles')
 			)
-		new_fig = plotly.graph_objs.Figure(new_trace, new_layout)
-		plotly.offline.plot(new_fig, filename=f'{csvName}_battery_cycles.plot.html', auto_open=False)
+		new_fig = graph_objects.Figure(new_trace, new_layout)
+		offline.plot(new_fig, filename=f'{csvName}_battery_cycles.plot.html', auto_open=False)
 
 	# Plots for gen, load, control.
-	layout = go.Layout(
+	layout = graph_objects.Layout(
 		title = f'{chart_name} <br><sup>Dotted black lines indicate outage start and end times</sup>',
 		xaxis = dict(title = 'Date'),
 		yaxis = dict(title = y_axis_name)
 	)
-	fig = plotly.graph_objs.Figure(data, layout)
+	fig = graph_objects.Figure(data, layout)
 	if ansi_bands == True:
 		line_style = {'color':'Red', 'width':3, 'dash':'dashdot'}
 		fig.add_hline(y=0.9, line=line_style)
@@ -614,7 +607,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 	end_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outageStart) + pd.Timedelta(hours=lengthOfOutage)
 	fig.add_vline(x=start_time, line=outage_line_style)
 	fig.add_vline(x=end_time, line=outage_line_style)
-	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
+	offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
 def play(pathToDss, workDir, microgrids, faultedLine):
 	# TODO: do we need non-default outage timing?
@@ -628,7 +621,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 	if curr_dir != workDir:
 		os.chdir(workDir)
 	# Read in the circuit information.
-	dssTree = dssConvert.dssToTree(pathToDss)
+	dssTree = opendss.dssConvert.dssToTree(pathToDss)
 	# Add the fault, modeled as a 3 phase open, to the actions.
 	actions[outageStart] = f'''
 		open object=line.{faultedLine} term=1
@@ -742,7 +735,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 	actions[outageStart] += f'calcv\n'
 	actions[outageEnd] += f'calcv\n'
 	# Write the adjusted opendss file with new kw, generators.
-	dssConvert.treeToDss(dssTree, 'circuit_control.dss')
+	opendss.dssConvert.treeToDss(dssTree, 'circuit_control.dss')
 	# Run the simulation
 	FPREFIX = 'timezcontrol'
 	opendss.newQstsPlot(

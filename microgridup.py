@@ -1527,7 +1527,8 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 		# Draw the circuit oneline.
 		distNetViz.viz(OMD_NAME, forceLayout=False, outputPath='.', outputName=ONELINE_NAME, open_file=False)
 		# Draw the map.
-		geo.mapOmd(OMD_NAME, MAP_NAME, 'html', openBrowser=False, conversion=False)
+		# geo.mapOmd(OMD_NAME, MAP_NAME, 'html', openBrowser=False, conversion=False)
+		geo.map_omd(OMD_NAME, MAP_NAME, open_browser=False)
 		# Powerflow outputs.
 		print('QSTS with ', FULL_NAME, 'AND CWD IS ', os.getcwd())
 		opendss.newQstsPlot(FULL_NAME,

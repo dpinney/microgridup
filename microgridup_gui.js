@@ -252,7 +252,7 @@ $('#makeDropdowns').on('click', function() {
         $(this).append('<option value="">None</option>')
         for (let i = 0; i < numMgs; i++) {
             var count = i + 1;
-            $(this).append('<option value="">Mg' + count + '</option>');
+            $(this).append('<option value="Mg' + count + '">Mg' + count + '</option>');
         }
     });
     $('#dropDowns').show();
@@ -477,10 +477,9 @@ var elements = `
 function fillWizardLehigh() {
     $('#elements').replaceWith(elements);
 }
-
-var dropDowns = `
-<div id="dropDowns" class="chunk" style=""><div id="switchGenbus"><label for="mg1Genbus">Mg1 Gen Bus: </label><input id="mg1Genbus" type="text"><label for="mg1Switch"> Mg1 Switch: </label><input id="mg1Switch" type="text"><br><label for="mg2Genbus">Mg2 Gen Bus: </label><input id="mg2Genbus" type="text"><label for="mg2Switch"> Mg2 Switch: </label><input id="mg2Switch" type="text"><br><label for="mg3Genbus">Mg3 Gen Bus: </label><input id="mg3Genbus" type="text"><label for="mg3Switch"> Mg3 Switch: </label><input id="mg3Switch" type="text"><br></div><label><select><option value="">None</option><option value="">Mg1</option><option value="">Mg2</option><option value="">Mg3</option></select> 684_command_center</label><br><label><select><option value="">None</option><option value="">Mg1</option><option value="">Mg2</option><option value="">Mg3</option></select> 634a_data_center</label><br><label><select><option value="">None</option><option value="">Mg1</option><option value="">Mg2</option><option value="">Mg3</option></select> 634b_radar</label><br><label><select><option value="">None</option><option value="">Mg1</option><option value="">Mg2</option><option value="">Mg3</option></select> 634c_atc_tower</label><br><label><select><option value="">None</option><option value="">Mg1</option><option value="">Mg2</option><option value="">Mg3</option></select> 645_hangar</label><br><label><select><option value="">None</option><option value="">Mg1</option><option value="">Mg2</option><option value="">Mg3</option></select> 646_office</label><br><label><select><option value="">None</option><option value="">Mg1</option><option value="">Mg2</option><option value="">Mg3</option></select> 692_warehouse2</label><br><label><select><option value="">None</option><option value="">Mg1</option><option value="">Mg2</option><option value="">Mg3</option></select> 675a_hospital</label><br><label><select><option value="">None</option><option value="">Mg1</option><option value="">Mg2</option><option value="">Mg3</option></select> 675b_residential1</label><br><label><select><option value="">None</option><option value="">Mg1</option><option value="">Mg2</option><option value="">Mg3</option></select> 675c_residential1</label><br><label><select><option value="">None</option><option value="">Mg1</option><option value="">Mg2</option><option value="">Mg3</option></select> 611_runway</label><br><label><select><option value="">None</option><option value="">Mg1</option><option value="">Mg2</option><option value="">Mg3</option></select> 652_residential</label><br><label><select><option value="">None</option><option value="">Mg1</option><option value="">Mg2</option><option value="">Mg3</option></select> 670a_residential2</label><br><label><select><option value="">None</option><option value="">Mg1</option><option value="">Mg2</option><option value="">Mg3</option></select> 670b_residential2</label><br><label><select><option value="">None</option><option value="">Mg1</option><option value="">Mg2</option><option value="">Mg3</option></select> 670c_residential2</label><br></div>
-`
-function fillDropdownsLehigh() {
-    $('#dropdowns').replaceWith(dropDowns);
-}
+// TO DO: Avoid using below hack in Selenium frontend tests.
+(function ($) {
+    window.fillWizardLehigh = function(){
+        $('#elements').replaceWith(elements);
+    };
+}) (jQuery);

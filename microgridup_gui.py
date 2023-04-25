@@ -8,14 +8,14 @@ from omf.solvers.opendss import dssConvert
 from microgridup_gen_mgs import mg_group, nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch
 from microgridup import full
 
-_myDir = os.path.abspath(os.path.dirname(__file__))
+_mguDir = os.path.abspath(os.path.dirname(__file__))
+_analysisDir = f'{_mguDir}/data/projects'
 
-ALLOWED_EXTENSIONS = {'dss'}
-
-app = Flask(__name__, static_folder='', template_folder='') #TODO: we cannot make these folders the root.
+app = Flask(__name__, static_folder='data', template_folder='templates')
 
 def list_analyses():
-	return [x for x in os.listdir(_myDir) if os.path.isdir(x) and os.path.isfile(f'{x}/circuit.dss')] #TODO: fix this gross hack.
+	all_analyses = [x for x in os.listdir(_analysisDir) if os.path.isdir(f'{_analysisDir}/{x}')]
+	return all_analyses
 
 @app.route('/')
 def home():
@@ -24,30 +24,30 @@ def home():
 
 @app.route('/load/<analysis>')
 def load(analysis):
-	ana_files = os.listdir(analysis)
+	ana_files = os.listdir(f'{_analysisDir}/{analysis}')
 	if '0crashed.txt' in ana_files:
 		return 'Model Crashed. Please delete and recreate.'
 	elif '0running.txt' in ana_files:
 		return 'Model Running. Please reload to check for completion.'
 	elif 'output_final.html' in ana_files:
-		return redirect(f'/{analysis}/output_final.html')
+		return redirect(f'/data/projects/{analysis}/output_final.html')
 	else:
 		return 'Model is in an inconsistent state. Please delete and recreate.'
 
 @app.route('/edit/<analysis>')
 def edit(analysis):
 	try:
-		with open(f'{_myDir}/{analysis}/allInputData.json') as in_data_file:
+		with open(f'{_analysisDir}/{analysis}/allInputData.json') as in_data_file:
 			in_data = json.load(in_data_file)
 	except:
 		in_data = None
-	return render_template('microgridup_gui.html', in_data=in_data)
+	return render_template('template_new.html', in_data=in_data)
 
 @app.route('/new')
 def newGui():
-	with open(f'{_myDir}/lehigh_3mg_inputs.json') as default_in_file:
+	with open(f'{_mguDir}/data/static/lehigh_3mg_inputs.json') as default_in_file:
 		default_in = json.load(default_in_file)
-	return render_template('microgridup_gui.html', in_data=default_in)
+	return render_template('template_new.html', in_data=default_in)
 
 @app.route('/duplicate', methods=["POST"])
 def duplicate():
@@ -57,7 +57,7 @@ def duplicate():
 	if (analysis not in analyses) or (new_name in analyses):
 		return 'Duplication failed. Analysis does not exist or the new name is invalid.'
 	else:
-		shutil.copytree(analysis, new_name)
+		shutil.copytree(analysis, f'{_analysisDir}/{new_name}')
 		return f'Successfully duplicated {analysis} as {new_name}.'
 
 @app.route('/jsonToDss', methods=['GET','POST'])
@@ -70,7 +70,6 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 		lon = float(request.form['longitude'])
 	if not elements:
 		elements = json.loads(request.form['json'])
-
 	# Convert to DSS and return loads.
 	dssString = f'clear \nset defaultbasefrequency=60 \nnew object=circuit.{model_dir} \n'
 	# Name substation bus after substation itself. Name gen bus after the feeder. Having parent/child connections could be a useful shortcut + add robustness.
@@ -98,34 +97,27 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 			dssString += f'new object=storage.{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 kv=0.277 kwrated=79 kwhstored=307 kwhrated=307 dispmode=follow %charge=100 %discharge=100 %effcharge=96 %effdischarge=96 \n'
 		elif obType == 'diesel':
 			dssString += f'new object=generator.{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 kw=265 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 \n'	
-	
 	# Convert dssString to a networkx graph.
 	tree = dssConvert.dssToTree(dssString, is_path=False)
 	G = dssConvert.dss_to_networkx('', tree=tree)
-
 	# Set twopi layout to custom coordinates.
-	dssFilePath = f'{_myDir}/uploads/BASE_DSS_{model_dir}'
+	dssFilePath = f'{_mguDir}/uploads/BASE_DSS_{model_dir}'
 	G = dssConvert.dss_to_networkx(dssFilePath)
 	pos = nx.drawing.nx_agraph.graphviz_layout(G, prog="twopi", args="")
-
 	# Define the scale
 	scale_factor = 0.00005
-	
 	# Calculate the translation coordinates
 	x_offset = lon - (scale_factor * (max(pos.values(), key=lambda x: x[0])[0] - min(pos.values(), key=lambda x: x[0])[0])) / 2
 	y_offset = lat - (scale_factor * (max(pos.values(), key=lambda x: x[1])[1] - min(pos.values(), key=lambda x: x[1])[1])) / 2
-	
 	# Apply the translation and scaling to the layout
 	new_pos = {node: (scale_factor * (x - min(pos.values(), key=lambda x: x[0])[0]) + x_offset, scale_factor * (y - min(pos.values(), key=lambda x: x[1])[1]) + y_offset) for node, (x, y) in pos.items()}
-
 	dssString += 'makebuslist \n'
 	for bus in busList:
 		new_pos_bus = bus.lower()
 		dssString += f'setbusxy bus={bus} y={new_pos[new_pos_bus][1]} x={new_pos[new_pos_bus][0]} \n'
 	dssString += 'set voltagebases=[115,4.16,0.48]\ncalcvoltagebases'
-
-	if not os.path.isdir(f'{_myDir}/uploads'):
-		os.mkdir(f'{_myDir}/uploads')
+	if not os.path.isdir(f'{_mguDir}/uploads'):
+		os.mkdir(f'{_mguDir}/uploads')
 	with open(dssFilePath, "w") as outFile:
 		outFile.writelines(dssString)
 	loads = getLoads(dssFilePath)
@@ -151,11 +143,11 @@ def uploadDss():
 			return redirect(request.url)
 		if file and allowed_file(file.filename):
 			filename = secure_filename(file.filename)
-			if not os.path.isdir(f'{_myDir}/uploads'):
-				os.mkdir(f'{_myDir}/uploads')
-			file.save(f'{_myDir}/uploads/BASE_DSS_{model_dir}')
-			loads = getLoads(file.filename)
-			return jsonify(loads=loads, filename=f'{_myDir}/uploads/BASE_DSS_{model_dir}')
+			if not os.path.isdir(f'{_mguDir}/uploads'):
+				os.mkdir(f'{_mguDir}/uploads')
+			file.save(f'{_mguDir}/uploads/BASE_DSS_{model_dir}')
+			loads = getLoads(f'{_mguDir}/uploads/BASE_DSS_{model_dir}')
+			return jsonify(loads=loads, filename=f'{_mguDir}/uploads/BASE_DSS_{model_dir}')
 	return ''
 
 @app.route('/previewPartitions', methods = ['GET','POST'])
@@ -164,10 +156,8 @@ def previewPartitions():
 	CRITICAL_LOADS = json.loads(request.form['critLoads'])
 	METHOD = json.loads(request.form['method'])
 	MGQUANT = int(json.loads(request.form['mgQuantity']))
-
 	G = dssConvert.dss_to_networkx(CIRC_FILE)
 	algo_params={}
-
 	if METHOD == 'lukes':
 		default_size = int(len(G.nodes())/3)
 		MG_GROUPS = nx_group_lukes(G, algo_params.get('size',default_size))
@@ -180,13 +170,11 @@ def previewPartitions():
 	else:
 		print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", or "criticalLoads". No mgs generated.')
 		return {}
-
 	plt.switch_backend('Agg')
 	plt.figure(figsize=(15,9))
 	pos_G = nice_pos(G)
 	n_color_map = node_group_map(G, MG_GROUPS)
 	nx.draw(G, with_labels=True, pos=pos_G, node_color=n_color_map)
-
 	pic_IObytes = io.BytesIO()
 	plt.savefig(pic_IObytes,  format='png')
 	pic_IObytes.seek(0)
@@ -199,27 +187,27 @@ def run():
 	if 'BASE_DSS_NAME' in request.form and 'LOAD_CSV_NAME' in request.form:
 		print('we are editing an existing model')
 		# editing an existing model
-		dss_path = f'{_myDir}/{model_dir}/circuit.dss'
-		csv_path = f'{_myDir}/{model_dir}/loads.csv'
+		dss_path = f'{_analysisDir}/{model_dir}/circuit.dss'
+		csv_path = f'{_analysisDir}/{model_dir}/loads.csv'
 		all_files = 'Using Existing Files'
 	else:
 		# new files uploaded. 
 		all_files = request.files
 		# Save the files.
-		if not os.path.isdir(f'{_myDir}/uploads'):
-			os.mkdir(f'{_myDir}/uploads')
+		if not os.path.isdir(f'{_mguDir}/uploads'):
+			os.mkdir(f'{_mguDir}/uploads')
 		# Note: Uploaded circuit stored separately.
 		csv_file = all_files['LOAD_CSV']
-		csv_file.save(f'{_myDir}/uploads/LOAD_CSV_{model_dir}')
-		dss_path = f'{_myDir}/uploads/BASE_DSS_{model_dir}'
-		csv_path = f'{_myDir}/uploads/LOAD_CSV_{model_dir}'
+		csv_file.save(f'{_mguDir}/uploads/LOAD_CSV_{model_dir}')
+		dss_path = f'{_mguDir}/uploads/BASE_DSS_{model_dir}'
+		csv_path = f'{_mguDir}/uploads/LOAD_CSV_{model_dir}'
 		# Handle uploaded CSVs for HISTORICAL_OUTAGES and criticalLoadShapeFile. Put both in models folder.    
 		HISTORICAL_OUTAGES = all_files['HISTORICAL_OUTAGES']
 		if HISTORICAL_OUTAGES.filename != '':
-			HISTORICAL_OUTAGES.save(f'{_myDir}/uploads/HISTORICAL_OUTAGES_{model_dir}')
+			HISTORICAL_OUTAGES.save(f'{_mguDir}/uploads/HISTORICAL_OUTAGES_{model_dir}')
 		criticalLoadShapeFile = all_files['criticalLoadShapeFile']
 		if criticalLoadShapeFile.filename != '':
-			criticalLoadShapeFile.save(f'{_myDir}/uploads/criticalLoadShapeFile_{model_dir}')
+			criticalLoadShapeFile.save(f'{_mguDir}/uploads/criticalLoadShapeFile_{model_dir}')
 	# Handle arguments to our main function.
 	crit_loads = json.loads(request.form['CRITICAL_LOADS'])
 	mg_method = request.form['MG_DEF_METHOD']
@@ -304,7 +292,7 @@ def run():
 		# 'windItcPercent':request.form['windItcPercent'],
 	}
 	mgu_args = [
-		request.form['MODEL_DIR'],
+		f'{_analysisDir}/{request.form["MODEL_DIR"]}',
 		dss_path,
 		csv_path,
 		float(request.form['QSTS_STEPS']),
@@ -320,8 +308,8 @@ def run():
 	time.sleep(5)
 	return redirect(f'/')
 
-
 def allowed_file(filename):
+    ALLOWED_EXTENSIONS = {'dss'}
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def gen_col_map(item_ob, map_dict, default_col):
@@ -342,6 +330,7 @@ def nice_pos(G):
 	return nx.drawing.nx_agraph.graphviz_layout(G, prog="twopi", args="")
 
 def getLoads(path):
+	print(f'Working on {path}')
 	tree = dssConvert.dssToTree(path)
 	loads = [obj.get('object','').split('.')[1] for obj in tree if 'load.' in obj.get('object','')]
 	return loads

@@ -48,7 +48,7 @@ def write_test_params():
         'templateDssTree':templateDssTree,
         'MG_MINES':MG_MINES
     }
-    with open('test_params.json', 'w') as file:
+    with open(f'{microgridup.MGU_FOLDER}/testfiles/test_params.json', 'w') as file:
         json.dump(test_params, file, sort_keys=False, indent=4)
     return print('Wrote test_params to test_params.json.')
 

@@ -7,7 +7,6 @@ import microgridup_resilience
 import shutil
 import os
 from os import path
-from pprint import pprint as pp
 import json
 import pandas as pd
 import numpy as np
@@ -15,13 +14,11 @@ import plotly
 import plotly.graph_objects as go
 import csv
 import jinja2 as j2
-import re
-import math
-import random
 import datetime
 import traceback
 
-MGU_FOLDER = os.path.dirname(__file__)
+MGU_FOLDER = os.path.abspath(os.path.dirname(__file__))
+PROJ_FOLDER = f'{MGU_FOLDER}/data/projects'
 
 def _getByName(tree, name):
     ''' Return first object with name in tree as an OrderedDict. '''
@@ -34,7 +31,7 @@ def _getByName(tree, name):
 
 def _walkTree(dirName):
 	listOfFiles = []
-	for (dirpath, dirnames, filenames) in os.walk(dirName):
+	for (dirpath, _, filenames) in os.walk(dirName):
 		listOfFiles += [os.path.join(dirpath, file) for file in filenames]
 	return listOfFiles
 
@@ -1498,7 +1495,7 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	allInputData['loadShape'] = 'From File'
 	allInputData['criticalLoadShape'] = 'From File'
 	# Templating.
-	with open(f'{MGU_FOLDER}/template_microgridDesign.html') as file:
+	with open(f'{MGU_FOLDER}/templates/template_microgridDesign.html') as file:
 		mgd_template = j2.Template(file.read())
 	# mgd_template = j2.Template(open(f'{MGU_FOLDER}/template_microgridDesign.html').read())
 	mgd = mgd_template.render(
@@ -1527,7 +1524,8 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 		# Draw the circuit oneline.
 		distNetViz.viz(OMD_NAME, forceLayout=False, outputPath='.', outputName=ONELINE_NAME, open_file=False)
 		# Draw the map.
-		geo.mapOmd(OMD_NAME, MAP_NAME, 'html', openBrowser=False, conversion=False)
+		# geo.mapOmd(OMD_NAME, MAP_NAME, 'html', openBrowser=False, conversion=False)
+		geo.map_omd(OMD_NAME, MAP_NAME, open_browser=False)
 		# Powerflow outputs.
 		print('QSTS with ', FULL_NAME, 'AND CWD IS ', os.getcwd())
 		opendss.newQstsPlot(FULL_NAME,
@@ -1655,7 +1653,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		# generate a decent chart of additional generation.
 		chart_html = summary_charts(stats)
 		# Write out overview iframe
-		with open(f'{MGU_FOLDER}/template_overview.html') as file:
+		with open(f'{MGU_FOLDER}/templates/template_overview.html') as file:
 			over_template = j2.Template(file.read())
 		# over_template = j2.Template(open(f'{MGU_FOLDER}/template_overview.html').read())
 		over = over_template.render(
@@ -1669,12 +1667,12 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		with open('overview.html', 'w') as overfile:
 			overfile.write(over)
 		# Write full output
-		with open(f'{MGU_FOLDER}/template_output.html') as file:
+		with open(f'{MGU_FOLDER}/templates/template_output.html') as file:
 			template = j2.Template(file.read())
 		# template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
 		out = template.render(
 			raw_files = _walkTree('.'),
-			model_name = MODEL_DIR,
+			model_name =  os.path.basename(MODEL_DIR), # just the filename here please.
 			mg_names_and_reopt_folders = names_and_folders,
 			resilience_show = (OUTAGE_CSV is not None)
 		)

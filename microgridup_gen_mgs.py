@@ -1,9 +1,8 @@
-import json
-import os
+import os, json
 from omf.solvers import opendss
 import networkx as nx
 from pprint import pprint as pp
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 
 # Auto gen some microgrid descriptions.
 # See experiments with networkx here: https://colab.research.google.com/drive/1RZyD6pRIdRAT-V2sBB0nPKVIvZP_RGHw
@@ -345,7 +344,7 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 
 def _tests():
 	_myDir = os.path.abspath(os.path.dirname(__file__))
-	with open('test_params.json') as file:
+	with open('testfiles/test_params.json') as file:
 		test_params = json.load(file)
 	MG_MINES = test_params['MG_MINES']
 	algo_params = test_params['algo_params']

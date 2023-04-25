@@ -3,15 +3,15 @@ import microgridup_gen_mgs as gmg
 
 if __name__ == '__main__':
 	# Input data.
-	CIRC_FILE = 'lehigh_base_3mg.dss'
+	CIRC_FILE = f'{MGU_FOLDER}/testfiles/lehigh_base_3mg.dss'
 	CRITICAL_LOADS = ['645_hangar','684_command_center', '611_runway','675a_hospital','634a_data_center', '634b_radar', '634c_atc_tower']
-	MODEL_DIR = 'auto3mg'
-	BASE_DSS = 'lehigh_base_3mg.dss'
-	LOAD_CSV = 'lehigh_load.csv'
+	MODEL_DIR = f'{PROJ_FOLDER}/auto3mg'
+	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_3mg.dss'
+	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINE = '670671'
 	QSTS_STEPS = 24*20
 	FOSSIL_BACKUP_PERCENT = .5
-	OUTAGE_CSV = 'lehigh_random_outages.csv'
+	OUTAGE_CSV = f'{MGU_FOLDER}/testfiles/lehigh_random_outages.csv'
 	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth 
 	REOPT_INPUTS = {
 		"solar" : "on",

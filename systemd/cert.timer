@@ -1,0 +1,9 @@
+[Unit]
+Description=Cert renewal
+
+[Timer]
+OnBootSec=5min
+OnCalendar=weekly
+
+[Install]
+WantedBy=timers.target

@@ -4,9 +4,9 @@ from microgridup import *
 
 if __name__ == '__main__':
 	# Input data.
-	MODEL_DIR = '2mgs'
-	BASE_DSS = 'lehigh_base_2mg.dss'
-	LOAD_CSV = 'lehigh_load.csv'
+	MODEL_DIR = f'{PROJ_FOLDER}/2mgs'
+	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_2mg.dss'
+	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINE = '650632'
 	QSTS_STEPS = 24*20
 	FOSSIL_BACKUP_PERCENT = 0

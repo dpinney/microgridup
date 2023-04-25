@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- <link rel="stylesheet" href="/main.css"> -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>MicrogridUP &raquo; iowa240_1mg</title>
+    <style type="text/css">
+        /* SEMANTIC ELEMENTS */
+        :root {
+            /* Heading div was moved into top nav */
+            /*--headingDivHeight: 3rem;*/
+            --mobileToDesktopBreakpointWidth: 977px;
+            --sideNavWidth: 272px;
+            --sideNavTransitionTime: 0.3s;
+            --topNavHeight: 64px;
+        }
+        @media screen and (min-width: 977px) {
+            article {
+                margin: 0;
+                transition: margin-left var(--sideNavTransitionTime);
+            }
+            article.compressed {
+                margin-left: var(--sideNavWidth);
+                transition: margin-left var(--sideNavTransitionTime);
+            }
+        }
+        body {
+            margin: 0;
+            background: white;
+        }
+        body.loading {
+            overflow-y: hidden;
+        }
+        header {
+            height: var(--topNavHeight);
+            position: fixed;
+            top: 0;
+            width: 100%;
+        }
+        header span {
+            color: white;
+        }
+        iframe {
+            border: 0;
+            width: 100%;
+            height: calc(99.5vh - var(--topNavHeight));
+            /*height: calc(99vh - var(--topNavHeight) - var(--headingDivHeight));*/
+        }
+        main {
+            height: calc(100% - var(--topNavHeight));
+            padding: var(--topNavHeight) 0px 0px 0px;
+        }
+        main.loading {
+            padding: initial;
+        }
+        /* No longer used
+        div.div--spanDisplay {
+            align-items: center;
+            display: flex;
+            height: var(--headingDivHeight);
+        } */
+        section.hidden {
+            display: none;
+        }
+        section.loading {
+            visibility: hidden;
+        }
+        span.span--sectionTitle {
+            font-family: sans-serif;
+            font-size: 2rem;
+            padding-left: 1rem;
+        }
+        div > span.span--sectionTitle:nth-child(2) {
+            padding-left: .5rem;
+        }
+        /* TOP NAV */
+        nav.js-nav--topNav {
+            background: black;
+            display: flex;
+            height: 100%;
+        }
+        /* TOP NAV ANCHORS */
+        nav.js-nav--topNav a {
+            text-decoration: none;
+        }
+        /* TOP NAV BUTTONS */
+        nav.js-nav--topNav button {
+            border: 0;
+            background-color: transparent;
+            cursor: pointer;
+            padding: 14px;
+            width: var(--topNavHeight);
+        }
+        nav.js-nav--topNav button:hover {
+            background-color: gray;
+            transition: background-color 0.2s ease-out;
+        }
+        /* TOP NAV SPANS */
+        nav.js-nav--topNav div {
+            align-items: center;
+            display: flex;
+        }
+        /* TOP NAV SVGS */
+        nav.js-nav--topNav svg {
+            fill: white;
+        }
+        /* SIDE NAV */
+        nav.js-nav--sideNav {
+            /*background-clip: content-box;*/
+            background-color: white;
+            box-shadow: inset -1px 0px darkgray;
+            font-family: sans-serif;
+            height: 100%;
+            overflow-y: auto;
+            position: fixed;
+            transform: translate(calc(var(--sideNavWidth) * -1), 0px);
+            transition: transform var(--sideNavTransitionTime);
+            width: var(--sideNavWidth);
+            z-index: 1;
+        }
+        nav.js-nav--sideNav.open {
+            transform: translate(0px, 0px);
+        }
+        /* SIDE NAV BUTTONS */
+        nav.js-nav--sideNav button {
+            /*background-clip: content-box;*/
+            align-items: center;
+            background-color: white;
+            box-shadow: inset -1px 0px darkgray;
+            border: 0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            height: 6em;
+            padding: 10px 0 10px 0;
+            width: 100%;
+        }
+        nav.js-nav--sideNav button:hover {
+            background-color: lightgray;
+        }
+        /* Safari workaround for missing :focus implementation */
+        nav.js-nav--sideNav button.focused {
+            /*background-clip: content-box;*/
+            box-shadow: inset 0 0 0 1px darkgray;
+        }
+        nav.js-nav--sideNav button.focused > span {
+            font-weight: bold;
+        }
+        /* SIDE NAV COVER */
+        div.js-div--sideNavCover {
+            display: none;
+        }
+        div.js-div--sideNavCover.loading {
+            align-items: center;
+            background-color: rgba(189, 189, 189, 0.6);
+            display: flex;
+            height: 100%;
+            justify-content: space-around; 
+            position: fixed;
+            width: 100%;
+        }
+        @media screen and (max-width: 976px) {
+            div.js-div--sideNavCover.open {
+                background-color: rgba(189, 189, 189, 0.6);
+                display: initial;
+                height: 100%;
+                position: fixed;
+                width: 100%;
+            }
+        }
+        /* SIDE NAV BUTTON DIVS */
+        div.js-div--buttonContainer {
+            max-height: 0;
+            transition: max-height 0.25s ease;
+            overflow: hidden;
+        }
+        div.js-div--buttonContainer.expanded {
+            max-height: 500px;
+            transition: max-height 1s ease;
+        }
+        /* SIDE NAV BUTTON SPANS */
+        nav.js-nav--sideNav button span {
+            color: black;
+            margin: auto 0 auto 1rem;
+            font-size: 2rem;
+        }
+        div.js-div--buttonContainer > button > span {
+            font-size: 1.5rem;
+            margin: auto 0 auto 2rem;
+        }
+        div.js-div--buttonContainer > div.js-div--buttonContainer > button > span {
+            font-size: 1rem;
+            margin: auto 0 auto 3rem;
+        }
+        /* SIDE NAV SVGS */
+        nav.js-nav--sideNav svg {
+            transform: rotate(0deg);
+            transition: transform 0.25s ease;
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+        nav.js-nav--sideNav svg.rotated {
+            transform: rotate(90deg);
+        }
+        /* HOMEPAGE */
+        div.box {
+            width:300px;
+            height:300px;
+            background:white;
+            border:1px black solid;
+            display:inline-block;
+            text-align:left;
+            margin:5px;
+            padding:5px;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+            background: black;
+        }
+        div.box a {
+            color: mediumseagreen;
+            font-family: sans-serif;
+            text-decoration: none;
+        }
+        /*div.box p {
+            margin: 0;
+        }*/
+        div.box a:visited {
+            color: seagreen;
+            text-decoration: none;
+        }
+        #container {
+            display:inline;
+            width:auto;
+            float:left;
+            text-align:center;
+            font-size:25px;
+        }
+    </style>
+  </head>
+  <body class="loading">
+    <header>
+        <nav class="js-nav--topNav">
+            <button>
+                <svg width="100%" height="100%" viewBox="-2.5 -2.5 15 15"><path d="M0,1L10,1v1h-10v-1M0,5.5L10,5.5v-1h-10v1M0,9L10,9v-1h-10v1"/></svg> 
+            </button>
+            <div>
+                <a href="/">
+                    <span class="span--sectionTitle">MicrogridUp &raquo; iowa240_1mg &raquo;</span>
+                </a>
+                <span class="span--sectionTitle">Overview</span>
+            </div>
+        </nav>
+    </header>
+    <main class="loading">
+        <nav class="js-nav--sideNav">
+            <button data-content="Overview">
+                <span>Overview</span>
+                <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none">
+                    <path d="M13 5a1 1 0 1 0-2 0v1a1 1 0 1 0 2 0V5z" fill="#0D0D0D"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M9.028 19H3a1 1 0 1 1 0-2h3.803a6 6 0 1 1 10.394 0H21a1 1 0 1 1 0 2H9.028zM12 10a4 4 0 0 0-2.646 7h5.292A4 4 0 0 0 12 10z" fill="#0D0D0D"/>
+                    <path d="M19.071 8.343l-.707.707a1 1 0 1 1-1.414-1.414l.707-.707a1 1 0 1 1 1.414 1.414zM4 15a1 1 0 1 0 0-2H3a1 1 0 1 0 0 2h1zm18-1a1 1 0 0 1-1 1h-1a1 1 0 1 1 0-2h1a1 1 0 0 1 1 1zM5.636 9.05A1 1 0 0 0 7.05 7.636l-.707-.707A1 1 0 1 0 4.93 8.343l.707.707z" fill="#0D0D0D"/>
+                </svg>
+            </button>
+            <button data-content="Oneline">
+                <span>Oneline</span>
+                <svg width="100%" height="100%" viewBox="0 0 462.782 462.782"><!--style="enable-background:new 0 0 462.782 462.782;">-->
+                    <path d="M350.272,323.014c-5.974,0-11.411-3.556-13.783-9.091l-50.422-117.65l-40.505,116.662
+                    c-2.08,5.989-7.699,10.023-14.038,10.08c-0.044,0-0.089,0-0.133,0c-6.286,0-11.911-3.921-14.081-9.831l-41.979-114.358
+                    l-40.798,114.234c-2.095,5.867-7.599,9.828-13.827,9.952c-6.242,0.127-11.886-3.615-14.213-9.394l-31.482-78.172H0v-30h85.141
+                    c6.121,0,11.627,3.719,13.914,9.396l20.511,50.93l41.446-116.048c2.124-5.947,7.745-9.927,14.06-9.955c0.022,0,0.044,0,0.066,0
+                    c6.289,0,11.912,3.923,14.081,9.831l41.779,113.814l39.431-113.565c2.032-5.851,7.451-9.852,13.64-10.071
+                    c6.203-0.217,11.877,3.389,14.317,9.082l49.683,115.927l15.254-48.815c1.957-6.262,7.756-10.526,14.317-10.526h85.141v30h-74.113
+                    l-24.076,77.043c-1.873,5.994-7.281,10.186-13.553,10.506C350.784,323.007,350.527,323.014,350.272,323.014z"/>
+                </svg>
+            </button>
+            <button data-content="Map">
+                <span>Map</span>
+                <svg width="100%" height="100%" viewBox="0 0 58 58"><!--style="enable-background:new 0 0 58 58;">-->
+                <path d="M51,1.5c-3.519,0-6.432,2.613-6.92,6H40v4c0,0.552-0.447,1-1,1s-1-0.448-1-1v-4h-2v6c0,0.552-0.447,1-1,1s-1-0.448-1-1v-6
+                    H13.92c-0.488-3.387-3.401-6-6.92-6c-3.859,0-7,3.14-7,7v41c0,3.86,3.141,7,7,7h10v-6c0-0.552,0.447-1,1-1s1,0.448,1,1v6h2v-3
+                    c0-0.552,0.447-1,1-1s1,0.448,1,1v3h28c3.859,0,7-3.14,7-7v-41C58,4.64,54.859,1.5,51,1.5z M12,44.605
+                    C10.729,43.307,8.957,42.5,7,42.5s-3.729,0.807-5,2.105V8.5c0-2.757,2.243-5,5-5s5,2.243,5,5V44.605z M18.707,25.207l-1.414-1.414
+                    l2.293-2.293l-2.293-2.293l1.414-1.414L21,20.086l2.293-2.293l1.414,1.414L22.414,21.5l2.293,2.293l-1.414,1.414L21,22.914
+                    L18.707,25.207z M21.378,29.961c-0.426,0-0.819-0.273-0.954-0.7C20.143,28.367,20,27.438,20,26.5c0-0.552,0.447-1,1-1s1,0.448,1,1
+                    c0,0.734,0.111,1.461,0.332,2.161c0.166,0.527-0.127,1.088-0.654,1.254C21.578,29.946,21.477,29.961,21.378,29.961z M26.314,34.508
+                    c-0.188,0.313-0.519,0.486-0.858,0.486c-0.175,0-0.353-0.046-0.514-0.143c-1.066-0.64-1.995-1.436-2.759-2.366
+                    c-0.351-0.427-0.289-1.057,0.138-1.408c0.43-0.351,1.059-0.288,1.407,0.138c0.619,0.753,1.373,1.399,2.243,1.921
+                    C26.445,33.42,26.599,34.035,26.314,34.508z M34.415,36.178c-0.135,0.427-0.528,0.7-0.954,0.7c-0.1,0-0.2-0.015-0.3-0.046
+                    c-0.7-0.22-1.427-0.332-2.161-0.332c-0.915,0-1.826-0.103-2.709-0.305c-0.538-0.123-0.874-0.66-0.751-1.198
+                    c0.124-0.539,0.658-0.879,1.198-0.751C29.474,34.415,30.234,34.5,31,34.5c0.938,0,1.867,0.143,2.761,0.424
+                    C34.288,35.09,34.581,35.651,34.415,36.178z M37.637,40.471c-0.521-0.869-1.168-1.624-1.921-2.243
+                    c-0.427-0.351-0.488-0.981-0.138-1.408c0.351-0.425,0.98-0.488,1.407-0.137c0.932,0.766,1.728,1.694,2.366,2.759
+                    c0.284,0.474,0.131,1.088-0.343,1.372c-0.161,0.097-0.339,0.143-0.514,0.143C38.155,40.957,37.824,40.784,37.637,40.471z M40,46.5
+                    c-0.553,0-1-0.448-1-1c0-0.768-0.085-1.528-0.254-2.261c-0.124-0.539,0.212-1.075,0.751-1.199c0.538-0.122,1.074,0.212,1.198,0.75
+                    C40.897,43.67,41,44.582,41,45.5C41,46.052,40.553,46.5,40,46.5z M56,44.605c-1.271-1.298-3.043-2.105-5-2.105s-3.729,0.807-5,2.105
+                    V8.5c0-2.757,2.243-5,5-5s5,2.243,5,5V44.605z"/>
+                </svg>
+            </button>
+            
+            <button data-content="Interconnection">
+                <span>Interconn</span>
+                <svg width="100%" height="100%" viewBox="0 0 512 512"><!--enable-background="new 0 0 512 512">-->
+                    <path d="m495,17c-8-8-20.9-8-28.9,0l-39.9,39.9c-16.8-11.2-36.4-17.2-57-17.2-27.5,0-53.4,10.7-72.9,30.2l-58.4,58.4c-8,8-8,20.9 0,28.9l116.9,116.9c12.5,11.3 25,3.8 28.9,0l58.4-58.4c35.2-35.2 39.6-89.9 13-129.9l39.9-39.9c8-8 8-20.9 0-28.9zm-81.8,169.8l-44,44-88-88 44-44c11.8-11.8 27.4-18.2 44-18.2 16.6,0 32.3,6.5 44,18.2 24.3,24.2 24.3,63.7 0,88z"/>
+                    <path d="m268.9,274.5l-37.6,37.5-31.3-31.4 37.5-37.5c8-8 8-20.9 0-28.9-8-8-20.9-8-28.9,0l-37.5,37.5-13.9-13.9c-3.8-3.8-16.1-11.2-28.9,0l-58.4,58.4c-35.2,35.2-39.6,89.9-13,129.9l-39.9,40c-8,8-8,20.9 0,28.9 8,8 20.9,8 28.9,0l39.9-39.9c16.8,11.2 36.4,17.2 57,17.2 27.5,0 53.4-10.7 72.9-30.2l58.4-58.4c8-8 8-20.9 0-28.9l-13.9-13.9 37.5-37.5c8-8 8-20.9 0-28.9-7.9-8-20.9-8-28.8-1.13687e-13zm-82.1,138.7c-11.8,11.8-27.4,18.2-44,18.2s-32.3-6.5-44-18.2c-24.3-24.3-24.3-63.8 0-88l44-44 88,88-44,44z"/>
+                </svg>
+            </button>
+            <button data-content="Control">
+                <span>Control</span>
+                <svg width="100%" height="100%" viewBox="0 0 294.1 294.1"><!--style="enable-background:new 0 0 294.1 294.1;">-->
+                    <path d="M294.089,25.772c-0.766-7.566-6.988-13.222-14.756-13.222h-264C7.049,12.55,0,18.766,0,27.05v158.333
+                        c0,0.002,0,0.004,0,0.006v29.161c0,8.284,7.049,15,15.333,15h74.618l-4.416,22H64.333c-8.284,0-15,6.716-15,15s6.716,15,15,15h33.5
+                        h99c0.005-0.001,0.013-0.001,0.02,0h32.48c8.284,0,15-6.716,15-15s-6.716-15-15-15H209.13l-4.416-22h74.618
+                        c8.284,0,14.667-6.716,14.667-15V27.05C294,26.532,294.14,26.273,294.089,25.772z M264,42.55v128H30v-128H264z"/>
+                </svg>
+            </button>
+            <button>
+                <span>Microgrids</span>
+                <svg width="60px" height="100%" viewBox="0 0 330.001 330.001" style="margin: auto;">
+                    <path id="XMLID_453_" d="M298.601,118.673C296.139,113.383,290.834,110,285,110h-82.675l55.33-86.947
+                        c2.939-4.619,3.128-10.472,0.494-15.271C255.515,2.983,250.475,0,245,0h-90c-5.353,0-10.3,2.852-12.981,7.484l-110,190
+                        c-2.687,4.641-2.692,10.362-0.014,15.008C34.684,217.138,39.638,220,45,220h90.361l-24.833,91.053
+                        c-1.853,6.793,1.269,13.96,7.504,17.23c2.208,1.158,4.596,1.717,6.961,1.717c4.313,0,8.552-1.86,11.48-5.339l160-190
+                        C300.232,130.199,301.062,123.962,298.601,118.673z M157.389,253.252l12.083-44.305c1.23-4.51,0.287-9.336-2.551-13.052
+                        C164.083,192.18,159.675,190,155,190H71.017l92.632-160h54.026l-55.33,86.947c-2.938,4.619-3.128,10.472-0.494,15.272
+                        C164.486,137.017,169.526,140,175,140h77.759L157.389,253.252z"/>
+                </svg>
+                <!--<svg width="100%" height="100%" viewBox="-2.5 -2.5 15 15"><path d="M4,2.5L6.5,5L4,7.5L3,6.5L4.5,5L3,3.5L4,2.5"/></svg>-->
+            </button>
+            <div class="js-div--buttonContainer">
+                
+                <button data-content="mg0">
+                    <span>mg0</span>
+                </button>
+                
+            </div>
+            <button data-content="Files">
+                <span>Files</span>
+                <svg width="100%" height="100%" viewBox="0 0 497.186 497.186"><!--style="enable-background:new 0 0 497.186 497.186;">-->
+                    <path d="M409.595,0H197.651c-22.646,0-41.048,18.415-41.048,41.044v13.968h-13.979c-22.63,0-41.064,18.398-41.064,41.043v14.016
+                        H87.613c-22.63,0-41.064,18.418-41.064,41.045v305.022c0,22.629,18.435,41.049,41.064,41.049h211.929
+                        c22.646,0,41.06-18.42,41.06-41.049v-13.979h13.968c22.63,0,41.059-18.417,41.059-41.063v-13.961h13.968
+                        c22.63,0,41.043-18.419,41.043-41.049V41.044C450.638,18.415,432.225,0,409.595,0z M307.832,456.138
+                        c0,4.569-3.727,8.278-8.29,8.278H87.613c-4.567,0-8.294-3.709-8.294-8.278V151.115c0-4.564,3.727-8.275,8.294-8.275h211.929
+                        c4.564,0,8.29,3.711,8.29,8.275V456.138z M362.842,401.096c0,4.584-3.705,8.295-8.273,8.295h-13.968V151.115
+                        c0-22.627-18.413-41.045-41.06-41.045H134.329V96.055c0-4.584,3.727-8.289,8.295-8.289h211.945c4.568,0,8.273,3.705,8.273,8.289
+                        V401.096z M417.869,346.086c0,4.567-3.705,8.273-8.273,8.273h-13.968V96.055c0-22.646-18.429-41.043-41.059-41.043H189.355V41.044
+                        c0-4.567,3.727-8.272,8.296-8.272h211.944c4.568,0,8.273,3.705,8.273,8.272V346.086z"/>
+                    <path d="M137.842,228.396h85.237c9.042,0,16.398-7.334,16.398-16.393c0-9.051-7.356-16.376-16.398-16.376h-85.237
+                        c-9.036,0-16.394,7.325-16.394,16.376C121.449,221.063,128.806,228.396,137.842,228.396z"/>
+                    <path d="M249.308,261.205H137.842c-9.036,0-16.394,7.336-16.394,16.391c0,9.054,7.357,16.379,16.394,16.379h111.466
+                        c9.058,0,16.377-7.325,16.377-16.379C265.685,268.541,258.366,261.205,249.308,261.205z"/>
+                    <path d="M249.308,326.775H137.842c-9.036,0-16.394,7.319-16.394,16.377c0,9.053,7.357,16.377,16.394,16.377h111.466
+                        c9.058,0,16.377-7.324,16.377-16.377C265.685,334.095,258.366,326.775,249.308,326.775z"/>
+                    <path d="M249.308,392.332H137.842c-9.036,0-16.394,7.318-16.394,16.375c0,9.054,7.357,16.394,16.394,16.394h111.466
+                        c9.058,0,16.377-7.34,16.377-16.394C265.685,399.65,258.366,392.332,249.308,392.332z"/>
+                </svg>
+            </button>
+        </nav>
+        <div class="js-div--sideNavCover loading">
+            <span class="span--sectionTitle">Loading...</span>
+        </div>
+        <article>
+            <section data-content="Overview">
+                <iframe src="overview.html"></iframe>
+            </section>
+            <section class="loading" data-content="Oneline">
+                <iframe src="circuit_oneline.html"></iframe>
+            </section>
+            <section class="loading" data-content="Map">
+                <iframe src="circuit_map/geoJsonMap_offline.html"></iframe>
+            </section>
+            
+            <section class="loading" data-content="Interconnection">
+                <div>
+                    <iframe src="timeseries_gen.csv.plot.html"></iframe>
+                    <iframe src="timeseries_load.csv.plot.html"></iframe>
+                    <iframe src="timeseries_source.csv.plot.html"></iframe>
+                    <iframe src="timeseries_control.csv.plot.html"></iframe>
+                </div>
+            </section>
+            <section class="loading" data-content="Control">
+                <iframe src="output_control.html"></iframe>
+            </section>
+            
+            <section class="loading" data-content="mg0">
+                <iframe src="reopt_final_0/cleanMicrogridDesign.html"></iframe>
+            </section>
+            
+            <section class="loading" data-content="Files">
+                <ul>
+                    
+                    <li><a href='/iowa240_1mg/./240_node_test_system_EXP_VOLTAGES.CSV'>./240_node_test_system_EXP_VOLTAGES.CSV</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timezcontrol_control.csv.plot.html'>./timezcontrol_control.csv.plot.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timeseries_control.csv.plot.html'>./timeseries_control.csv.plot.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timezcontrol_source_and_gen.csv'>./timezcontrol_source_and_gen.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./loads.csv'>./loads.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./ref_gen_loads.csv'>./ref_gen_loads.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timeseries_control.csv'>./timeseries_control.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./.DS_Store'>./.DS_Store</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timezcontrol_inrush_plot.html'>./timezcontrol_inrush_plot.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./circuit_control.dss'>./circuit_control.dss</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timezcontrol_control.csv'>./timezcontrol_control.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./dss_run_file.dss'>./dss_run_file.dss</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timezcontrol_source_and_gen.csv_fuel_consumption.plot.html'>./timezcontrol_source_and_gen.csv_fuel_consumption.plot.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./circuit_plusmg_0.dss'>./circuit_plusmg_0.dss</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timezcontrol_source_and_gen.csv_fossil_loading.plot.html'>./timezcontrol_source_and_gen.csv_fossil_loading.plot.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./circuit.dss'>./circuit.dss</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./ultimate_rep_circuit_plusmg_0.dss.csv'>./ultimate_rep_circuit_plusmg_0.dss.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timezcontrol_load.csv'>./timezcontrol_load.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timezcontrol_load.csv.plot.html'>./timezcontrol_load.csv.plot.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timeseries_gen.csv'>./timeseries_gen.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timeseries_gen.csv.plot.html'>./timeseries_gen.csv.plot.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./output_control.html'>./output_control.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./overview.html'>./overview.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timezcontrol_source.csv'>./timezcontrol_source.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./circuit.dss.omd'>./circuit.dss.omd</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./volts.csv'>./volts.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./Voltage Profile [PU].png'>./Voltage Profile [PU].png</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./0running.txt'>./0running.txt</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timeseries_load.csv.plot.html'>./timeseries_load.csv.plot.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timezcontrol_source_and_gen.csv_battery_cycles.plot.html'>./timezcontrol_source_and_gen.csv_battery_cycles.plot.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./coords.csv'>./coords.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timeseries_source.csv'>./timeseries_source.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./generation.csv'>./generation.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./circuit_oneline.html'>./circuit_oneline.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./output_final.html'>./output_final.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timeseries_load.csv'>./timeseries_load.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timeseries_source.csv.plot.html'>./timeseries_source.csv.plot.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timezcontrol_gen.csv'>./timezcontrol_gen.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./user_warnings.txt'>./user_warnings.txt</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./240_node_test_system_VLN.Txt'>./240_node_test_system_VLN.Txt</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./output_full_0.html'>./output_full_0.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./mg_add_cost_0.csv'>./mg_add_cost_0.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./allInputData.json'>./allInputData.json</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./timezcontrol_source_and_gen.csv.plot.html'>./timezcontrol_source_and_gen.csv.plot.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./reopt_base_0/inlineTemplate.html'>./reopt_base_0/inlineTemplate.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./reopt_base_0/resultsResilience.json'>./reopt_base_0/resultsResilience.json</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./reopt_base_0/Scenario_test_POST.json'>./reopt_base_0/Scenario_test_POST.json</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./reopt_base_0/loadShape.csv'>./reopt_base_0/loadShape.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./reopt_base_0/results.json'>./reopt_base_0/results.json</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./reopt_base_0/allOutputData.json'>./reopt_base_0/allOutputData.json</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./reopt_base_0/criticalLoadShape.csv'>./reopt_base_0/criticalLoadShape.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./reopt_base_0/allInputData.json'>./reopt_base_0/allInputData.json</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./circuit_map/geoJsonMap_offline.html'>./circuit_map/geoJsonMap_offline.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./reopt_final_0/inlineTemplate.html'>./reopt_final_0/inlineTemplate.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./reopt_final_0/resultsResilience.json'>./reopt_final_0/resultsResilience.json</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./reopt_final_0/Scenario_test_POST.json'>./reopt_final_0/Scenario_test_POST.json</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./reopt_final_0/loadShape.csv'>./reopt_final_0/loadShape.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./reopt_final_0/results.json'>./reopt_final_0/results.json</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./reopt_final_0/allOutputData.json'>./reopt_final_0/allOutputData.json</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./reopt_final_0/cleanMicrogridDesign.html'>./reopt_final_0/cleanMicrogridDesign.html</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./reopt_final_0/criticalLoadShape.csv'>./reopt_final_0/criticalLoadShape.csv</a></li>
+                    
+                    <li><a href='/iowa240_1mg/./reopt_final_0/allInputData.json'>./reopt_final_0/allInputData.json</a></li>
+                    
+                </ul>
+            </section>
+        </article>
+    </main>
+    <!-- <script src="/main.js"></script> -->
+    <script>
+"use strict";
+
+main();
+
+function setupSideNav() {
+    // - Set up the side nav
+    // - Add side nav expansion 
+    for (let div of document.getElementsByClassName('js-div--buttonContainer')) {
+        const button = div.previousElementSibling
+        const svg = button.getElementsByTagName('svg')[0];
+        button.addEventListener('click', function() {
+            div.classList.toggle('expanded');
+            svg.classList.toggle('rotated');
+            if (!div.classList.contains('expanded')) {
+                for (let innerDiv of div.getElementsByClassName('js-div--buttonContainer')) {
+                    innerDiv.classList.remove('expanded');
+                }
+                for (let innerSvg of div.getElementsByTagName('svg')) {
+                    innerSvg.classList.remove('rotated');
+                }
+            }
+        });
+    }
+    const sections = document.getElementsByTagName('section');
+    const buttons = document.getElementsByClassName('js-nav--sideNav')[0].getElementsByTagName('button');
+    for (let btn of buttons) {
+        btn.addEventListener('click', function() {
+            // - Add a class to buttons when clicked. Required for Safari because it doesn't implement the CSS :focus pseudo-class correctly
+            for (let b of buttons) {
+                if (b !== btn) {
+                    b.classList.remove('focused');
+                } else if (!b.classList.contains('focused')) {
+                    b.classList.add('focused'); 
+                }
+            }
+            // - Change page title
+            const buttonText = btn.dataset.content;
+            if (buttonText !== undefined) {
+                document.getElementsByClassName('js-nav--topNav')[0].getElementsByClassName('span--sectionTitle')[1].textContent = buttonText;
+            }
+        });
+        // - Connect side nav buttons to sections
+        const section = document.querySelector(`section[data-content='${btn.dataset.content}']`)
+        if (section !== null) {
+            btn.addEventListener('click', function() {
+                for (let sec of sections) {
+                    if (sec !== section && !sec.classList.contains('hidden')) {
+                        sec.classList.add('hidden');
+                    }
+                    section.classList.remove('hidden');
+                }
+            });
+        }
+    }
+}
+
+function setupTopNav() {
+    // - Set up the top nav
+    const hamburger = document.getElementsByClassName('js-nav--topNav')[0].getElementsByTagName('button')[0];
+    const sideNav = document.getElementsByClassName('js-nav--sideNav')[0];
+    const sideNavCover = document.getElementsByClassName('js-div--sideNavCover')[0];
+    const article = document.getElementsByTagName('article')[0];
+    hamburger.addEventListener('click', function () {
+        sideNav.classList.toggle('open');
+        sideNavCover.classList.toggle('open');
+        if (sideNav.classList.contains('open') && !article.classList.contains('compressed')) {
+            article.classList.add('compressed');
+        } else {
+            article.classList.remove('compressed');
+        }
+    });
+    sideNavCover.addEventListener('click', function() {
+        sideNav.classList.remove('open');
+        sideNavCover.classList.remove('open');
+    });
+}
+
+function loadPage() {
+    // - Load the page
+    window.onload = function() {
+        const sideNavCover = document.getElementsByClassName('js-div--sideNavCover')[0];
+        sideNavCover.getElementsByTagName('span')[0].remove();
+        sideNavCover.classList.remove('loading');
+        document.getElementsByTagName('body')[0].classList.remove('loading');
+        document.getElementsByTagName('main')[0].classList.remove('loading');
+        // - Section start with visibility: hidden; to load, then switch to display: none; to only show one section at a time
+        const overviewSection = document.querySelector('section[data-content=Overview]');
+        for (let sec of document.getElementsByTagName('section')) {
+            if (sec !== overviewSection) {
+                sec.classList.add('hidden');
+                sec.classList.remove('loading');
+            }
+        }
+    }
+}
+
+function main() {
+    setupSideNav();
+    setupTopNav();
+    loadPage();
+}
+</script>
+  </body>
+</html>

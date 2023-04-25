@@ -1,0 +1,8 @@
+[Unit]
+Description=Renews certificates
+
+[Service]
+ExecStart=/usr/bin/sudo /usr/bin/certbot --webroot --webroot-path=/opt/microgridup/ renew --force-renewal
+
+[Install]
+WantedBy=timers.target

@@ -4,13 +4,13 @@ from microgridup import *
 
 if __name__ == '__main__':
 	# Input data.
-	MODEL_DIR = '4mgs'
-	BASE_DSS = 'lehigh_base_4mg.dss'
-	LOAD_CSV = 'lehigh_load.csv'
+	MODEL_DIR = f'{PROJ_FOLDER}/4mgs'
+	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_4mg.dss'
+	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINE = '650632'
 	QSTS_STEPS = 24*20
 	FOSSIL_BACKUP_PERCENT = 1
-	OUTAGE_CSV = 'lehigh_random_outages.csv'
+	OUTAGE_CSV = f'{MGU_FOLDER}/testfiles/lehigh_random_outages.csv'
 	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth
 	REOPT_INPUTS = {
 		"solar" : "on",

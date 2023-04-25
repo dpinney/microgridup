@@ -1,0 +1,1 @@
+Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.

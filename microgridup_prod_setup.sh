@@ -15,12 +15,6 @@ sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo docker run hello-world
 
-# install and set up certbot
-sudo apt-get remove letsencrypt
-sudo apt-get install letsencrypt
-sudo certbot certonly --standalone --agree-tos -n -m david.pinney@nreca.coop -d app.microgridup.org
-# certbot as of 2023 should renew automatically via its crontab... let's pray...
-
 # get our container
 sudo docker pull ghcr.io/dpinney/microgridup:main
 sudo docker run -d -p 80:5000 --name mgucont ghcr.io/dpinney/microgridup:main

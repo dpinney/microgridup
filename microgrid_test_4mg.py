@@ -1,6 +1,6 @@
-from microgridup import *
-
 '''Test to confirm all 3 potential outcomes for existing batteries (new, new+ existing, use existing only) assuming natural gas backup with FOSSIL_BACKUP_PERCENT = 1'''
+
+from microgridup import *
 
 if __name__ == '__main__':
 	# Input data.

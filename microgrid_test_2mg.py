@@ -1,6 +1,6 @@
-from microgridup import *
-
 '''Test to confirm full renewable backup with no fossil generation and existing wind'''
+
+from microgridup import *
 
 if __name__ == '__main__':
 	# Input data.

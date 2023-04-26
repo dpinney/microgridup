@@ -1,6 +1,6 @@
-from microgridup import *
-
 '''Test to confirm FOSSIL_BACKUP_PERCENT sets criticalLoadFactor using diesel gensets without net metering'''
+
+from microgridup import *
 
 if __name__ == '__main__':
 	# Input data.

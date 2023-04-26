@@ -185,6 +185,7 @@ def previewPartitions():
 @app.route('/run', methods=["POST"])
 def run():
 	model_dir = request.form['MODEL_DIR']
+	print(f'---------------------------------------------------------Running {model_dir}.---------------------------------------------------------')
 	if 'BASE_DSS_NAME' in request.form and 'LOAD_CSV_NAME' in request.form:
 		print('we are editing an existing model')
 		# editing an existing model
@@ -339,7 +340,7 @@ def getLoads(path):
 def _tests():
 	lat = 39.7817
 	lon = -89.6501
-	with open('test_params.json') as file:
+	with open('testfiles/test_params.json') as file:
 		test_params = json.load(file)
 	MG_MINES = test_params['MG_MINES']
 	wizard_dir = [dir for dir in MG_MINES if 'wizard' in dir]

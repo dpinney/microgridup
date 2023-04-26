@@ -17,6 +17,7 @@ COPY . .
 WORKDIR .
 ENTRYPOINT ["python3"]
 CMD ["microgridup_gui.py"]
+EXPOSE 5000
 
 # USAGE
 # =====

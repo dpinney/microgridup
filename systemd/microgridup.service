@@ -4,8 +4,8 @@ After=syslog.target network.target
 
 [Service]
 User=microgridup
-WorkingDirectory=/opt/microgridup
-ExecStart=/usr/bin/authbind --deep /usr/bin/python3 microgridup_gui.py deploy --config=prod
+WorkingDirectory=SETME_IN_SETUP
+ExecStart=/usr/bin/authbind --deep /usr/bin/python3 microgridup_web_prod.py deploy --config=prod
 Restart=on-failure
 
 [Install]

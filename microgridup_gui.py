@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 from omf.solvers.opendss import dssConvert
 from microgridup_gen_mgs import mg_group, nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch
 from microgridup import full
+from subprocess import Popen
 
 _mguDir = os.path.abspath(os.path.dirname(__file__))
 _analysisDir = f'{_mguDir}/data/projects'
@@ -361,4 +362,6 @@ if __name__ == "__main__":
 	if platform.system() == "Darwin":  # MacOS
 		os.environ['NO_PROXY'] = '*' # Workaround for macOS proxy behavior
 		multiprocessing.set_start_method('forkserver') # Workaround for Catalina exec/fork behavior
-	app.run(debug=True, host="0.0.0.0")
+	# app.run(debug=True, host="0.0.0.0")
+	appProc = Popen(['gunicorn', '-w', '5', '-b', '0.0.0.0:5000', '--reload', 'microgridup_gui:app','--worker-class=sync'])
+	appProc.wait()

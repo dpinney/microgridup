@@ -8,8 +8,8 @@ export DATA_DIR=/MGU_PROD
 
 # Must be run via sudo since we're installing docker, etc.
 if [[ $(/usr/bin/id -u) -ne 0 ]]; then
-    echo "Not running as root"
-    exit
+	echo "Not running as root"
+	exit
 fi
 
 # Make required directories
@@ -54,4 +54,9 @@ ln -s /etc/letsencrypt/live/$APP_DNS/cert.pem $DATA_DIR/ssl/cert.pem
 
 # Get our container and run it.
 docker pull ghcr.io/dpinney/microgridup:main
-docker run -d -p 80:5000 --name mgucont ghcr.io/dpinney/microgridup:main
+if [ "$(docker ps -a -q -f name=mgucont)" ]; then
+	# already running, so kill it first
+	docker stop mgucont
+	docker rm mgucont
+fi
+docker run -d -p 80:80 -p 443:443 -v $DATA_DIR/data:/data -v $DATA_DIR/logs:logs -v $DATA_DIR/ssl:ssl --name mgucont ghcr.io/dpinney/microgridup:main

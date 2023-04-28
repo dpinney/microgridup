@@ -380,22 +380,20 @@ def before_request():
 		return redirect(url, code=301)
 
 if __name__ == "__main__":
-	# _tests()
 	if platform.system() == "Darwin":  # MacOS
 		os.environ['NO_PROXY'] = '*' # Workaround for macOS proxy behavior
 		multiprocessing.set_start_method('forkserver') # Workaround for Catalina exec/fork behavior
-	use_ssl = False
+	is_prod = False
 	gunicorn_args = ['gunicorn', '-w', '5', '-b', '0.0.0.0:5000', '--reload', 'microgridup_gui:app','--worker-class=sync']
-	# check for production directories.
-	if os.path.exists(f'{_mguDir}/ssl'):
-		use_ssl = True
-		gunicorn_args.extend([f'--certfile={_mguDir}/ssl/cert.pem', f'--keyfile={_mguDir}/ssl/privkey.pem', f'--ca-certs={_mguDir}/ssl/fullchain.pem'])
-	if os.path.exists(f'{_mguDir}/logs'):
+	if os.path.exists(f'{_mguDir}/ssl') and os.path.exists(f'{_mguDir}/logs'):
+		# if production directories, run in prod mode with logging and ssl.
+		is_prod = True
 		gunicorn_args.extend(['--access-logfile', 'mgu.access.log', '--error-logfile', 'mgu.error.log', '--capture-output'])
-	if use_ssl:
+		gunicorn_args.extend([f'--certfile={_mguDir}/ssl/cert.pem', f'--keyfile={_mguDir}/ssl/privkey.pem', f'--ca-certs={_mguDir}/ssl/fullchain.pem'])
 		redirProc = Popen(['gunicorn', '-w', '5', '-b', '0.0.0.0:80', 'microgridup_gui:reApp']) # don't need to wait, only wait on main proc.
 		appProc = Popen(gunicorn_args)
 	else:
-		# app.run(debug=True, host="0.0.0.0")
+		# no production directories, run in dev mode, i.e. no log files, no ssl.
+		# app.run(debug=True, host="0.0.0.0") # old flask way, don't use.
 		appProc = Popen(gunicorn_args)
 	appProc.wait()

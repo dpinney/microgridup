@@ -390,7 +390,7 @@ if __name__ == "__main__":
 		is_prod = True
 		gunicorn_args.extend(['--access-logfile', 'mgu.access.log', '--error-logfile', 'mgu.error.log', '--capture-output'])
 		gunicorn_args.extend([f'--certfile={_mguDir}/ssl/cert.pem', f'--keyfile={_mguDir}/ssl/privkey.pem', f'--ca-certs={_mguDir}/ssl/fullchain.pem'])
-		gunicorn_arge.extend(['-b', '0.0.0.0:443'])
+		gunicorn_args.extend(['-b', '0.0.0.0:443'])
 		redirProc = Popen(['gunicorn', '-w', '5', '-b', '0.0.0.0:80', 'microgridup_gui:reApp']) # don't need to wait, only wait on main proc.
 		appProc = Popen(gunicorn_args)
 	else:

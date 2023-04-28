@@ -384,16 +384,18 @@ if __name__ == "__main__":
 		os.environ['NO_PROXY'] = '*' # Workaround for macOS proxy behavior
 		multiprocessing.set_start_method('forkserver') # Workaround for Catalina exec/fork behavior
 	is_prod = False
-	gunicorn_args = ['gunicorn', '-w', '5', '-b', '0.0.0.0:5000', '--reload', 'microgridup_gui:app','--worker-class=sync']
+	gunicorn_args = ['gunicorn', '-w', '5', '--reload', 'microgridup_gui:app','--worker-class=sync']
 	if os.path.exists(f'{_mguDir}/ssl') and os.path.exists(f'{_mguDir}/logs'):
 		# if production directories, run in prod mode with logging and ssl.
 		is_prod = True
 		gunicorn_args.extend(['--access-logfile', 'mgu.access.log', '--error-logfile', 'mgu.error.log', '--capture-output'])
 		gunicorn_args.extend([f'--certfile={_mguDir}/ssl/cert.pem', f'--keyfile={_mguDir}/ssl/privkey.pem', f'--ca-certs={_mguDir}/ssl/fullchain.pem'])
+		gunicorn_arge.extend(['-b', '0.0.0.0:443'])
 		redirProc = Popen(['gunicorn', '-w', '5', '-b', '0.0.0.0:80', 'microgridup_gui:reApp']) # don't need to wait, only wait on main proc.
 		appProc = Popen(gunicorn_args)
 	else:
 		# no production directories, run in dev mode, i.e. no log files, no ssl.
 		# app.run(debug=True, host="0.0.0.0") # old flask way, don't use.
+		gunicorn_args.extend(['-b', '0.0.0.0:5000'])
 		appProc = Popen(gunicorn_args)
 	appProc.wait()

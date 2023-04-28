@@ -806,16 +806,16 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 def _tests():
 	_myDir = os.path.abspath(os.path.dirname(__file__))
 	FAULTED_LINE = 670671
-	with open('test_params.json') as file:
+	with open('testfiles/test_params.json') as file:
 		test_params = json.load(file)
-	MG_MINES = test_params['MG_MINES']
+	control_test_args = test_params['control_test_args']
 	# Testing microgridup_control.play() (End-to-end test of module).
-	for dir in MG_MINES:
+	for dir in control_test_args:
 		if 'lukes' in dir:
 			continue # NOTE: Remove this statement if support for lukes (multiple points of connection) is added.
-		final_run_count = len(MG_MINES[dir][0]) - 1 # FULL_NAME is based on the count of the microgrid in the final run.
+		final_run_count = len(control_test_args[dir]) - 1 # FULL_NAME is based on the count of the microgrid in the final run.
 		print(f'---------------------------------------------------------\nRunning test of microgridup_control.play() on {dir}.\n---------------------------------------------------------')
-		play(f'circuit_plusmg_{final_run_count}.dss', f'{_myDir}/{dir}', MG_MINES[dir][0], FAULTED_LINE)
+		play(f'circuit_plusmg_{final_run_count}.dss', f'{_myDir}/data/projects/{dir}', control_test_args[dir], FAULTED_LINE)
 	return print('Ran all tests for microgridup_control.py.')
 
 if __name__ == '__main__':

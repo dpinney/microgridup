@@ -185,7 +185,7 @@ def previewPartitions():
 @app.route('/run', methods=["POST"])
 def run():
 	model_dir = request.form['MODEL_DIR']
-	print(f'---------------------------------------------------------Running {model_dir}.---------------------------------------------------------')
+	print(f'-------------------------------Running {model_dir}.-------------------------------')
 	if 'BASE_DSS_NAME' in request.form and 'LOAD_CSV_NAME' in request.form:
 		print('we are editing an existing model')
 		# editing an existing model

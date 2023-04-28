@@ -358,11 +358,44 @@ def _tests():
 		assert dssTree[:idx] == expectedDssTree[:idx], f'dssTree did not match expectedDssTree when testing {dir}.\nExpected output: {expectedDssTree[:idx]}.\nReceived output: {dssTree[:idx]}.'
 	return print('Ran all tests for for microgridup_gui.py.')
 
+# Helper app to redirect http -> https
+reApp = Flask("HTTPS_REDIRECT")
+
+@reApp.route("/")
+def index():
+	return "NA"
+
+@reApp.before_request
+def before_request():
+	# Handle ACME challenges for letsencrypt to keep SSL renewing.
+	if '/.well-known/acme-challenge' in request.url:
+		try:
+			filename = request.url.split('/')[-1]
+		except:
+			filename = 'none'
+		return send_from_directory(f'/{_mguDir}/.well-known/acme-challenge', filename)
+	# Redirect http -> https
+	elif request.url.startswith("http://"):
+		url = request.url.replace("http://", "https://", 1)
+		return redirect(url, code=301)
+
 if __name__ == "__main__":
 	# _tests()
 	if platform.system() == "Darwin":  # MacOS
 		os.environ['NO_PROXY'] = '*' # Workaround for macOS proxy behavior
 		multiprocessing.set_start_method('forkserver') # Workaround for Catalina exec/fork behavior
-	# app.run(debug=True, host="0.0.0.0")
-	appProc = Popen(['gunicorn', '-w', '5', '-b', '0.0.0.0:5000', '--reload', 'microgridup_gui:app','--worker-class=sync'])
+	use_ssl = False
+	gunicorn_args = ['gunicorn', '-w', '5', '-b', '0.0.0.0:5000', '--reload', 'microgridup_gui:app','--worker-class=sync']
+	# check for production directories.
+	if os.path.exists(f'{_mguDir}/ssl'):
+		use_ssl = True
+		gunicorn_args.extend([f'--certfile={_mguDir}/ssl/cert.pem', f'--keyfile={_mguDir}/ssl/privkey.pem', f'--ca-certs={_mguDir}/ssl/fullchain.pem'])
+	if os.path.exists(f'{_mguDir}/logs'):
+		gunicorn_args.extend(['--access-logfile', 'mgu.access.log', '--error-logfile', 'mgu.error.log', '--capture-output'])
+	if use_ssl:
+		redirProc = Popen(['gunicorn', '-w', '5', '-b', '0.0.0.0:80', 'microgridup_gui:reApp']) # don't need to wait, only wait on main proc.
+		appProc = Popen(gunicorn_args)
+	else:
+		# app.run(debug=True, host="0.0.0.0")
+		appProc = Popen(gunicorn_args)
 	appProc.wait()

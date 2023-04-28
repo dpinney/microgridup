@@ -52,6 +52,6 @@ ln -s /etc/letsencrypt/live/$APP_DNS/fullchain.pem $DATA_DIR/ssl/fullchain.pem
 ln -s /etc/letsencrypt/live/$APP_DNS/privkey.pem $DATA_DIR/ssl/privkey.pem
 ln -s /etc/letsencrypt/live/$APP_DNS/cert.pem $DATA_DIR/ssl/cert.pem
 
-# get our container
+# Get our container and run it.
 docker pull ghcr.io/dpinney/microgridup:main
 docker run -d -p 80:5000 --name mgucont ghcr.io/dpinney/microgridup:main

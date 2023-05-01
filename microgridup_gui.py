@@ -9,6 +9,7 @@ from microgridup_gen_mgs import mg_group, nx_group_branch, nx_group_lukes, nx_bo
 from microgridup import full
 from subprocess import Popen
 from flask import send_from_directory
+from pathlib import Path
 
 _mguDir = os.path.abspath(os.path.dirname(__file__))
 _analysisDir = f'{_mguDir}/data/projects'
@@ -385,10 +386,11 @@ if __name__ == "__main__":
 		os.environ['NO_PROXY'] = '*' # Workaround for macOS proxy behavior
 		multiprocessing.set_start_method('forkserver') # Workaround for Catalina exec/fork behavior
 	gunicorn_args = ['gunicorn', '-w', '5', '--reload', 'microgridup_gui:app','--worker-class=sync']
-	if os.path.exists(f'{_mguDir}ssl') and os.path.exists(f'{_mguDir}logs'):
+	mguPath = Path(_mguDir)
+	if (mguPath/'ssl').exists() and (mguPath/'logs').exists():
 		# if production directories, run in prod mode with logging and ssl.
-		gunicorn_args.extend(['--access-logfile', '{_mguDir}mgu.access.log', '--error-logfile', '{_mguDir}mgu.error.log' , '--capture-output'])
-		gunicorn_args.extend([f'--certfile={_mguDir}ssl/cert.pem', f'--keyfile={_mguDir}ssl/privkey.pem', f'--ca-certs={_mguDir}ssl/fullchain.pem'])
+		gunicorn_args.extend(['--access-logfile', f'{mguPath/"logs/mgu.access.log"}', '--error-logfile', f'{mguPath/"logs/mgu.error.log"}' , '--capture-output'])
+		gunicorn_args.extend([f'--certfile={mguPath/"ssl/cert.pem"}', f'--keyfile={mguPath/"ssl/privkey.pem"}', f'--ca-certs={mguPath/"ssl/fullchain.pem"}'])
 		gunicorn_args.extend(['-b', '0.0.0.0:443'])
 		redirProc = Popen(['gunicorn', '-w', '5', '-b', '0.0.0.0:80', 'microgridup_gui:reApp']) # don't need to wait, only wait on main proc.
 		appProc = Popen(gunicorn_args)

@@ -48,9 +48,9 @@ else
 fi
 
 # Link the letsencrypt certs to the SSL directory
-ln -s /etc/letsencrypt/live/$APP_DNS/fullchain.pem $DATA_DIR/ssl/fullchain.pem
-ln -s /etc/letsencrypt/live/$APP_DNS/privkey.pem $DATA_DIR/ssl/privkey.pem
-ln -s /etc/letsencrypt/live/$APP_DNS/cert.pem $DATA_DIR/ssl/cert.pem
+cp /etc/letsencrypt/live/$APP_DNS/fullchain.pem $DATA_DIR/ssl/fullchain.pem
+cp /etc/letsencrypt/live/$APP_DNS/privkey.pem $DATA_DIR/ssl/privkey.pem
+cp /etc/letsencrypt/live/$APP_DNS/cert.pem $DATA_DIR/ssl/cert.pem
 
 # Get our container and run it.
 docker pull ghcr.io/dpinney/microgridup:main

@@ -387,7 +387,7 @@ if __name__ == "__main__":
 	gunicorn_args = ['gunicorn', '-w', '5', '--reload', 'microgridup_gui:app','--worker-class=sync']
 	if os.path.exists(f'{_mguDir}ssl') and os.path.exists(f'{_mguDir}logs'):
 		# if production directories, run in prod mode with logging and ssl.
-		gunicorn_args.extend(['--access-logfile', 'mgu.access.log', '--error-logfile', 'mgu.error.log']) #, '--capture-output'
+		gunicorn_args.extend(['--access-logfile', '{_mguDir}mgu.access.log', '--error-logfile', '{_mguDir}mgu.error.log'] , '--capture-output')
 		gunicorn_args.extend([f'--certfile={_mguDir}ssl/cert.pem', f'--keyfile={_mguDir}ssl/privkey.pem', f'--ca-certs={_mguDir}ssl/fullchain.pem'])
 		gunicorn_args.extend(['-b', '0.0.0.0:443'])
 		redirProc = Popen(['gunicorn', '-w', '5', '-b', '0.0.0.0:80', 'microgridup_gui:reApp']) # don't need to wait, only wait on main proc.

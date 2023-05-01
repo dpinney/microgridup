@@ -14,6 +14,7 @@ fi
 
 # Make required directories
 mkdir -p $DATA_DIR/data
+mkdir -p $DATA_DIR/data/projects
 mkdir -p $DATA_DIR/logs
 mkdir -p $DATA_DIR/ssl
 

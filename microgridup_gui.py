@@ -104,8 +104,6 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 	tree = dssConvert.dssToTree(dssString, is_path=False)
 	G = dssConvert.dss_to_networkx('', tree=tree)
 	# Set twopi layout to custom coordinates.
-	dssFilePath = f'{_mguDir}/uploads/BASE_DSS_{model_dir}'
-	G = dssConvert.dss_to_networkx(dssFilePath)
 	pos = nx.drawing.nx_agraph.graphviz_layout(G, prog="twopi", args="")
 	# Define the scale
 	scale_factor = 0.00005
@@ -121,6 +119,7 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 	dssString += 'set voltagebases=[115,4.16,0.48]\ncalcvoltagebases'
 	if not os.path.isdir(f'{_mguDir}/uploads'):
 		os.mkdir(f'{_mguDir}/uploads')
+	dssFilePath = f'{_mguDir}/uploads/BASE_DSS_{model_dir}'
 	with open(dssFilePath, "w") as outFile:
 		outFile.writelines(dssString)
 	loads = getLoads(dssFilePath)

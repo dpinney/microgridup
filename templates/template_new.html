@@ -962,6 +962,13 @@
 			});
 		});
 	});
+	// Also call above function if user presses enter.
+	$('#minQuantMgs').keypress(function(e) {
+		if (e.which === 13) {
+			e.preventDefault();
+			$('#previewPartitions').click();
+		}
+	});
 
 	// Show/hide optional inputs.
 	$(function () {

@@ -1115,6 +1115,9 @@
 					window.location.href = '/';
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
+					// Hide loading indicator if server fails.
+					$('#loading-background').hide();
+					$("#loading-indicator").hide();
 					alert(textStatus + ' : ' + errorThrown)
 				}
 			})

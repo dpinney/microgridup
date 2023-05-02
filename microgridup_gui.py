@@ -12,6 +12,8 @@ from flask import send_from_directory
 from pathlib import Path
 
 _mguDir = os.path.abspath(os.path.dirname(__file__))
+if _mguDir == '/':
+	_mguDir = '' #workaround for rooted installs through e.g. docker.
 _analysisDir = f'{_mguDir}/data/projects'
 
 app = Flask(__name__, static_folder='data', template_folder='templates')
@@ -384,11 +386,11 @@ if __name__ == "__main__":
 	if platform.system() == "Darwin":  # MacOS
 		os.environ['NO_PROXY'] = '*' # Workaround for macOS proxy behavior
 		multiprocessing.set_start_method('forkserver') # Workaround for Catalina exec/fork behavior
-	gunicorn_args = ['gunicorn', '-w', '5', '--reload', 'microgridup_gui:app','--worker-class=sync']
+	gunicorn_args = ['gunicorn', '-w', '5', '--reload', 'microgridup_gui:app','--worker-class=sync', '--timeout=100']
 	mguPath = Path(_mguDir)
 	if (mguPath/'ssl').exists() and (mguPath/'logs').exists():
 		# if production directories, run in prod mode with logging and ssl.
-		gunicorn_args.extend(['--access-logfile', f'{mguPath/"logs/mgu.access.log"}', '--error-logfile', f'{mguPath/"logs/mgu.error.log"}' , '--capture-output'])
+		gunicorn_args.extend(['--access-logfile', mguPath/"logs/mgu.access.log", '--error-logfile', mguPath/"logs/mgu.error.log", '--capture-output'])
 		gunicorn_args.extend([f'--certfile={mguPath/"ssl/cert.pem"}', f'--keyfile={mguPath/"ssl/privkey.pem"}', f'--ca-certs={mguPath/"ssl/fullchain.pem"}'])
 		gunicorn_args.extend(['-b', '0.0.0.0:443'])
 		redirProc = Popen(['gunicorn', '-w', '5', '-b', '0.0.0.0:80', 'microgridup_gui:reApp']) # don't need to wait, only wait on main proc.

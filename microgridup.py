@@ -18,6 +18,8 @@ import datetime
 import traceback
 
 MGU_FOLDER = os.path.abspath(os.path.dirname(__file__))
+if MGU_FOLDER == '/':
+	MGU_FOLDER = '' #workaround for docker root installs
 PROJ_FOLDER = f'{MGU_FOLDER}/data/projects'
 
 def _getByName(tree, name):

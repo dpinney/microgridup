@@ -138,6 +138,14 @@
 		#elements li i {
 			cursor:pointer;
 		}
+		/* Loading Indicator */
+		#loading_indicator   {
+			animation: fadeInOut 2s linear infinite forwards;
+		}
+		@keyframes fadeInOut {
+			0%,100% { opacity: 1; }
+			50% { opacity: 0; }
+		}
 	</style>
 </head>
 <body>
@@ -782,6 +790,9 @@
 					$('input[name="MODEL_DIR"]').prop("readonly", true);	
 					// Remove manual option from partitioning options because switches and gen_bus are predetermined.
 					$("#partitionMethod option[value='manual']").remove();
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					alert(textStatus + ' : ' + errorThrown)
 				}
 			});
 		})
@@ -944,9 +955,19 @@
 					img.attr('src', 'data:image/gif;base64,' + data);
 					$('#partitionsPreview').empty();
 					img.appendTo('#partitionsPreview'); 
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					alert(textStatus + ' : ' + errorThrown)
 				}
 			});
 		});
+	});
+	// Also call above function if user presses enter.
+	$('#minQuantMgs').keypress(function(e) {
+		if (e.which === 13) {
+			e.preventDefault();
+			$('#previewPartitions').click();
+		}
 	});
 
 	// Show/hide optional inputs.
@@ -1071,6 +1092,9 @@
 				contentType: false,
 				success: function(data) {
 					window.location.href = '/';
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					alert(textStatus + ' : ' + errorThrown)
 				}
 			})
 		})

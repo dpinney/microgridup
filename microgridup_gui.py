@@ -12,7 +12,7 @@ from flask import send_from_directory
 from pathlib import Path
 
 _mguDir = os.path.abspath(os.path.dirname(__file__))
-if _mguDir = '/':
+if _mguDir == '/':
 	_mguDir = '' #workaround for rooted installs through e.g. docker.
 _analysisDir = f'{_mguDir}/data/projects'
 

@@ -385,7 +385,7 @@ if __name__ == "__main__":
 	if platform.system() == "Darwin":  # MacOS
 		os.environ['NO_PROXY'] = '*' # Workaround for macOS proxy behavior
 		multiprocessing.set_start_method('forkserver') # Workaround for Catalina exec/fork behavior
-	gunicorn_args = ['gunicorn', '-w', '5', '--reload', 'microgridup_gui:app','--worker-class=sync']
+	gunicorn_args = ['gunicorn', '-w', '5', '--reload', 'microgridup_gui:app','--worker-class=sync', '--timeout=100']
 	mguPath = Path(_mguDir)
 	if (mguPath/'ssl').exists() and (mguPath/'logs').exists():
 		# if production directories, run in prod mode with logging and ssl.

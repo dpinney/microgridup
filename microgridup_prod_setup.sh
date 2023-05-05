@@ -55,4 +55,10 @@ if [ "$(docker ps -a -q -f name=mgucont)" ]; then
 	docker stop mgucont
 	docker rm mgucont
 fi
-docker run -d -p 80:80 -p 443:443 -v $DATA_DIR/data:/data -v $DATA_DIR/logs:/logs -v /etc/letsencrypt/archive/$APP_DNS/:/ssl --name mgucont ghcr.io/dpinney/microgridup:main
+docker run -d -p 80:80 -p 443:443 \
+	-v $DATA_DIR/data:/data \
+	-v $DATA_DIR/logs:/logs \
+	-v /etc/letsencrypt/live/$APP_DNS/fullchain.pem:/fullchain.pem \
+	-v /etc/letsencrypt/live/$APP_DNS/cert.pem:/cert.pem \
+	-v /etc/letsencrypt/live/$APP_DNS/privkey.pem:/privkey.pem \
+	--name mgucont ghcr.io/dpinney/microgridup:main

@@ -58,7 +58,7 @@ fi
 docker run -d -p 80:80 -p 443:443 \
 	-v $DATA_DIR/data:/data \
 	-v $DATA_DIR/logs:/logs \
-	-v /etc/letsencrypt/live/$APP_DNS/fullchain.pem:/fullchain.pem \
-	-v /etc/letsencrypt/live/$APP_DNS/cert.pem:/cert.pem \
-	-v /etc/letsencrypt/live/$APP_DNS/privkey.pem:/privkey.pem \
+	-v /etc/letsencrypt/live/$APP_DNS/fullchain.pem:/ssl/fullchain.pem \
+	-v /etc/letsencrypt/live/$APP_DNS/cert.pem:/ssl/cert.pem \
+	-v /etc/letsencrypt/live/$APP_DNS/privkey.pem:/ssl/privkey.pem \
 	--name mgucont ghcr.io/dpinney/microgridup:main

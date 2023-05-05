@@ -2,7 +2,6 @@
 <html>
 <head>
 	<title>MicrogridUP &raquo; New</title>
-	<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 	<script src="https://kit.fontawesome.com/92028f16c4.js" crossorigin="anonymous"></script>
 	<style type="text/css">
 		body {
@@ -138,8 +137,32 @@
 		#elements li i {
 			cursor:pointer;
 		}
-		/* Loading Indicator */
-		#loading_indicator   {
+		#loading-background {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 9998;
+			background-color: rgba(0, 0, 0, 0.5);
+			display: none;
+		}
+		#loading-indicator {
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			z-index: 9999;
+			background-color: white;
+			padding: 20px;
+			padding-left: 1rem;
+			border-radius: 10px;
+			text-align: center;
+			display: none;
+		}
+		#loading-indicator span {
+			display: block;
+			font-size: 2rem;
 			animation: fadeInOut 2s linear infinite forwards;
 		}
 		@keyframes fadeInOut {
@@ -616,26 +639,31 @@
 		</form>
 		<button id="submitEverything" type="submit">Run model</button>
 	</div>
+	<div id="loading-background"></div>
+	<div id="loading-indicator">
+		<span>Loading...</span>
+	</div>
+	<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 	<script>
-	var circuitIsSpecified = false;
-	var filename = '';
-
-	// Enable technology checkboxes.
-	$('[name="battery"]').change(function() {
-		$('#batteryDiv').toggle(500);
-	});
-	$('[name="wind"]').change(function() {
-		$('#windDiv').toggle(500);
-	});
-	$('[name="solar"]').change(function() {
-		$('#solarDiv').toggle(500);
-	});
-	$('[name="fossil"]').change(function() {
-		$('#fossilDiv').toggle(500);
-	});
-
-	// Enable circuit definition method choice.
 	$(document).ready(function() {
+		var circuitIsSpecified = false;
+		var filename = '';
+		
+		// Enable technology checkboxes.
+		$('[name="battery"]').change(function() {
+		$('#batteryDiv').toggle(500);
+		});
+		$('[name="wind"]').change(function() {
+			$('#windDiv').toggle(500);
+		});
+		$('[name="solar"]').change(function() {
+			$('#solarDiv').toggle(500);
+		});
+		$('[name="fossil"]').change(function() {
+			$('#fossilDiv').toggle(500);
+		});
+
+		// Enable circuit definition method choice.
 		$("div.desc").hide();
 		$("input[name$='circuit']").click(function() {
 			var test = $(this).val();
@@ -643,91 +671,89 @@
 			$("div.desc").hide();
 			$("#circuit" + test).show();
 		});
-	});
 
-	// Editable text for circuit widget.
-	$('body').on('click', '[data-editable]', function(){
-		var $og = $(this);
-		var $input = $('<input/>').val( $og.text() ).addClass( $og.attr('class') ).select();
-		$og.replaceWith( $input );
-		// Ensure element type remains uneditable in circuit widget.
-		var base = $og.attr('class').charAt(0).toUpperCase() + $og.attr('class').slice(1) + ': ';
-		var regex = new RegExp("^" + base, "i");
-		$('#elements input').on("input", function(ev) {
-			var query = $(this).val();
-			if (!regex.test(query)) {
-				ev.preventDefault();
-				$(this).val(base);
-			}
+		// Editable text for circuit widget.
+		$('body').on('click', '[data-editable]', function(){
+			var $og = $(this);
+			var $input = $('<input/>').val( $og.text() ).addClass( $og.attr('class') ).select();
+			$og.replaceWith( $input );
+			// Ensure element type remains uneditable in circuit widget.
+			var base = $og.attr('class').charAt(0).toUpperCase() + $og.attr('class').slice(1) + ': ';
+			var regex = new RegExp("^" + base, "i");
+			$('#elements input').on("input", function(ev) {
+				var query = $(this).val();
+				if (!regex.test(query)) {
+					ev.preventDefault();
+					$(this).val(base);
+				}
+			});
+			// Save on click or enter key press.
+			var save = function(){
+				var $p = $('<li data-editable />').html('<i class="fa fa-minus-square"></i> ' + $input.val() ).addClass( $og.attr("class") );
+				$input.replaceWith( $p );
+			};
+			$input.on('blur keypress', function(e) {
+				if (e.type == 'blur' || e.keyCode == 13) {
+					save();
+				}
+			}).focus();
 		});
-		// Save on click or enter key press.
-		var save = function(){
-			var $p = $('<li data-editable />').html('<i class="fa fa-minus-square"></i> ' + $input.val() ).addClass( $og.attr("class") );
-			$input.replaceWith( $p );
-		};
-		$input.on('blur keypress', function(e) {
-			if (e.type == 'blur' || e.keyCode == 13) {
-				save();
-			}
-		}).focus();
-	});
 
-	// Delete elements with click of icon in circuit widget. Delete all downstream elements as well.
-	$('body').on('click', '#elements li i', function(){
-		var type = $(this).parent($('li')).attr('class');
-		var downstream = {
-			'substation':['feeder','load','wind','solar','battery','diesel'],
-			'feeder':['load','wind','solar','battery','diesel']
-		}
-		// Warn user that downstream nodes will be deleted if they proceed.
-		if (type in downstream && $(this).parent($('li')).next('li').length > 0) {
-			if (downstream[type].includes($(this).parent($('li')).next('li').attr('class'))) {
-				if (confirm("All elements on the substation/feeder to be deleted will also be deleted. Continue?") == false) {
-					return
-				} 
-				delete_these = downstream[type]
-				while ($(this).parent($('li')).next('li').length > 0 && delete_these.includes($(this).parent($('li')).next('li').attr('class'))) {
-					$(this).parent($('li')).next('li').remove();
+		// Delete elements with click of icon in circuit widget. Delete all downstream elements as well.
+		$('body').on('click', '#elements li i', function(){
+			var type = $(this).parent($('li')).attr('class');
+			var downstream = {
+				'substation':['feeder','load','wind','solar','battery','diesel'],
+				'feeder':['load','wind','solar','battery','diesel']
+			}
+			// Warn user that downstream nodes will be deleted if they proceed.
+			if (type in downstream && $(this).parent($('li')).next('li').length > 0) {
+				if (downstream[type].includes($(this).parent($('li')).next('li').attr('class'))) {
+					if (confirm("All elements on the substation/feeder to be deleted will also be deleted. Continue?") == false) {
+						return
+					} 
+					delete_these = downstream[type]
+					while ($(this).parent($('li')).next('li').length > 0 && delete_these.includes($(this).parent($('li')).next('li').attr('class'))) {
+						$(this).parent($('li')).next('li').remove();
+					}
 				}
 			}
-		}
-		$(this).parent($('li')).remove();
-	});
+			$(this).parent($('li')).remove();
+		});
 
-	// Either add a new substation to the bottom or open up dialog.
-	$('#newSub, #newFeeder, #newLoad, #newSolar, #newWind, #newBattery, #newDiesel').on('click', function() {
-		$('#dialog select').empty();
-		$('#dialogText').removeClass();
-		let type = $(this).attr('id');
-		let map = {'newSub':['substation'],'newFeeder':['feeder','substation'],'newLoad':['load','feeder'],'newSolar':['solar','feeder'],'newWind':['wind','feeder'],'newBattery':['battery','feeder'],'newDiesel':['diesel','feeder']}
-		let name = ' '+map[type][0].charAt(0).toUpperCase()+map[type][0].slice(1)+': (click to name)'
-		if (type === 'newSub') {
-			$("#elements").append('<li class="substation" data-editable><i class="fa fa-minus-square"></i>'+name+'</li>');
-		} else {
-			var all = $("#elements ." + map[type][1]).map(function() {
-				let idx = this.innerHTML.indexOf(': ') + 2;
-				return this.innerHTML.slice(idx);
-			}).get();
-			$("#dialogText").text("To which "+map[type][1]+" would you like to add a "+map[type][0]+"?").addClass(map[type][0]+' '+map[type][1]);
-			for (let idx = 0; idx < all.length; idx++) {
-				$('#dialog select').append(`<option value="${all[idx]}">${all[idx]}</option>`);
+		// Either add a new substation to the bottom or open up dialog.
+		$('#newSub, #newFeeder, #newLoad, #newSolar, #newWind, #newBattery, #newDiesel').on('click', function() {
+			$('#dialog select').empty();
+			$('#dialogText').removeClass();
+			let type = $(this).attr('id');
+			let map = {'newSub':['substation'],'newFeeder':['feeder','substation'],'newLoad':['load','feeder'],'newSolar':['solar','feeder'],'newWind':['wind','feeder'],'newBattery':['battery','feeder'],'newDiesel':['diesel','feeder']}
+			let name = ' '+map[type][0].charAt(0).toUpperCase()+map[type][0].slice(1)+': (click to name)'
+			if (type === 'newSub') {
+				$("#elements").append('<li class="substation" data-editable><i class="fa fa-minus-square"></i>'+name+'</li>');
+			} else {
+				var all = $("#elements ." + map[type][1]).map(function() {
+					let idx = this.innerHTML.indexOf(': ') + 2;
+					return this.innerHTML.slice(idx);
+				}).get();
+				$("#dialogText").text("To which "+map[type][1]+" would you like to add a "+map[type][0]+"?").addClass(map[type][0]+' '+map[type][1]);
+				for (let idx = 0; idx < all.length; idx++) {
+					$('#dialog select').append(`<option value="${all[idx]}">${all[idx]}</option>`);
+				}
+				window.dialog.showModal();
 			}
-			window.dialog.showModal();
-		}
-	});
-	// Close dialog and add non-substation element.
-	$('#dialog button[type="button"]').on('click', function() {
-		window.dialog.close()
-		let parentName = $('#dialog select').val();
-		let type = $('#dialogText').attr('class').split(' ')[0];
-		let parentType = $('#dialogText').attr('class').split(' ')[1];
-		let child = ' '+type.charAt(0).toUpperCase()+type.slice(1)+': (click to name)';
-		let parent = ' '+parentType.charAt(0).toUpperCase()+parentType.slice(1)+': '+parentName;
-		$('<li class="'+type+'" data-editable><i class="fa fa-minus-square"></i>'+child+'</li>').insertAfter('#elements li:contains('+parent+')')
-	});
+		});
+		// Close dialog and add non-substation element.
+		$('#dialog button[type="button"]').on('click', function() {
+			window.dialog.close()
+			let parentName = $('#dialog select').val();
+			let type = $('#dialogText').attr('class').split(' ')[0];
+			let parentType = $('#dialogText').attr('class').split(' ')[1];
+			let child = ' '+type.charAt(0).toUpperCase()+type.slice(1)+': (click to name)';
+			let parent = ' '+parentType.charAt(0).toUpperCase()+parentType.slice(1)+': '+parentName;
+			$('<li class="'+type+'" data-editable><i class="fa fa-minus-square"></i>'+child+'</li>').insertAfter('#elements li:contains('+parent+')')
+		});
 
-	// Create DSS from manually built circuit. Get loads.
-	$(function() {
+		// Create DSS from manually built circuit. Get loads.
 		$('#toDss').click(function() {
 			// Do not proceed if model has no name.
 			if ($('input[name="MODEL_DIR"]').val() === '') {
@@ -796,10 +822,8 @@
 				}
 			});
 		})
-	})
 
-	// Upload DSS circuit. Get loads.
-	$(function() {
+		// Upload DSS circuit. Get loads.
 		$('#upload-file-btn').click(function() {
 			// Do not proceed if model has no name.
 			if ($('input[name="MODEL_DIR"]').val() === '') {
@@ -842,78 +866,76 @@
 				}
 			});
 		});
-	});
 
-	// Manual partitioning dynamic dropdown creation. 
-	$('#makeDropdowns').on('click', function() {
-		if (circuitIsSpecified === false) {
-			alert('Please complete step 2.')
-			return
-		}
-		if ($('#mgQuantity').val() === "") {
-			alert('Please input a number.')
-			return
-		}
-		// Manual grouping GUI includes inputs for gen_bus and switch.
-		var numMgs = $('#mgQuantity').val();
-		if ($('#partitionMethod').val() == 'manual') {
-			// Clear existing #switchGenbus if it exists already. 
-			$('#switchGenbus').remove();
-			$('#dropDowns').prepend('<div id="switchGenbus"></div>')
-			for (let i = 0; i < numMgs; i++) {
-				var count = i + 1;
-				$('#switchGenbus').append('<label for="mg' + count + 'Genbus">Mg' + count + ' Gen Bus: </label>');
-				$('#switchGenbus').append('<input id="mg' + count + 'Genbus" type="text"></input>');
-				$('#switchGenbus').append('<label for="mg' + count + 'Switch"> Mg' + count + ' Switch: </label>');
-				$('#switchGenbus').append('<input id="mg' + count + 'Switch" type="text"></input>');
-				$('#switchGenbus').append('<br>');
+		// Manual partitioning dynamic dropdown creation. 
+		$('#makeDropdowns').on('click', function() {
+			if (circuitIsSpecified === false) {
+				alert('Please complete step 2.')
+				return
 			}
-		}
-		$('#dropDowns label select').each(function() {
-			$(this).empty();
-			$(this).append('<option value="">None</option>')
-			for (let i = 0; i < numMgs; i++) {
-				var count = i + 1;
-				$(this).append('<option value="Mg' + count + '">Mg' + count + '</option>');
+			if ($('#mgQuantity').val() === "") {
+				alert('Please input a number.')
+				return
+			}
+			// Manual grouping GUI includes inputs for gen_bus and switch.
+			var numMgs = $('#mgQuantity').val();
+			if ($('#partitionMethod').val() == 'manual') {
+				// Clear existing #switchGenbus if it exists already. 
+				$('#switchGenbus').remove();
+				$('#dropDowns').prepend('<div id="switchGenbus"></div>')
+				for (let i = 0; i < numMgs; i++) {
+					var count = i + 1;
+					$('#switchGenbus').append('<label for="mg' + count + 'Genbus">Mg' + count + ' Gen Bus: </label>');
+					$('#switchGenbus').append('<input id="mg' + count + 'Genbus" type="text"></input>');
+					$('#switchGenbus').append('<label for="mg' + count + 'Switch"> Mg' + count + ' Switch: </label>');
+					$('#switchGenbus').append('<input id="mg' + count + 'Switch" type="text"></input>');
+					$('#switchGenbus').append('<br>');
+				}
+			}
+			$('#dropDowns label select').each(function() {
+				$(this).empty();
+				$(this).append('<option value="">None</option>')
+				for (let i = 0; i < numMgs; i++) {
+					var count = i + 1;
+					$(this).append('<option value="Mg' + count + '">Mg' + count + '</option>');
+				}
+			});
+			$('#dropDowns').show();
+		})
+		// Also call above function if user presses enter.
+		$('#mgQuantity').keypress(function(e){
+			if (e.which === 13) {
+				e.preventDefault();
+				$('#makeDropdowns').click();
 			}
 		});
-		$('#dropDowns').show();
-	})
-	// Also call above function if user presses enter.
-	$('#mgQuantity').keypress(function(e){
-		if (e.which === 13) {
-			e.preventDefault();
-			$('#makeDropdowns').click();
-		}
-	});
 
-	// Hide/show manual partitioning div. 
-	$('#partitionMethod').change(function() {
-		$('#minQuantMgs').val('');
-		if ($(this).val() == 'manual' || $(this).val() == 'loadGrouping') {
-			$('#partitionManually').show();
-			$('#makeDropdowns').show();
-			$('#previewPartitions').hide();
-			$('#minQuantMgsForm').hide();
-			$('#partitionsPreview').empty();
-		}
-		else { 
-			$('#partitionManually').hide();
-			$('#minQuantMgsForm').hide();
-			$('#dropDowns').hide();
-			$('#previewPartitions').show();
-		}
-		if ($(this).val() == 'loadGrouping') {
-			$('#switchGenbus').remove();
-		}
-		if ($(this).val() == 'bottomUp' || $(this).val() == 'criticalLoads') {
-			$('#minQuantMgsForm').show();
-			$('#makeDropdowns').hide();
-		}
-	})
+		// Hide/show manual partitioning div. 
+		$('#partitionMethod').change(function() {
+			$('#minQuantMgs').val('');
+			if ($(this).val() == 'manual' || $(this).val() == 'loadGrouping') {
+				$('#partitionManually').show();
+				$('#makeDropdowns').show();
+				$('#previewPartitions').hide();
+				$('#minQuantMgsForm').hide();
+				$('#partitionsPreview').empty();
+			}
+			else { 
+				$('#partitionManually').hide();
+				$('#minQuantMgsForm').hide();
+				$('#dropDowns').hide();
+				$('#previewPartitions').show();
+			}
+			if ($(this).val() == 'loadGrouping') {
+				$('#switchGenbus').remove();
+			}
+			if ($(this).val() == 'bottomUp' || $(this).val() == 'criticalLoads') {
+				$('#minQuantMgsForm').show();
+				$('#makeDropdowns').hide();
+			}
+		})
 
-	// Grab partitioning preview.
-	$(function() {
+		// Grab partitioning preview.
 		$('#previewPartitions').click(function() {
 			if (circuitIsSpecified === false) {
 				alert('Please complete step 2.')
@@ -961,17 +983,15 @@
 				}
 			});
 		});
-	});
-	// Also call above function if user presses enter.
-	$('#minQuantMgs').keypress(function(e) {
-		if (e.which === 13) {
-			e.preventDefault();
-			$('#previewPartitions').click();
-		}
-	});
+		// Also call above function if user presses enter.
+		$('#minQuantMgs').keypress(function(e) {
+			if (e.which === 13) {
+				e.preventDefault();
+				$('#previewPartitions').click();
+			}
+		});
 
-	// Show/hide optional inputs.
-	$(function () {
+		// Show/hide optional inputs.
 		$('.toggle').click(function() {
 			if ( $(this).hasClass('show') ) {
 				//replace the text
@@ -988,10 +1008,8 @@
 			}
 			$(this).next('div').slideToggle('500');
 		});
-	});
 
-	// Submit everything. 
-	$(function() {
+		// Submit everything. 
 		$('#submitEverything').click(function() {
 			// Do not proceed if no circuit is specified.
 			if (filename === '') {
@@ -1008,6 +1026,9 @@
 				alert('Please specify a partitioning method.')
 				return 
 			}
+			// Show loading indicator.
+			$('#loading-background').show();
+			$("#loading-indicator").show();
 			var form1 = new FormData(document.getElementById("modelInfoForm"));
 			var form2 = new FormData(document.getElementById("techParamForm"));
 			for (var pair of form2.entries()) {
@@ -1094,6 +1115,9 @@
 					window.location.href = '/';
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
+					// Hide loading indicator if server fails.
+					$('#loading-background').hide();
+					$("#loading-indicator").hide();
 					alert(textStatus + ' : ' + errorThrown)
 				}
 			})

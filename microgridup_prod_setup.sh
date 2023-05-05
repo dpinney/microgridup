@@ -48,11 +48,6 @@ else
 	# certbot as of 2023 should renew automatically via its crontab... let's pray...
 fi
 
-# Link the letsencrypt certs to the SSL directory
-cp /etc/letsencrypt/live/$APP_DNS/fullchain.pem $DATA_DIR/ssl/fullchain.pem
-cp /etc/letsencrypt/live/$APP_DNS/privkey.pem $DATA_DIR/ssl/privkey.pem
-cp /etc/letsencrypt/live/$APP_DNS/cert.pem $DATA_DIR/ssl/cert.pem
-
 # Get our container and run it.
 docker pull ghcr.io/dpinney/microgridup:main
 if [ "$(docker ps -a -q -f name=mgucont)" ]; then
@@ -60,4 +55,4 @@ if [ "$(docker ps -a -q -f name=mgucont)" ]; then
 	docker stop mgucont
 	docker rm mgucont
 fi
-docker run -d -p 80:80 -p 443:443 -v $DATA_DIR/data:/data -v $DATA_DIR/logs:/logs -v $DATA_DIR/ssl:/ssl --name mgucont ghcr.io/dpinney/microgridup:main
+docker run -d -p 80:80 -p 443:443 -v $DATA_DIR/data:/data -v $DATA_DIR/logs:/logs -v /etc/letsencrypt/live/$APP_DNS/:/ssl --name mgucont ghcr.io/dpinney/microgridup:main

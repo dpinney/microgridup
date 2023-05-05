@@ -62,3 +62,5 @@ docker run -d -p 80:80 -p 443:443 \
 	-v /etc/letsencrypt/live/$APP_DNS/cert.pem:/ssl/cert.pem \
 	-v /etc/letsencrypt/live/$APP_DNS/privkey.pem:/ssl/privkey.pem \
 	--name mgucont ghcr.io/dpinney/microgridup:main
+# Clean up old images and containers to save on disk.
+docker system prune -f

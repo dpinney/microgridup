@@ -390,8 +390,8 @@ if __name__ == "__main__":
 	mguPath = Path(_mguDir)
 	if (mguPath/'ssl').exists() and (mguPath/'logs').exists():
 		# if production directories, run in prod mode with logging and ssl.
-		gunicorn_args.extend(['--access-logfile', mguPath/'logs/mgu.access.log', '--error-logfile', mguPath/'logs/mgu.error.log', '--capture-output'])
-		gunicorn_args.extend([f'--certfile={mguPath/'ssl/cert.pem'}', f'--keyfile={mguPath/'ssl/privkey.pem'}', f'--ca-certs={mguPath/'ssl/fullchain.pem'}'])
+		gunicorn_args.extend(['--access-logfile', mguPath / 'logs/mgu.access.log', '--error-logfile', mguPath / 'logs/mgu.error.log', '--capture-output'])
+		gunicorn_args.extend([f'--certfile={mguPath / 'ssl/cert1.pem'}', f'--keyfile={mguPath / 'ssl/privkey1.pem'}', f'--ca-certs={mguPath/'ssl/fullchain1.pem'}'])
 		gunicorn_args.extend(['-b', '0.0.0.0:443'])
 		redirProc = Popen(['gunicorn', '-w', '5', '-b', '0.0.0.0:80', 'microgridup_gui:reApp']) # don't need to wait, only wait on main proc.
 		appProc = Popen(gunicorn_args)

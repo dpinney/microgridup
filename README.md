@@ -16,3 +16,7 @@ MicrogridUp Design Tool - for a given circuit, determine an optimal set of micro
 1. `pip install -e git+https://github.com/dpinney/microgridup`
 1. Test the code by running `python microgrid_test_3mg.py`
 1. Start the GUI with `python microgridup_gui.py`
+
+## Installation (for Production Configuration)
+
+1. Read, understand, and use [microgridup_prod_setup.sh](./microgridup_prod_setup.sh)

@@ -14,7 +14,7 @@ RUN cd omf; sudo python3 install.py
 COPY . .
 
 # Special requirements for graph layout
-RUN sudo apt-get install graphviz graphviz-dev
+RUN sudo apt-get -y install graphviz graphviz-dev
 RUN pip install pygraphviz
 
 # Run the MGU gui.

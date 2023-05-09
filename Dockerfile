@@ -13,6 +13,10 @@ RUN cd omf; sudo python3 install.py
 # Move files across.
 COPY . .
 
+# Special requirements for graph layout
+RUN sudo apt-get install graphviz graphviz-dev
+RUN pip install pygraphviz
+
 # Run the MGU gui.
 WORKDIR .
 ENTRYPOINT ["python3"]

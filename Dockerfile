@@ -19,8 +19,8 @@ RUN pip install pygraphviz
 
 # Set default locale = UTF-8
 ENV PYTHONIOENCODING=UTF-8
-ENV LANG en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
 
 # Run the MGU gui.
 WORKDIR .

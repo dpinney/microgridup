@@ -3,7 +3,7 @@ FROM ubuntu:18.04
 MAINTAINER <david.pinney@nreca.coop>
 
 # Install OS prereqs.
-RUN apt-get -y update && apt-get install -y python3 git sudo vim python3-pip python3-setuptools
+RUN apt-get -y update && apt-get install -y python3 git sudo vim python3-pip python3-setuptools locales
 
 # Install the OMF
 # Warning: clone might be cached. Consider invalidating manually.
@@ -17,6 +17,11 @@ COPY . .
 RUN sudo apt-get -y install graphviz graphviz-dev
 RUN pip install pygraphviz
 
+# Set default locale = UTF-8
+ENV PYTHONIOENCODING=UTF-8
+ENV LANG en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+
 # Run the MGU gui.
 WORKDIR .
 ENTRYPOINT ["python3"]
@@ -26,7 +31,7 @@ EXPOSE 5000
 # USAGE
 # =====
 # - Navigate to this directory
-# - Build image with command `docker build . -f mgu.Dockerfile -t mguim`
+# - Build image with command `docker build . -f Dockerfile -t mguim`
 # - Run image in background with `docker run -d -p 5000:5000 --name mgucont mguim`
 # - View at http://127.0.0.1:5000
 # - Stop it with `docker stop mgucont` and remove it with `docker rm mgucont`.

@@ -315,12 +315,16 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 		]
 		MG_MINES = {}
 		for idx in range(len(all_mgs)):
-			M_ID, MG_GROUP, TREE_ROOT, BORDERS = all_mgs[idx] 
+			M_ID, MG_GROUP, TREE_ROOT, BORDERS = all_mgs[idx]
 			this_switch = switch[f'Mg{M_ID+1}'] if switch else [get_edge_name(swedge[0], swedge[1], omd_list) for swedge in BORDERS]
+			print(f'this_switch for {circ_path}',this_switch)
+			print(f'for context switch is {switch}')
+			if type(this_switch) == list:
+				this_switch = this_switch[-1] if this_switch[-1] else this_switch[0] # TODO: Why is this_switch a list? Which value do we use? 
 			this_gen_bus = gen_bus[f'Mg{M_ID+1}'] if gen_bus else TREE_ROOT
 			MG_MINES[f'mg{M_ID}'] = {
 				'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
-				'switch': this_switch,
+				'switch': this_switch, 
 				'gen_bus': this_gen_bus,
 				'gen_obs_existing': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') in ('generator','pvsystem')],
 				'critical_load_kws': [0.0 if ob.get('name') not in CRITICAL_LOADS else float(ob.get('kw','0')) for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
@@ -358,6 +362,7 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 		print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", or "criticalLoads". No mgs generated.')
 		return {}
 	MG_MINES = helper(MG_GROUPS, switch, gen_bus)
+	print(f'MG_MINES for {circ_path} and {algo}',MG_MINES)
 	return MG_MINES
 
 def _tests():
@@ -368,15 +373,15 @@ def _tests():
 	algo_params = test_params['algo_params']
 	crit_loads = test_params['crit_loads']
 	# Testing microgridup_gen_mgs.mg_group().
-	for dir in MG_MINES:
-		if MG_MINES[dir][1] == 'manual':
+	for _dir in MG_MINES:
+		if MG_MINES[_dir][1] == 'manual':
 			params = algo_params
 		else:
 			params = algo_params['pairings']
-		MINES_TEST = mg_group(f'{_myDir}/uploads/BASE_DSS_{dir}', crit_loads, MG_MINES[dir][1], params)
+		MINES_TEST = mg_group(f'{_myDir}/uploads/BASE_DSS_{_dir}', crit_loads, MG_MINES[_dir][1], params)
 		# Lukes algorithm outputs different configuration each time. Not repeatable. Also errors out later in the MgUP run.
-		if MG_MINES[dir][1] != 'lukes':
-			assert MINES_TEST == MG_MINES[dir][0], f'MGU_MINES_{dir} did not match expected output.\nExpected output: {MG_MINES[dir][0]}.\nReceived output: {MINES_TEST}.'
+		if MG_MINES[_dir][1] != 'lukes':
+			assert MINES_TEST == MG_MINES[_dir][0], f'MGU_MINES_{_dir} did not match expected output.\nExpected output: {MG_MINES[_dir][0]}.\nReceived output: {MINES_TEST}.'
 	return print('Ran all tests for microgridup_gen_mgs.py.')
 
 if __name__ == '__main__':

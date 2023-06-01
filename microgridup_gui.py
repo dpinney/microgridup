@@ -222,6 +222,7 @@ def run():
 		microgrids = mg_group(dss_path, crit_loads, 'loadGrouping', pairings)	
 	elif mg_method == 'manual':
 		algo_params = json.loads(request.form['MICROGRIDS'])
+		print('algo_params',algo_params)
 		microgrids = mg_group(dss_path, crit_loads, 'manual', algo_params)
 	elif mg_method == 'lukes':
 		microgrids = mg_group(dss_path, crit_loads, 'lukes')
@@ -348,19 +349,19 @@ def _tests():
 	with open('testfiles/test_params.json') as file:
 		test_params = json.load(file)
 	MG_MINES = test_params['MG_MINES']
-	wizard_dir = [dir for dir in MG_MINES if 'wizard' in dir]
+	wizard_dir = [_dir for _dir in MG_MINES if 'wizard' in _dir]
 	elements = test_params['elements']
 	templateDssTree = test_params['templateDssTree']
 	# Testing jsonToDss().
-	for dir in wizard_dir:
-		dssFilePath = jsonToDss(dir, lat, lon, elements, True)
+	for _dir in wizard_dir:
+		dssFilePath = jsonToDss(_dir, lat, lon, elements, True)
 		dssTree = dssConvert.dssToTree(dssFilePath)
 		expectedDssTree = templateDssTree
-		expectedDssTree[2] = OrderedDict([('!CMD', 'new'), ('object', f'circuit.{dir.lower()}')])
+		expectedDssTree[2] = OrderedDict([('!CMD', 'new'), ('object', f'circuit.{_dir.lower()}')])
 		# Find index of 'makebuslist' because NetworkX shifts coordinates around each run and it is useless to compare them.
 		mbl = [y for y in expectedDssTree if y.get('!CMD') == 'makebuslist']
 		idx = expectedDssTree.index(mbl[0])
-		assert dssTree[:idx] == expectedDssTree[:idx], f'dssTree did not match expectedDssTree when testing {dir}.\nExpected output: {expectedDssTree[:idx]}.\nReceived output: {dssTree[:idx]}.'
+		assert dssTree[:idx] == expectedDssTree[:idx], f'dssTree did not match expectedDssTree when testing {_dir}.\nExpected output: {expectedDssTree[:idx]}.\nReceived output: {dssTree[:idx]}.'
 	return print('Ran all tests for for microgridup_gui.py.')
 
 # Helper app to redirect http -> https

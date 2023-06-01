@@ -2,7 +2,7 @@ import os, json
 from omf.solvers import opendss
 import networkx as nx
 from pprint import pprint as pp
-from collections import defaultdict
+from collections import defaultdict, deque
 
 # Auto gen some microgrid descriptions.
 # See experiments with networkx here: https://colab.research.google.com/drive/1RZyD6pRIdRAT-V2sBB0nPKVIvZP_RGHw
@@ -72,7 +72,7 @@ def loop_avoider(G, mgs):
 		mgs[parents[1]].extend([])
 		if isKey:
 			del mgs[node]
-		new_keys = [x for x in nx.topological_sort(G) if x in list(mgs.keys())] 
+		new_keys = [x for x in topological_sort(G) if x in list(mgs.keys())] 
 		for k in new_keys:
 			if k in lca_succs:
 				vals = mgs[k]
@@ -87,7 +87,7 @@ def loop_avoider(G, mgs):
 				del mgs[k]
 
 	# If a node has multiple parents, must find lowest common ancestor and make this node new key in mgs.
-	keys = [x for x in nx.topological_sort(G) if x in list(mgs.keys())]
+	keys = [x for x in topological_sort(G) if x in list(mgs.keys())]
 	for key in keys:
 		parents = list(G.predecessors(key))
 		if len(parents) > 1:
@@ -102,7 +102,7 @@ def loop_avoider(G, mgs):
 
 # Used by the bottom up algorithm.
 def relatable_siblings(G, mgs):
-	items = [x for x in nx.topological_sort(G) if x in list(mgs.keys())]
+	items = [x for x in topological_sort(G) if x in list(mgs.keys())]
 	for key in items:
 		if key not in mgs:
 			continue
@@ -126,7 +126,7 @@ def merge_mgs(G, mgs):
 	Check to see if parent is parent of other most ancestral node.
 	Check to see if parent has no successors in any other mg.
 	'''
-	items = [x for x in nx.topological_sort(G) if x in list(mgs.keys())]
+	items = [x for x in topological_sort(G) if x in list(mgs.keys())]
 	for k in items:
 		if k not in mgs.keys():
 			continue
@@ -168,7 +168,7 @@ def nx_group_branch(G, i_branch=0):
 	'Create graph subgroups at branch point i_branch (topological order).'
 	if not nx.is_tree(G):
 		G = remove_loops(G)
-	tree_root = list(nx.topological_sort(G))[0]
+	tree_root = list(topological_sort(G))[0]
 	edges_in_order = nx.DiGraph(nx.algorithms.traversal.breadth_first_search.bfs_edges(G, tree_root))
 	bbl = nx_get_branches(edges_in_order)
 	first_branch = bbl[i_branch][0]
@@ -180,15 +180,15 @@ def nx_group_lukes(G, size, node_weight=None, edge_weight=None):
 	'Partition the graph using Lukes algorithm into pieces of [size] nodes.'
 	if not nx.is_tree(G):
 		G = remove_loops(G)
-	tree_root = list(nx.topological_sort(G))[0]
+	tree_root = list(topological_sort(G))[0]
 	G_topo_order = nx.DiGraph(nx.algorithms.traversal.breadth_first_search.bfs_edges(G, tree_root))
 	return nx.algorithms.community.lukes.lukes_partitioning(G_topo_order, size, node_weight=node_weight, edge_weight=edge_weight)
 
 def nx_bottom_up_branch(G, num_mgs=3, large_or_small='large'):
 	'Form all microgrid combinations starting with leaves and working up to source maintaining single points of connection for each.'
 	try:
-		list(nx.topological_sort(G))
-	except nx.NetworkXUnfeasible:
+		list(topological_sort(G))
+	except ValueError:
 		G = remove_loops(G)
 	# Find leaves.
 	end_nodes = [[x] for x in G.nodes() if G.out_degree(x)==0 and G.in_degree(x)!=0]
@@ -220,10 +220,10 @@ def nx_critical_load_branch(G, criticalLoads, num_mgs=3, large_or_small='large')
 	# Find all critical loads. They get a microgrid each. Output.
 	critical_nodes = [[x] for x in G.nodes() if x in criticalLoads]
 	try:
-		top_down = list(nx.topological_sort(G))
-	except nx.NetworkXUnfeasible:
+		top_down = list(topological_sort(G))
+	except ValueError:
 		G = remove_loops(G)
-		top_down = list(nx.topological_sort(G))
+		top_down = list(topological_sort(G))
 	mgs = defaultdict(list)
 	for node in critical_nodes:
 		mgs[node[-1]] = []
@@ -248,6 +248,26 @@ def nx_critical_load_branch(G, criticalLoads, num_mgs=3, large_or_small='large')
 			break
 	return parts[len(parts)-1]
 
+def manual_groups(G, pairings):
+	# Create reference dict of lcas for each pair of two nodes.
+	tree_root = list(topological_sort(G))[0]
+	lcas = nx.tree_all_pairs_lowest_common_ancestor(G, root=tree_root)
+	lcas = dict(lcas)
+	# Iterate through each MG's loads, comparing LCAs each time to find new overall LCA.
+	mgs = {}
+	pairings.pop('None', None)
+	for mg in pairings:
+		pairs = pairings[mg]
+		cur_lca = lcas.get((pairs[0],pairs[1]),lcas.get((pairs[1],pairs[0])))
+		for idx in range(2,len(pairs)):
+			cur_lca = lcas.get((cur_lca,pairs[idx]),lcas.get((pairs[idx],cur_lca)))
+		mgs[mg] = list(nx.nodes(nx.dfs_tree(G, cur_lca)))
+	# Only return the contents of each MG but do so in order specified by the user.
+	parts = []
+	for idx in range(len(mgs)):
+		parts.append(mgs[f'Mg{idx+1}'])
+	return parts
+
 def nx_get_parent(G, n):
 	preds = G.predecessors(n)
 	return list(preds)[0]
@@ -269,25 +289,23 @@ def get_edge_name(fr, to, omd_list):
 	edges = [ob.get('name') for ob in omd_list if ob.get('from') == fr and ob.get('to') == to]
 	return None if len(edges) == 0 else edges[0]
 
-def manual_groups(G, pairings):
-	# Create reference dict of lcas for each pair of two nodes.
-	tree_root = list(nx.topological_sort(G))[0]
-	lcas = nx.tree_all_pairs_lowest_common_ancestor(G, root=tree_root)
-	lcas = dict(lcas)
-	# Iterate through each MG's loads, comparing LCAs each time to find new overall LCA.
-	mgs = {}
-	pairings.pop('None', None)
-	for mg in pairings:
-		pairs = pairings[mg]
-		cur_lca = lcas.get((pairs[0],pairs[1]),lcas.get((pairs[1],pairs[0])))
-		for idx in range(2,len(pairs)):
-			cur_lca = lcas.get((cur_lca,pairs[idx]),lcas.get((pairs[idx],cur_lca)))
-		mgs[mg] = list(nx.nodes(nx.dfs_tree(G, cur_lca)))
-	# Only return the contents of each MG but do so in order specified by the user.
-	parts = []
-	for idx in range(len(mgs)):
-		parts.append(mgs[f'Mg{idx+1}'])
-	return parts
+def topological_sort(G):
+    in_degree = {v: 0 for v in G}
+    for u in G:
+        for v in G[u]:
+            in_degree[v] += 1
+    queue = deque([u for u in in_degree if in_degree[u] == 0])
+    result = []
+    while queue:
+        u = queue.popleft()
+        result.append(u)
+        for v in G[u]:
+            in_degree[v] -= 1
+            if in_degree[v] == 0:
+                queue.append(v)
+    if len(result) != len(G):
+        raise ValueError("Graph contains a cycle")
+    return result
 
 def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 	def helper(MG_GROUPS, switch, gen_bus):
@@ -297,12 +315,16 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 		]
 		MG_MINES = {}
 		for idx in range(len(all_mgs)):
-			M_ID, MG_GROUP, TREE_ROOT, BORDERS = all_mgs[idx] 
+			M_ID, MG_GROUP, TREE_ROOT, BORDERS = all_mgs[idx]
 			this_switch = switch[f'Mg{M_ID+1}'] if switch else [get_edge_name(swedge[0], swedge[1], omd_list) for swedge in BORDERS]
+			print(f'this_switch for {circ_path}',this_switch)
+			print(f'for context switch is {switch}')
+			if type(this_switch) == list:
+				this_switch = this_switch[-1] if this_switch[-1] else this_switch[0] # TODO: Why is this_switch a list? Which value do we use? 
 			this_gen_bus = gen_bus[f'Mg{M_ID+1}'] if gen_bus else TREE_ROOT
 			MG_MINES[f'mg{M_ID}'] = {
 				'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
-				'switch': this_switch,
+				'switch': this_switch, 
 				'gen_bus': this_gen_bus,
 				'gen_obs_existing': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') in ('generator','pvsystem')],
 				'critical_load_kws': [0.0 if ob.get('name') not in CRITICAL_LOADS else float(ob.get('kw','0')) for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
@@ -340,6 +362,7 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 		print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", or "criticalLoads". No mgs generated.')
 		return {}
 	MG_MINES = helper(MG_GROUPS, switch, gen_bus)
+	print(f'MG_MINES for {circ_path} and {algo}',MG_MINES)
 	return MG_MINES
 
 def _tests():
@@ -350,15 +373,15 @@ def _tests():
 	algo_params = test_params['algo_params']
 	crit_loads = test_params['crit_loads']
 	# Testing microgridup_gen_mgs.mg_group().
-	for dir in MG_MINES:
-		if MG_MINES[dir][1] == 'manual':
+	for _dir in MG_MINES:
+		if MG_MINES[_dir][1] == 'manual':
 			params = algo_params
 		else:
 			params = algo_params['pairings']
-		MINES_TEST = mg_group(f'{_myDir}/uploads/BASE_DSS_{dir}', crit_loads, MG_MINES[dir][1], params)
+		MINES_TEST = mg_group(f'{_myDir}/uploads/BASE_DSS_{_dir}', crit_loads, MG_MINES[_dir][1], params)
 		# Lukes algorithm outputs different configuration each time. Not repeatable. Also errors out later in the MgUP run.
-		if MG_MINES[dir][1] != 'lukes':
-			assert MINES_TEST == MG_MINES[dir][0], f'MGU_MINES_{dir} did not match expected output.\nExpected output: {MG_MINES[dir][0]}.\nReceived output: {MINES_TEST}.'
+		if MG_MINES[_dir][1] != 'lukes':
+			assert MINES_TEST == MG_MINES[_dir][0], f'MGU_MINES_{_dir} did not match expected output.\nExpected output: {MG_MINES[_dir][0]}.\nReceived output: {MINES_TEST}.'
 	return print('Ran all tests for microgridup_gen_mgs.py.')
 
 if __name__ == '__main__':

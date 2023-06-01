@@ -1698,10 +1698,14 @@ def _tests():
 	FOSSIL_BACKUP_PERCENT = 0.5
 	FAULTED_LINE = '670671'
 	# Test of full().
-	for dir in MG_MINES:
-		mgu_args = [f'{PROJ_FOLDER}/{dir}', f'{MGU_FOLDER}/uploads/BASE_DSS_{dir}', f'{MGU_FOLDER}/uploads/LOAD_CSV_{dir}', QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MG_MINES[dir][0], FAULTED_LINE]
-		print(f'---------------------------------------------------------\nBeginning end-to-end backend test of {dir}.\n---------------------------------------------------------')
+	for _dir in MG_MINES:
+		mgu_args = [f'{PROJ_FOLDER}/{_dir}', f'{MGU_FOLDER}/uploads/BASE_DSS_{_dir}', f'{MGU_FOLDER}/uploads/LOAD_CSV_{_dir}', QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MG_MINES[_dir][0], FAULTED_LINE]
+		print(f'---------------------------------------------------------\nBeginning end-to-end backend test of {_dir}.\n---------------------------------------------------------')
 		full(*mgu_args)
+	# _dir = '3mgs_lehigh_criticalLoads'
+	# print(f'---------------------------------------------------------\nBeginning end-to-end backend test of {_dir}.\n---------------------------------------------------------')
+	# mgu_args = [f'{PROJ_FOLDER}/{_dir}', f'{MGU_FOLDER}/uploads/BASE_DSS_{_dir}', f'{MGU_FOLDER}/uploads/LOAD_CSV_{_dir}', QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MG_MINES[_dir][0], FAULTED_LINE]
+	# full(*mgu_args)
 	return print('Ran all tests for microgridup.py.')
 
 if __name__ == '__main__':

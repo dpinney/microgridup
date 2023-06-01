@@ -810,12 +810,12 @@ def _tests():
 		test_params = json.load(file)
 	control_test_args = test_params['control_test_args']
 	# Testing microgridup_control.play() (End-to-end test of module).
-	for dir in control_test_args:
-		if 'lukes' in dir:
+	for _dir in control_test_args:
+		if 'lukes' in _dir:
 			continue # NOTE: Remove this statement if support for lukes (multiple points of connection) is added.
-		final_run_count = len(control_test_args[dir]) - 1 # FULL_NAME is based on the count of the microgrid in the final run.
-		print(f'---------------------------------------------------------\nRunning test of microgridup_control.play() on {dir}.\n---------------------------------------------------------')
-		play(f'circuit_plusmg_{final_run_count}.dss', f'{_myDir}/data/projects/{dir}', control_test_args[dir], FAULTED_LINE)
+		final_run_count = len(control_test_args[_dir]) - 1 # FULL_NAME is based on the count of the microgrid in the final run.
+		print(f'---------------------------------------------------------\nRunning test of microgridup_control.play() on {_dir}.\n---------------------------------------------------------')
+		play(f'circuit_plusmg_{final_run_count}.dss', f'{_myDir}/data/projects/{_dir}', control_test_args[_dir], FAULTED_LINE)
 	return print('Ran all tests for microgridup_control.py.')
 
 if __name__ == '__main__':

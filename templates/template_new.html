@@ -130,7 +130,7 @@
 			padding-left: 40px;
 			list-style: none;
 		}
-		#elements .load, .solar, .battery, .wind, .diesel {
+		#elements .load, .solar, .battery, .wind, .fossil {
 			padding-left: 80px;
 			list-style: none;
 		}
@@ -375,7 +375,7 @@
 				<li class="load" data-editable><i class="fa fa-minus-square"></i> Load: (click to name)</li>
 				<li class="solar" data-editable><i class="fa fa-minus-square"></i> Solar: (click to name)</li>
 				<li class="battery" data-editable><i class="fa fa-minus-square"></i> Battery: (click to name)</li>
-				<li class="diesel" data-editable><i class="fa fa-minus-square"></i> Diesel: (click to name)</li>
+				<li class="fossil" data-editable><i class="fa fa-minus-square"></i> Fossil: (click to name)</li>
 			</ul>
 			<div id="dropdowns" class="dropdown">
 				<button class="dropbtn">Add element</button>
@@ -386,7 +386,7 @@
 				    <div id="newSolar" role="button" tabindex="0">Solar</div>
 				    <div id="newWind" role="button" tabindex="0">Wind</div>
 				    <div id="newBattery" role="button" tabindex="0">Battery</div>
-				    <div id="newDiesel" role="button" tabindex="0">Diesel</div>
+				    <div id="newFossil" role="button" tabindex="0">Fossil</div>
 				</div>
 			</div>
 			<button id="toDss" type="button">Submit circuit</button>
@@ -548,15 +548,15 @@
 			<div id=fossilDiv style="display:none">
 				<h5>Fossil</h5>
 				<div class="chunk">
-					<label class="tooltip" for="dieselGenCost">Diesel Gen Cost ($/kW)<span class="classic">Specify the cost in $/kWh.</span></label>
+					<label class="tooltip" for="dieselGenCost">Fossil Gen Cost ($/kW)<span class="classic">Specify the cost in $/kWh.</span></label>
 					<input type="text" name="dieselGenCost" value="500" pattern="^\d+\.?\d*?$"/>
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="dieselMax">Diesel Max (kW)<span class="classic">Specify max fossil generation in kW. Only specify if needed, as the optimization runs best if left unedited.</span></label>
+					<label class="tooltip" for="dieselMax">Fossil Max (kW)<span class="classic">Specify max fossil generation in kW. Only specify if needed, as the optimization runs best if left unedited.</span></label>
 					<input type="text" name="dieselMax" value="1000000" pattern="^\d+\.?\d*?$"/>
 				</div>
 				<div class="chunk">
-					<label class="tooltip" for="dieselMin">Diesel Min (kW)<span class="classic">Specify minimum fossil generation in kW. Only specify if needed, as the optimization runs best if left unedited.</span></label>
+					<label class="tooltip" for="dieselMin">Fossil Min (kW)<span class="classic">Specify minimum fossil generation in kW. Only specify if needed, as the optimization runs best if left unedited.</span></label>
 					<input type="text" name="dieselMin" value="0" pattern="^\d+\.?\d*?$"/>
 				</div>
 				<div class="chunk">
@@ -703,8 +703,8 @@
 		$('body').on('click', '#elements li i', function(){
 			var type = $(this).parent($('li')).attr('class');
 			var downstream = {
-				'substation':['feeder','load','wind','solar','battery','diesel'],
-				'feeder':['load','wind','solar','battery','diesel']
+				'substation':['feeder','load','wind','solar','battery','fossil'],
+				'feeder':['load','wind','solar','battery','fossil']
 			}
 			// Warn user that downstream nodes will be deleted if they proceed.
 			if (type in downstream && $(this).parent($('li')).next('li').length > 0) {
@@ -722,11 +722,11 @@
 		});
 
 		// Either add a new substation to the bottom or open up dialog.
-		$('#newSub, #newFeeder, #newLoad, #newSolar, #newWind, #newBattery, #newDiesel').on('click', function() {
+		$('#newSub, #newFeeder, #newLoad, #newSolar, #newWind, #newBattery, #newFossil').on('click', function() {
 			$('#dialog select').empty();
 			$('#dialogText').removeClass();
 			let type = $(this).attr('id');
-			let map = {'newSub':['substation'],'newFeeder':['feeder','substation'],'newLoad':['load','feeder'],'newSolar':['solar','feeder'],'newWind':['wind','feeder'],'newBattery':['battery','feeder'],'newDiesel':['diesel','feeder']}
+			let map = {'newSub':['substation'],'newFeeder':['feeder','substation'],'newLoad':['load','feeder'],'newSolar':['solar','feeder'],'newWind':['wind','feeder'],'newBattery':['battery','feeder'],'newFossil':['fossil','feeder']}
 			let name = ' '+map[type][0].charAt(0).toUpperCase()+map[type][0].slice(1)+': (click to name)'
 			if (type === 'newSub') {
 				$("#elements").append('<li class="substation" data-editable><i class="fa fa-minus-square"></i>'+name+'</li>');
@@ -1125,7 +1125,7 @@
 	});
 	var elements = `
 	<ul id="elements">
-			<li data-editable="" class="substation"><i class="fa fa-minus-square" aria-hidden="true"></i> Substation: sub</li><li data-editable="" class="feeder"><i class="fa fa-minus-square" aria-hidden="true"></i>  Feeder: regNone</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 684_command_center</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 692_warehouse2</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 611_runway</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 652_residential</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 670a_residential2</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 670b_residential2</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 670c_residential2</li><li data-editable="" class="feeder"><i class="fa fa-minus-square" aria-hidden="true"></i> Feeder: reg0</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 634a_data_center</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 634b_radar</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 634c_atc_tower</li><li data-editable="" class="solar"><i class="fa fa-minus-square" aria-hidden="true"></i> Solar: solar_634_existing</li><li data-editable="" class="battery"><i class="fa fa-minus-square" aria-hidden="true"></i> Battery: battery_634_existing</li><li data-editable="" class="feeder"><i class="fa fa-minus-square" aria-hidden="true"></i> Feeder: reg1</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 675a_hospital</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 675b_residential1</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 675c_residential1</li><li data-editable="" class="diesel"><i class="fa fa-minus-square" aria-hidden="true"></i> Diesel: fossil_675_existing</li>
+			<li data-editable="" class="substation"><i class="fa fa-minus-square" aria-hidden="true"></i> Substation: sub</li><li data-editable="" class="feeder"><i class="fa fa-minus-square" aria-hidden="true"></i>  Feeder: regNone</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 684_command_center</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 692_warehouse2</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 611_runway</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 652_residential</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 670a_residential2</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 670b_residential2</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 670c_residential2</li><li data-editable="" class="feeder"><i class="fa fa-minus-square" aria-hidden="true"></i> Feeder: reg0</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 634a_data_center</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 634b_radar</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 634c_atc_tower</li><li data-editable="" class="solar"><i class="fa fa-minus-square" aria-hidden="true"></i> Solar: solar_634_existing</li><li data-editable="" class="battery"><i class="fa fa-minus-square" aria-hidden="true"></i> Battery: battery_634_existing</li><li data-editable="" class="feeder"><i class="fa fa-minus-square" aria-hidden="true"></i> Feeder: reg1</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 675a_hospital</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 675b_residential1</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 675c_residential1</li><li data-editable="" class="fossil"><i class="fa fa-minus-square" aria-hidden="true"></i> Fossil: fossil_675_existing</li>
 			<li data-editable="" class="feeder"><i class="fa fa-minus-square" aria-hidden="true"></i> Feeder: reg2</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 645_hangar</li><li data-editable="" class="load"><i class="fa fa-minus-square" aria-hidden="true"></i> Load: 646_office</li>
 			
 			

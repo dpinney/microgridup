@@ -6,7 +6,7 @@ import microgridup_gen_mgs as gmg
 
 def test_1mg():
 	# Input data.
-	MODEL_DIR = f'{PROJ_FOLDER}/1mg'
+	MODEL_DIR = f'{PROJ_FOLDER}/Lehigh_1mg'
 	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_1mg.dss'
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINE = '650632' # Why this line, which is not closing off the genbus from source?
@@ -77,7 +77,7 @@ def test_1mg():
 
 def test_2mg():
 	# Input data.
-	MODEL_DIR = f'{PROJ_FOLDER}/2mgs'
+	MODEL_DIR = f'{PROJ_FOLDER}/Lehigh_2mgs'
 	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_2mg.dss'
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINE = '650632'
@@ -154,7 +154,7 @@ def test_2mg():
 
 def test_3mg():
 	# Input data.
-	MODEL_DIR = f'{PROJ_FOLDER}/3mgs'
+	MODEL_DIR = f'{PROJ_FOLDER}/Lehigh_3mgs'
 	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_3mg.dss'
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINE = '650632'
@@ -238,7 +238,7 @@ def test_3mg():
 
 def test_4mg():
 	# Input data.
-	MODEL_DIR = f'{PROJ_FOLDER}/4mgs'
+	MODEL_DIR = f'{PROJ_FOLDER}/Lehigh_4mgs'
 	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_4mg.dss'
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINE = '650632'
@@ -333,7 +333,7 @@ def test_auto3mg():
 	# Input data.
 	CIRC_FILE = f'{MGU_FOLDER}/testfiles/lehigh_base_3mg.dss'
 	CRITICAL_LOADS = ['645_hangar','684_command_center', '611_runway','675a_hospital','634a_data_center', '634b_radar', '634c_atc_tower']
-	MODEL_DIR = f'{PROJ_FOLDER}/auto3mg'
+	MODEL_DIR = f'{PROJ_FOLDER}/Lehigh_auto3mg'
 	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_3mg.dss'
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINE = '670671'
@@ -420,7 +420,7 @@ def test_auto3mg():
 
 if __name__ == '__main__':
 	test_1mg()
-	# test_2mg()
-	# test_3mg()
-	# test_4mg()
-	# test_auto3mg()
+	test_2mg()
+	test_3mg()
+	test_4mg()
+	test_auto3mg()

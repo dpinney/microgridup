@@ -1,10 +1,10 @@
 # MicrogridUP: only keep certain test projects
 data/projects/*
-!data/projects/1mg/*
-!data/projects/2mgs/*
-!data/projects/3mgs/*
-!data/projects/4mgs/*
-!data/projects/auto3mg/*
+!data/projects/Lehigh_1mg/*
+!data/projects/Lehigh_2mgs/*
+!data/projects/Lehigh_3mgs/*
+!data/projects/Lehigh_4mgs/*
+!data/projects/Lehigh_auto3mg/*
 !data/projects/iowa240/*
 
 # MicrogridUP: ignore production files

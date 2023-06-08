@@ -360,7 +360,6 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 		print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", or "criticalLoads". No mgs generated.')
 		return {}
 	MG_MINES = helper(MG_GROUPS, switch, gen_bus)
-	print(f'MG_MINES for {circ_path} and {algo}',MG_MINES)
 	return MG_MINES
 
 def _tests():

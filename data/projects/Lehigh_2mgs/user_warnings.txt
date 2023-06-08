@@ -1,0 +1,4 @@
+Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+Pre-existing battery battery_675_existing will not be utilized to support loads in microgrid mg1.
+Pre-existing battery battery_675_2_existing will not be utilized to support loads in microgrid mg1.
+Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.

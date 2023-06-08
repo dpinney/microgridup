@@ -317,8 +317,6 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 		for idx in range(len(all_mgs)):
 			M_ID, MG_GROUP, TREE_ROOT, BORDERS = all_mgs[idx]
 			this_switch = switch[f'Mg{M_ID+1}'] if switch else [get_edge_name(swedge[0], swedge[1], omd_list) for swedge in BORDERS]
-			print(f'this_switch for {circ_path}',this_switch)
-			print(f'for context switch is {switch}')
 			if type(this_switch) == list:
 				this_switch = this_switch[-1] if this_switch[-1] else this_switch[0] # TODO: Why is this_switch a list? Which value do we use? 
 			this_gen_bus = gen_bus[f'Mg{M_ID+1}'] if gen_bus else TREE_ROOT

@@ -14,35 +14,35 @@ from pathlib import Path
 _mguDir = os.path.abspath(os.path.dirname(__file__))
 if _mguDir == '/':
 	_mguDir = '' #workaround for rooted installs through e.g. docker.
-_analysisDir = f'{_mguDir}/data/projects'
+_projectDir = f'{_mguDir}/data/projects'
 
 app = Flask(__name__, static_folder='data', template_folder='templates')
 
-def list_analyses():
-	all_analyses = [x for x in os.listdir(_analysisDir) if os.path.isdir(f'{_analysisDir}/{x}')]
-	return all_analyses
+def list_projects():
+	all_projects = [x for x in os.listdir(_projectDir) if os.path.isdir(f'{_projectDir}/{x}')]
+	return all_projects
 
 @app.route('/')
 def home():
-	analyses = list_analyses()
-	return render_template('template_home.html', analyses=analyses)
+	projects = list_projects()
+	return render_template('template_home.html', projects=projects)
 
-@app.route('/load/<analysis>')
-def load(analysis):
-	ana_files = os.listdir(f'{_analysisDir}/{analysis}')
+@app.route('/load/<project>')
+def load(project):
+	ana_files = os.listdir(f'{_projectDir}/{project}')
 	if '0crashed.txt' in ana_files:
 		return 'Model Crashed. Please delete and recreate.'
 	elif '0running.txt' in ana_files:
 		return 'Model Running. Please reload to check for completion.'
 	elif 'output_final.html' in ana_files:
-		return redirect(f'/data/projects/{analysis}/output_final.html')
+		return redirect(f'/data/projects/{project}/output_final.html')
 	else:
 		return 'Model is in an inconsistent state. Please delete and recreate.'
 
-@app.route('/edit/<analysis>')
-def edit(analysis):
+@app.route('/edit/<project>')
+def edit(project):
 	try:
-		with open(f'{_analysisDir}/{analysis}/allInputData.json') as in_data_file:
+		with open(f'{_projectDir}/{project}/allInputData.json') as in_data_file:
 			in_data = json.load(in_data_file)
 	except:
 		in_data = None
@@ -56,14 +56,14 @@ def newGui():
 
 @app.route('/duplicate', methods=["POST"])
 def duplicate():
-	analysis = request.json.get('analysis', None)
+	project = request.json.get('project', None)
 	new_name = request.json.get('new_name', None)
-	analyses = list_analyses()
-	if (analysis not in analyses) or (new_name in analyses):
-		return 'Duplication failed. Analysis does not exist or the new name is invalid.'
+	projects = list_projects()
+	if (project not in projects) or (new_name in projects):
+		return 'Duplication failed. Project does not exist or the new name is invalid.'
 	else:
-		shutil.copytree(analysis, f'{_analysisDir}/{new_name}')
-		return f'Successfully duplicated {analysis} as {new_name}.'
+		shutil.copytree(project, f'{_projectDir}/{new_name}')
+		return f'Successfully duplicated {project} as {new_name}.'
 
 @app.route('/jsonToDss', methods=['GET','POST'])
 def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False):
@@ -192,8 +192,8 @@ def run():
 	if 'BASE_DSS_NAME' in request.form and 'LOAD_CSV_NAME' in request.form:
 		print('we are editing an existing model')
 		# editing an existing model
-		dss_path = f'{_analysisDir}/{model_dir}/circuit.dss'
-		csv_path = f'{_analysisDir}/{model_dir}/loads.csv'
+		dss_path = f'{_projectDir}/{model_dir}/circuit.dss'
+		csv_path = f'{_projectDir}/{model_dir}/loads.csv'
 		all_files = 'Using Existing Files'
 	else:
 		# new files uploaded. 
@@ -298,7 +298,7 @@ def run():
 		# 'windItcPercent':request.form['windItcPercent'],
 	}
 	mgu_args = [
-		f'{_analysisDir}/{request.form["MODEL_DIR"]}',
+		f'{_projectDir}/{request.form["MODEL_DIR"]}',
 		dss_path,
 		csv_path,
 		float(request.form['QSTS_STEPS']),

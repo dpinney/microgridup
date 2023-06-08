@@ -236,7 +236,7 @@
         }
     </style>
     <script type="text/javascript">
-        function duplicate(analysis) {
+        function duplicate(project) {
             var new_name = prompt('Name for the duplicate?', '');
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function() {
@@ -248,7 +248,7 @@
             xhr.open('POST', '/duplicate', true);
             xhr.setRequestHeader('Content-Type', 'application/json');
             var contents = JSON.stringify({
-                'analysis':analysis,
+                'project':project,
                 'new_name':new_name
             });
             xhr.send(contents);
@@ -268,13 +268,13 @@
     </header>
     <main>
         <div id='container' style='margin-top:10px'>
-            {% for analysis in analyses %}
+            {% for project in projects %}
             <div class='box'>
-                <a style="font-size:40px" href='load/{{analysis}}'>{{analysis}}</a>
+                <a style="font-size:40px" href='load/{{project}}'>{{project}}</a>
                 <br>
-                <a href='javascript:duplicate("{{analysis}}")'>[dup]</a>
-                <a href='edit/{{analysis}}'>[edit]</a>
-                <a href='delete/{{analysis}}'>[del]</a>
+                <a href='javascript:duplicate("{{project}}")'>[dup]</a>
+                <a href='edit/{{project}}'>[edit]</a>
+                <a href='delete/{{project}}'>[del]</a>
             </div>
             {% endfor %}
             <div class='box' style="border:1px black dashed">

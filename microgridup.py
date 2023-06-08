@@ -339,7 +339,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		except:
 			pass
 	except:
-		print('Rerunning existing analysis. DSS and CSV files not moved.')
+		print('Rerunning existing project. DSS and CSV files not moved.')
 	if DELETE_FILES:
 		for fname in [BASE_DSS, LOAD_CSV]:
 			try:
@@ -369,7 +369,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 				'OUTAGE_CSV':OUTAGE_CSV
 			}
 			json.dump(inputs, inputs_file, indent=4)
-		# Run the analysis
+		# Run the project.
 		mgs_name_sorted = sorted(MICROGRIDS.keys())
 		for i, mg_name in enumerate(mgs_name_sorted):
 			BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'

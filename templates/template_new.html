@@ -181,16 +181,17 @@
 		<form id="modelInfoForm" enctype="multipart/form-data">
 			<h5>Site and Energy Provider</h5>
 			<div class="chunk">
-				<label for="MODEL_DIR">Model Name</label>
-				<input type="text" name="MODEL_DIR" value="{{in_data.MODEL_DIR}}" pattern="[a-z0-9_-]" required/>
+				<!-- <label for="MODEL_DIR">Model Name</label> -->
+				<label class="tooltip" for="MODEL_DIR">Model Name<span class="classic">Model names must be entirely lowercase.</span></label>
+				<input type="text" name="MODEL_DIR" value="{{in_data.MODEL_DIR}}" pattern="[a-z0-9_\-]" required/>
 			</div>
 			<div class="chunk">
 				<label class="tooltip" for="latitude">Latitude<span class="classic">Specify the latitude of the load/grid.</span></label>
-				<input type="text" name="latitude" pattern="^\-?\d+\.?\d*?$" value="39.7817"/>
+				<input type="text" name="latitude" pattern="^\\-?\\d+\\.?\\d*?$" value="39.7817"/>
 			</div>
 			<div class="chunk">
 				<label class="tooltip" for="longitude">Longitude<span class="classic">>Specify the longitude of the load/grid.</span></label>
-				<input type="text" name="longitude" pattern="^\-?\d+\.?\d*?$" value="-89.6501"/>
+				<input type="text" name="longitude" pattern="^\\-?\\d+\\.?\\d*?$" value="-89.6501"/>
 			</div>
 			<div class="chunk">
 				<label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">TO DO: FILL TOOLTIP</span></label>
@@ -1011,6 +1012,22 @@
 
 		// Submit everything. 
 		$('#submitEverything').click(function() {
+			// Do not proceed if regex patterns are not matched.
+			var form1_ = document.getElementById("modelInfoForm");
+			var form2_ = document.getElementById("techParamForm");
+			if (!form1_.checkValidity()) {
+				var invalidInput = form1_.querySelector(':invalid');
+				invalidInput.focus();
+				alert('Please correct invalid input.')
+				return
+			}
+			if (!form2_.checkValidity()) {
+				var invalidInput = form2_.querySelector(':invalid');
+				invalidInput.focus();
+				alert('Please correct invalid input.')
+				return
+			}
+
 			// Do not proceed if no circuit is specified.
 			if (filename === '') {
 				alert('Please specify a circuit.')

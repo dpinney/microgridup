@@ -1,11 +1,11 @@
 # MicrogridUP: only keep certain test projects
-# data/projects/*
-# !data/projects/lehigh1mg/*
-# !data/projects/lehigh2mgs/*
-# !data/projects/lehigh3mgs/*
-# !data/projects/lehigh4mgs/*
-# !data/projects/lehighauto_3mg/*
-# !data/projects/iowa240/*
+data/projects/*
+!data/projects/lehigh1mg/*
+!data/projects/lehigh2mgs/*
+!data/projects/lehigh3mgs/*
+!data/projects/lehigh4mgs/*
+!data/projects/lehighauto_3mg/*
+!data/projects/iowa240/*
 
 # MicrogridUP: ignore production files
 ssl/*

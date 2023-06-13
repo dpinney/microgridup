@@ -17,6 +17,9 @@ COPY . .
 RUN sudo apt-get -y install graphviz graphviz-dev
 RUN pip install pygraphviz
 
+# Stupid workaround for an OpenDSS bug
+RUN mkdir -p /root/Documents
+
 # Set default locale = UTF-8
 ENV PYTHONIOENCODING=UTF-8
 ENV LANG=en_US.UTF-8

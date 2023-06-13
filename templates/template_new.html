@@ -182,7 +182,7 @@
 			<h5>Site and Energy Provider</h5>
 			<div class="chunk">
 				<label for="MODEL_DIR">Model Name</label>
-				<input type="text" name="MODEL_DIR" value="{{in_data.MODEL_DIR}}" />
+				<input type="text" name="MODEL_DIR" value="{{in_data.MODEL_DIR}}" pattern="[a-z0-9_-]" required/>
 			</div>
 			<div class="chunk">
 				<label class="tooltip" for="latitude">Latitude<span class="classic">Specify the latitude of the load/grid.</span></label>

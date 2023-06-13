@@ -31,8 +31,8 @@
             "angle": "30",
             "mvasc3": "20000",
             "mvasc1": "21000",
-            "latitude": "30.284816790461043",
-            "longitude": "-84.07153175328145"
+            "latitude": "30.28485944691467",
+            "longitude": "-84.07162114620552"
         },
         "4": {
             "object": "vsource",
@@ -46,8 +46,8 @@
             "x1": "0.0001",
             "r0": "0",
             "x0": "0.0001",
-            "latitude": "30.28508847206025",
-            "longitude": "-84.0716782133044"
+            "latitude": "30.285188771627922",
+            "longitude": "-84.07139758336196"
         },
         "5": {
             "object": "vsource",
@@ -60,8 +60,8 @@
             "r0": "0",
             "x0": "0.0001",
             "!CONNCODE": ".1.2.3",
-            "latitude": "30.2848173600273",
-            "longitude": "-84.07553453313234"
+            "latitude": "30.28484266510023",
+            "longitude": "-84.07559781422574"
         },
         "6": {
             "object": "transformer",
@@ -433,8 +433,8 @@
             "kvar": "660",
             "yearly": "684_command_center_shape",
             "!CONNCODE": ".3",
-            "latitude": "30.284144767898503",
-            "longitude": "-84.07434254329219"
+            "latitude": "30.284116250257842",
+            "longitude": "-84.0746642874317"
         },
         "45": {
             "object": "load",
@@ -448,8 +448,8 @@
             "kvar": "110",
             "yearly": "634a_data_center_shape",
             "!CONNCODE": ".1",
-            "latitude": "30.287178532755476",
-            "longitude": "-84.07310524485229"
+            "latitude": "30.287126792630726",
+            "longitude": "-84.07315747260317"
         },
         "46": {
             "object": "load",
@@ -463,8 +463,8 @@
             "kvar": "90",
             "yearly": "634b_radar_shape",
             "!CONNCODE": ".1",
-            "latitude": "30.287201650895117",
-            "longitude": "-84.07305941415339"
+            "latitude": "30.287211461658814",
+            "longitude": "-84.0729682417694"
         },
         "47": {
             "object": "load",
@@ -478,8 +478,8 @@
             "kvar": "90",
             "yearly": "634c_atc_tower_shape",
             "!CONNCODE": ".1",
-            "latitude": "30.286983194920488",
-            "longitude": "-84.07279523332627"
+            "latitude": "30.28685428157761",
+            "longitude": "-84.07287130997413"
         },
         "48": {
             "object": "load",
@@ -493,8 +493,8 @@
             "kvar": "125",
             "yearly": "645_hangar_shape",
             "!CONNCODE": ".2",
-            "latitude": "30.283815353673766",
-            "longitude": "-84.07302359296857"
+            "latitude": "30.283964791958116",
+            "longitude": "-84.07318710302599"
         },
         "49": {
             "object": "load",
@@ -508,8 +508,8 @@
             "kvar": "132",
             "yearly": "646_office_shape",
             "!CONNCODE": ".2",
-            "latitude": "30.282960622169703",
-            "longitude": "-84.072799980408"
+            "latitude": "30.28283341824203",
+            "longitude": "-84.07290496368815"
         },
         "50": {
             "object": "load",
@@ -523,8 +523,8 @@
             "kvar": "151",
             "yearly": "692_warehouse2_shape",
             "!CONNCODE": ".1.2.3",
-            "latitude": "30.285327878755012",
-            "longitude": "-84.07456869758684"
+            "latitude": "30.285448364041667",
+            "longitude": "-84.07430373248327"
         },
         "51": {
             "object": "load",
@@ -538,8 +538,8 @@
             "kvar": "190",
             "yearly": "675a_hospital_shape",
             "!CONNCODE": ".1.2.3",
-            "latitude": "30.287195588244668",
-            "longitude": "-84.07441138178568"
+            "latitude": "30.286925623610024",
+            "longitude": "-84.07467290377005"
         },
         "52": {
             "object": "load",
@@ -553,8 +553,8 @@
             "kvar": "60",
             "yearly": "675b_residential1_shape",
             "!CONNCODE": ".1.2.3",
-            "latitude": "30.286916269508517",
-            "longitude": "-84.0743179479734"
+            "latitude": "30.287169682416803",
+            "longitude": "-84.074617300524"
         },
         "53": {
             "object": "load",
@@ -568,8 +568,8 @@
             "kvar": "212",
             "yearly": "675c_residential1_shape",
             "!CONNCODE": ".1.2.3",
-            "latitude": "30.286832014014735",
-            "longitude": "-84.07457811212097"
+            "latitude": "30.286951996826183",
+            "longitude": "-84.07430253054633"
         },
         "54": {
             "object": "load",
@@ -583,8 +583,8 @@
             "kvar": "80",
             "yearly": "611_runway_shape",
             "!CONNCODE": ".3",
-            "latitude": "30.2831499015921",
-            "longitude": "-84.07434719892291"
+            "latitude": "30.283209913423477",
+            "longitude": "-84.07452800148077"
         },
         "55": {
             "object": "load",
@@ -598,8 +598,8 @@
             "kvar": "86",
             "yearly": "652_residential_shape",
             "!CONNCODE": ".3",
-            "latitude": "30.28382671689916",
-            "longitude": "-84.07542020847342"
+            "latitude": "30.28383403737407",
+            "longitude": "-84.07540371182317"
         },
         "56": {
             "object": "load",
@@ -613,8 +613,8 @@
             "kvar": "10",
             "yearly": "670a_residential2_shape",
             "!CONNCODE": ".1",
-            "latitude": "30.28495793281958",
-            "longitude": "-84.07330073038295"
+            "latitude": "30.285211077575507",
+            "longitude": "-84.07352066358763"
         },
         "57": {
             "object": "load",
@@ -628,8 +628,8 @@
             "kvar": "38",
             "yearly": "670b_residential2_shape",
             "!CONNCODE": ".2",
-            "latitude": "30.284906145048144",
-            "longitude": "-84.07332393782427"
+            "latitude": "30.284948574235752",
+            "longitude": "-84.07330366083104"
         },
         "58": {
             "object": "load",
@@ -643,8 +643,8 @@
             "kvar": "68",
             "yearly": "670c_residential2_shape",
             "!CONNCODE": ".3",
-            "latitude": "30.284838261004815",
-            "longitude": "-84.07339570517196"
+            "latitude": "30.285210343758116",
+            "longitude": "-84.0735254875535"
         },
         "59": {
             "object": "generator",
@@ -656,8 +656,8 @@
             "pf": "1",
             "yearly": "solar_634_existing_shape",
             "!CONNCODE": ".1",
-            "latitude": "30.28712765253522",
-            "longitude": "-84.07315687433041"
+            "latitude": "30.28693826045465",
+            "longitude": "-84.07280748989149"
         },
         "60": {
             "object": "generator",
@@ -669,8 +669,8 @@
             "pf": "1",
             "yearly": "solar_675_existing_shape",
             "!CONNCODE": ".1.2.3",
-            "latitude": "30.287085320042056",
-            "longitude": "-84.07467946664988"
+            "latitude": "30.28698733184049",
+            "longitude": "-84.07429465397512"
         },
         "61": {
             "object": "generator",
@@ -685,8 +685,8 @@
             "h": "2",
             "yearly": "fossil_684_existing_shape",
             "!CONNCODE": ".3",
-            "latitude": "30.28389606923255",
-            "longitude": "-84.07433074342657"
+            "latitude": "30.283884705026683",
+            "longitude": "-84.07433957118974"
         },
         "62": {
             "object": "generator",
@@ -701,8 +701,8 @@
             "h": "2",
             "yearly": "fossil_646_existing_shape",
             "!CONNCODE": ".2",
-            "latitude": "30.28320250215419",
-            "longitude": "-84.07292905523042"
+            "latitude": "30.283060709996075",
+            "longitude": "-84.07279877395572"
         },
         "63": {
             "object": "capacitor",
@@ -711,8 +711,8 @@
             "phases": "3",
             "kvar": "600",
             "kv": "2.4",
-            "latitude": "30.287089060890185",
-            "longitude": "-84.07430802772915"
+            "latitude": "30.286856573279074",
+            "longitude": "-84.07436837784716"
         },
         "64": {
             "object": "capacitor",
@@ -722,8 +722,8 @@
             "kvar": "100",
             "kv": "2.4",
             "!CONNCODE": ".3",
-            "latitude": "30.28321064875658",
-            "longitude": "-84.07452357726316"
+            "latitude": "30.283002488611896",
+            "longitude": "-84.07429327641421"
         },
         "65": {
             "object": "line",
@@ -901,8 +901,8 @@
             "%idlingkw": "0",
             "yearly": "battery_670_shape",
             "!CONNCODE": ".1.2.3",
-            "latitude": "30.28508551375334",
-            "longitude": "-84.07330660859576"
+            "latitude": "30.28502814413552",
+            "longitude": "-84.07329357418632"
         },
         "79": {
             "object": "generator",
@@ -914,8 +914,8 @@
             "pf": "1",
             "yearly": "wind_670_shape",
             "!CONNCODE": ".1.2.3",
-            "latitude": "30.284829514312623",
-            "longitude": "-84.07341341983583"
+            "latitude": "30.28504009029344",
+            "longitude": "-84.0736911567965"
         },
         "80": {
             "object": "generator",
@@ -929,8 +929,8 @@
             "h": "2",
             "yearly": "fossil_670_shape",
             "!CONNCODE": ".1.2.3",
-            "latitude": "30.28481858281857",
-            "longitude": "-84.07344607495803"
+            "latitude": "30.284870821395746",
+            "longitude": "-84.07363366003162"
         },
         "81": {
             "object": "generator",
@@ -942,8 +942,8 @@
             "pf": "1",
             "yearly": "solar_670_shape",
             "!CONNCODE": ".1.2.3",
-            "latitude": "30.28499692540779",
-            "longitude": "-84.0736923529721"
+            "latitude": "30.284946156019668",
+            "longitude": "-84.07330450097535"
         },
         "82": {
             "object": "!CMD",

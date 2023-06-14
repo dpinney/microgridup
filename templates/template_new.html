@@ -169,6 +169,9 @@
 			0%,100% { opacity: 1; }
 			50% { opacity: 0; }
 		}
+		.invalid-input {
+			border: 1px solid red;
+		}
 	</style>
 </head>
 <body>
@@ -181,17 +184,16 @@
 		<form id="modelInfoForm" enctype="multipart/form-data">
 			<h5>Site and Energy Provider</h5>
 			<div class="chunk">
-				<!-- <label for="MODEL_DIR">Model Name</label> -->
 				<label class="tooltip" for="MODEL_DIR">Model Name<span class="classic">Model names must be entirely lowercase.</span></label>
-				<input type="text" name="MODEL_DIR" value="{{in_data.MODEL_DIR}}" pattern="[a-z0-9_\-]" required/>
+				<input type="text" name="MODEL_DIR" value="{{in_data.MODEL_DIR}}" pattern="[a-z0-9_\-]+" required/>
 			</div>
 			<div class="chunk">
 				<label class="tooltip" for="latitude">Latitude<span class="classic">Specify the latitude of the load/grid.</span></label>
-				<input type="text" name="latitude" pattern="^\\-?\\d+\\.?\\d*?$" value="39.7817"/>
+				<input type="text" name="latitude" pattern="-?\d+\.?\d*" value="39.7817"/>
 			</div>
 			<div class="chunk">
-				<label class="tooltip" for="longitude">Longitude<span class="classic">>Specify the longitude of the load/grid.</span></label>
-				<input type="text" name="longitude" pattern="^\\-?\\d+\\.?\\d*?$" value="-89.6501"/>
+				<label class="tooltip" for="longitude">Longitude<span class="classic">Specify the longitude of the load/grid.</span></label>
+				<input type="text" name="longitude" pattern="-?\d+\.?\d*" value="-89.6501"/>
 			</div>
 			<div class="chunk">
 				<label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">TO DO: FILL TOOLTIP</span></label>
@@ -1010,24 +1012,58 @@
 			$(this).next('div').slideToggle('500');
 		});
 
-		// Submit everything. 
+		// Validate forms.
 		$('#submitEverything').click(function() {
-			// Do not proceed if regex patterns are not matched.
-			var form1_ = document.getElementById("modelInfoForm");
-			var form2_ = document.getElementById("techParamForm");
-			if (!form1_.checkValidity()) {
-				var invalidInput = form1_.querySelector(':invalid');
-				invalidInput.focus();
-				alert('Please correct invalid input.')
-				return
-			}
-			if (!form2_.checkValidity()) {
-				var invalidInput = form2_.querySelector(':invalid');
-				invalidInput.focus();
-				alert('Please correct invalid input.')
-				return
-			}
+			var form1 = document.getElementById("modelInfoForm");
+			var form2 = document.getElementById("techParamForm");
 
+			// Validate form inputs
+			var form1Valid = validateForm(form1);
+			var form2Valid = validateForm(form2);
+
+			if (form1Valid && form2Valid) {
+				// Submit the forms
+				submitEverything();
+			} else {
+				// Show alert and highlight incorrect fields
+				if (!form1Valid) {
+				highlightIncorrectFields(form1);
+				}
+				if (!form2Valid) {
+				highlightIncorrectFields(form2);
+				}
+				alert('Please correct the input fields higlighted with red borders.');
+			}
+		// }
+		});
+
+		function validateForm(form) {
+			var inputs = form.querySelectorAll("input");
+			var valid = true;
+			for (var i = 0; i < inputs.length; i++) {
+				var input = inputs[i];
+				if (!input.checkValidity()) {
+				valid = false;
+				input.style.border = "1px solid red";
+				} else {
+				input.style.border = "";
+				}
+			}
+			return valid;
+		}
+
+		function highlightIncorrectFields(form) {
+			var inputs = form.querySelectorAll("input");
+			for (var i = 0; i < inputs.length; i++) {
+				var input = inputs[i];
+				if (!input.checkValidity()) {
+					input.style.border = "1px solid red";
+				}
+			}
+		}
+
+		// Submit everything. 
+		function submitEverything() {
 			// Do not proceed if no circuit is specified.
 			if (filename === '') {
 				alert('Please specify a circuit.')
@@ -1138,7 +1174,7 @@
 					alert(textStatus + ' : ' + errorThrown)
 				}
 			})
-		})
+		}
 	});
 	var elements = `
 	<ul id="elements">

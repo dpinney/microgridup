@@ -464,7 +464,7 @@
         }
     ],
     "MG_MINES": {
-        "3mgs_wizard_loadGrouping": [
+        "3mgs_wizard_loadgrouping": [
             {
                 "mg0": {
                     "loads": [
@@ -687,7 +687,7 @@
             },
             "branch"
         ],
-        "3mgs_wizard_bottomUp": [
+        "3mgs_wizard_bottomup": [
             {
                 "mg0": {
                     "loads": [
@@ -774,7 +774,7 @@
             },
             "bottomUp"
         ],
-        "3mgs_wizard_criticalLoads": [
+        "3mgs_wizard_criticalloads": [
             {
                 "mg0": {
                     "loads": [
@@ -892,7 +892,7 @@
             },
             "manual"
         ],
-        "3mgs_lehigh_loadGrouping": [
+        "3mgs_lehigh_loadgrouping": [
             {
                 "mg0": {
                     "loads": [
@@ -1091,7 +1091,7 @@
             },
             "branch"
         ],
-        "3mgs_lehigh_bottomUp": [
+        "3mgs_lehigh_bottomup": [
             {
                 "mg0": {
                     "loads": [
@@ -1166,7 +1166,7 @@
             },
             "bottomUp"
         ],
-        "3mgs_lehigh_criticalLoads": [
+        "3mgs_lehigh_criticalloads": [
             {
                 "mg0": {
                     "loads": [
@@ -1225,7 +1225,7 @@
         ]
     },
     "control_test_args": {
-        "Lehigh_1mg": {
+        "lehigh1mg": {
             "mg0": {
                 "loads": [
                     "634a_data_center",
@@ -1267,7 +1267,7 @@
                 ]
             }
         },
-        "Lehigh_2mgs": {
+        "lehigh2mgs": {
             "mg0": {
                 "loads": [
                     "634a_data_center",
@@ -1305,7 +1305,7 @@
                 ]
             }
         },
-        "Lehigh_3mgs": {
+        "lehigh3mgs": {
             "mg0": {
                 "loads": [
                     "634a_data_center",
@@ -1356,7 +1356,7 @@
                 ]
             }
         },
-        "Lehigh_4mgs": {
+        "lehigh4mgs": {
             "mg0": {
                 "loads": [
                     "634a_data_center",
@@ -1428,7 +1428,7 @@
                 ]
             }
         },
-        "Lehigh_auto3mg": {
+        "lehighauto_3mg": {
             "mg0": {
                 "loads": [
                     "634a_data_center",
@@ -1499,6 +1499,31 @@
                 "max_potential_diesel": "1000000",
                 "battery_capacity": "10000"
             }
+        }
+    },
+    "max_crit_loads": {
+        "lehigh1mg": {
+            "mg0": 1240
+        },
+        "lehigh2mgs": {
+            "mg0": 170,
+            "mg1": 550
+        },
+        "lehigh3mgs": {
+            "mg0": 170,
+            "mg1": 550,
+            "mg2": 100
+        },
+        "lehigh4mgs": {
+            "mg0": 170,
+            "mg1": 550,
+            "mg2": 420,
+            "mg3": 100
+        },
+        "lehighauto_3mg": {
+            "mg0": 400,
+            "mg1": 170,
+            "mg2": 1810
         }
     }
 }

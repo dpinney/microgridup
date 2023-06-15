@@ -303,3 +303,39 @@ def run(LOAD_NAME, microgrid, mg_name, BASE_NAME, REOPT_INPUTS, REOPT_FOLDER_FIN
 	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_NAME, microgrid, mg_name)
 	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_FINAL, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load, mg_name)
 	return max_crit_load
+
+def _tests():
+	# Load arguments from JSON.
+	with open('testfiles/test_params.json') as file:
+		test_params = json.load(file)
+	control_test_args = test_params['control_test_args']
+	REOPT_INPUTS = test_params['REOPT_INPUTS']
+
+	# TESTING DIRECTORY.
+	_dir = 'lehigh4mgs' # Change to test on different directory.
+
+	MODEL_DIR = f'{PROJ_FOLDER}/{_dir}'
+
+	# HACK: work in directory because we're very picky about the current dir.
+	curr_dir = os.getcwd()
+	workDir = os.path.abspath(MODEL_DIR)
+	if curr_dir != workDir:
+		os.chdir(workDir)
+
+	microgrids = control_test_args[_dir]
+
+	for run_count in range(len(microgrids)):
+		LOAD_NAME = 'loads.csv'
+		microgrid = microgrids[f'mg{run_count}']
+		mg_name = f'mg{run_count}'
+		BASE_NAME = 'circuit.dss' if run_count == 0 else f'circuit_plusmg_{run_count - 1}.dss'
+		REOPT_FOLDER_FINAL = f'reopt_final_{run_count}'
+		FOSSIL_BACKUP_PERCENT = 0.5
+
+		run(LOAD_NAME, microgrid, mg_name, BASE_NAME, REOPT_INPUTS, REOPT_FOLDER_FINAL, FOSSIL_BACKUP_PERCENT)
+
+	os.chdir(curr_dir)
+	return
+
+if __name__ == '__main__':
+	_tests()

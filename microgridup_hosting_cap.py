@@ -1,4 +1,4 @@
-import csv, json
+import csv, json, os
 import pandas as pd
 import numpy as np
 from os import path
@@ -961,3 +961,51 @@ def run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, REF_NAME, L
 	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
 	return mg_list_of_dicts_full
+
+def _tests():
+	# Load arguments from JSON.
+	with open('testfiles/test_params.json') as file:
+		test_params = json.load(file)
+	control_test_args = test_params['control_test_args']
+	max_crit_loads = test_params['max_crit_loads']
+
+	# Setup paths.
+	MGU_FOLDER = os.path.abspath(os.path.dirname(__file__))
+	if MGU_FOLDER == '/':
+		MGU_FOLDER = '' #workaround for docker root installs
+	PROJ_FOLDER = f'{MGU_FOLDER}/data/projects'
+
+	# TESTING DIRECTORY.
+	_dir = 'lehigh4mgs' # Change to test on different directory.
+
+	MODEL_DIR = f'{PROJ_FOLDER}/{_dir}'
+
+	# HACK: work in directory because we're very picky about the current dir.
+	curr_dir = os.getcwd()
+	workDir = os.path.abspath(MODEL_DIR)
+	if curr_dir != workDir:
+		os.chdir(workDir)
+
+	microgrids = control_test_args[_dir]
+
+	# As many tests per directory as there are microgrids/REopt API calls per directory.
+	for run_count in range(len(microgrids)):
+		print('run_count',run_count)
+		REOPT_FOLDER_FINAL = f'reopt_final_{run_count}'
+		GEN_NAME = 'generation.csv'
+		microgrid = microgrids[f'mg{run_count}']
+		BASE_NAME = 'circuit.dss' if run_count == 0 else f'circuit_plusmg_{run_count - 1}.dss'
+		mg_name = f'mg{run_count}'
+		REF_NAME = 'ref_gen_loads.csv'
+		LOAD_NAME = 'loads.csv'
+		FULL_NAME = f'circuit_plusmg_{run_count}.dss'
+		ADD_COST_NAME = f'mg_add_cost_{run_count}.csv'
+		max_crit_load = max_crit_loads[_dir][f'mg{run_count}']
+
+		run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, REF_NAME, LOAD_NAME, FULL_NAME, ADD_COST_NAME, max_crit_load)
+
+	os.chdir(curr_dir)
+	return
+
+if __name__ == '__main__':
+	_tests()

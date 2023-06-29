@@ -990,7 +990,6 @@ def _tests():
 
 	# As many tests per directory as there are microgrids/REopt API calls per directory.
 	for run_count in range(len(microgrids)):
-		print('run_count',run_count)
 		REOPT_FOLDER_FINAL = f'reopt_final_{run_count}'
 		GEN_NAME = 'generation.csv'
 		microgrid = microgrids[f'mg{run_count}']

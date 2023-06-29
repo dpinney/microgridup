@@ -158,6 +158,7 @@
         "value_of_lost_load": "1",
         "solar": "on",
         "battery": "on",
+        "fossil": "on",
         "wind": "off",
         "solarCost": "1600",
         "solarExisting": "0",

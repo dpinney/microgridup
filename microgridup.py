@@ -314,7 +314,7 @@ def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, G
 		# Create consolidated report per mg.
 		mg_add_cost_dict_of_lists = pd.read_csv(ADD_COST_NAME).to_dict(orient='list')
 
-def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, DIESEL_SAFETY_FACTOR=False, DELETE_FILES=False, open_results=False, OUTAGE_CSV=None):
+def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS=None, DIESEL_SAFETY_FACTOR=False, DELETE_FILES=False, open_results=False, OUTAGE_CSV=None):
 	''' Generate a full microgrid plan for the given inputs. '''
 	# Constants
 	MODEL_DSS = 'circuit.dss'
@@ -366,7 +366,8 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 				'MICROGRIDS':MICROGRIDS,
 				'FAULTED_LINE':FAULTED_LINE,
 				'DIESEL_SAFETY_FACTOR':DIESEL_SAFETY_FACTOR,
-				'OUTAGE_CSV':OUTAGE_CSV
+				'OUTAGE_CSV':OUTAGE_CSV,
+				'CRITICAL_LOADS':CRITICAL_LOADS
 			}
 			json.dump(inputs, inputs_file, indent=4)
 		# Run the project.
@@ -453,9 +454,10 @@ def _tests():
 	QSTS_STEPS = 480.0
 	FOSSIL_BACKUP_PERCENT = 0.5
 	FAULTED_LINE = '670671'
+	CRITICAL_LOADS = test_params['crit_loads']
 	# Test of full().
 	for _dir in MG_MINES:
-		mgu_args = [f'{PROJ_FOLDER}/{_dir}', f'{MGU_FOLDER}/uploads/BASE_DSS_{_dir}', f'{MGU_FOLDER}/uploads/LOAD_CSV_{_dir}', QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MG_MINES[_dir][0], FAULTED_LINE]
+		mgu_args = [f'{PROJ_FOLDER}/{_dir}', f'{MGU_FOLDER}/uploads/BASE_DSS_{_dir}', f'{MGU_FOLDER}/uploads/LOAD_CSV_{_dir}', QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MG_MINES[_dir][0], FAULTED_LINE, CRITICAL_LOADS]
 		print(f'---------------------------------------------------------\nBeginning end-to-end backend test of {_dir}.\n---------------------------------------------------------')
 		full(*mgu_args)
 	return print('Ran all tests for microgridup.py.')

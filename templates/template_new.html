@@ -93,7 +93,7 @@
 		}
 		a {text-decoration: none; color: black;}
 		a:hover {text-decoration: underline;}
-		#image_id {
+		#previewImage, #oldPartitionPreview {
 			max-width: 700px;
 			padding: 10px;
 		}
@@ -343,7 +343,7 @@
 			{% if 'BASE_DSS' in in_data %}
 			<div class="chunk">
 				<label for="BASE_DSS_NAME">Circuit Definition (.dss)</label>
-				<input type="text" name="BASE_DSS_NAME" value="{{in_data.BASE_DSS}}" readonly />
+				<input id="circuitPostCreation" type="text" name="BASE_DSS_NAME" value="{{in_data.BASE_DSS}}" readonly />
 			</div>
 			{% else %}
 			<div class="chunk">
@@ -397,10 +397,10 @@
 
 	</div>
 
-	<div id="partionPreviewer" class="step">
+	<div id="partitionPreviewer" class="step">
 		<h3>Step 3: Partition circuit into microgrids</h3>
 		<div id="stepThree" class="chunk">
-			<label class="tooltip" for="MG_DEF_METHOD">Microgrid Definition Method<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
+			<label class="tooltip" for="MG_DEF_METHOD">Microgrid Definition Method<span class="classic">TO DO: FILL TOOLTIP</span></label>
 			<select id="partitionMethod" name="MG_DEF_METHOD" style="margin-right:6px">
 				<option value="" disabled selected>Select method</option>
 				<option value="manual" {% if in_data.MG_DEF_METHOD == 'manual' %}selected{% endif %}>Manual</option>
@@ -432,22 +432,22 @@
 		<form id="techParamForm" enctype="multipart/form-data">
 			<div class="chunk">
 				<label for="solar">Solar</label>
-				<input type="checkbox" name="solar" value="on" id="solar" />
+				<input type="checkbox" name="solar" value="on" id="solar" {% if in_data.REOPT_INPUTS.solar == 'on' %}checked{% endif %}/>
 				<input type="hidden" name="solar" value="off">
 			</div>
 			<div class="chunk">
 				<label for="battery">Battery</label>
-				<input type="checkbox" name="battery" value="on" id="battery" />
+				<input type="checkbox" name="battery" value="on" id="battery" {% if in_data.REOPT_INPUTS.battery == 'on' %}checked{% endif %}/>
 				<input type="hidden" name="battery" value="off">
 			</div>
 			<div class="chunk">
 				<label for="fossil">Fossil</label>
-				<input type="checkbox" name="fossil" value="on" id="fossil" />
+				<input type="checkbox" name="fossil" value="on" id="fossil" {% if in_data.REOPT_INPUTS.fossil == 'on' %}checked{% endif %}/>
 				<input type="hidden" name="fossil" value="off">
 			</div>
 			<div class="chunk">
 				<label for="wind">Wind</label>
-				<input type="checkbox" name="wind" value="on" id="wind" />
+				<input type="checkbox" name="wind" value="on" id="wind" {% if in_data.REOPT_INPUTS.wind == 'on' %}checked{% endif %}/>
 				<input type="hidden" name="wind" value="off">
 			</div>
 
@@ -650,17 +650,31 @@
 		var filename = '';
 		
 		// Enable technology checkboxes.
-		$('[name="battery"]').change(function() {
-		$('#batteryDiv').toggle(500);
+		function toggleDivVisibility(checkboxId, divId) {
+			const checkbox = $(`#${checkboxId}`);
+			const div = $(`#${divId}`);
+			if (checkbox.is(':checked')) {
+				div.slideDown(500);
+			} else {
+				div.slideUp(500);
+			}
+		}
+		toggleDivVisibility('solar', 'solarDiv');
+		toggleDivVisibility('battery', 'batteryDiv');
+		toggleDivVisibility('fossil', 'fossilDiv');
+		toggleDivVisibility('wind', 'windDiv');
+
+		$('#solar').change(function() {
+			toggleDivVisibility('solar', 'solarDiv');
 		});
-		$('[name="wind"]').change(function() {
-			$('#windDiv').toggle(500);
+		$('#battery').change(function() {
+			toggleDivVisibility('battery', 'batteryDiv');
 		});
-		$('[name="solar"]').change(function() {
-			$('#solarDiv').toggle(500);
+		$('#fossil').change(function() {
+			toggleDivVisibility('fossil', 'fossilDiv');
 		});
-		$('[name="fossil"]').change(function() {
-			$('#fossilDiv').toggle(500);
+		$('#wind').change(function() {
+			toggleDivVisibility('wind', 'windDiv');
 		});
 
 		// Enable circuit definition method choice.
@@ -671,6 +685,97 @@
 			$("div.desc").hide();
 			$("#circuit" + test).show();
 		});
+
+		// Populate critical load selection div if editing an existing circuit.
+		function getLoadsFromExistingFile(filePath, criticalLoads) {
+			$.ajax({
+				url: '/getLoadsFromExistingFile',
+				method: 'POST',
+				data: { path: filePath },
+				success: function(response) {
+					circuitIsSpecified = true;
+					const loads = response.loads;
+					$('#critLoads').empty();
+					$('#critLoads').append('<p>Please select all critical loads:</p>')
+					$('#dropDowns').empty();
+					$('#dropDowns').hide();
+					jQuery('<form>', {
+						id: 'criticalLoadsSelect',
+						class: 'chunk'
+					}).appendTo('#critLoads');
+					for (let i=0; i<loads.length; i++) {
+						var checkbox = $('<input>').attr('type', 'checkbox');
+						if (criticalLoads.includes(loads[i])) {
+							checkbox.prop('checked', true);
+						}
+						var label = $('<label>').append(checkbox).append(loads[i]);
+						$('#criticalLoadsSelect').append(label)
+						$('#dropDowns').append('<label><select></select> '+loads[i]+'</label><br>')
+					}
+					if (loads.length === 0) {
+						$('#criticalLoadsSelect').append('<p>No loads to select from.</p>')
+					}
+					// Make directory uneditable. 
+					$('input[name="MODEL_DIR"]').prop("readonly", true);
+				},
+				error: function(xhr, status, error) {
+					// Handle errors, if any.
+					console.error(error);
+				}
+			});
+		}
+		
+		// If user clicked edit, show used circuit.
+		if ($('#circuitPostCreation').length) {
+			$('#circuitUpload').show();
+			$('#upload').prop('checked', true);
+			$('#wizard').attr('disabled', true);
+			circuitIsSpecified = true;
+			filename = $('#circuitPostCreation').val();
+			// Get allDataInputs.json params from Jinja as variables in the script.
+			var in_data = JSON.parse('{{ in_data | tojson | safe }}');
+			criticalLoads = in_data['CRITICAL_LOADS']		
+			microgrids = in_data['MICROGRIDS']
+			// Also populate critical load selection div.
+			getLoadsFromExistingFile(filename, criticalLoads);
+
+			// Also populate partitioning preview div from original run.
+			showOldPartitions(filename, microgrids)
+		}
+
+		function showOldPartitions(filename, microgrids) {
+			$('#stepThree').hide();
+			var oldPartitionsDiv = $('<div>').addClass('chunk');
+
+			// Grab a NetworkX diagram of current partition layout.
+			var data = {
+				filename: filename,
+				microgrids: microgrids
+			};
+			$.ajax({
+				type: 'POST',
+				url: '/previewOldPartitions',
+				data: JSON.stringify(data),
+				contentType: 'application/json',
+				success: function(data, status) {
+					var img = $('<img id="oldPartitionPreview">');
+					img.attr('src', 'data:image/gif;base64,' + data);
+					oldPartitionsDiv.prepend(img); 
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					alert(textStatus + ' : ' + errorThrown);
+				}
+			})
+
+			$('#partitionPreviewer').append(oldPartitionsDiv);
+			var partitionButton = $('<button>').text('Partition circuit differently');
+			oldPartitionsDiv.append(partitionButton);
+			
+			partitionButton.on('click', function() {
+				$('#stepThree').show();
+				oldPartitionsDiv.hide();
+			});
+		}
 
 		// Editable text for circuit widget.
 		$('body').on('click', '[data-editable]', function(){
@@ -973,7 +1078,7 @@
 				},
 				success: function(data, status) {
 					/* creating image */
-					var img = $('<img id="image_id">');
+					var img = $('<img id="previewImage">');
 					img.attr('src', 'data:image/gif;base64,' + data);
 					$('#partitionsPreview').empty();
 					img.appendTo('#partitionsPreview'); 
@@ -1067,9 +1172,9 @@
 				return 
 			}
 			// Do not proceed if no loads are specified.
-			if ($('#LOAD_CSV')[0].files.length === 0) {
+			if ((!$('#LOAD_CSV').val()) && (!$('[name="LOAD_CSV_NAME"]').val())) {
 				alert('Please specify load data.')
-				return 
+				return
 			}
 			// Do not proceed if no partition method is specified.
 			if ($( "#partitionMethod option:selected" ).val() === '') {

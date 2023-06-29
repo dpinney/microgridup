@@ -22,25 +22,25 @@ def run():
     algo_params = test_params['algo_params']
     pairings = algo_params['pairings']
 
-    for dir in MG_MINES:
+    for _dir in MG_MINES:
         driver.find_element(By.XPATH, '//a[@href][text()="+"]').click()
 
-        print(f'---------------------------------------------------------\nBeginning end-to-end test of {dir}.\n---------------------------------------------------------')
+        print(f'---------------------------------------------------------\nBeginning end-to-end test of {_dir}.\n---------------------------------------------------------')
 
         MODEL_DIR = driver.find_element(By.NAME, 'MODEL_DIR')
         MODEL_DIR.clear()
-        MODEL_DIR.send_keys(f'{dir}')
+        MODEL_DIR.send_keys(f'{_dir}')
 
         driver.find_element(By.NAME, 'LOAD_CSV').send_keys(f'{MGU_FOLDER}/testfiles/lehigh_load.csv')
 
-        if 'lehigh' in dir:
+        if 'lehigh' in _dir:
             driver.find_element(By.ID, 'upload').click()
 
             driver.find_element(By.NAME, 'file').send_keys(f'{MGU_FOLDER}/testfiles/lehigh_base_3mg.dss')
 
             driver.find_element(By.ID, 'upload-file-btn').click()
         
-        elif 'wizard' in dir:
+        elif 'wizard' in _dir:
             driver.find_element(By.ID, 'wizard').click()
 
             # JavaScript shortcut.
@@ -60,9 +60,9 @@ def run():
             checkbox = driver.find_element(By.XPATH, f'//label[text()="{load}"]')
             checkbox.click()
         
-        algo = MG_MINES[dir][1]
+        algo = MG_MINES[_dir][1]
         select = Select(driver.find_element(By.ID, 'partitionMethod'))
-        select.select_by_value(f'{MG_MINES[dir][1]}')
+        select.select_by_value(f'{MG_MINES[_dir][1]}')
 
         if algo in ('loadGrouping','manual'):
             driver.find_element(By.ID, 'mgQuantity').send_keys('3')
@@ -88,7 +88,7 @@ def run():
 
         time.sleep(2)
 
-        technologies = ['solar', 'battery', 'fossil']
+        technologies = ['fossil'] # 'solar' and 'battery' are checked by default when loading in data/static/lehigh_3mg_inputs.json.
         for tech in technologies:
             driver.find_element(By.NAME, f'{tech}').click()
 

@@ -2,7 +2,7 @@ import base64, io, json, multiprocessing, os, platform, shutil, time
 import networkx as nx
 from collections import OrderedDict
 from matplotlib import pyplot as plt
-from flask import Flask, flash, request, redirect, render_template, jsonify
+from flask import Flask, flash, request, redirect, render_template, jsonify, url_for
 from werkzeug.utils import secure_filename
 from omf.solvers.opendss import dssConvert
 from microgridup_gen_mgs import mg_group, nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch
@@ -44,9 +44,19 @@ def edit(project):
 	try:
 		with open(f'{_projectDir}/{project}/allInputData.json') as in_data_file:
 			in_data = json.load(in_data_file)
+			in_data['MODEL_DIR'] = in_data['MODEL_DIR'].split('/')[-1]
 	except:
 		in_data = None
 	return render_template('template_new.html', in_data=in_data)
+
+@app.route('/delete/<project>')
+def delete(project):
+	full_path = f'{_projectDir}/{project}'
+	if os.path.exists(full_path) and os.path.isdir(full_path):
+		shutil.rmtree(full_path)
+	else:
+		return 'Directory does not exist or is not a directory.'
+	return redirect(url_for('home'))
 
 @app.route('/new')
 def newGui():
@@ -62,7 +72,7 @@ def duplicate():
 	if (project not in projects) or (new_name in projects):
 		return 'Duplication failed. Project does not exist or the new name is invalid.'
 	else:
-		shutil.copytree(project, f'{_projectDir}/{new_name}')
+		shutil.copytree(f'{_projectDir}/{project}', f'{_projectDir}/{new_name}')
 		return f'Successfully duplicated {project} as {new_name}.'
 
 @app.route('/jsonToDss', methods=['GET','POST'])
@@ -100,7 +110,7 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 			dssString += f'new object=generator.{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 kv=0.277 kw=200 pf=1 \n'
 		elif obType == 'battery':
 			dssString += f'new object=storage.{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 kv=0.277 kwrated=79 kwhstored=307 kwhrated=307 dispmode=follow %charge=100 %discharge=100 %effcharge=96 %effdischarge=96 \n'
-		elif obType == 'diesel':
+		elif obType == 'fossil':
 			dssString += f'new object=generator.{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 kw=265 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 \n'	
 	# Convert dssString to a networkx graph.
 	tree = dssConvert.dssToTree(dssString, is_path=False)
@@ -135,7 +145,7 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 @app.route('/uploadDss', methods = ['GET','POST'])
 def uploadDss():
 	if request.method == 'POST':
-		# check if the post request has the file part
+		# Check if the post request has the file part.
 		model_dir = request.form['MODEL_DIR']
 		if 'file' not in request.files:
 			flash('No file part')
@@ -154,7 +164,42 @@ def uploadDss():
 			return jsonify(loads=loads, filename=f'{_mguDir}/uploads/BASE_DSS_{model_dir}')
 	return ''
 
+@app.route('/getLoadsFromExistingFile', methods=['POST'])
+def getLoadsFromExistingFile():
+	path = request.form.get('path')
+	loads = getLoads(path)
+	return jsonify(loads=loads)
+
+@app.route('/previewOldPartitions', methods=['POST'])
+def previewOldPartitions():
+	data = request.get_json()
+	filename = data['filename']
+	microgrids = data['microgrids']
+	G = dssConvert.dss_to_networkx(filename)
+
+	MG_GROUPS = []
+	for mg in microgrids:
+		cur_mg = []
+		cur_mg.extend([load for load in microgrids[mg].get('loads')])
+		# cur_mg.append(microgrids[mg].get('switch'))
+		cur_mg.append(microgrids[mg].get('gen_bus'))
+		cur_mg.extend([load for load in microgrids[mg].get('gen_obs_existing')])
+		MG_GROUPS.append(cur_mg)
+
+	# Make and save plot, convert to base64 hash, send to frontend.
+	plt.switch_backend('Agg')
+	plt.figure(figsize=(15,9))
+	pos_G = nice_pos(G)
+	n_color_map = node_group_map(G, MG_GROUPS)
+	nx.draw(G, with_labels=True, pos=pos_G, node_color=n_color_map)
+	pic_IObytes = io.BytesIO()
+	plt.savefig(pic_IObytes,  format='png')
+	pic_IObytes.seek(0)
+	pic_hash = base64.b64encode(pic_IObytes.read())
+	return pic_hash
+
 @app.route('/previewPartitions', methods = ['GET','POST'])
+@app.route('/edit/previewPartitions', methods = ['GET','POST'])
 def previewPartitions():
 	CIRC_FILE = json.loads(request.form['fileName'])
 	CRITICAL_LOADS = json.loads(request.form['critLoads'])
@@ -192,8 +237,10 @@ def run():
 	if 'BASE_DSS_NAME' in request.form and 'LOAD_CSV_NAME' in request.form:
 		print('we are editing an existing model')
 		# editing an existing model
-		dss_path = f'{_projectDir}/{model_dir}/circuit.dss'
-		csv_path = f'{_projectDir}/{model_dir}/loads.csv'
+		# dss_path = f'{_projectDir}/{model_dir}/circuit.dss'
+		# csv_path = f'{_projectDir}/{model_dir}/loads.csv'
+		dss_path = f'{_mguDir}/uploads/BASE_DSS_{model_dir}'
+		csv_path = f'{_mguDir}/uploads/LOAD_CSV_{model_dir}'
 		all_files = 'Using Existing Files'
 	else:
 		# new files uploaded. 
@@ -256,7 +303,7 @@ def run():
 
 		'solar':request.form['solar'],
 		'battery':request.form['battery'],
-		# 'fossil':request.form['fossil'],
+		'fossil':request.form['fossil'],
 		'wind':request.form['wind'],
 		'solarCost':request.form['solarCost'],
 		'solarExisting':request.form['solarExisting'],
@@ -305,7 +352,8 @@ def run():
 		float(request.form['FOSSIL_BACKUP_PERCENT']),
 		REOPT_INPUTS,
 		microgrids,
-		request.form['FAULTED_LINE']
+		request.form['FAULTED_LINE'],
+		crit_loads
 	]
 	# Kickoff the run
 	new_proc = multiprocessing.Process(target=full, args=mgu_args)

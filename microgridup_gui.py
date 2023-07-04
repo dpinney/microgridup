@@ -174,28 +174,29 @@ def getLoadsFromExistingFile():
 def previewOldPartitions():
 	data = request.get_json()
 	filename = data['filename']
-	microgrids = data['microgrids']
+	MG_MINES = data['MG_MINES']
 	G = dssConvert.dss_to_networkx(filename)
 
-	MG_GROUPS = []
-	for mg in microgrids:
+	parts = []
+	for mg in MG_MINES:
 		cur_mg = []
-		cur_mg.extend([load for load in microgrids[mg].get('loads')])
-		# cur_mg.append(microgrids[mg].get('switch'))
-		cur_mg.append(microgrids[mg].get('gen_bus'))
-		cur_mg.extend([load for load in microgrids[mg].get('gen_obs_existing')])
-		MG_GROUPS.append(cur_mg)
+		cur_mg.extend([load for load in MG_MINES[mg].get('loads')])
+		# cur_mg.append(MG_MINES[mg].get('switch'))
+		cur_mg.append(MG_MINES[mg].get('gen_bus'))
+		cur_mg.extend([load for load in MG_MINES[mg].get('gen_obs_existing')])
+		parts.append(cur_mg)
 
 	# Make and save plot, convert to base64 hash, send to frontend.
 	plt.switch_backend('Agg')
 	plt.figure(figsize=(15,9))
 	pos_G = nice_pos(G)
-	n_color_map = node_group_map(G, MG_GROUPS)
+	# Add here later: function to convert MG_MINES to algo_params[pairings] for passing to manual_groups(). Would be more accurate when passed to node_group_map() than parts.
+	n_color_map = node_group_map(G, parts)
 	nx.draw(G, with_labels=True, pos=pos_G, node_color=n_color_map)
 	pic_IObytes = io.BytesIO()
 	plt.savefig(pic_IObytes,  format='png')
 	pic_IObytes.seek(0)
-	pic_hash = base64.b64encode(pic_IObytes.read())
+	pic_hash = base64.b64encode(pic_IObytes.getvalue()).decode('utf-8')
 	return pic_hash
 
 @app.route('/previewPartitions', methods = ['GET','POST'])
@@ -234,11 +235,9 @@ def previewPartitions():
 def run():
 	model_dir = request.form['MODEL_DIR']
 	print(f'-------------------------------Running {model_dir}.-------------------------------')
-	if 'BASE_DSS_NAME' in request.form and 'LOAD_CSV_NAME' in request.form:
-		print('we are editing an existing model')
-		# editing an existing model
-		# dss_path = f'{_projectDir}/{model_dir}/circuit.dss'
-		# csv_path = f'{_projectDir}/{model_dir}/loads.csv'
+	if 'LOAD_CSV_NAME' in request.form:
+		print('We are editing an existing model.')
+		# Editing an existing model.
 		dss_path = f'{_mguDir}/uploads/BASE_DSS_{model_dir}'
 		csv_path = f'{_mguDir}/uploads/LOAD_CSV_{model_dir}'
 		all_files = 'Using Existing Files'
@@ -279,6 +278,8 @@ def run():
 		microgrids = mg_group(dss_path, crit_loads, 'bottomUp', algo_params={'num_mgs':MGQUANT})
 	elif mg_method == 'criticalLoads':
 		microgrids = mg_group(dss_path, crit_loads, 'criticalLoads', algo_params={'num_mgs':MGQUANT})
+	elif mg_method == '': 
+		microgrids = json.loads(request.form['MICROGRIDS'])
 	# Form REOPT_INPUTS. 
 	REOPT_INPUTS = {
 		# 'latitude':request.form['latitude'],

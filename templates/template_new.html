@@ -734,23 +734,23 @@
 			filename = $('#circuitPostCreation').val();
 			// Get allDataInputs.json params from Jinja as variables in the script.
 			var in_data = JSON.parse('{{ in_data | tojson | safe }}');
-			criticalLoads = in_data['CRITICAL_LOADS']		
-			microgrids = in_data['MICROGRIDS']
+			var criticalLoads = in_data['CRITICAL_LOADS'];
+			var MG_MINES = in_data['MICROGRIDS'];
 			// Also populate critical load selection div.
 			getLoadsFromExistingFile(filename, criticalLoads);
 
 			// Also populate partitioning preview div from original run.
-			showOldPartitions(filename, microgrids)
+			showOldPartitions(filename, MG_MINES)
 		}
 
-		function showOldPartitions(filename, microgrids) {
+		function showOldPartitions(filename, MG_MINES) {
 			$('#stepThree').hide();
-			var oldPartitionsDiv = $('<div>').addClass('chunk');
+			var oldPartitionsDiv = $('<div>').attr('id','oldPartitionDiv').addClass('chunk');
 
 			// Grab a NetworkX diagram of current partition layout.
 			var data = {
 				filename: filename,
-				microgrids: microgrids
+				MG_MINES: MG_MINES
 			};
 			$.ajax({
 				type: 'POST',
@@ -760,6 +760,7 @@
 				success: function(data, status) {
 					var img = $('<img id="oldPartitionPreview">');
 					img.attr('src', 'data:image/gif;base64,' + data);
+					oldPartitionsDiv.prepend('<br>')
 					oldPartitionsDiv.prepend(img); 
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
@@ -1177,7 +1178,7 @@
 				return
 			}
 			// Do not proceed if no partition method is specified.
-			if ($( "#partitionMethod option:selected" ).val() === '') {
+			if (($( "#partitionMethod option:selected" ).val() === '') & ($('#oldPartitionDiv').length == 0)) {
 				alert('Please specify a partitioning method.')
 				return 
 			}
@@ -1215,46 +1216,48 @@
 			}
 			// If manual or loadGrouping is selected, append a 'MICROGRIDS' value.
 			var MICROGRIDS = {}
-			$('#dropDowns label').each( function() {
-				// Skip the Gen Buses and Switches.
-				if (this.hasAttribute('for')) {
-					return true
-				}
-				console.log(this);
-				var load = $(this).text().split(' ')[1]
-				console.log('load');
-				console.log(load);
-				var mg = $(this).find(':selected').text()
-				console.log('mg');
-				console.log(mg);
-				if (method === 'loadGrouping') {
-					MICROGRIDS[mg] ??= [];
-					MICROGRIDS[mg].push(load);
-				}
-				else if (method === 'manual') {
-					MICROGRIDS.pairings ??= {};
-					MICROGRIDS.pairings[mg] ??= [];
-					MICROGRIDS['pairings'][mg].push(load); 
-				}
-			} )
-			// If manual is selected, append switch and gen_bus values.
-			var counter = 0;
-			$('#switchGenbus input').each( function() {
-				counter = counter + 0.5;
-				var id = $(this).attr('id');
-				var val = $(this).val();
-				var mg = 'Mg' + Math.round(counter);
-				if (id.includes('Genbus')) {
-					MICROGRIDS.gen_bus ??= {};
-					MICROGRIDS.gen_bus[mg] = val;
-				} 
-				else {
-					MICROGRIDS.switch ??= {};
-					MICROGRIDS.switch[mg] = [String(val)];
-				}
-			})
-			console.log('MICROGRIDS');
-			console.log(MICROGRIDS);
+			if ((method == 'manual') || (method == 'loadGrouping')) {
+				$('#dropDowns label').each( function() {
+					// Skip the Gen Buses and Switches.
+					if (this.hasAttribute('for')) {
+						return true
+					}
+					console.log(this);
+					var load = $(this).text().split(' ')[1]
+					console.log('load');
+					console.log(load);
+					var mg = $(this).find(':selected').text()
+					console.log('mg');
+					console.log(mg);
+					if (method === 'loadGrouping') {
+						MICROGRIDS[mg] ??= [];
+						MICROGRIDS[mg].push(load);
+					}
+					else if (method === 'manual') {
+						MICROGRIDS.pairings ??= {};
+						MICROGRIDS.pairings[mg] ??= [];
+						MICROGRIDS['pairings'][mg].push(load); 
+					}
+				} )
+				// If manual is selected, append switch and gen_bus values.
+				var counter = 0;
+				$('#switchGenbus input').each( function() {
+					counter = counter + 0.5;
+					var id = $(this).attr('id');
+					var val = $(this).val();
+					var mg = 'Mg' + Math.round(counter);
+					if (id.includes('Genbus')) {
+						MICROGRIDS.gen_bus ??= {};
+						MICROGRIDS.gen_bus[mg] = val;
+					} 
+					else {
+						MICROGRIDS.switch ??= {};
+						MICROGRIDS.switch[mg] = [String(val)];
+					}
+				})
+			} else if (($('#circuitPostCreation').length) && (method == '')) {
+				var MICROGRIDS = in_data['MICROGRIDS'];
+			}
 			form1.append('MICROGRIDS',JSON.stringify(MICROGRIDS));
 			// Append mgQuantity. 
 			var mgQuantity = $('#minQuantMgs').val() ? $('#minQuantMgs').val() : 0;

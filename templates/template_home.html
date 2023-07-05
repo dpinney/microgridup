@@ -254,6 +254,12 @@
             xhr.send(contents);
             alert(contents);
         }
+        function confirmDelete(event) {
+            var confirmed = confirm("Are you sure you want to delete?");
+            if (!confirmed) {
+                event.preventDefault();
+            }
+        }
     </script>
 </head>
 <body>
@@ -274,7 +280,7 @@
                 <br>
                 <a href='javascript:duplicate("{{project}}")'>[dup]</a>
                 <a href='edit/{{project}}'>[edit]</a>
-                <a href='delete/{{project}}'>[del]</a>
+                <a href='delete/{{project}}' onclick='return confirmDelete(event)'>[del]</a>
             </div>
             {% endfor %}
             <div class='box' style="border:1px black dashed">

@@ -81,7 +81,7 @@ def newGui():
 def duplicate():
 	project = request.json.get('project', None)
 	new_name = request.json.get('new_name', None)
-	projects = list_projects()
+	projects, project_timestamps, project_descriptions = list_projects()
 	if (project not in projects) or (new_name in projects):
 		return 'Duplication failed. Project does not exist or the new name is invalid.'
 	else:

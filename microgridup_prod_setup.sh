@@ -48,6 +48,8 @@ else
 	# certbot as of 2023 should renew automatically via its crontab... let's pray...
 fi
 
+# If you want a password, make a ./data/static/users.json with format {'username':'password'}.
+
 # Get our container and run it.
 docker pull ghcr.io/dpinney/microgridup:main
 if [ "$(docker ps -a -q -f name=mgucont)" ]; then

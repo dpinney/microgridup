@@ -12,6 +12,7 @@ from collections import defaultdict, deque
 CIRC_FILE = 'lehigh_base_3mg.dss'
 CRITICAL_LOADS = ['645_hangar','684_command_center', '611_runway','675a_hospital','634a_data_center', '634b_radar', '634c_atc_tower']
 ALGO = 'lukes' #'branch'
+_myDir = os.path.abspath(os.path.dirname(__file__))
 
 # Networkx helper functions
 def nx_get_branches(G):
@@ -362,8 +363,33 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 	MG_MINES = helper(MG_GROUPS, switch, gen_bus)
 	return MG_MINES
 
+def colorby_mgs(mg_group_dictionary):
+	''' generate a colorby CSV/JSON that works with omf.geo map interface.
+	To use, set omd['attachments'] = function JSON output'''
+	attachments_keys = {
+		"coloringFiles": {
+			"microgridColoring.csv": {
+				"csv": "<content>",
+				"colorOnLoadColumnIndex": "1" 
+			}
+		}
+	}
+	mg_keys = mg_group_dictionary.keys()
+	color_step = float(1/len(mg_keys))
+	output_csv = 'bus,color\n'
+	for i, mg_key in enumerate(mg_group_dictionary):
+		my_color = i * color_step
+		mg_ob = mg_group_dictionary[mg_key]
+		all_items = mg_ob['loads'] + mg_ob['gen_obs_existing'] + [mg_ob['gen_bus']]
+		# TODO: find all buses in the interior of the microgrid and add them to the list.
+		# TODO: also find new generation objects
+		# TODO: also  make all other objects gray or something.
+		for item in all_items:
+			output_csv += item + ',' + str(my_color) + '\n'
+	attachments_keys['coloringFiles']['microgridColoring.csv']['csv'] = output_csv
+	return attachments_keys
+
 def _tests():
-	_myDir = os.path.abspath(os.path.dirname(__file__))
 	with open('testfiles/test_params.json') as file:
 		test_params = json.load(file)
 	MG_MINES = test_params['MG_MINES']

@@ -10,6 +10,8 @@ from microgridup import full
 from subprocess import Popen
 from flask import send_from_directory
 from pathlib import Path
+from flask_httpauth import HTTPBasicAuth
+from werkzeug.security import generate_password_hash, check_password_hash
 
 _mguDir = os.path.abspath(os.path.dirname(__file__))
 if _mguDir == '/':
@@ -17,6 +19,27 @@ if _mguDir == '/':
 _projectDir = f'{_mguDir}/data/projects'
 
 app = Flask(__name__, static_folder='data', template_folder='templates')
+auth = HTTPBasicAuth()
+
+users = {} # if blank then no authentication.
+users_path = f'{_mguDir}/data/static/users.json'
+if os.path.exists(users_path):
+	user_json = json.load(open(users_path))
+	users = {k:generate_password_hash(user_json[k]) for k in user_json}
+
+# authenticate every request if user json available.
+@app.before_request
+@auth.login_required
+def before_request_func():
+	pass #print("Performing Authentication")
+
+@auth.verify_password
+def verify_password(username, password):
+	if users != {}:
+		if username in users and check_password_hash(users.get(username), password):
+			return username
+	else:
+		return username
 
 def list_projects():
 	projects = [x for x in os.listdir(_projectDir) if os.path.isdir(f'{_projectDir}/{x}')]

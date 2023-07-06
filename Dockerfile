@@ -17,6 +17,9 @@ COPY . .
 RUN sudo apt-get -y install graphviz graphviz-dev
 RUN pip install pygraphviz
 
+# Also need a package for auth
+RUN pip install flask_httpauth
+
 # Stupid workaround for an OpenDSS bug
 RUN mkdir -p /root/Documents
 

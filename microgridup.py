@@ -353,6 +353,8 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		os.chdir(workDir)
 	if os.path.exists("user_warnings.txt"):
 		os.remove("user_warnings.txt")
+	CREATION_DATE_unformatted = datetime.datetime.now()
+	CREATION_DATE = CREATION_DATE_unformatted.strftime('%Y-%m-%d %H:%M:%S')
 	# Dump the inputs for future reference.
 	try:
 		with open('allInputData.json','w') as inputs_file:
@@ -367,7 +369,8 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 				'FAULTED_LINE':FAULTED_LINE,
 				'DIESEL_SAFETY_FACTOR':DIESEL_SAFETY_FACTOR,
 				'OUTAGE_CSV':OUTAGE_CSV,
-				'CRITICAL_LOADS':CRITICAL_LOADS
+				'CRITICAL_LOADS':CRITICAL_LOADS,
+				'CREATION_DATE':CREATION_DATE
 			}
 			json.dump(inputs, inputs_file, indent=4)
 		# Run the project.

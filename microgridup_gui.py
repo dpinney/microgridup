@@ -1,4 +1,4 @@
-import base64, io, json, multiprocessing, os, platform, shutil, time
+import base64, io, json, multiprocessing, os, platform, shutil, datetime, time
 import networkx as nx
 from collections import OrderedDict
 from matplotlib import pyplot as plt
@@ -18,14 +18,34 @@ _projectDir = f'{_mguDir}/data/projects'
 
 app = Flask(__name__, static_folder='data', template_folder='templates')
 
+# def list_projects():
+# 	all_projects = [x for x in os.listdir(_projectDir) if os.path.isdir(f'{_projectDir}/{x}')]
+# 	return all_projects
+
+# @app.route('/')
+# def home():
+# 	projects = list_projects()
+# 	return render_template('template_home.html', projects=projects)
+
 def list_projects():
-	all_projects = [x for x in os.listdir(_projectDir) if os.path.isdir(f'{_projectDir}/{x}')]
-	return all_projects
+	projects = [x for x in os.listdir(_projectDir) if os.path.isdir(f'{_projectDir}/{x}')]
+	project_timestamps = {}
+	
+	for project in projects:
+		input_data_path = os.path.join(_projectDir, project, 'allInputData.json')
+		if os.path.exists(input_data_path):
+			with open(input_data_path) as json_file:
+				data = json.load(json_file)
+				if 'CREATION_DATE' in data and data['CREATION_DATE']:
+					timestamp = datetime.datetime.strptime(data['CREATION_DATE'], '%Y-%m-%d %H:%M:%S')
+					project_timestamps[project] = timestamp
+					print(f'{project} was created at {timestamp}')
+	return projects, project_timestamps
 
 @app.route('/')
 def home():
-	projects = list_projects()
-	return render_template('template_home.html', projects=projects)
+	projects, project_timestamps = list_projects()
+	return render_template('template_home.html', projects=projects, project_timestamps=project_timestamps)
 
 @app.route('/load/<project>')
 def load(project):

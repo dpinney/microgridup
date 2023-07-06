@@ -220,6 +220,11 @@
             font-family: sans-serif;
             text-decoration: none;
         }
+        div.box p {
+            color: mediumseagreen;
+            font-family: sans-serif;
+            text-decoration: none;
+        }
         /*div.box p {
             margin: 0;
         }*/
@@ -281,6 +286,9 @@
                 <a href='javascript:duplicate("{{project}}")'>[dup]</a>
                 <a href='edit/{{project}}'>[edit]</a>
                 <a href='delete/{{project}}' onclick='return confirmDelete(event)'>[del]</a>
+                {% if project in project_timestamps %}
+                <p>Created on: {{ project_timestamps[project].strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                {% endif %}            
             </div>
             {% endfor %}
             <div class='box' style="border:1px black dashed">

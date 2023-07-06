@@ -18,18 +18,10 @@ _projectDir = f'{_mguDir}/data/projects'
 
 app = Flask(__name__, static_folder='data', template_folder='templates')
 
-# def list_projects():
-# 	all_projects = [x for x in os.listdir(_projectDir) if os.path.isdir(f'{_projectDir}/{x}')]
-# 	return all_projects
-
-# @app.route('/')
-# def home():
-# 	projects = list_projects()
-# 	return render_template('template_home.html', projects=projects)
-
 def list_projects():
 	projects = [x for x in os.listdir(_projectDir) if os.path.isdir(f'{_projectDir}/{x}')]
 	project_timestamps = {}
+	project_descriptions = {}
 	
 	for project in projects:
 		input_data_path = os.path.join(_projectDir, project, 'allInputData.json')
@@ -39,13 +31,14 @@ def list_projects():
 				if 'CREATION_DATE' in data and data['CREATION_DATE']:
 					timestamp = datetime.datetime.strptime(data['CREATION_DATE'], '%Y-%m-%d %H:%M:%S')
 					project_timestamps[project] = timestamp
-					print(f'{project} was created at {timestamp}')
-	return projects, project_timestamps
+				if 'DESCRIPTION' in data and data['DESCRIPTION']:
+					project_descriptions[project] = data['DESCRIPTION']
+	return projects, project_timestamps, project_descriptions
 
 @app.route('/')
 def home():
-	projects, project_timestamps = list_projects()
-	return render_template('template_home.html', projects=projects, project_timestamps=project_timestamps)
+	projects, project_timestamps, project_descriptions = list_projects()
+	return render_template('template_home.html', projects=projects, project_timestamps=project_timestamps, project_descriptions=project_descriptions)
 
 @app.route('/load/<project>')
 def load(project):
@@ -374,7 +367,8 @@ def run():
 		REOPT_INPUTS,
 		microgrids,
 		request.form['FAULTED_LINE'],
-		crit_loads
+		crit_loads,
+		request.form['DESCRIPTION']
 	]
 	# Kickoff the run
 	new_proc = multiprocessing.Process(target=full, args=mgu_args)

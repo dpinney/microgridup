@@ -196,6 +196,12 @@
 				<label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">TO DO: FILL TOOLTIP</span></label>
 				<input type="text" name="QSTS_STEPS" value="{{in_data.QSTS_STEPS}}" />
 			</div>
+			<br>
+			<div class="chunk">
+				<label class="tooltip" for="DESCRIPTION">Description<span class="classic">Include an optional description of the project. Max 140 characters.</span></label>
+				<textarea id="DESCRIPTION" name="DESCRIPTION" rows="1" cols="30"></textarea>
+				<p id="characterCount" style="display:inline">0 / 140</p>
+			</div>
 			<div>
 				<i class="fa fa-plus-square"></i>
 				<a href="javascript:void(0)" class="toggle show">Optional inputs</a>
@@ -648,6 +654,21 @@
 	$(document).ready(function() {
 		var circuitIsSpecified = false;
 		var filename = '';
+
+		// Limit characters in description textarea.
+		function limitTextareaCharacters() {
+			var textarea = $('#DESCRIPTION')[0];
+			var characterCount = $('#characterCount')[0];
+			var text = textarea.value;
+			var remainingCharacters = 140 - text.length;
+			if (remainingCharacters < 0) {
+				// Trim the text if it exceeds the character limit.
+				textarea.value = text.substr(0, 140);
+				remainingCharacters = 0;
+			}
+			characterCount.textContent = text.length + " / 140";
+		}
+		$("#DESCRIPTION").on("input", limitTextareaCharacters);
 		
 		// Enable technology checkboxes.
 		function toggleDivVisibility(checkboxId, divId) {

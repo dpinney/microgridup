@@ -3,6 +3,7 @@ import jinja2 as j2
 import plotly.graph_objects as go
 import pandas as pd
 from omf.solvers.opendss import dssConvert
+# from omf.models.__neoMetaModel__ import csvValidateAndLoad
 
 MGU_FOLDER = os.path.abspath(os.path.dirname(__file__))
 if MGU_FOLDER == '/':
@@ -14,11 +15,16 @@ def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
 	by finding the ratio of max critical load kws 
 	to the max kw of the loadshape of that mg'''
 	load_df = pd.read_csv(LOAD_NAME)
+	# Can pre-process csv and add parameters for ncols and dtypes. For more, see omf/omf/models/__neoMetaModel__.py
+	# load_df = csvValidateAndLoad(<stream>, os.getcwd(), header=0, nrows=8760, return_type='df', ignore_nans=True, save_file=None)
 	mg_load_df = pd.DataFrame()
 	loads = microgrid['loads']
 	mg_load_df['load'] = [0 for x in range(8760)]
 	for load_name in loads:
-		mg_load_df['load'] = mg_load_df['load'] + load_df[load_name]
+		try:
+			mg_load_df['load'] = mg_load_df['load'] + load_df[load_name]
+		except:
+			print('ERROR: loads in Load Data (.csv) do not match loads in circuit.')
 	max_load = float(mg_load_df.max())
 	# print("max_load:", max_load)
 	# TO DO: select specific critical loads from circuit.dss if meta data on max kw or loadshapes exist for those loads

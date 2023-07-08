@@ -334,11 +334,10 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		mgs_name_sorted = sorted(MICROGRIDS.keys())
 		for i, mg_name in enumerate(mgs_name_sorted):
 			BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
-			new_mg_names = mgs_name_sorted[0:i+1]
-			new_mg_for_control = {name:MICROGRIDS[name] for name in new_mg_names}
-			max_crit_load = microgridup_design.run(MODEL_LOAD_CSV, MICROGRIDS[mg_name], mg_name, BASE_DSS, REOPT_INPUTS, f'reopt_final_{i}', FOSSIL_BACKUP_PERCENT)
+			max_crit_load = microgridup_design.run(MODEL_LOAD_CSV, MICROGRIDS[mg_name], mg_name, 
+			BASE_DSS, REOPT_INPUTS, f'reopt_final_{i}', FOSSIL_BACKUP_PERCENT)
+			microgridup_design.microgrid_design_output(f'reopt_final_{i}/allOutputData.json', f'reopt_final_{i}/allInputData.json', f'reopt_final_{i}/cleanMicrogridDesign.html')
 			microgridup_hosting_cap.run(f'reopt_final_{i}', GEN_NAME, MICROGRIDS[mg_name], BASE_DSS, mg_name, REF_NAME, MODEL_LOAD_CSV, f'circuit_plusmg_{i}.dss', f'mg_add_cost_{i}.csv', max_crit_load, diesel_total_calc=False)
-			microgridup_design.microgrid_design_output(f'reopt_final_{i}' + '/allOutputData.json', f'reopt_final_{i}' + '/allInputData.json', f'reopt_final_{i}' + '/cleanMicrogridDesign.html')
 		# Make OMD of fully detailed system.
 		dssConvert.dssToOmd(f'circuit_plusmg_{i}.dss', OMD_NAME, RADIUS=0.0002)
 		# Draw the circuit oneline.
@@ -354,9 +353,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 			actions={},
 			filePrefix='timeseries'
 		)
-		#HACK: If only analyzing a set of generators with a single phase, remove ['P2(kW)','P3(kW)'] of make_chart('timeseries_gen.csv',...) below
 		make_chart('timeseries_gen.csv', f'circuit_plusmg_{i}.dss', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Generator Output", "Average hourly kW")
-		# for timeseries_load, output ANSI Range A service bands (2,520V - 2,340V for 2.4kV and 291V - 263V for 0.277kV)
 		make_chart('timeseries_load.csv', f'circuit_plusmg_{i}.dss', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'], QSTS_STEPS, "Load Voltage", "PU", ansi_bands = True)
 		make_chart('timeseries_source.csv', f'circuit_plusmg_{i}.dss', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Voltage Source Output", "Average hourly kW")
 		try:
@@ -364,13 +361,13 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		except:
 			pass #TODO: better detection of missing control data.
 		# Perform control sim.
+		new_mg_for_control = {name:MICROGRIDS[name] for name in mgs_name_sorted[0:i+1]}
 		microgridup_control.play(f'circuit_plusmg_{i}.dss', os.getcwd(), new_mg_for_control, FAULTED_LINE)
 		# Resilience simulation with outages. Optional. Skipped if no OUTAGE_CSV
 		if OUTAGE_CSV:
 			all_microgrid_loads = [x.get('loads',[]) for x in MICROGRIDS.values()]
 			all_loads = [item for sublist in all_microgrid_loads for item in sublist]
-			mg_count = len(MICROGRIDS.keys())
-			microgridup_resilience.main('outages.csv', 'outages_ADJUSTED.csv', all_loads, f'circuit_plusmg_{mg_count-1}.dss', 'output_resilience.html')
+			microgridup_resilience.main('outages.csv', 'outages_ADJUSTED.csv', all_loads, f'circuit_plusmg_{i-1}.dss', 'output_resilience.html')
 		# Build Final report
 		reports = [x for x in os.listdir('.') if x.startswith('ultimate_rep_')]
 		reports.sort()

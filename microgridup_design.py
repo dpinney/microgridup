@@ -308,7 +308,7 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 def run(LOAD_NAME, microgrid, mg_name, BASE_NAME, REOPT_INPUTS, REOPT_FOLDER_FINAL, FOSSIL_BACKUP_PERCENT):
 	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_NAME, microgrid, mg_name)
 	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_FINAL, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load, mg_name)
-	return max_crit_load
+	microgrid_design_output(f'{REOPT_FOLDER_FINAL}/allOutputData.json', f'{REOPT_FOLDER_FINAL}/allInputData.json', f'{REOPT_FOLDER_FINAL}/cleanMicrogridDesign.html')
 
 def _tests():
 	# Load arguments from JSON.

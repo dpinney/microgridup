@@ -330,7 +330,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 				'DESCRIPTION':DESCRIPTION
 			}
 			json.dump(inputs, inputs_file, indent=4)
-		# Generate the per-microgrid results.
+		# Generate the per-microgrid results and add each to the circuit iteratively.
 		mgs_name_sorted = sorted(MICROGRIDS.keys())
 		for i, mg_name in enumerate(mgs_name_sorted):
 			BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'

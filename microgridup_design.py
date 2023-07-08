@@ -315,20 +315,15 @@ def _tests():
 		test_params = json.load(file)
 	control_test_args = test_params['control_test_args']
 	REOPT_INPUTS = test_params['REOPT_INPUTS']
-
 	# TESTING DIRECTORY.
 	_dir = 'lehigh4mgs' # Change to test on different directory.
-
 	MODEL_DIR = f'{PROJ_FOLDER}/{_dir}'
-
 	# HACK: work in directory because we're very picky about the current dir.
 	curr_dir = os.getcwd()
 	workDir = os.path.abspath(MODEL_DIR)
 	if curr_dir != workDir:
 		os.chdir(workDir)
-
 	microgrids = control_test_args[_dir]
-
 	for run_count in range(len(microgrids)):
 		LOAD_NAME = 'loads.csv'
 		microgrid = microgrids[f'mg{run_count}']
@@ -338,7 +333,6 @@ def _tests():
 		FOSSIL_BACKUP_PERCENT = 0.5
 
 		run(LOAD_NAME, microgrid, mg_name, BASE_NAME, REOPT_INPUTS, REOPT_FOLDER_FINAL, FOSSIL_BACKUP_PERCENT)
-
 	os.chdir(curr_dir)
 	return
 

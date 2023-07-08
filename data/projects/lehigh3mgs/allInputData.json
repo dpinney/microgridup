@@ -1,5 +1,5 @@
 {
-    "MODEL_DIR": "/Users/dpinney/gdrive/LATERBASE/NRECA/MICROGRIDUP (MGU) ESTCP FY2020/del2.2.1K - Requirements and Specifications/microgridup mgu test system lehigh/data/projects/lehigh_3mgs",
+    "MODEL_DIR": "/Users/dpinney/gdrive/LATERBASE/NRECA/MICROGRIDUP (MGU) ESTCP FY2020/del2.2.1K - Requirements and Specifications/microgridup mgu test system lehigh/data/projects/lehigh3mgs",
     "BASE_DSS": "/Users/dpinney/gdrive/LATERBASE/NRECA/MICROGRIDUP (MGU) ESTCP FY2020/del2.2.1K - Requirements and Specifications/microgridup mgu test system lehigh/testfiles/lehigh_base_3mg.dss",
     "LOAD_CSV": "/Users/dpinney/gdrive/LATERBASE/NRECA/MICROGRIDUP (MGU) ESTCP FY2020/del2.2.1K - Requirements and Specifications/microgridup mgu test system lehigh/testfiles/lehigh_load.csv",
     "QSTS_STEPS": 480,
@@ -104,5 +104,8 @@
     },
     "FAULTED_LINE": "650632",
     "DIESEL_SAFETY_FACTOR": false,
-    "OUTAGE_CSV": null
+    "OUTAGE_CSV": null,
+    "CRITICAL_LOADS": null,
+    "CREATION_DATE": "2023-07-08 11:49:55",
+    "DESCRIPTION": ""
 }

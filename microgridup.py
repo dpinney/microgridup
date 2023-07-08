@@ -270,8 +270,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		mgs_name_sorted = sorted(MICROGRIDS.keys())
 		for i, mg_name in enumerate(mgs_name_sorted):
 			BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
-			microgridup_design.run(MODEL_LOAD_CSV, MICROGRIDS[mg_name], mg_name, 
-			BASE_DSS, REOPT_INPUTS, f'reopt_final_{i}', FOSSIL_BACKUP_PERCENT)
+			microgridup_design.run(MODEL_LOAD_CSV, MICROGRIDS[mg_name], mg_name, BASE_DSS, REOPT_INPUTS, f'reopt_final_{i}', FOSSIL_BACKUP_PERCENT)
 			max_crit_load = sum(MICROGRIDS[mg_name]['critical_load_kws'])
 			microgridup_hosting_cap.run(f'reopt_final_{i}', GEN_NAME, MICROGRIDS[mg_name], BASE_DSS, mg_name, REF_NAME, MODEL_LOAD_CSV, f'circuit_plusmg_{i}.dss', f'mg_add_cost_{i}.csv', max_crit_load, diesel_total_calc=False)
 		# Make OMD of fully detailed system.

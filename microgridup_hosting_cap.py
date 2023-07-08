@@ -400,7 +400,6 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 	load_map = {x.get('object',''):i for i, x in enumerate(tree)}
 	#print("load_map:", load_map)
 	gen_obs_existing = microgrid['gen_obs_existing']
-
 	bus_list_pos = -1
 	for i, ob in enumerate(tree):
 		if ob.get('!CMD','') == 'makebuslist':
@@ -626,7 +625,6 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 					}
 		except:
 			pass #Old existing gen, ignore.
-
 	# Do shape insertions at proper places
 	# print("shape_insert_list:", shape_insert_list)
 	for key in shape_insert_list:
@@ -724,12 +722,10 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		mg_add_cost_df = pd.read_csv(ADD_COST_NAME)
 		mg_add_cost = mg_add_cost_df['Cost Estimate ($)'].sum()
 		# print('mg_add_cost:',mg_add_cost)
-
 		#TODO: Redo post-REopt economic calculations to match updated discounts, taxations, etc
 		npv = reopt_out.get(f'savings{mg_num}', 0.0) - mg_add_cost # overall npv against the business as usual case from REopt
 		cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) + mg_add_cost# description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
 		cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) + mg_add_cost # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
-		
 		years_of_analysis = reopt_out.get(f'analysisYears{mg_num}', 0.0)
 		battery_replacement_year = reopt_out.get(f'batteryCapacityReplaceYear{mg_num}', 0.0)
 		inverter_replacement_year = reopt_out.get(f'batteryPowerReplaceYear{mg_num}', 0.0)
@@ -786,7 +782,6 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		avg_outage = reopt_out.get(f'avgOutage{mg_num}')
 		if avg_outage is not None:
 			avg_outage = int(round(avg_outage))
-
 		row =[str(mg_name), gen_bus_name, min_load, ave_load, round(avg_daytime_load), 
 		max_load, round(max_crit_load),
 		round(fossil_size_existing), round(fossil_size_new), # round(diesel_used_gal), 
@@ -835,7 +830,6 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	# mg_dict["Microgrid Name"] = str(REOPT_FOLDER[-1]) # previously used sequential numerical naming
 	mg_dict["Microgrid Name"] = str(mg_name)
 	mg_dict["Generation Bus"] = mg_ob['gen_bus']
-	
 	# Previous to 9/2021 Version: pulling in load outputted by REopt
 	# load = reopt_out.get(f'load1', 0.0)
 	# mg_dict["Minimum 1 hr Load (kW)"] = round(min(load))
@@ -846,7 +840,6 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	# daytime_kwh = np_load[:,9:17] #365 8-hour daytime arrays
 	# mg_dict["Average Daytime 1 hr Load (kW)"] = round(np.average(np.average(daytime_kwh, axis=1)))
 	# mg_dict["Maximum 1 hr Load (kW)"] = round(max(load))
-
 	# Use loadshape supplied to REopt with no alterations
 	load = []
 	with open(REOPT_FOLDER + '/loadShape.csv', newline = '') as csvfile:
@@ -891,11 +884,9 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	# calculate added year 0 costs from mg_add_cost()
 	mg_add_cost_df = pd.read_csv(ADD_COST_NAME)
 	mg_add_cost = mg_add_cost_df['Cost Estimate ($)'].sum()
-
 	npv = reopt_out.get(f'savings{mg_num}', 0.0) - mg_add_cost # overall npv against the business as usual case from REopt
 	cap_ex = reopt_out.get(f'initial_capital_costs{mg_num}', 0.0) + mg_add_cost # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs and incentives
 	cap_ex_after_incentives = reopt_out.get(f'initial_capital_costs_after_incentives{mg_num}', 0.0) + mg_add_cost # description from REopt: Up-front capital costs for all technologies, in present value, excluding replacement costs, including incentives
-	
 	#TODO: Once incentive structure is finalized, update NPV and cap_ex_after_incentives calculation to include depreciation over time if appropriate, and tenth year replacement of batteries
 	# economic outcomes with the capital costs of existing wind and batteries deducted:
 	years_of_analysis = reopt_out.get(f'analysisYears{mg_num}', 0.0)
@@ -968,26 +959,20 @@ def _tests():
 		test_params = json.load(file)
 	control_test_args = test_params['control_test_args']
 	max_crit_loads = test_params['max_crit_loads']
-
 	# Setup paths.
 	MGU_FOLDER = os.path.abspath(os.path.dirname(__file__))
 	if MGU_FOLDER == '/':
 		MGU_FOLDER = '' #workaround for docker root installs
 	PROJ_FOLDER = f'{MGU_FOLDER}/data/projects'
-
 	# TESTING DIRECTORY.
 	_dir = 'lehigh4mgs' # Change to test on different directory.
-
 	MODEL_DIR = f'{PROJ_FOLDER}/{_dir}'
-
 	# HACK: work in directory because we're very picky about the current dir.
 	curr_dir = os.getcwd()
 	workDir = os.path.abspath(MODEL_DIR)
 	if curr_dir != workDir:
 		os.chdir(workDir)
-
 	microgrids = control_test_args[_dir]
-
 	# As many tests per directory as there are microgrids/REopt API calls per directory.
 	for run_count in range(len(microgrids)):
 		REOPT_FOLDER_FINAL = f'reopt_final_{run_count}'
@@ -1000,9 +985,7 @@ def _tests():
 		FULL_NAME = f'circuit_plusmg_{run_count}.dss'
 		ADD_COST_NAME = f'mg_add_cost_{run_count}.csv'
 		max_crit_load = max_crit_loads[_dir][f'mg{run_count}']
-
 		run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, REF_NAME, LOAD_NAME, FULL_NAME, ADD_COST_NAME, max_crit_load)
-
 	os.chdir(curr_dir)
 	return
 

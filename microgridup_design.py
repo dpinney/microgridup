@@ -201,7 +201,6 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 	with open(REOPT_FOLDER + '/allInputData.json','w') as outfile:
 		json.dump(allInputData, outfile, indent=4)
 	omf.models.__neoMetaModel__.runForeground(REOPT_FOLDER)
-	# omf.models.__neoMetaModel__.renderTemplateToFile(REOPT_FOLDER) # deprecated in favor of clean new design.
 
 def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	''' Generate a clean microgridDesign output with edge-to-edge design. '''

@@ -11,8 +11,8 @@ if MGU_FOLDER == '/':
 PROJ_FOLDER = f'{MGU_FOLDER}/data/projects'
 
 def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
-	''' Set the critical load percent input for REopt 
-	by finding the ratio of max critical load kws 
+	''' Set the critical load percent input for REopt
+	by finding the ratio of max critical load kws
 	to the max kw of the loadshape of that mg'''
 	load_df = pd.read_csv(LOAD_NAME)
 	# Can pre-process csv and add parameters for ncols and dtypes. For more, see omf/omf/models/__neoMetaModel__.py
@@ -44,11 +44,11 @@ def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
 	return critical_load_percent, max_crit_load
 
 def set_fossil_max_kw(FOSSIL_BACKUP_PERCENT, max_crit_load):
-	'''User-selected fossil generation backup as a 
+	'''User-selected fossil generation backup as a
 	maximum percentage of the critical load.
-	Range: 0-1, which needs to be checked on input 
-	TODO: Test assumption that setting 'dieselMax' 
-	in microgridDesign does not override behavior 
+	Range: 0-1, which needs to be checked on input
+	TODO: Test assumption that setting 'dieselMax'
+	in microgridDesign does not override behavior
 	of 'genExisting' in reopt_gen_mg_specs()'''
 	# to run REopt without fossil backup
 	if FOSSIL_BACKUP_PERCENT == 0:
@@ -127,7 +127,7 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 	if allInputData['wind'] == 'on':
 		allInputData['windMin'] = '1'
 	if allInputData['solar'] == 'on':
-		allInputData['solarMin'] = '1'	
+		allInputData['solarMin'] = '1'
 	# Workflow to deal with existing generators in the microgrid and analyze for these in REopt
 	# This workflow requires pre-selection of all objects in a given microgrid in microgrids['gen_obs_existing']
 	# Multiple existing gens of any type except batteries are permitted
@@ -182,7 +182,7 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 	fossil_max_kw = set_fossil_max_kw(FOSSIL_BACKUP_PERCENT, max_crit_load)
 	# print("reopt_gen_mg_specs.fossil_max_kw:", fossil_max_kw)
 	if fossil_max_kw <= sum(fossil_kw_exist):
-		allInputData['dieselMax'] = str(sum(fossil_kw_exist))	
+		allInputData['dieselMax'] = str(sum(fossil_kw_exist))
 	elif fossil_max_kw > sum(fossil_kw_exist):
 		allInputData['dieselMax'] = fossil_max_kw
 	# print("allInputData['dieselMax']:", allInputData['dieselMax'])
@@ -208,7 +208,7 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	all_html = ''
 	legend_spec = {'orientation':'h', 'xanchor':'left'}#, 'x':0, 'y':-0.2}
 	with open(allOutDataPath) as file:
-		allOutData = json.load(file)	
+		allOutData = json.load(file)
 	# allOutData = json.load(open(allOutDataPath))
 	# Make timeseries charts
 	plotlyData = {
@@ -289,7 +289,7 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	all_html = fin_fig_html + all_html
 	# Nice input display
 	with open(allInputDataPath) as file:
-		allInputData = json.load(file)	
+		allInputData = json.load(file)
 	# allInputData = json.load(open(allInputDataPath))
 	allInputData['loadShape'] = 'From File'
 	allInputData['criticalLoadShape'] = 'From File'
@@ -303,10 +303,10 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	)
 	with open(outputPath, 'w') as outFile:
 		outFile.write(mgd)
-		
-def run(LOAD_NAME, microgrid, mg_name, BASE_NAME, REOPT_INPUTS, REOPT_FOLDER_FINAL, FOSSIL_BACKUP_PERCENT):
-	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_NAME, microgrid, mg_name)
-	reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER_FINAL, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load, mg_name)
+
+def run(LOAD_FILE_PATH, MICROGRID_DICT, MG_NAME, DSS_FILE_PATH, REOPT_INPUTS, REOPT_FOLDER_FINAL, FOSSIL_BACKUP_PERCENT):
+	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_FILE_PATH, MICROGRID_DICT, MG_NAME)
+	reopt_gen_mg_specs(DSS_FILE_PATH, LOAD_FILE_PATH, REOPT_INPUTS, REOPT_FOLDER_FINAL, MICROGRID_DICT, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load, MG_NAME)
 	microgrid_design_output(f'{REOPT_FOLDER_FINAL}/allOutputData.json', f'{REOPT_FOLDER_FINAL}/allInputData.json', f'{REOPT_FOLDER_FINAL}/cleanMicrogridDesign.html')
 
 def _tests():

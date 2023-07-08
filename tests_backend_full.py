@@ -419,8 +419,8 @@ def test_auto3mg():
 	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
 
 if __name__ == '__main__':
-	# test_1mg()
-	# test_2mg()
-	# test_3mg()
+	test_1mg()
+	test_2mg()
+	test_3mg()
 	test_4mg()
-	# test_auto3mg()
+	test_auto3mg()

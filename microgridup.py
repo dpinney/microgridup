@@ -1,4 +1,3 @@
-from omf.solvers import opendss
 from omf.solvers.opendss import dssConvert
 from omf import distNetViz
 from omf import geo
@@ -10,7 +9,6 @@ import shutil
 import os
 import json
 import pandas as pd
-import plotly
 import plotly.graph_objects as go
 import csv
 import jinja2 as j2
@@ -22,73 +20,11 @@ if MGU_FOLDER == '/':
 	MGU_FOLDER = '' #workaround for docker root installs
 PROJ_FOLDER = f'{MGU_FOLDER}/data/projects'
 
-def _getByName(tree, name):
-    ''' Return first object with name in tree as an OrderedDict. '''
-    matches =[]
-    for x in tree:
-        if x.get('object',''):
-            if x.get('object','').split('.')[1] == name:
-                matches.append(x)
-    return matches[0]
-
 def _walkTree(dirName):
 	listOfFiles = []
 	for (dirpath, _, filenames) in os.walk(dirName):
 		listOfFiles += [os.path.join(dirpath, file) for file in filenames]
 	return listOfFiles
-
-def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_steps, chart_name, y_axis_name, ansi_bands=False):
-	''' Charting outputs.
-	y_list is a list of column headers from csvName including all possible phases
-	category_name is the column header for the names of the monitoring object in csvName
-	x is the column header of the timestep in csvName
-	chart_name is the name of the chart to be displayed'''
-	gen_data = pd.read_csv(csvName)
-	tree = dssConvert.dssToTree(circuitFilePath)
-	data = []
-	for ob_name in set(gen_data[category_name]):
-		# csv_column_headers = y_list
-		# search the tree of the updated circuit to find the phases associate with ob_name
-		dss_ob_name = ob_name.split('-')[1]
-		the_object = _getByName(tree, dss_ob_name)
-		# create phase list, removing neutral phases
-		phase_ids = the_object.get('bus1','').replace('.0','').split('.')[1:]
-		# when charting objects with the potential for multiple phases, if object is single phase, index out the correct column heading to match the phase
-		if len(y_list) == 3 and len(phase_ids) == 1:
-			csv_column_headers = []
-			csv_column_headers.append(y_list[int(phase_ids[0])-1])
-		else:
-			csv_column_headers = y_list
-
-		for y_name in csv_column_headers:
-			this_series = gen_data[gen_data[category_name] == ob_name]
-			trace = plotly.graph_objs.Scatter(
-				x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
-				y = this_series[y_name], # ToDo: rounding to 3 decimals here would be ideal, but doing so does not accept Inf values 
-				name = ob_name + '_' + y_name,
-				hoverlabel = dict(namelength = -1)
-			)
-			data.append(trace)
-	layout = plotly.graph_objs.Layout(
-		#title = f'{csvName} Output',
-		title = chart_name,
-		xaxis = dict(title="Date"),
-		yaxis = dict(title=y_axis_name)
-		#yaxis = dict(title = str(y_list))
-	)
-	fig = plotly.graph_objs.Figure(data, layout)
-
-	if ansi_bands == True:
-		date = pd.Timestamp(f'{year}-01-01')
-		fig.add_shape(type="line",
- 			x0=date, y0=.95, x1=date+datetime.timedelta(hours=qsts_steps), y1=.95,
- 			line=dict(color="Red", width=3, dash="dashdot")
-		)
-		fig.add_shape(type="line",
- 			x0=date, y0=1.05, x1=date+datetime.timedelta(hours=qsts_steps), y1=1.05,
- 			line=dict(color="Red", width=3, dash="dashdot")
-		)
-	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
 def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
 	'''Helper function within full() to take in a dict of lists of the microgrid
@@ -289,7 +225,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		shutil.copyfile(LOAD_CSV, f'{MODEL_DIR}/{MODEL_LOAD_CSV}')
 		if OUTAGE_CSV:
 			shutil.copyfile(OUTAGE_CSV, f'{MODEL_DIR}/outages.csv')
-		os.system(f'touch {MODEL_DIR}/0running.txt')
+		os.system(f'touch "{MODEL_DIR}/0running.txt"')
 		try:
 			os.remove("0crashed.txt")
 		except:
@@ -345,21 +281,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		# Draw the map.
 		geo.map_omd(OMD_NAME, MAP_NAME, open_browser=False)
 		# Powerflow outputs.
-		print('QSTS with ', f'circuit_plusmg_{i}.dss', 'AND CWD IS ', os.getcwd())
-		opendss.newQstsPlot(f'circuit_plusmg_{i}.dss',
-			stepSizeInMinutes=60, 
-			numberOfSteps=QSTS_STEPS,
-			keepAllFiles=False,
-			actions={},
-			filePrefix='timeseries'
-		)
-		make_chart('timeseries_gen.csv', f'circuit_plusmg_{i}.dss', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Generator Output", "Average hourly kW")
-		make_chart('timeseries_load.csv', f'circuit_plusmg_{i}.dss', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'], QSTS_STEPS, "Load Voltage", "PU", ansi_bands = True)
-		make_chart('timeseries_source.csv', f'circuit_plusmg_{i}.dss', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Voltage Source Output", "Average hourly kW")
-		try:
-			make_chart('timeseries_control.csv', f'circuit_plusmg_{i}.dss', 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS, "Tap Position", "PU")
-		except:
-			pass #TODO: better detection of missing control data.
+		microgridup_hosting_cap.gen_powerflow_results(f'circuit_plusmg_{i}.dss', REOPT_INPUTS['year'], QSTS_STEPS)
 		# Perform control sim.
 		new_mg_for_control = {name:MICROGRIDS[name] for name in mgs_name_sorted[0:i+1]}
 		microgridup_control.play(f'circuit_plusmg_{i}.dss', os.getcwd(), new_mg_for_control, FAULTED_LINE)
@@ -367,7 +289,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		if OUTAGE_CSV:
 			all_microgrid_loads = [x.get('loads',[]) for x in MICROGRIDS.values()]
 			all_loads = [item for sublist in all_microgrid_loads for item in sublist]
-			microgridup_resilience.main('outages.csv', 'outages_ADJUSTED.csv', all_loads, f'circuit_plusmg_{i-1}.dss', 'output_resilience.html')
+			microgridup_resilience.main('outages.csv', 'outages_ADJUSTED.csv', all_loads, f'circuit_plusmg_{i}.dss', 'output_resilience.html')
 		# Build Final report
 		reports = [x for x in os.listdir('.') if x.startswith('ultimate_rep_')]
 		reports.sort()

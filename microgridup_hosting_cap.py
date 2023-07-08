@@ -4,6 +4,18 @@ import numpy as np
 from os import path
 from omf.solvers import opendss
 from omf.solvers.opendss import dssConvert
+from omf.solvers import opendss
+import plotly
+import datetime
+
+def _getByName(tree, name):
+	''' Return first object with name in tree as an OrderedDict. '''
+	matches =[]
+	for x in tree:
+		if x.get('object',''):
+			if x.get('object','').split('.')[1] == name:
+				matches.append(x)
+	return matches[0]
 
 def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 	''' Get generator objects from REopt. Calculate new gen sizes, using updated fossil size 
@@ -942,6 +954,77 @@ def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, 
 	list_of_mg_dict.append(mg_dict)
 	# print("list_of_mg_dict:", list_of_mg_dict)
 	return(list_of_mg_dict)
+
+
+def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_steps, chart_name, y_axis_name, ansi_bands=False):
+	''' Charting outputs.
+	y_list is a list of column headers from csvName including all possible phases
+	category_name is the column header for the names of the monitoring object in csvName
+	x is the column header of the timestep in csvName
+	chart_name is the name of the chart to be displayed'''
+	gen_data = pd.read_csv(csvName)
+	tree = dssConvert.dssToTree(circuitFilePath)
+	data = []
+	for ob_name in set(gen_data[category_name]):
+		# csv_column_headers = y_list
+		# search the tree of the updated circuit to find the phases associate with ob_name
+		dss_ob_name = ob_name.split('-')[1]
+		the_object = _getByName(tree, dss_ob_name)
+		# create phase list, removing neutral phases
+		phase_ids = the_object.get('bus1','').replace('.0','').split('.')[1:]
+		# when charting objects with the potential for multiple phases, if object is single phase, index out the correct column heading to match the phase
+		if len(y_list) == 3 and len(phase_ids) == 1:
+			csv_column_headers = []
+			csv_column_headers.append(y_list[int(phase_ids[0])-1])
+		else:
+			csv_column_headers = y_list
+
+		for y_name in csv_column_headers:
+			this_series = gen_data[gen_data[category_name] == ob_name]
+			trace = plotly.graph_objs.Scatter(
+				x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
+				y = this_series[y_name], # ToDo: rounding to 3 decimals here would be ideal, but doing so does not accept Inf values 
+				name = ob_name + '_' + y_name,
+				hoverlabel = dict(namelength = -1)
+			)
+			data.append(trace)
+	layout = plotly.graph_objs.Layout(
+		#title = f'{csvName} Output',
+		title = chart_name,
+		xaxis = dict(title="Date"),
+		yaxis = dict(title=y_axis_name)
+		#yaxis = dict(title = str(y_list))
+	)
+	fig = plotly.graph_objs.Figure(data, layout)
+
+	if ansi_bands == True:
+		date = pd.Timestamp(f'{year}-01-01')
+		fig.add_shape(type="line",
+ 			x0=date, y0=.95, x1=date+datetime.timedelta(hours=qsts_steps), y1=.95,
+ 			line=dict(color="Red", width=3, dash="dashdot")
+		)
+		fig.add_shape(type="line",
+ 			x0=date, y0=1.05, x1=date+datetime.timedelta(hours=qsts_steps), y1=1.05,
+ 			line=dict(color="Red", width=3, dash="dashdot")
+		)
+	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
+
+def gen_powerflow_results(CIRCUIT_FILE, YEAR, QSTS_STEPS):
+	''' Generate full powerflow results on a given circuit. '''
+	print('QSTS with ', CIRCUIT_FILE, 'AND CWD IS ', os.getcwd())
+	opendss.newQstsPlot(CIRCUIT_FILE,
+		stepSizeInMinutes=60, 
+		numberOfSteps=QSTS_STEPS,
+		keepAllFiles=False,
+		actions={},
+		filePrefix='timeseries')
+	make_chart('timeseries_gen.csv', CIRCUIT_FILE, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], YEAR, QSTS_STEPS, "Generator Output", "Average hourly kW")
+	make_chart('timeseries_load.csv', CIRCUIT_FILE, 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], YEAR, QSTS_STEPS, "Load Voltage", "PU", ansi_bands = True)
+	make_chart('timeseries_source.csv', CIRCUIT_FILE, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], YEAR, QSTS_STEPS, "Voltage Source Output", "Average hourly kW")
+	try:
+		make_chart('timeseries_control.csv', CIRCUIT_FILE, 'Name', 'hour', ['Tap(pu)'], YEAR, QSTS_STEPS, "Tap Position", "PU")
+	except:
+		pass #TODO: better detection of missing control data.
 
 def run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, REF_NAME, LOAD_NAME, FULL_NAME, ADD_COST_NAME, max_crit_load, diesel_total_calc=False):
 	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, diesel_total_calc=False)

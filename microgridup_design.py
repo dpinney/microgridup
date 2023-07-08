@@ -3,7 +3,6 @@ import jinja2 as j2
 import plotly.graph_objects as go
 import pandas as pd
 from omf.solvers.opendss import dssConvert
-# from omf.models.__neoMetaModel__ import csvValidateAndLoad
 
 MGU_FOLDER = os.path.abspath(os.path.dirname(__file__))
 if MGU_FOLDER == '/':
@@ -15,8 +14,6 @@ def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
 	by finding the ratio of max critical load kws
 	to the max kw of the loadshape of that mg'''
 	load_df = pd.read_csv(LOAD_NAME)
-	# Can pre-process csv and add parameters for ncols and dtypes. For more, see omf/omf/models/__neoMetaModel__.py
-	# load_df = csvValidateAndLoad(<stream>, os.getcwd(), header=0, nrows=8760, return_type='df', ignore_nans=True, save_file=None)
 	mg_load_df = pd.DataFrame()
 	loads = microgrid['loads']
 	mg_load_df['load'] = [0 for x in range(8760)]
@@ -26,8 +23,7 @@ def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
 		except:
 			print('ERROR: loads in Load Data (.csv) do not match loads in circuit.')
 	max_load = float(mg_load_df.max())
-	# print("max_load:", max_load)
-	# TO DO: select specific critical loads from circuit.dss if meta data on max kw or loadshapes exist for those loads
+	# TODO: select specific critical loads from circuit.dss if meta data on max kw or loadshapes exist for those loads
 	# add up all max kws from critical loads to support during an outage
 	max_crit_load = sum(microgrid['critical_load_kws'])
 	if max_crit_load > max_load:
@@ -56,7 +52,7 @@ def set_fossil_max_kw(FOSSIL_BACKUP_PERCENT, max_crit_load):
 		fossil_max_kw = 100000
 	elif FOSSIL_BACKUP_PERCENT > 0 and FOSSIL_BACKUP_PERCENT < 1:
 		fossil_max_kw = FOSSIL_BACKUP_PERCENT*max_crit_load
-	# TO DO: deal with edge case of FOSSIL_MAX_BACKUP > 1, or call it out as a warning
+	# TODO: deal with edge case of FOSSIL_MAX_BACKUP > 1, or call it out as a warning
 	print("fossil_max_kw:", fossil_max_kw)
 	return fossil_max_kw
 
@@ -85,8 +81,6 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 	for key in REOPT_INPUTS:
 		allInputData[key] = REOPT_INPUTS[key]
 	# Set the REopt outage to be centered around the max load in the loadshape
-	# TODO: Make it safe for the max to be at begining or end of the year
-	# find max and index of max in mg_load_df['load']
 	max_load = mg_load_df.max()
 	max_load_index = int(mg_load_df.idxmax())
 	# reset the outage timing such that the length of REOPT_INPUTS falls half before and half after the hour of max load
@@ -167,8 +161,8 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 		allInputData['windExisting'] = str(sum(wind_kw_exist))
 		allInputData['windMin'] = str(sum(wind_kw_exist))
 		allInputData['wind'] = 'on' #failsafe to include wind if found in base_dss
-		 # To Do: update logic if windMin, windExisting and other generation variables are enabled to be set by the user as inputs
-	#To Do: Test that dieselMax = 0 is passed to REopt if both fossil_max_kw and sum(fossil_kw_exist) == 0
+		 #TODO: update logic if windMin, windExisting and other generation variables are enabled to be set by the user as inputs
+	#TODO: Test that dieselMax = 0 is passed to REopt if both fossil_max_kw and sum(fossil_kw_exist) == 0
 	# Set max fossil kw used to support critical load
 	fossil_max_kw = set_fossil_max_kw(FOSSIL_BACKUP_PERCENT, max_crit_load)
 	# print("reopt_gen_mg_specs.fossil_max_kw:", fossil_max_kw)
@@ -290,6 +284,7 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 		outFile.write(mgd)
 
 def run(LOAD_FILE_PATH, MICROGRID_DICT, MG_NAME, DSS_FILE_PATH, REOPT_INPUTS, REOPT_FOLDER_FINAL, FOSSIL_BACKUP_PERCENT):
+	''' Generate full microgrid design for given microgrid spec dictionary and circuit file (used to gather distribution assets).'''
 	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_FILE_PATH, MICROGRID_DICT, MG_NAME)
 	reopt_gen_mg_specs(DSS_FILE_PATH, LOAD_FILE_PATH, REOPT_INPUTS, REOPT_FOLDER_FINAL, MICROGRID_DICT, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load, MG_NAME)
 	microgrid_design_output(f'{REOPT_FOLDER_FINAL}/allOutputData.json', f'{REOPT_FOLDER_FINAL}/allInputData.json', f'{REOPT_FOLDER_FINAL}/cleanMicrogridDesign.html')
@@ -300,7 +295,7 @@ def _tests():
 		test_params = json.load(file)
 	control_test_args = test_params['control_test_args']
 	REOPT_INPUTS = test_params['REOPT_INPUTS']
-	# TESTING DIRECTORY.
+	# Testing directory.
 	_dir = 'lehigh4mgs' # Change to test on different directory.
 	MODEL_DIR = f'{PROJ_FOLDER}/{_dir}'
 	# HACK: work in directory because we're very picky about the current dir.

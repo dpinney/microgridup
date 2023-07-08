@@ -270,50 +270,6 @@ def summary_charts(stats):
 	all_html = money_summary_html + gen_load_html + gen_mix_html
 	return all_html
 
-def main(BASE_NAME, LOAD_NAME, REOPT_INPUTS, microgrid, playground_microgrids, GEN_NAME, REF_NAME, FULL_NAME, OMD_NAME, ONELINE_NAME, MAP_NAME, REOPT_FOLDER_FINAL, BIG_OUT_NAME, QSTS_STEPS, FAULTED_LINE, mg_name, ADD_COST_NAME, FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR = False, final_run=False):
-	''' Add a single microgrid to a microgrid plan. '''
-	max_crit_load = microgridup_design.run(LOAD_NAME, microgrid, mg_name, BASE_NAME, REOPT_INPUTS, REOPT_FOLDER_FINAL, FOSSIL_BACKUP_PERCENT)
-	mg_list_of_dicts_full = microgridup_hosting_cap.run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, REF_NAME, LOAD_NAME, FULL_NAME, ADD_COST_NAME, max_crit_load, diesel_total_calc=False)
-	# Generate a nice microgrid design output.
-	microgridup_design.microgrid_design_output(REOPT_FOLDER_FINAL + '/allOutputData.json', REOPT_FOLDER_FINAL + '/allInputData.json', REOPT_FOLDER_FINAL + '/cleanMicrogridDesign.html')
-	if final_run:
-		# Make OMD.
-		dssConvert.dssToOmd(FULL_NAME, OMD_NAME, RADIUS=0.0002)
-		# Draw the circuit oneline.
-		distNetViz.viz(OMD_NAME, forceLayout=False, outputPath='.', outputName=ONELINE_NAME, open_file=False)
-		# Draw the map.
-		# geo.mapOmd(OMD_NAME, MAP_NAME, 'html', openBrowser=False, conversion=False)
-		geo.map_omd(OMD_NAME, MAP_NAME, open_browser=False)
-		# Powerflow outputs.
-		print('QSTS with ', FULL_NAME, 'AND CWD IS ', os.getcwd())
-		opendss.newQstsPlot(FULL_NAME,
-			stepSizeInMinutes=60, 
-			numberOfSteps=QSTS_STEPS,
-			keepAllFiles=False,
-			actions={
-				#24*5:'open object=line.671692 term=1',
-				#24*8:'new object=fault.f1 bus1=670.1.2.3 phases=3 r=0 ontime=0.0'
-			},
-			filePrefix='timeseries'
-		)
-		# opendss.voltagePlot(FULL_NAME, PU=True)
-		# opendss.currentPlot(FULL_NAME)
-		#HACK: If only analyzing a set of generators with a single phase, remove ['P2(kW)','P3(kW)'] of make_chart('timeseries_gen.csv',...) below
-		make_chart('timeseries_gen.csv', FULL_NAME, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Generator Output", "Average hourly kW")
-		# for timeseries_load, output ANSI Range A service bands (2,520V - 2,340V for 2.4kV and 291V - 263V for 0.277kV)
-		make_chart('timeseries_load.csv', FULL_NAME, 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'], QSTS_STEPS, "Load Voltage", "PU", ansi_bands = True)
-		make_chart('timeseries_source.csv', FULL_NAME, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Voltage Source Output", "Average hourly kW")
-		try:
-			make_chart('timeseries_control.csv', FULL_NAME, 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS, "Tap Position", "PU")
-		except:
-			pass #TODO: better detection of missing control data.
-		# Perform control sim.
-		microgridup_control.play(FULL_NAME, os.getcwd(), playground_microgrids, FAULTED_LINE)
-		# convert mg_list_of_dicts_full to dict of lists for columnar output in output_template.html
-		mg_dict_of_lists_full = {key: [dic[key] for dic in mg_list_of_dicts_full] for key in mg_list_of_dicts_full[0]}
-		# Create consolidated report per mg.
-		mg_add_cost_dict_of_lists = pd.read_csv(ADD_COST_NAME).to_dict(orient='list')
-
 def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS=None, DESCRIPTION='', DIESEL_SAFETY_FACTOR=False, DELETE_FILES=False, open_results=False, OUTAGE_CSV=None):
 	''' Generate a full microgrid plan for the given inputs. '''
 	# Constants
@@ -353,10 +309,10 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		os.chdir(workDir)
 	if os.path.exists("user_warnings.txt"):
 		os.remove("user_warnings.txt")
-	CREATION_DATE_unformatted = datetime.datetime.now()
-	CREATION_DATE = CREATION_DATE_unformatted.strftime('%Y-%m-%d %H:%M:%S')
-	# Dump the inputs for future reference.
+	CREATION_DATE = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+	# Run the full MicrogridUP analysis.
 	try:
+		# Dump the inputs for future reference.
 		with open('allInputData.json','w') as inputs_file:
 			inputs = {
 				'MODEL_DIR':MODEL_DIR,
@@ -374,14 +330,41 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 				'DESCRIPTION':DESCRIPTION
 			}
 			json.dump(inputs, inputs_file, indent=4)
-		# Run the project.
+		# Generate the per-microgrid results.
 		mgs_name_sorted = sorted(MICROGRIDS.keys())
 		for i, mg_name in enumerate(mgs_name_sorted):
 			BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
 			new_mg_names = mgs_name_sorted[0:i+1]
 			new_mg_for_control = {name:MICROGRIDS[name] for name in new_mg_names}
-			final_run = True if i == len(mgs_name_sorted) - 1 else False
-			main(BASE_DSS, MODEL_LOAD_CSV, REOPT_INPUTS, MICROGRIDS[mg_name], new_mg_for_control, GEN_NAME, REF_NAME, f'circuit_plusmg_{i}.dss', OMD_NAME, ONELINE_NAME, MAP_NAME, f'reopt_final_{i}', f'output_full_{i}.html', QSTS_STEPS, FAULTED_LINE, mg_name, f'mg_add_cost_{i}.csv', FOSSIL_BACKUP_PERCENT, DIESEL_SAFETY_FACTOR, final_run=final_run)
+			max_crit_load = microgridup_design.run(MODEL_LOAD_CSV, MICROGRIDS[mg_name], mg_name, BASE_DSS, REOPT_INPUTS, f'reopt_final_{i}', FOSSIL_BACKUP_PERCENT)
+			microgridup_hosting_cap.run(f'reopt_final_{i}', GEN_NAME, MICROGRIDS[mg_name], BASE_DSS, mg_name, REF_NAME, MODEL_LOAD_CSV, f'circuit_plusmg_{i}.dss', f'mg_add_cost_{i}.csv', max_crit_load, diesel_total_calc=False)
+			microgridup_design.microgrid_design_output(f'reopt_final_{i}' + '/allOutputData.json', f'reopt_final_{i}' + '/allInputData.json', f'reopt_final_{i}' + '/cleanMicrogridDesign.html')
+		# Make OMD of fully detailed system.
+		dssConvert.dssToOmd(f'circuit_plusmg_{i}.dss', OMD_NAME, RADIUS=0.0002)
+		# Draw the circuit oneline.
+		distNetViz.viz(OMD_NAME, forceLayout=False, outputPath='.', outputName=ONELINE_NAME, open_file=False)
+		# Draw the map.
+		geo.map_omd(OMD_NAME, MAP_NAME, open_browser=False)
+		# Powerflow outputs.
+		print('QSTS with ', f'circuit_plusmg_{i}.dss', 'AND CWD IS ', os.getcwd())
+		opendss.newQstsPlot(f'circuit_plusmg_{i}.dss',
+			stepSizeInMinutes=60, 
+			numberOfSteps=QSTS_STEPS,
+			keepAllFiles=False,
+			actions={},
+			filePrefix='timeseries'
+		)
+		#HACK: If only analyzing a set of generators with a single phase, remove ['P2(kW)','P3(kW)'] of make_chart('timeseries_gen.csv',...) below
+		make_chart('timeseries_gen.csv', f'circuit_plusmg_{i}.dss', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Generator Output", "Average hourly kW")
+		# for timeseries_load, output ANSI Range A service bands (2,520V - 2,340V for 2.4kV and 291V - 263V for 0.277kV)
+		make_chart('timeseries_load.csv', f'circuit_plusmg_{i}.dss', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], REOPT_INPUTS['year'], QSTS_STEPS, "Load Voltage", "PU", ansi_bands = True)
+		make_chart('timeseries_source.csv', f'circuit_plusmg_{i}.dss', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], REOPT_INPUTS['year'], QSTS_STEPS, "Voltage Source Output", "Average hourly kW")
+		try:
+			make_chart('timeseries_control.csv', f'circuit_plusmg_{i}.dss', 'Name', 'hour', ['Tap(pu)'], REOPT_INPUTS['year'], QSTS_STEPS, "Tap Position", "PU")
+		except:
+			pass #TODO: better detection of missing control data.
+		# Perform control sim.
+		microgridup_control.play(f'circuit_plusmg_{i}.dss', os.getcwd(), new_mg_for_control, FAULTED_LINE)
 		# Resilience simulation with outages. Optional. Skipped if no OUTAGE_CSV
 		if OUTAGE_CSV:
 			all_microgrid_loads = [x.get('loads',[]) for x in MICROGRIDS.values()]
@@ -418,24 +401,22 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		# Write out overview iframe
 		with open(f'{MGU_FOLDER}/templates/template_overview.html') as file:
 			over_template = j2.Template(file.read())
-		# over_template = j2.Template(open(f'{MGU_FOLDER}/template_overview.html').read())
 		over = over_template.render(
 			chart_html=chart_html,
 			summary=stats,
 			add_cost_rows = add_cost_rows,
 			warnings = warnings,
 			now=current_time,
-			inputs=inputs, #TODO: Make the inputs clearer and maybe at the bottom, showing only the appropriate keys from MICROGRIDS as necessary
+			inputs=inputs, #TODO: we will generate a frozen view of the input screen instead of just dumping inputs here.
 		)
 		with open('overview.html', 'w') as overfile:
 			overfile.write(over)
 		# Write full output
 		with open(f'{MGU_FOLDER}/templates/template_output.html') as file:
 			template = j2.Template(file.read())
-		# template = j2.Template(open(f'{MGU_FOLDER}/template_output.html').read())
 		out = template.render(
 			raw_files = _walkTree('.'),
-			model_name =  os.path.basename(MODEL_DIR), # just the filename here please.
+			model_name =  os.path.basename(MODEL_DIR),
 			mg_names_and_reopt_folders = names_and_folders,
 			resilience_show = (OUTAGE_CSV is not None)
 		)

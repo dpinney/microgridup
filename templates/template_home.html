@@ -294,7 +294,7 @@
                 <a href='edit/{{project}}'>[edit]</a>
                 <a href='delete/{{project}}' onclick='return confirmDelete(event)'>[del]</a>
                 {% if project in project_timestamps %}
-                <p class="timestamp">Created on: {{ project_timestamps[project].strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                <p class="timestamp">Last updated: {{ project_timestamps[project].strftime('%Y-%m-%d %H:%M:%S') }}</p>
                 {% endif %}
                 {% if project in project_descriptions %}
                 <p class="description">Description: {{ project_descriptions[project] }}</p>

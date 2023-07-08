@@ -30,7 +30,6 @@ def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
 	# TO DO: select specific critical loads from circuit.dss if meta data on max kw or loadshapes exist for those loads
 	# add up all max kws from critical loads to support during an outage
 	max_crit_load = sum(microgrid['critical_load_kws'])
-	# print("max_crit_load:", max_crit_load)
 	if max_crit_load > max_load:
 		warning_message = f'The critical loads specified for microgrid {mg_name} are larger than the max kw of the total loadshape.\n'
 		print(warning_message)
@@ -40,7 +39,6 @@ def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
 	if critical_load_percent > 2:
 		print(f'This critical load percent of {critical_load_percent} is over 2.0, the maximum allowed. Setting critical load percent to 2.0.\n')
 		critical_load_percent = 2.0
-	# print('critical_load_percent:',critical_load_percent)
 	return critical_load_percent, max_crit_load
 
 def set_fossil_max_kw(FOSSIL_BACKUP_PERCENT, max_crit_load):
@@ -90,9 +88,7 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 	# TODO: Make it safe for the max to be at begining or end of the year
 	# find max and index of max in mg_load_df['load']
 	max_load = mg_load_df.max()
-	#print("max_load:", max_load)
 	max_load_index = int(mg_load_df.idxmax())
-	#print("max_load_index:", max_load_index)
 	# reset the outage timing such that the length of REOPT_INPUTS falls half before and half after the hour of max load
 	outage_duration = int(REOPT_INPUTS["outageDuration"])
 	if max_load_index + outage_duration/2 > 8760:
@@ -102,24 +98,19 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 		outage_start_hour = 2
 	else:
 		outage_start_hour = max_load_index - outage_duration/2
-	#print("outage_start_hour:", str(int(outage_start_hour)))
 	allInputData['outage_start_hour'] = str(int(outage_start_hour))
 	allInputData['criticalLoadFactor'] = str(critical_load_percent)
 	# Pulling coordinates from BASE_NAME.dss into REopt allInputData.json:
 	tree = dssConvert.dssToTree(BASE_NAME)
-	#print(tree)
 	evil_glm = dssConvert.evilDssTreeToGldTree(tree)
-	#print(evil_glm)
 	# using evil_glm to get around the fact that buses in openDSS are created in memory and do not exist in the BASE_NAME dss file
 	for ob in evil_glm.values():
 		ob_name = ob.get('name','')
 		ob_type = ob.get('object','')
 		# pull out long and lat of the gen_bus
-		# if ob_type == "bus" and ob_name == "sourcebus":
 		if ob_type == "bus" and ob_name == microgrid['gen_bus']:
 			ob_lat = ob.get('latitude','')
 			ob_long = ob.get('longitude','')
-			#print('lat:', float(ob_lat), 'long:', float(ob_long))
 			allInputData['latitude'] = float(ob_lat)
 			allInputData['longitude'] = float(ob_long)
 	# enable following 5 lines when using gen_existing_ref_shapes()
@@ -185,8 +176,6 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 		allInputData['dieselMax'] = str(sum(fossil_kw_exist))
 	elif fossil_max_kw > sum(fossil_kw_exist):
 		allInputData['dieselMax'] = fossil_max_kw
-	# print("allInputData['dieselMax']:", allInputData['dieselMax'])
-	# print("allInputData['genExisting']:", allInputData['genExisting'])
 	# enable following 9 lines when using gen_existing_ref_shapes()
 	# if not already turned on, set solar and wind on to 1 kw to provide loadshapes for existing gen in make_full_dss()
 	if allInputData['wind'] == 'off':
@@ -204,12 +193,10 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 
 def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	''' Generate a clean microgridDesign output with edge-to-edge design. '''
-	# Globals
 	all_html = ''
 	legend_spec = {'orientation':'h', 'xanchor':'left'}#, 'x':0, 'y':-0.2}
 	with open(allOutDataPath) as file:
 		allOutData = json.load(file)
-	# allOutData = json.load(open(allOutDataPath))
 	# Make timeseries charts
 	plotlyData = {
 		'Generation Serving Load':'powerGenerationData1',
@@ -288,15 +275,13 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	fin_fig_html = fin_fig.to_html(default_height='600px')
 	all_html = fin_fig_html + all_html
 	# Nice input display
-	with open(allInputDataPath) as file:
-		allInputData = json.load(file)
-	# allInputData = json.load(open(allInputDataPath))
+	with open(allInputDataPath) as inFile:
+		allInputData = json.load(inFile)
 	allInputData['loadShape'] = 'From File'
 	allInputData['criticalLoadShape'] = 'From File'
 	# Templating.
-	with open(f'{MGU_FOLDER}/templates/template_microgridDesign.html') as file:
-		mgd_template = j2.Template(file.read())
-	# mgd_template = j2.Template(open(f'{MGU_FOLDER}/template_microgridDesign.html').read())
+	with open(f'{MGU_FOLDER}/templates/template_microgridDesign.html') as inFile:
+		mgd_template = j2.Template(inFile.read())
 	mgd = mgd_template.render(
 		chart_html=all_html,
 		allInputData=allInputData
@@ -331,7 +316,6 @@ def _tests():
 		BASE_NAME = 'circuit.dss' if run_count == 0 else f'circuit_plusmg_{run_count - 1}.dss'
 		REOPT_FOLDER_FINAL = f'reopt_final_{run_count}'
 		FOSSIL_BACKUP_PERCENT = 0.5
-
 		run(LOAD_NAME, microgrid, mg_name, BASE_NAME, REOPT_INPUTS, REOPT_FOLDER_FINAL, FOSSIL_BACKUP_PERCENT)
 	os.chdir(curr_dir)
 	return

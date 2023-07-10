@@ -63,6 +63,10 @@ def home():
 	projects, project_timestamps, project_descriptions = list_projects()
 	return render_template('template_home.html', projects=projects, project_timestamps=project_timestamps, project_descriptions=project_descriptions)
 
+@app.route('/rfile/<project>/<filename>')
+def rfile(project, filename):
+	return send_from_directory(f'{_projectDir}/{project}', filename)
+
 @app.route('/load/<project>')
 def load(project):
 	ana_files = os.listdir(f'{_projectDir}/{project}')

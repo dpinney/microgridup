@@ -424,9 +424,9 @@
             </section>
             {% endfor %}
             <section class="loading" data-content="Files">
-                <ul>
+                <ul style="font-family:sans-serif; column-width: 400px; margin-right: 12px;">
                     {% for file_name in raw_files %}
-                    <li><a href='/{{model_name}}/{{file_name}}'>{{file_name}}</a></li>
+                    <li><a href='/rfile/{{model_name}}/{{file_name}}' target="_blank">{{file_name}}</a></li>
                     {% endfor %}
                 </ul>
             </section>

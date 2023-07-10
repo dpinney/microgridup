@@ -227,7 +227,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 			shutil.copyfile(OUTAGE_CSV, f'{MODEL_DIR}/outages.csv')
 		os.system(f'touch "{MODEL_DIR}/0running.txt"')
 		try:
-			os.remove("0crashed.txt")
+			os.remove(f"{MODEL_DIR}/0crashed.txt")
 		except:
 			pass
 	except:

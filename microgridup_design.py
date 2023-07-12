@@ -198,12 +198,12 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 		'Wind Generation Detail':'windData1',
 		'Fossil Generation Detail':'dieselData1',
 		'Storage Charge Source':'batteryData1',
-		'Storage State of Charge':'batteryChargeData1' }
+		'Storage State of Charge':'batteryChargeData1'}
 	# Sometimes missing, so only add if available.
 	if 'resilienceData1' in allOutData:
-		plotlyData['Resilience Overview'] = 'resilienceData1'
+		plotlyData['Resilience Overview'] = 'resilience1'
 	if 'resilienceProbData1' in allOutData:
-		plotlyData['Outage Survival Probability'] = 'resilienceProbData1'
+		plotlyData['Outage Survival Probability'] = 'survivalProbY1'
 	for k,v in plotlyData.items():
 		chart_data = json.loads(allOutData[v])
 		fig = go.Figure(chart_data)

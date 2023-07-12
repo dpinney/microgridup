@@ -520,19 +520,22 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 			else:
 				y_axis = this_series[y_name]
 			# Splice over the outage portions if manual balance approach was used (rengen only circuit).
-			if rengen_mgs and legend_group in rengen_mgs:
-				if "mongenerator-wind" in ob_name or "mongenerator-solar" in ob_name:
-					splice = rengen_proportional_loadshapes[legend_group][ob_name.split("-")[1]]
-					y_axis = list(y_axis.iloc[:outageStart]) + splice + list(y_axis.iloc[outageEnd:])
-				if "mongenerator-battery" in ob_name:
-					splice = storage_proportional_loadshapes[legend_group][ob_name.split("-")[1]]
-					y_axis = list(y_axis.iloc[:outageStart]) + splice + list(y_axis.iloc[outageEnd:])
-				if "monload-" in ob_name:
-					splice = rengen_mgs[legend_group]["Generic loadshape (kw)"]
-					y_axis = list(y_axis.iloc[:outageStart]) + splice + list(y_axis.iloc[outageEnd:])
-				plot_legend_group = f"{legend_group} – Manual Balance Approach used during outage"
-			else:
-				plot_legend_group = legend_group
+			try: #HACK: unreliable as of 2023-07-12
+				if rengen_mgs and legend_group in rengen_mgs:
+					if "mongenerator-wind" in ob_name or "mongenerator-solar" in ob_name:
+						splice = rengen_proportional_loadshapes[legend_group][ob_name.split("-")[1]]
+						y_axis = list(y_axis.iloc[:outageStart]) + splice + list(y_axis.iloc[outageEnd:])
+					if "mongenerator-battery" in ob_name:
+						splice = storage_proportional_loadshapes[legend_group][ob_name.split("-")[1]]
+						y_axis = list(y_axis.iloc[:outageStart]) + splice + list(y_axis.iloc[outageEnd:])
+					if "monload-" in ob_name:
+						splice = rengen_mgs[legend_group]["Generic loadshape (kw)"]
+						y_axis = list(y_axis.iloc[:outageStart]) + splice + list(y_axis.iloc[outageEnd:])
+					plot_legend_group = f"{legend_group} – Manual Balance Approach used during outage"
+				else:
+					plot_legend_group = legend_group
+			except:
+				pass
 			if not this_series[y_name].isnull().values.any():
 				trace = graph_objects.Scatter(
 					x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
@@ -544,7 +547,6 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 					hoverlabel = dict(namelength = -1)
 				)
 				data.append(trace)
-	
 	# Make fossil genset loading plot. 
 	if fossil_loading_chart == True:
 		new_layout = graph_objects.Layout(

@@ -73,7 +73,7 @@ def test_1mg():
 		}
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
 
 def test_2mg():
 	# Input data.
@@ -150,7 +150,7 @@ def test_2mg():
 		}
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True)
 
 def test_3mg():
 	# Input data.
@@ -234,7 +234,7 @@ def test_3mg():
 		}
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True)
 
 def test_4mg():
 	# Input data.
@@ -327,7 +327,7 @@ def test_4mg():
 		}
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
 
 def test_auto3mg():
 	# Input data.
@@ -416,7 +416,7 @@ def test_auto3mg():
 	# 	}
 	# }
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
 
 if __name__ == '__main__':
 	test_1mg()

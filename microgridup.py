@@ -206,7 +206,7 @@ def summary_charts(stats):
 	all_html = money_summary_html + gen_load_html + gen_mix_html
 	return all_html
 
-def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS=None, DESCRIPTION='', DIESEL_SAFETY_FACTOR=False, DELETE_FILES=False, open_results=False, OUTAGE_CSV=None):
+def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS=None, DESCRIPTION='', DIESEL_SAFETY_FACTOR=False, DELETE_FILES=False, open_results=False, OUTAGE_CSV=None):
 	''' Generate a full microgrid plan for the given inputs. '''
 	# Constants
 	MODEL_DSS = 'circuit.dss'
@@ -255,7 +255,6 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 				'BASE_DSS':BASE_DSS,
 				'LOAD_CSV':LOAD_CSV,
 				'QSTS_STEPS':QSTS_STEPS,
-				'FOSSIL_BACKUP_PERCENT':FOSSIL_BACKUP_PERCENT,
 				'REOPT_INPUTS':REOPT_INPUTS,
 				'MICROGRIDS':MICROGRIDS,
 				'FAULTED_LINE':FAULTED_LINE,
@@ -270,7 +269,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT
 		mgs_name_sorted = sorted(MICROGRIDS.keys())
 		for i, mg_name in enumerate(mgs_name_sorted):
 			BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
-			microgridup_design.run(MODEL_LOAD_CSV, MICROGRIDS[mg_name], mg_name, BASE_DSS, REOPT_INPUTS, f'reopt_final_{i}', FOSSIL_BACKUP_PERCENT)
+			microgridup_design.run(MODEL_LOAD_CSV, MICROGRIDS[mg_name], mg_name, BASE_DSS, REOPT_INPUTS, f'reopt_final_{i}')
 			max_crit_load = sum(MICROGRIDS[mg_name]['critical_load_kws'])
 			microgridup_hosting_cap.run(f'reopt_final_{i}', GEN_NAME, MICROGRIDS[mg_name], BASE_DSS, mg_name, REF_NAME, MODEL_LOAD_CSV, f'circuit_plusmg_{i}.dss', f'mg_add_cost_{i}.csv', max_crit_load, diesel_total_calc=False)
 		# Make OMD of fully detailed system.
@@ -355,12 +354,11 @@ def _tests():
 	MG_MINES = test_params['MG_MINES']
 	REOPT_INPUTS = test_params['REOPT_INPUTS']
 	QSTS_STEPS = 480.0
-	FOSSIL_BACKUP_PERCENT = 0.5
 	FAULTED_LINE = '670671'
 	CRITICAL_LOADS = test_params['crit_loads']
 	# Test of full().
 	for _dir in MG_MINES:
-		mgu_args = [f'{PROJ_FOLDER}/{_dir}', f'{MGU_FOLDER}/uploads/BASE_DSS_{_dir}', f'{MGU_FOLDER}/uploads/LOAD_CSV_{_dir}', QSTS_STEPS, FOSSIL_BACKUP_PERCENT, REOPT_INPUTS, MG_MINES[_dir][0], FAULTED_LINE, CRITICAL_LOADS]
+		mgu_args = [f'{PROJ_FOLDER}/{_dir}', f'{MGU_FOLDER}/uploads/BASE_DSS_{_dir}', f'{MGU_FOLDER}/uploads/LOAD_CSV_{_dir}', QSTS_STEPS, REOPT_INPUTS, MG_MINES[_dir][0], FAULTED_LINE, CRITICAL_LOADS]
 		print(f'---------------------------------------------------------\nBeginning end-to-end backend test of {_dir}.\n---------------------------------------------------------')
 		full(*mgu_args)
 	return print('Ran all tests for microgridup.py.')

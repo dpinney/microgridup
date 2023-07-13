@@ -10,9 +10,7 @@ if MGU_FOLDER == '/':
 PROJ_FOLDER = f'{MGU_FOLDER}/data/projects'
 
 def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
-	''' Set the critical load percent input for REopt
-	by finding the ratio of max critical load kws
-	to the max kw of the loadshape of that mg'''
+	''' Set the critical load percent input for REopt by finding the ratio of max critical load kws to the max kw of the loadshape of that mg'''
 	load_df = pd.read_csv(LOAD_NAME)
 	mg_load_df = pd.DataFrame()
 	loads = microgrid['loads']
@@ -23,7 +21,6 @@ def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
 		except:
 			print('ERROR: loads in Load Data (.csv) do not match loads in circuit.')
 	max_load = float(mg_load_df.max())
-	# TODO: select specific critical loads from circuit.dss if meta data on max kw or loadshapes exist for those loads
 	# add up all max kws from critical loads to support during an outage
 	max_crit_load = sum(microgrid['critical_load_kws'])
 	if max_crit_load > max_load:
@@ -37,26 +34,7 @@ def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
 		critical_load_percent = 2.0
 	return critical_load_percent, max_crit_load
 
-def set_fossil_max_kw(FOSSIL_BACKUP_PERCENT, max_crit_load):
-	'''User-selected fossil generation backup as a
-	maximum percentage of the critical load.
-	Range: 0-1, which needs to be checked on input
-	TODO: Test assumption that setting 'dieselMax'
-	in microgridDesign does not override behavior
-	of 'genExisting' in reopt_gen_mg_specs()'''
-	# to run REopt without fossil backup
-	if FOSSIL_BACKUP_PERCENT == 0:
-		fossil_max_kw = 0
-	# to run REopt to cost optimize with fossil in the mix
-	elif FOSSIL_BACKUP_PERCENT == 1:
-		fossil_max_kw = 100000
-	elif FOSSIL_BACKUP_PERCENT > 0 and FOSSIL_BACKUP_PERCENT < 1:
-		fossil_max_kw = FOSSIL_BACKUP_PERCENT*max_crit_load
-	# TODO: deal with edge case of FOSSIL_MAX_BACKUP > 1, or call it out as a warning
-	print("fossil_max_kw:", fossil_max_kw)
-	return fossil_max_kw
-
-def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load, mg_name):
+def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid, critical_load_percent, max_crit_load, mg_name):
 	''' Generate the microgrid specs with REOpt.
 	SIDE-EFFECTS: generates REOPT_FOLDER'''
 	load_df = pd.read_csv(LOAD_NAME)
@@ -162,14 +140,6 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 		allInputData['windMin'] = str(sum(wind_kw_exist))
 		allInputData['wind'] = 'on' #failsafe to include wind if found in base_dss
 		 #TODO: update logic if windMin, windExisting and other generation variables are enabled to be set by the user as inputs
-	#TODO: Test that dieselMax = 0 is passed to REopt if both fossil_max_kw and sum(fossil_kw_exist) == 0
-	# Set max fossil kw used to support critical load
-	fossil_max_kw = set_fossil_max_kw(FOSSIL_BACKUP_PERCENT, max_crit_load)
-	# print("reopt_gen_mg_specs.fossil_max_kw:", fossil_max_kw)
-	if fossil_max_kw <= sum(fossil_kw_exist):
-		allInputData['dieselMax'] = str(sum(fossil_kw_exist))
-	elif fossil_max_kw > sum(fossil_kw_exist):
-		allInputData['dieselMax'] = fossil_max_kw
 	# enable following 9 lines when using gen_existing_ref_shapes()
 	# if not already turned on, set solar and wind on to 1 kw to provide loadshapes for existing gen in make_full_dss()
 	if allInputData['wind'] == 'off':
@@ -283,10 +253,10 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	with open(outputPath, 'w') as outFile:
 		outFile.write(mgd)
 
-def run(LOAD_FILE_PATH, MICROGRID_DICT, MG_NAME, DSS_FILE_PATH, REOPT_INPUTS, REOPT_FOLDER_FINAL, FOSSIL_BACKUP_PERCENT):
+def run(LOAD_FILE_PATH, MICROGRID_DICT, MG_NAME, DSS_FILE_PATH, REOPT_INPUTS, REOPT_FOLDER_FINAL):
 	''' Generate full microgrid design for given microgrid spec dictionary and circuit file (used to gather distribution assets).'''
 	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_FILE_PATH, MICROGRID_DICT, MG_NAME)
-	reopt_gen_mg_specs(DSS_FILE_PATH, LOAD_FILE_PATH, REOPT_INPUTS, REOPT_FOLDER_FINAL, MICROGRID_DICT, FOSSIL_BACKUP_PERCENT, critical_load_percent, max_crit_load, MG_NAME)
+	reopt_gen_mg_specs(DSS_FILE_PATH, LOAD_FILE_PATH, REOPT_INPUTS, REOPT_FOLDER_FINAL, MICROGRID_DICT, critical_load_percent, max_crit_load, MG_NAME)
 	microgrid_design_output(f'{REOPT_FOLDER_FINAL}/allOutputData.json', f'{REOPT_FOLDER_FINAL}/allInputData.json', f'{REOPT_FOLDER_FINAL}/cleanMicrogridDesign.html')
 
 def _tests():
@@ -310,8 +280,7 @@ def _tests():
 		mg_name = f'mg{run_count}'
 		BASE_NAME = 'circuit.dss' if run_count == 0 else f'circuit_plusmg_{run_count - 1}.dss'
 		REOPT_FOLDER_FINAL = f'reopt_final_{run_count}'
-		FOSSIL_BACKUP_PERCENT = 0.5
-		run(LOAD_NAME, microgrid, mg_name, BASE_NAME, REOPT_INPUTS, REOPT_FOLDER_FINAL, FOSSIL_BACKUP_PERCENT)
+		run(LOAD_NAME, microgrid, mg_name, BASE_NAME, REOPT_INPUTS, REOPT_FOLDER_FINAL)
 	os.chdir(curr_dir)
 	return
 

@@ -206,7 +206,7 @@ def summary_charts(stats):
 	all_html = money_summary_html + gen_load_html + gen_mix_html
 	return all_html
 
-def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS=None, DESCRIPTION='', DIESEL_SAFETY_FACTOR=False, DELETE_FILES=False, open_results=False, OUTAGE_CSV=None):
+def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS=None, DESCRIPTION='', DELETE_FILES=False, open_results=False, OUTAGE_CSV=None):
 	''' Generate a full microgrid plan for the given inputs. '''
 	# Constants
 	MODEL_DSS = 'circuit.dss'
@@ -258,7 +258,6 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 				'REOPT_INPUTS':REOPT_INPUTS,
 				'MICROGRIDS':MICROGRIDS,
 				'FAULTED_LINE':FAULTED_LINE,
-				'DIESEL_SAFETY_FACTOR':DIESEL_SAFETY_FACTOR,
 				'OUTAGE_CSV':OUTAGE_CSV,
 				'CRITICAL_LOADS':CRITICAL_LOADS,
 				'CREATION_DATE':CREATION_DATE,
@@ -271,7 +270,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 			BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
 			microgridup_design.run(MODEL_LOAD_CSV, MICROGRIDS[mg_name], mg_name, BASE_DSS, REOPT_INPUTS, f'reopt_final_{i}')
 			max_crit_load = sum(MICROGRIDS[mg_name]['critical_load_kws'])
-			microgridup_hosting_cap.run(f'reopt_final_{i}', GEN_NAME, MICROGRIDS[mg_name], BASE_DSS, mg_name, REF_NAME, MODEL_LOAD_CSV, f'circuit_plusmg_{i}.dss', f'mg_add_cost_{i}.csv', max_crit_load, diesel_total_calc=False)
+			microgridup_hosting_cap.run(f'reopt_final_{i}', GEN_NAME, MICROGRIDS[mg_name], BASE_DSS, mg_name, REF_NAME, MODEL_LOAD_CSV, f'circuit_plusmg_{i}.dss', f'mg_add_cost_{i}.csv', max_crit_load)
 		# Make OMD of fully detailed system.
 		dssConvert.dssToOmd(f'circuit_plusmg_{i}.dss', OMD_NAME, RADIUS=0.0002)
 		# Draw the circuit oneline.

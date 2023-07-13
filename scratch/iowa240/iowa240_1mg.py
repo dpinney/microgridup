@@ -10,7 +10,6 @@ if __name__ == '__main__':
 	FAULTED_LINE = 'cb_1'
 	QSTS_STEPS = 24*20
 	FOSSIL_BACKUP_PERCENT = 1
-	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth
 	REOPT_INPUTS = {
 		"solar" : "on",
 		"wind" : "off",

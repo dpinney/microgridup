@@ -12,7 +12,6 @@ def test_1mg():
 	FAULTED_LINE = '650632' # Why this line, which is not closing off the genbus from source?
 	QSTS_STEPS = 24*20
 	OUTAGE_CSV = f'{MGU_FOLDER}/testfiles/lehigh_random_outages.csv'
-	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth
 	REOPT_INPUTS = {
 		"solar" : "on",
 		"wind" : "off",
@@ -81,7 +80,6 @@ def test_2mg():
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINE = '650632'
 	QSTS_STEPS = 24*20
-	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth
 	REOPT_INPUTS = {
 		"solar" : "on",
 		"wind" : "on",
@@ -157,7 +155,6 @@ def test_3mg():
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINE = '650632'
 	QSTS_STEPS = 24*20
-	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth 
 	REOPT_INPUTS = {
 		"solar" : "on",
 		"wind" : "off",
@@ -241,7 +238,6 @@ def test_4mg():
 	FAULTED_LINE = '650632'
 	QSTS_STEPS = 24*20
 	OUTAGE_CSV = f'{MGU_FOLDER}/testfiles/lehigh_random_outages.csv'
-	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth
 	REOPT_INPUTS = {
 		"solar" : "on",
 		"wind" : "off",
@@ -335,7 +331,6 @@ def test_auto3mg():
 	FAULTED_LINE = '670671'
 	QSTS_STEPS = 24*20
 	OUTAGE_CSV = f'{MGU_FOLDER}/testfiles/lehigh_random_outages.csv'
-	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth 
 	REOPT_INPUTS = {
 		"solar" : "on",
 		"wind" : "off",

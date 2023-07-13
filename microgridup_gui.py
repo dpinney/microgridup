@@ -335,7 +335,6 @@ def run():
 		'year':request.form['year'],
 		# 'analysisYears':request.form['analysisYears'],
 		'outageDuration':request.form['outageDuration'],
-		# 'DIESEL_SAFETY_FACTOR':request.form['DIESEL_SAFETY_FACTOR'],
 		# 'outage_start_hour':request.form['outage_start_hour'],
 		# 'userCriticalLoadShape':request.form['userCriticalLoadShape'],
 		'value_of_lost_load':request.form['value_of_lost_load'],

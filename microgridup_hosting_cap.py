@@ -17,9 +17,8 @@ def _getByName(tree, name):
 				matches.append(x)
 	return matches[0]
 
-def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
-	''' Get generator objects from REopt. Calculate new gen sizes, using updated fossil size 
-	from diesel_total_calc if True. Returns all gens in a dictionary.
+def get_gen_ob_from_reopt(REOPT_FOLDER):
+	''' Get generator objects from REopt. Calculate new gen sizes. Returns all gens in a dictionary.
 	TODO: To implement multiple same-type existing generators within a single microgrid, 
 	will need to implement searching the tree of FULL_NAME to find kw ratings of existing gens'''
 	with open(REOPT_FOLDER + '/allOutputData.json') as file: 
@@ -28,7 +27,6 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 	mg_num = 1
 	gen_sizes = {}
 	'''	Notes: Existing solar and diesel are supported natively in REopt.
-		If turned on, diesel_total_calc is used to set the total amount of fossil generation.
 		Existing wind and batteries require setting the minimimum generation threshold (windMin, batteryPowerMin, batteryCapacityMin) 
 		explicitly to the existing generator sizes in REopt
 		SIDE EFFECTS: If additional kwh but not additional kw above existing battery kw is recommended by REopt,
@@ -43,10 +41,7 @@ def get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False):
 	else:
 		wind_size_new = 0.0
 	# calculate additional diesel to be added to existing diesel gen (if any) to adjust kW based on diesel_sizing()
-	if diesel_total_calc == False:
-		fossil_size_total = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
-	else:
-		fossil_size_total = diesel_total_calc
+	fossil_size_total = reopt_out.get(f'sizeDiesel{mg_num}', 0.0)
 	fossil_size_existing = reopt_out.get(f'sizeDieselExisting{mg_num}', 0.0)
 	if fossil_size_total - fossil_size_existing > 0:
 		fossil_size_new = fossil_size_total - fossil_size_existing
@@ -137,7 +132,7 @@ def mg_phase_and_kv(BASE_NAME, microgrid, mg_name):
 	print('mg_phase_and_kv out_dict:', out_dict)
 	return out_dict
 	
-def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_name, diesel_total_calc=False):
+def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_name):
 	'''Create new generator objects and shapes. 
 	Returns a list of generator objects formatted for reading into openDSS tree.
 	SIDE EFFECTS: creates GEN_NAME generator shape
@@ -333,7 +328,7 @@ def gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_FINAL):
 	'''Create new generator 1kw reference loadshapes for existing gen located outside of the microgrid in analysis. 
 	To run this effectively when not running feedback_reopt_gen_values(), specify REOPT_FOLDER_BASE for both of the final arguments
 	SIDE EFFECTS: creates REF_NAME generator reference shape'''
-	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER_FINAL, diesel_total_calc=False)
+	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER_FINAL)
 	with open(REOPT_FOLDER_FINAL + '/allOutputData.json') as file:
 		reopt_final_out = json.load(file)	
 	# reopt_final_out = json.load(open(REOPT_FOLDER_FINAL + '/allOutputData.json'))
@@ -657,12 +652,12 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 	# Write new DSS file.
 	dssConvert.treeToDss(tree, FULL_NAME)
 
-def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False):
+def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, ADD_COST_NAME):
 	''' Generate a report on each microgrid '''
 	with open(REOPT_FOLDER + inputName) as file:
 		reopt_out = json.load(file)
 	# reopt_out = json.load(open(REOPT_FOLDER + inputName))
-	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False)
+	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER)
 	print("microgrid_report_csv() gen_sizes into CSV report:", gen_sizes)
 	solar_size_total = gen_sizes.get('solar_size_total')
 	solar_size_new = gen_sizes.get('solar_size_new')
@@ -805,12 +800,12 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 		writer.writerow(row)
 		# print("row:", row)
 	
-def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False):
+def microgrid_report_list_of_dicts(inputName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, ADD_COST_NAME):
 	''' Generate a dictionary report for each key for all microgrids. '''
 	with open(REOPT_FOLDER + inputName) as file:
 		reopt_out = json.load(file)
 	# reopt_out = json.load(open(REOPT_FOLDER + inputName))
-	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER, diesel_total_calc=False)
+	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER)
 	solar_size_total = gen_sizes.get('solar_size_total')
 	solar_size_new = gen_sizes.get('solar_size_new')
 	solar_size_existing = gen_sizes.get('solar_size_existing')
@@ -1026,14 +1021,14 @@ def gen_powerflow_results(CIRCUIT_FILE, YEAR, QSTS_STEPS):
 	except:
 		pass #TODO: better detection of missing control data.
 
-def run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, REF_NAME, LOAD_NAME, FULL_NAME, ADD_COST_NAME, max_crit_load, diesel_total_calc=False):
-	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, diesel_total_calc=False)
+def run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, REF_NAME, LOAD_NAME, FULL_NAME, ADD_COST_NAME, max_crit_load):
+	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name)
 	gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_FINAL)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, microgrid)
 	# Generate microgrid control hardware costs.
 	mg_add_cost(ADD_COST_NAME, microgrid, mg_name, BASE_NAME)
-	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
-	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, diesel_total_calc=False)
+	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME)
+	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME)
 	return mg_list_of_dicts_full
 
 def _tests():

@@ -11,7 +11,6 @@ def test_1mg():
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINE = '650632' # Why this line, which is not closing off the genbus from source?
 	QSTS_STEPS = 24*20
-	FOSSIL_BACKUP_PERCENT = 1
 	OUTAGE_CSV = f'{MGU_FOLDER}/testfiles/lehigh_random_outages.csv'
 	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth
 	REOPT_INPUTS = {
@@ -82,7 +81,6 @@ def test_2mg():
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINE = '650632'
 	QSTS_STEPS = 24*20
-	FOSSIL_BACKUP_PERCENT = 0
 	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth
 	REOPT_INPUTS = {
 		"solar" : "on",
@@ -159,7 +157,6 @@ def test_3mg():
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINE = '650632'
 	QSTS_STEPS = 24*20
-	FOSSIL_BACKUP_PERCENT = .5
 	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth 
 	REOPT_INPUTS = {
 		"solar" : "on",
@@ -243,7 +240,6 @@ def test_4mg():
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINE = '650632'
 	QSTS_STEPS = 24*20
-	FOSSIL_BACKUP_PERCENT = 1
 	OUTAGE_CSV = f'{MGU_FOLDER}/testfiles/lehigh_random_outages.csv'
 	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth
 	REOPT_INPUTS = {
@@ -338,7 +334,6 @@ def test_auto3mg():
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINE = '670671'
 	QSTS_STEPS = 24*20
-	FOSSIL_BACKUP_PERCENT = .5
 	OUTAGE_CSV = f'{MGU_FOLDER}/testfiles/lehigh_random_outages.csv'
 	# DIESEL_SAFETY_FACTOR = 0 # DIESEL_SAFETY_FACTOR is not currenty in use; Revisit once we have a strategy for load growth 
 	REOPT_INPUTS = {
@@ -391,7 +386,7 @@ def test_auto3mg():
 		"dieselOnlyRunsDuringOutage": True
 	}
 	ALGO = 'branch' #'lukes'
-	MICROGRIDS = gmg.mg_group(CIRC_FILE, CRITICAL_LOADS, 'branch')
+	MICROGRIDS = gmg.mg_group(CIRC_FILE, CRITICAL_LOADS, ALGO)
 	# MICROGRIDS = {
 	# 	'mg0': {
 	# 		'loads': ['634a_data_center','634b_radar','634c_atc_tower'],

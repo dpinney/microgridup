@@ -389,7 +389,6 @@ def run():
 		dss_path,
 		csv_path,
 		float(request.form['QSTS_STEPS']),
-		float(request.form['FOSSIL_BACKUP_PERCENT']),
 		REOPT_INPUTS,
 		microgrids,
 		request.form['FAULTED_LINE'],
@@ -440,7 +439,7 @@ def _tests():
 	MG_MINES = test_params['MG_MINES']
 	wizard_dir = [_dir for _dir in MG_MINES if 'wizard' in _dir]
 	elements = test_params['elements']
-	templateDssTree = test_params['templateDssTree']
+	templateDssTree = [OrderedDict(item) for item in test_params['templateDssTree']]
 	# Testing jsonToDss().
 	for _dir in wizard_dir:
 		dssFilePath = jsonToDss(_dir, lat, lon, elements, True)

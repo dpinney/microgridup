@@ -73,7 +73,13 @@ def load(project):
 	if '0crashed.txt' in ana_files:
 		return 'Model Crashed. Please delete and recreate.'
 	elif '0running.txt' in ana_files:
-		return 'Model Running. Please reload to check for completion.'
+		input_data_path = os.path.join(_projectDir, project, 'allInputData.json')
+		if os.path.exists(input_data_path):
+			with open(input_data_path) as json_file:
+				data = json.load(json_file)
+				return render_template('template_in_progress.html', model_name=project, in_data=data)
+		else:
+			return 'Model Running. Please reload to check for completion.'
 	elif 'output_final.html' in ana_files:
 		return redirect(f'/data/projects/{project}/output_final.html')
 	else:

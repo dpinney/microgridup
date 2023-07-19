@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>MicrogridUP &raquo; In Progress</title>
+        <style>
+            /* SEMANTIC ELEMENTS */
+            :root {
+                /* Heading div was moved into top nav */
+                /*--headingDivHeight: 3rem;*/
+                --mobileToDesktopBreakpointWidth: 977px;
+                --sideNavTransitionTime: 0.3s;
+                --sideNavWidth: 272px;
+                --topNavHeight: 64px;
+            }
+            @media screen and (min-width: 977px) {
+                article {
+                    margin: 0;
+                    transition: margin-left var(--sideNavTransitionTime);
+                }
+                article.compressed {
+                    margin-left: var(--sideNavWidth);
+                    transition: margin-left var(--sideNavTransitionTime);
+                }
+            }
+            body {
+                margin: 0;
+                background: white;
+            }
+            body.loading {
+                overflow-y: hidden;
+            }
+            header {
+                height: var(--topNavHeight);
+                position: fixed;
+                top: 0;
+                width: 100%;
+            }
+            header span {
+                color: white;
+            }
+            iframe {
+                border: 0;
+                width: 100%;
+                height: calc(99.5vh - var(--topNavHeight));
+                /*height: calc(99vh - var(--topNavHeight) - var(--headingDivHeight));*/
+            }
+            main {
+                height: calc(100% - var(--topNavHeight));
+                padding: var(--topNavHeight) 0px 0px 0px;
+            }
+            main.loading {
+                padding: initial;
+            }
+            /* No longer used
+            div.div--spanDisplay {
+                align-items: center;
+                display: flex;
+                height: var(--headingDivHeight);
+            } */
+            section.hidden {
+                display: none;
+            }
+            section.loading {
+                visibility: hidden;
+            }
+            span.span--sectionTitle {
+                font-family: sans-serif;
+                font-size: 2rem;
+                padding-left: 1rem;
+            }
+            div > span.span--sectionTitle:nth-child(2) {
+                padding-left: .5rem;
+            }
+            /* TOP NAV */
+            nav.js-nav--topNav {
+                background: black;
+                display: flex;
+                height: 100%;
+            }
+            /* TOP NAV ANCHORS */
+            nav.js-nav--topNav a {
+                text-decoration: none;
+            }
+            /* TOP NAV BUTTONS */
+            nav.js-nav--topNav button {
+                border: 0;
+                background-color: transparent;
+                cursor: pointer;
+                padding: 14px;
+                width: var(--topNavHeight);
+            }
+            nav.js-nav--topNav button:hover {
+                background-color: gray;
+                transition: background-color 0.2s ease-out;
+            }
+            /* TOP NAV SPANS */
+            nav.js-nav--topNav div {
+                align-items: center;
+                display: flex;
+            }
+            /* TOP NAV SVGS */
+            nav.js-nav--topNav svg {
+                fill: white;
+            }
+            nav.js-nav--sideNav {
+                /*background-clip: content-box;*/
+                background-color: white;
+                box-shadow: inset -1px 0px darkgray;
+                font-family: sans-serif;
+                height: 100%;
+                overflow-y: auto;
+                position: fixed;
+                transform: translate(calc(var(--sideNavWidth) * -1), 0px);
+                transition: transform var(--sideNavTransitionTime);
+                width: var(--sideNavWidth);
+                z-index: 1;
+            }
+            nav.js-nav--sideNav.open {
+                transform: translate(0px, 0px);
+            }
+            /* SIDE NAV BUTTONS */
+            nav.js-nav--sideNav button {
+                /*background-clip: content-box;*/
+                align-items: center;
+                background-color: white;
+                box-shadow: inset -1px 0px darkgray;
+                border: 0;
+                cursor: pointer;
+                display: flex;
+                height: 6em;
+                padding: 10px 0 10px 10px;
+                width: 100%;
+            }
+            nav.js-nav--sideNav button:hover {
+                background-color: lightgray;
+            }
+            /* Safari workaround for missing :focus implementation */
+            nav.js-nav--sideNav button.focused {
+                /*background-clip: content-box;*/
+                box-shadow: inset 0 0 0 1px darkgray;
+            }
+            nav.js-nav--sideNav button.focused > span {
+                font-weight: bold;
+            }
+            /* SIDE NAV COVER */
+            div.js-div--sideNavCover {
+                display: none;
+            }
+            div.js-div--sideNavCover.loading {
+                align-items: center;
+                background-color: rgba(189, 189, 189, 0.6);
+                display: flex;
+                height: 100%;
+                justify-content: space-around; 
+                position: fixed;
+                width: 100%;
+            }
+            @media screen and (max-width: 976px) {
+                div.js-div--sideNavCover.open {
+                    background-color: rgba(189, 189, 189, 0.6);
+                    display: initial;
+                    height: 100%;
+                    position: fixed;
+                    width: 100%;
+                }
+            }
+            /* SIDE NAV BUTTON DIVS */
+            div.js-div--dropdownContainer {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.25s;
+            }
+            div.js-div--dropdownContainer.expanded {
+                max-height: 500px;
+                /* TODO: fix box shadow with scroll bar */
+                overflow: auto;
+            }
+            /* SIDE NAV BUTTON SPANS */
+            nav.js-nav--sideNav * span {
+                color: black;
+                margin: auto 0 auto 1rem;
+                font-size: 1.6rem;
+            }
+            div.js-div--dropdownContainer > * > span {
+                font-size: 1.35rem;
+                margin: auto 0 auto 2rem;
+            }
+            div.js-div--dropdownContainer > div.js-div--dropdownContainer > * > span {
+                font-size: 1rem;
+                margin: auto 0 auto 3rem;
+            }
+            /* SIDE NAV SVGS */
+            nav.js-nav--sideNav svg {
+                transform: rotate(0deg);
+                transition: transform 0.25s;
+                transform-box: fill-box;
+                transform-origin: center;
+                width: 20%;
+            }
+            nav.js-nav--sideNav svg.rotated {
+                transform: rotate(90deg);
+            }
+            /* template_microgridDesign.html */
+            * {
+                font-family:sans-serif
+            }
+            .chunk {
+                display: inline-block;
+                background-color: lightgray;
+                padding: 6px;
+                border-radius: 4px;
+                margin: 4px 2px 4px 2px;
+            }
+            #holder {
+                width: 93%;
+                margin-left: 4%;
+            }
+            h2, h3 {
+                margin-left: 4%;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <nav class="js-nav--topNav">
+                <div>
+                    <a href="/">
+                        <span class="span--sectionTitle">MicrogridUp &raquo; {{model_name}} &raquo;</span>
+                    </a>
+                    <span class="span--sectionTitle">In Progress</span>
+                </div>
+            </nav>
+        </header>
+        <main>
+            <div id="container">
+                <h2><em>Model Running. Please reload to check for completion.</em></h2>
+                <h3>Input Data</h3>
+                <div id="holder">
+                    {% for k,v in in_data.items() %}
+                        {% if v is mapping %}
+                            {% for key,value in v.items() %}
+                                {% if value is mapping %}
+                                    <div class="chunk"><em>{{key}}: </em>
+                                    {% for _key,_value in value.items() %}
+                                        <li><em>{{_key}}: </em>{{_value}}</li>
+                                    {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="chunk"><em>{{key}}: </em>{{value}}</div>
+                                {% endif %}
+                            {% endfor %}    
+                        {% else %}
+                            <div class="chunk"><em>{{k}}: </em>{{v}}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

@@ -3,6 +3,7 @@ import jinja2 as j2
 import plotly.graph_objects as go
 import pandas as pd
 from omf.solvers.opendss import dssConvert
+from omf.models.__neoMetaModel__ import csvValidateAndLoad
 
 MGU_FOLDER = os.path.abspath(os.path.dirname(__file__))
 if MGU_FOLDER == '/':
@@ -37,7 +38,14 @@ def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
 def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid, critical_load_percent):
 	''' Generate the microgrid specs with REOpt.
 	SIDE-EFFECTS: generates REOPT_FOLDER'''
-	load_df = pd.read_csv(LOAD_NAME)
+	with open(LOAD_NAME, "r") as file:
+		file_input = file.read()
+		first_line = file_input.splitlines()[0]
+		csv_width = len(first_line.split(','))
+	cwd = os.getcwd()
+	modelDir = cwd
+	dtypes = [float if i > 0 else False for i in range(csv_width)]
+	load_df = csvValidateAndLoad(file_input, modelDir, header=0, nrows=8760, ncols=csv_width, dtypes=dtypes, return_type='df', ignore_nans=True, save_file=None)
 	if os.path.isdir(REOPT_FOLDER):
 		# cached results detected, exit.
 		return None

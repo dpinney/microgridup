@@ -399,7 +399,8 @@ def run():
 		microgrids,
 		request.form['FAULTED_LINE'],
 		crit_loads,
-		request.form['DESCRIPTION']
+		request.form['DESCRIPTION'],
+		request.form['INVALIDATE_CACHE']
 	]
 	# Kickoff the run
 	new_proc = multiprocessing.Process(target=full, args=mgu_args)

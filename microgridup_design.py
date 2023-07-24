@@ -35,7 +35,7 @@ def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
 		critical_load_percent = 2.0
 	return critical_load_percent, max_crit_load
 
-def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid, critical_load_percent):
+def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid, critical_load_percent, INVALIDATE_CACHE=False):
 	''' Generate the microgrid specs with REOpt.
 	SIDE-EFFECTS: generates REOPT_FOLDER'''
 	with open(LOAD_NAME, "r") as file:
@@ -46,8 +46,8 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 	modelDir = cwd
 	dtypes = [float if i > 0 else False for i in range(csv_width)]
 	load_df = csvValidateAndLoad(file_input, modelDir, header=0, nrows=8760, ncols=csv_width, dtypes=dtypes, return_type='df', ignore_nans=True, save_file=None)
-	if os.path.isdir(REOPT_FOLDER):
-		# cached results detected, exit.
+	if os.path.isdir(REOPT_FOLDER) and INVALIDATE_CACHE == False:
+		# Cached results detected, user does not want to invalidate them, exit.
 		return None
 	import omf.models
 	shutil.rmtree(REOPT_FOLDER, ignore_errors=True)
@@ -261,10 +261,10 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	with open(outputPath, 'w') as outFile:
 		outFile.write(mgd)
 
-def run(LOAD_FILE_PATH, MICROGRID_DICT, MG_NAME, DSS_FILE_PATH, REOPT_INPUTS, REOPT_FOLDER_FINAL):
+def run(LOAD_FILE_PATH, MICROGRID_DICT, MG_NAME, DSS_FILE_PATH, REOPT_INPUTS, REOPT_FOLDER_FINAL, INVALIDATE_CACHE=False):
 	''' Generate full microgrid design for given microgrid spec dictionary and circuit file (used to gather distribution assets).'''
 	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_FILE_PATH, MICROGRID_DICT, MG_NAME)
-	reopt_gen_mg_specs(DSS_FILE_PATH, LOAD_FILE_PATH, REOPT_INPUTS, REOPT_FOLDER_FINAL, MICROGRID_DICT, critical_load_percent)
+	reopt_gen_mg_specs(DSS_FILE_PATH, LOAD_FILE_PATH, REOPT_INPUTS, REOPT_FOLDER_FINAL, MICROGRID_DICT, critical_load_percent, INVALIDATE_CACHE)
 	microgrid_design_output(f'{REOPT_FOLDER_FINAL}/allOutputData.json', f'{REOPT_FOLDER_FINAL}/allInputData.json', f'{REOPT_FOLDER_FINAL}/cleanMicrogridDesign.html')
 
 def _tests():

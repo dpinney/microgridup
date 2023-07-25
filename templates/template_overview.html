@@ -32,6 +32,13 @@
                 margin-bottom: 10px;
                 overflow-x: scroll
             }
+            .chunk {
+                display: inline-block;
+                background-color: lightgray;
+                padding: 6px;
+                border-radius: 4px;
+                margin: 4px 2px 4px 2px;
+            }
         </style>
     </head>
     <body>
@@ -55,11 +62,30 @@
         <div id="grid">
             <div class="over_block">
                 <h3>Report Generated</h3>
-                <pre>{{now}}</pre>
+                <div class="chunk">{{now}}</div>
+                <!-- <pre>{{now}}</pre> -->
             </div>
             <div class="over_block">
                 <h3>Model Inputs</h3>
-                <pre>{{inputs}}</pre>
+                {% for k,v in inputs.items() %}
+                    {% if v is mapping %}
+                        {% for key,value in v.items() %}
+                            {% if value is mapping %}
+                                <br>
+                                <div class="chunk"><em>{{key}}: </em>
+                                {% for _key,_value in value.items() %}
+                                    <li><em>{{_key}}: </em>{{_value}}</li>
+                                {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="chunk"><em>{{key}}: </em>{{value}}</div>
+                            {% endif %}
+                        {% endfor %}    
+                    {% else %}
+                        <div class="chunk"><em>{{k}}: </em>{{v}}</div>
+                    {% endif %}
+                {% endfor %}
+                <!-- <pre>{{inputs}}</pre> -->
             </div>
             <div class="over_block">
                 <h3>User Warnings</h3>

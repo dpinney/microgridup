@@ -240,6 +240,7 @@
                         {% if v is mapping %}
                             {% for key,value in v.items() %}
                                 {% if value is mapping %}
+                                    <br>
                                     <div class="chunk"><em>{{key}}: </em>
                                     {% for _key,_value in value.items() %}
                                         <li><em>{{_key}}: </em>{{_value}}</li>

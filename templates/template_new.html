@@ -199,6 +199,7 @@
 			<div class="chunk">
 				<label class="tooltip" for="INVALIDATE_CACHE">Invalidate Cache<span class="classic">Cache from previous run (if applicable) is cleared when selected.</span></label>
 				<input type="checkbox" name="INVALIDATE_CACHE" value="True" {% if in_data.INVALIDATE_CACHE == "True" %}checked{% endif %}/>
+				<input type="hidden" name="INVALIDATE_CACHE" value="False">
 			</div>
 			<br>
 			<div class="chunk">

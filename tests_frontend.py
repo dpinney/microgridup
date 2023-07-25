@@ -1,17 +1,14 @@
 import json, time
-from selenium.webdriver import Chrome
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from microgridup import MGU_FOLDER
 
 def run():
     options = Options()
-    options.add_experimental_option('detach', True)
-
-    driver = Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    driver = webdriver.Chrome(options=options)
 
     driver.get('http://localhost:5000/')
 

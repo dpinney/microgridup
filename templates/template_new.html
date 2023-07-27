@@ -172,10 +172,11 @@
 	</style>
 </head>
 <body>
+    {% if not iframe_mode %}
 	<div style="height:40px; width:100%; background:black; line-height:40px; padding-left:10px;">
 		<p style="color:white; margin:0px"><a style="color:white; text-decoration:none" href="/"><b>MicrogridUP</b></a> &raquo; New</p>
 	</div>
-
+    {% endif %}
 	<div id='introInfo' class='step'>
 		<h3>Step 1: Input model information</h3>
 		<form id="modelInfoForm" enctype="multipart/form-data">
@@ -648,7 +649,9 @@
 
 			<br>
 		</form>
+        {% if not iframe_mode %}
 		<button id="submitEverything" type="submit">Run model</button>
+        {% endif %}
 	</div>
 	<div id="loading-background"></div>
 	<div id="loading-indicator">
@@ -793,8 +796,8 @@
 					alert(textStatus + ' : ' + errorThrown);
 				}
 			})
-
 			$('#partitionPreviewer').append(oldPartitionsDiv);
+			{% if not iframe_mode %}
 			var partitionButton = $('<button>').text('Partition circuit differently');
 			oldPartitionsDiv.append(partitionButton);
 			
@@ -802,6 +805,7 @@
 				$('#stepThree').show();
 				oldPartitionsDiv.hide();
 			});
+			{% endif %}
 		}
 
 		// Editable text for circuit widget.
@@ -1142,6 +1146,7 @@
 		});
 
 		// Validate forms.
+        {% if not iframe_mode %}
 		$('#submitEverything').click(function() {
 			var form1 = document.getElementById("modelInfoForm");
 			var form2 = document.getElementById("techParamForm");
@@ -1165,6 +1170,7 @@
 			}
 		// }
 		});
+        {% endif %}
 
 		function validateForm(form) {
 			var inputs = form.querySelectorAll("input");

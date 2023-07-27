@@ -93,7 +93,7 @@ def edit(project):
 			in_data['MODEL_DIR'] = in_data['MODEL_DIR'].split('/')[-1]
 	except:
 		in_data = None
-	return render_template('template_new.html', in_data=in_data)
+	return render_template('template_new.html', in_data=in_data, iframe_mode=False)
 
 @app.route('/delete/<project>')
 def delete(project):
@@ -108,7 +108,7 @@ def delete(project):
 def newGui():
 	with open(f'{_mguDir}/data/static/lehigh_3mg_inputs.json') as default_in_file:
 		default_in = json.load(default_in_file)
-	return render_template('template_new.html', in_data=default_in)
+	return render_template('template_new.html', in_data=default_in, iframe_mode=False)
 
 @app.route('/duplicate', methods=["POST"])
 def duplicate():

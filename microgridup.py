@@ -1,6 +1,7 @@
 from omf.solvers.opendss import dssConvert
 from omf import distNetViz
 from omf import geo
+from omf.runAllTests import _print_header
 import microgridup_control
 import microgridup_resilience
 import microgridup_design
@@ -14,6 +15,7 @@ import csv
 import jinja2 as j2
 import datetime
 import traceback
+import sys
 
 MGU_FOLDER = os.path.abspath(os.path.dirname(__file__))
 if MGU_FOLDER == '/':
@@ -366,11 +368,34 @@ def _tests():
 	FAULTED_LINE = '670671'
 	CRITICAL_LOADS = test_params['crit_loads']
 	# Test of full().
+	successful_tests = []
+	failed_tests = []
+	untested = ['3mgs_wizard_lukes', '3mgs_lehigh_lukes']
 	for _dir in MG_MINES:
-		mgu_args = [f'{PROJ_FOLDER}/{_dir}', f'{MGU_FOLDER}/uploads/BASE_DSS_{_dir}', f'{MGU_FOLDER}/uploads/LOAD_CSV_{_dir}', QSTS_STEPS, REOPT_INPUTS, MG_MINES[_dir][0], FAULTED_LINE, CRITICAL_LOADS]
+		try:
+			_dir.index('wizard')
+			mgu_args = [f'{PROJ_FOLDER}/{_dir}', f'{MGU_FOLDER}/testfiles/wizard_base_3mg.dss']
+		except ValueError as e:
+			mgu_args = [f'{PROJ_FOLDER}/{_dir}', f'{MGU_FOLDER}/testfiles/lehigh_base_3mg.dss']
+		mgu_args.extend([f'{MGU_FOLDER}/testfiles/lehigh_load.csv', QSTS_STEPS, REOPT_INPUTS, MG_MINES[_dir][0], FAULTED_LINE, CRITICAL_LOADS])
 		print(f'---------------------------------------------------------\nBeginning end-to-end backend test of {_dir}.\n---------------------------------------------------------')
 		full(*mgu_args)
-	return print('Ran all tests for microgridup.py.')
+		if untested.count(_dir) == 0 and os.path.isfile(f'{PROJ_FOLDER}/{_dir}/0crashed.txt'):
+			failed_tests.append(_dir)
+		else:
+			successful_tests.append(_dir)
+	_print_header('Successful Tests Report')
+	print(f'Number of successful tests: {len(successful_tests)}')
+	print(successful_tests)
+	_print_header('Failed Tests Report')
+	print(f'Number of failed tests: {len(failed_tests)}')
+	print(failed_tests)
+	_print_header('Untested Circuits Report')
+	print(f'Number of untested circuits: {len(untested)}')
+	print(untested)
+	if len(failed_tests) > 0:
+		sys.exit(1) # trigger failure
+	print('\nSuccessfully completed tests for microgridup.py.')
 
 if __name__ == '__main__':
 	_tests()

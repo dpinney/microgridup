@@ -48,6 +48,9 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 	load_df = csvValidateAndLoad(file_input, modelDir, header=0, nrows=8760, ncols=csv_width, dtypes=dtypes, return_type='df', ignore_nans=True, save_file=None)
 	if os.path.isdir(REOPT_FOLDER) and INVALIDATE_CACHE == False:
 		# Cached results detected, user does not want to invalidate them, exit.
+		print('**************************************************')
+		print(f'** Using cached REopt results for {REOPT_FOLDER} **')
+		print('**************************************************')
 		return None
 	import omf.models
 	shutil.rmtree(REOPT_FOLDER, ignore_errors=True)

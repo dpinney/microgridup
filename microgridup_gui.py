@@ -2,8 +2,7 @@ import base64, io, json, multiprocessing, os, platform, shutil, datetime, time
 import networkx as nx
 from collections import OrderedDict
 from matplotlib import pyplot as plt
-from flask import Flask, flash, request, redirect, render_template, jsonify, url_for
-from werkzeug.utils import secure_filename
+from flask import Flask, request, redirect, render_template, jsonify, url_for
 from omf.solvers.opendss import dssConvert
 from microgridup_gen_mgs import mg_group, nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch
 from microgridup import full
@@ -193,22 +192,22 @@ def uploadDss():
 	if request.method == 'POST':
 		# Check if the post request has the file part.
 		model_dir = request.form['MODEL_DIR']
-		if 'file' not in request.files:
-			flash('No file part')
-			return redirect(request.url)
-		file = request.files['file']
+		if 'BASE_DSS_NAME' not in request.files:
+			print('No file part.')
+			return jsonify(error='No file part'), 400  # Return a JSON response with 400 Bad Request status.
+		file = request.files['BASE_DSS_NAME']
 		# If the user does not select a file, the browser submits an empty file without a filename.
 		if file.filename == '':
-			flash('No selected file')
-			return redirect(request.url)
+			print('No selected file.')
+			return jsonify(error='No selected file'), 400  # Return a JSON response with 400 Bad Request status.
 		if file and allowed_file(file.filename):
-			filename = secure_filename(file.filename)
 			if not os.path.isdir(f'{_mguDir}/uploads'):
 				os.mkdir(f'{_mguDir}/uploads')
 			file.save(f'{_mguDir}/uploads/BASE_DSS_{model_dir}')
 			loads = getLoads(f'{_mguDir}/uploads/BASE_DSS_{model_dir}')
 			return jsonify(loads=loads, filename=f'{_mguDir}/uploads/BASE_DSS_{model_dir}')
-	return ''
+	print('Invalid file.')
+	return jsonify(error='Invalid file'), 400  # Return a JSON response with 400 Bad Request status for invalid files.
 
 @app.route('/getLoadsFromExistingFile', methods=['POST'])
 def getLoadsFromExistingFile():
@@ -288,7 +287,7 @@ def run():
 		csv_path = f'{_mguDir}/uploads/LOAD_CSV_{model_dir}'
 		all_files = 'Using Existing Files'
 	else:
-		# new files uploaded. 
+		# New files uploaded. 
 		all_files = request.files
 		# Save the files.
 		if not os.path.isdir(f'{_mguDir}/uploads'):
@@ -314,7 +313,6 @@ def run():
 		microgrids = mg_group(dss_path, crit_loads, 'loadGrouping', pairings)	
 	elif mg_method == 'manual':
 		algo_params = json.loads(request.form['MICROGRIDS'])
-		print('algo_params',algo_params)
 		microgrids = mg_group(dss_path, crit_loads, 'manual', algo_params)
 	elif mg_method == 'lukes':
 		microgrids = mg_group(dss_path, crit_loads, 'lukes')

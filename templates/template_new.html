@@ -33,7 +33,8 @@
 			width:auto;
 			padding: 9px;
 			margin-left: 5px;
-			margin-right:3px;
+			margin-right:5px;
+			margin-top: 5px;
 			font-size:small;
 			background:seagreen;
 			-webkit-border-radius: 5px;
@@ -42,6 +43,12 @@
 			border: none;
 			color: white;
 			cursor:pointer;
+		}
+		/* Style for the disabled button state */
+		button[disabled], input[type='submit'][disabled], label.fileButton[disabled] {
+			background: rgba(46, 139, 86, 0.561);
+			color: rgba(255, 255, 255, 0.725); 
+			cursor: default;
 		}
 		textarea {
 			font-size: 12pt;
@@ -251,17 +258,17 @@
 				</div>
 			</div>
 			<h5>Load Profile</h5>
-			{% if 'LOAD_CSV' in in_data %}
 			<div class="chunk">
-				<label class="tooltip" for="LOAD_CSV_NAME">Load Data (.csv)<span class="classic">Please enter the name of a .csv file representing the hourly load shape.</span></label>
-				<input type="text" name="LOAD_CSV_NAME" value="{{in_data.LOAD_CSV}}" readonly />
-			</div>
-			{% else %}
-			<div class="chunk">
-				<label class="tooltip" for="LOAD_CSV">Load Data (.csv)<span class="classic">Please enter the name of a .csv file representing the hourly load shape.</span></label>
-				<input type="file" name="LOAD_CSV" id="LOAD_CSV"/>
-			</div>
-			{% endif %}
+				{% if in_data.get('LOAD_CSV') %}
+					<label class="tooltip" for="LOAD_CSV_NAME">Load Data (.csv)<span class="classic">Please enter the name of a .csv file representing the hourly load shape.</span></label>
+					<input type="text" name="LOAD_CSV_NAME" value="{{ in_data.get('LOAD_CSV') }}" class="file-input" readonly>
+					<button type="button" class="remove-btn">Remove File</button>
+				{% else %}
+					<label class="tooltip" for="LOAD_CSV">Load Data (.csv)<span class="classic">Please enter the name of a .csv file representing the hourly load shape.</span></label>
+				  	<input type="file" name="LOAD_CSV" class="file-input">
+				  	<button type="button" class="remove-btn">Remove File</button>
+				{% endif %}
+			</div>				
 			<div class="chunk">
 				<label class="tooltip" for="criticalLoadFactor">Critical Load Factor (% as decimal)<span class="classic">Please enter a number 0-1 for the fraction of total typical load that must be met during a grid outage. Format 0.XX</span></label>
 				<input type="text" name="criticalLoadFactor" value="1" step="0.01" min="0.0" max="1.0"/>
@@ -291,8 +298,9 @@
 			</div>
 			<div class="chunk">
 				<label for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)</label>
-				<input type="file" name="HISTORICAL_OUTAGES">
-			</div>
+				<input type="file" name="HISTORICAL_OUTAGES" class="file-input" data-uploaded="{{ in_data.get('HISTORICAL_OUTAGES') }}">
+				<button type="button" class="remove-btn">Remove File</button>
+			  </div>
 			<div>
 				<i class="fa fa-plus-square"></i>
 				<a href="javascript:void(0)" class="toggle show">Optional inputs</a>
@@ -318,8 +326,10 @@
 					</div>
 					<div class="chunk">
 						<label class="tooltip" for="criticalLoadShapeFile">Optional Critical Load Shape (.csv)<span class="classic">Optional: Please enter the name of a .csv file representing the hourly critical load shape. Number of columns much match LoadShape file. Overrides "Critical Load Factor" if present.</span></label>
-						<input type="file" name="criticalLoadShapeFile">
-					</div>
+						<input type="file" name="criticalLoadShapeFile" class="file-input" data-uploaded="{{ in_data.get('criticalLoadShapeFile') }}">
+						<button type="button" class="remove-btn">Remove File</button>
+					  </div>
+					<div>
 				</div>
 			</div>
 			<h5>Financial</h5>
@@ -351,24 +361,29 @@
 		<label for="wizard">Build circuit manually</label><br>
 
 		<div id="circuitUpload" class="desc" style="margin-top:10px">
-			{% if 'BASE_DSS' in in_data %}
-			<div class="chunk">
-				<label for="BASE_DSS_NAME">Circuit Definition (.dss)</label>
-				<input id="circuitPostCreation" type="text" name="BASE_DSS_NAME" value="{{in_data.BASE_DSS}}" readonly />
-			</div>
-			{% else %}
 			<div class="chunk">
 				<form id="upload-file" method="post" enctype="multipart/form-data">
-				    <fieldset>
-				        <label class="tooltip" for="file">Select a file<span class="classic">The threshold for how many seconds an outage lasts before it is considered a sustained outage.</span></label>
-				        <input name="file" type="file" />
-				    </fieldset>
-				    <fieldset>
-				        <button id="upload-file-btn" type="button">Upload</button>
-				    </fieldset>
+					{% if in_data.get('BASE_DSS') %}
+						<fieldset>
+							<label for="BASE_DSS_NAME">Circuit Definition (.dss)</label>
+							<input id="circuitPostCreation" type="text" name="BASE_DSS_NAME" value="{{in_data.BASE_DSS}}" class="file-input" readonly />
+						</fieldset>
+						<fieldset>
+							<button id="upload-file-btn" type="button" hidden>Upload</button>
+							<button type="button" class="remove-btn">Remove File</button>
+						</fieldset>
+					{% else %}
+						<fieldset>
+							<label for="BASE_DSS_NAME">Circuit Definition (.dss)</label>
+							<input name="BASE_DSS_NAME" type="file" class="file-input">
+						</fieldset>
+						<fieldset>
+							<button id="upload-file-btn" type="button">Upload</button>
+							<button type="button" class="remove-btn">Remove File</button>
+						</fieldset>
+					{% endif %}
 				</form>
-			</div>
-			{% endif %}
+			</div>		
 		</div>
 
 		<div id="circuitCreator" class="desc">
@@ -408,11 +423,11 @@
 
 	</div>
 
-	<div id="partitionPreviewer" class="step">
+	<div id="partitionPreviewerContainer" class="step">
 		<h3>Step 3: Partition circuit into microgrids</h3>
 		<div id="stepThree" class="chunk">
 			<label class="tooltip" for="MG_DEF_METHOD">Microgrid Definition Method<span class="classic">TO DO: FILL TOOLTIP</span></label>
-			<select id="partitionMethod" name="MG_DEF_METHOD" style="margin-right:6px">
+			<select id="partitionMethod" name="MG_DEF_METHOD" style="margin-right:6px" disabled>
 				<option value="" disabled selected>Select method</option>
 				<option value="manual" {% if in_data.MG_DEF_METHOD == 'manual' %}selected{% endif %}>Manual</option>
 				<option value="loadGrouping" {% if in_data.MG_DEF_METHOD == 'load_grouping' %}selected{% endif %}>Load Grouping</option>
@@ -421,10 +436,10 @@
 				<option value="bottomUp" {% if in_data.MG_DEF_METHOD == 'bottom-up' %}selected{% endif %}>Bottom-Up</option>
 				<option value="criticalLoads" {% if in_data.MG_DEF_METHOD == 'critical_loads' %}selected{% endif %}>Critical Loads</option>
 			</select></br>
-			<form id="partitionManually" style="display: none;">
+			<form id="partitionManuallyForm" style="display: none;">
 				<label for="mgQuantity">How many microgrids?</label>
 				<input id="mgQuantity" type="text" autocomplete="off" placeholder="# of microgrids" />
-				<button id="makeDropdowns" type="button">Go</button><br>
+				<button id="makeDropdownsButton" type="button">Go</button><br>
 			</form>
 			<form id="minQuantMgsForm" style="display: none;">
 				<label for="mingQuantMgs">At least how many microgrids?</label>
@@ -432,8 +447,8 @@
 			</form>
 			<div id="dropDowns" class="chunk" style="display: none;">
 			</div>
-			<button id="previewPartitions" type="button">Preview partitions</button>
-			<div id="partitionsPreview">
+			<button id="previewPartitionsButton" type="button" disabled>Preview partitions</button>
+			<div id="partitionsPreviewDiv">
 			</div>
 		</div>
 	</div>
@@ -656,9 +671,58 @@
 	</div>
 	<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 	<script>
+  // Function to check if a .file-input (can be a file input or read-only text input) has a value and show/hide the associated Remove File button.
+  function toggleRemoveButton(chunk, btnElement) {
+    const fileInput = $(chunk).find('input.file-input');
+    const removeBtn = $(chunk).find('button.remove-btn');
+    const uploadedFile = $(fileInput).data('uploaded');
+    const isNoneValue = uploadedFile === 'None'; // Check for 'None' value
+    if ($(fileInput).val() || (uploadedFile && !isNoneValue) || (uploadedFile && $(fileInput).attr('type') === 'text')) {
+      // Show the Remove File button if there is a file input value or uploadedFile is not 'None'. Also show the Remove File button if there is a non-empty uploadedFile value and the file input is a read-only text input.
+      removeBtn.show();
+    } else {
+      removeBtn.hide();
+	  // Modify the behavior when the Remove File button is clicked for pre-Jinja'd file uploads (read-only text input).
+      if ($(fileInput).attr('type') === 'text') {
+		const parentFormId = $(btnElement).parents('form').attr('id');
+		const nameAttribute = parentFormId === 'upload-file' ? 'BASE_DSS_NAME' : 'LOAD_CSV';
+        // Replace the read-only text input with a new file input.
+		const newFileInput = $('<input type="file" class="file-input">').attr('name', nameAttribute);
+        fileInput.replaceWith(newFileInput);
+        // Set up the new file input for further functionality.
+        newFileInput.on('change', function () {
+          	toggleRemoveButton(chunk, this);
+        });
+        toggleRemoveButton(chunk, newFileInput);
+		// Show the upload button if user wants to upload new circuit.
+		$('#upload-file-btn').show();
+      };
+    }
+  }
+
 	$(document).ready(function() {
 		var circuitIsSpecified = false;
 		var filename = '';
+
+		$('.chunk').each(function () {
+		toggleRemoveButton(this);
+		});
+
+		// Add click event listeners to the Remove File buttons.
+		$(document).on('click', 'button.remove-btn', function () {
+			const chunk = $(this).closest('.chunk');
+			const fileInput = chunk.find('input.file-input');
+			// Clear the file input value and hide the Remove File button.
+			fileInput.val('');
+			$(this).hide();
+			toggleRemoveButton(chunk, this);
+		});
+
+		// Function to check if a .file-input has a value and show/hide the associated Remove button after a new file is selected.
+		$(document).on('change', 'input.file-input', function () {
+			const chunk = $(this).closest('.chunk');
+			toggleRemoveButton(chunk);
+		});
 
 		// Limit characters in description textarea.
 		function limitTextareaCharacters() {
@@ -794,7 +858,7 @@
 				}
 			})
 
-			$('#partitionPreviewer').append(oldPartitionsDiv);
+			$('#partitionPreviewerContainer').append(oldPartitionsDiv);
 			var partitionButton = $('<button>').text('Partition circuit differently');
 			oldPartitionsDiv.append(partitionButton);
 			
@@ -990,6 +1054,9 @@
 					if (loads.length === 0) {
 						$('#criticalLoadsSelect').append('<p>No loads to select from.</p>')
 					}
+					// Enable partition selector.
+					$('#previewPartitionsButton').prop('disabled', false);
+					$('#partitionMethod').prop('disabled', false);
 					
 					// Set filename.
 					filename = data.filename;
@@ -1000,7 +1067,7 @@
 		});
 
 		// Manual partitioning dynamic dropdown creation. 
-		$('#makeDropdowns').on('click', function() {
+		$('#makeDropdownsButton').on('click', function() {
 			if (circuitIsSpecified === false) {
 				alert('Please complete step 2.')
 				return
@@ -1038,7 +1105,7 @@
 		$('#mgQuantity').keypress(function(e){
 			if (e.which === 13) {
 				e.preventDefault();
-				$('#makeDropdowns').click();
+				$('#makeDropdownsButton').click();
 			}
 		});
 
@@ -1046,29 +1113,29 @@
 		$('#partitionMethod').change(function() {
 			$('#minQuantMgs').val('');
 			if ($(this).val() == 'manual' || $(this).val() == 'loadGrouping') {
-				$('#partitionManually').show();
-				$('#makeDropdowns').show();
-				$('#previewPartitions').hide();
+				$('#partitionManuallyForm').show();
+				$('#makeDropdownsButton').show();
+				$('#previewPartitionsButton').hide();
 				$('#minQuantMgsForm').hide();
-				$('#partitionsPreview').empty();
+				$('#partitionsPreviewDiv').empty();
 			}
 			else { 
-				$('#partitionManually').hide();
+				$('#partitionManuallyForm').hide();
 				$('#minQuantMgsForm').hide();
 				$('#dropDowns').hide();
-				$('#previewPartitions').show();
+				$('#previewPartitionsButton').show();
 			}
 			if ($(this).val() == 'loadGrouping') {
 				$('#switchGenbus').remove();
 			}
 			if ($(this).val() == 'bottomUp' || $(this).val() == 'criticalLoads') {
 				$('#minQuantMgsForm').show();
-				$('#makeDropdowns').hide();
+				$('#makeDropdownsButton').hide();
 			}
 		})
 
 		// Grab partitioning preview.
-		$('#previewPartitions').click(function() {
+		$('#previewPartitionsButton').click(function() {
 			if (circuitIsSpecified === false) {
 				alert('Please complete step 2.')
 				return
@@ -1107,8 +1174,8 @@
 					/* creating image */
 					var img = $('<img id="previewImage">');
 					img.attr('src', 'data:image/gif;base64,' + data);
-					$('#partitionsPreview').empty();
-					img.appendTo('#partitionsPreview'); 
+					$('#partitionsPreviewDiv').empty();
+					img.appendTo('#partitionsPreviewDiv'); 
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					alert(textStatus + ' : ' + errorThrown)
@@ -1119,7 +1186,7 @@
 		$('#minQuantMgs').keypress(function(e) {
 			if (e.which === 13) {
 				e.preventDefault();
-				$('#previewPartitions').click();
+				$('#previewPartitionsButton').click();
 			}
 		});
 
@@ -1199,7 +1266,7 @@
 				return 
 			}
 			// Do not proceed if no loads are specified.
-			if ((!$('#LOAD_CSV').val()) && (!$('[name="LOAD_CSV_NAME"]').val())) {
+			if ((!$('[name="LOAD_CSV"]').val()) && (!$('[name="LOAD_CSV_NAME"]').val())) {
 				alert('Please specify load data.')
 				return
 			}

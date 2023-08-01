@@ -155,10 +155,10 @@ def utility_outage_cost_TEST():
 	print(utilcost)
 
 def _tests():
-	_many_random_outages(100, 'lehigh_random_outages999.csv', 'lehigh_base_phased.dss')
+	_many_random_outages(100, './testfiles/lehigh_random_outages999.csv', './testfiles/lehigh_base_phased.dss')
 	utility_outage_cost_TEST()
 	# customer_outage_cost(f'{omf.omfDir}/static/testFiles/customerInfo.csv')
-	main('lehigh_random_outages.csv', 'lehigh_random_outages_ADJUSTED.csv', ['634a_data_center','634b_radar','634c_atc_tower','675a_hospital','675b_residential1','675c_residential1','692_warehouse2'], 'lehigh_base_phased.dss', 'zoutput.html')
+	main('./testfiles/lehigh_random_outages.csv', './testfiles/lehigh_random_outages_ADJUSTED.csv', ['634a_data_center','634b_radar','634c_atc_tower','675a_hospital','675b_residential1','675c_residential1','692_warehouse2'], './testfiles/lehigh_base_phased.dss', 'zoutput.html')
 	os.system('open zoutput.html')
 
 if __name__ == '__main__':

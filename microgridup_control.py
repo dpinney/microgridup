@@ -47,10 +47,11 @@ def convert_to_json(all_mg_elements):
 		json[key] = list(all_mg_elements[key])
 	return json
 
-def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, vsourceRatings, motor_perc=0.5):
+def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, logger, vsourceRatings, motor_perc=0.5):
 	# Grab all elements by mg. 
 	all_mg_elements = get_all_mg_elements(dssPath, microgrids)
 	print('JSON compatible representation of all_mg_elements (for jinja-ing into the circuit map):',convert_to_json(all_mg_elements))
+	logger.warning(f'JSON compatible representation of all_mg_elements (for jinja-ing into the circuit map): {convert_to_json(all_mg_elements)}')
 	dssTree = opendss.dssConvert.dssToTree(dssPath)
 
 	# Divide up transformers and loads by microgrid.
@@ -59,7 +60,7 @@ def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, vsou
 		data['Microgrid ID'].append(key)
 
 		# # of Interruptions --> Number of times gen drops to zero during sim.
-		dssTree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw = do_manual_balance_approach(outageStart, outageEnd, key, microgrids[key], dssTree)
+		dssTree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw = do_manual_balance_approach(outageStart, outageEnd, key, microgrids[key], dssTree, logger)
 		# Stole a few lines from plot_mba_approach().
 		new_batt_loadshape = list(new_batt_loadshape)
 		cumulative_existing_batt_shapes = list(cumulative_existing_batt_shapes)
@@ -196,7 +197,7 @@ def count_interruptions_rengenmg(outageStart, outageEnd, all_loads_shapes_kw, ge
 		pass
 	return interruptions
 
-def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTree):
+def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTree, logger):
 	# Manually constructs battery loadshapes for outage and reinserts into tree based on a proportional to kWh basis. 
 	gen_bus = mg_values['gen_bus']
 	# Do vector subtraction to figure out battery loadshapes. 
@@ -218,6 +219,7 @@ def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTre
 		all_loads_shapes_kw = np.sum(data,0)
 	else:
 		print("Error: No loads.")
+		logger.warning("Error: No loads.")
 		return dssTree, None, None, None, None, None
 
 	# Second, get all renewable generation.
@@ -611,12 +613,13 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 	fig.add_vline(x=end_time, line=outage_line_style)
 	offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
-def play(pathToDss, workDir, microgrids, faultedLine):
+def play(pathToDss, workDir, microgrids, faultedLine, logger):
 	# TODO: do we need non-default outage timing?
 	(outageStart, lengthOfOutage, switchingTime) = 60, 120, 30
 	outageEnd = outageStart + lengthOfOutage
 	actions = {}
 	print('CONTROLLING ON', microgrids)
+	logger.warning(f'CONTROLLING ON {microgrids}')
 	# microgridup.py changes our directory to the one containing the currently running analysis. This is to help opendss run. If we're running this function by itself, we need to chdir into the workDir argument.
 	curr_dir = os.getcwd()
 	workDir = os.path.abspath(workDir)
@@ -654,6 +657,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 				old_kw = this_load['kw']
 				this_load['kw'] = str(load_kw)
 				print(f'reduced {load_name} from {old_kw} to {load_kw}')
+				logger.warning(f'reduced {load_name} from {old_kw} to {load_kw}')
 			except:
 				pass
 		# Have all microgrids switch out of the circuit during fault.
@@ -694,6 +698,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 				gen_base_kv = float(gen_base_kv_str)
 			except:
 				print(f"HACK: no voltage detected for {vsource_ob_and_name} on {big_gen_bus} so falling back on default 4.16kv")
+				logger.warning(f"HACK: no voltage detected for {vsource_ob_and_name} on {big_gen_bus} so falling back on default 4.16kv")
 				gen_base_kv = 4.16
 			if phase_count == '3':
 				gen_base_kv = gen_base_kv * math.sqrt(3)
@@ -722,7 +727,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 		else:
 			manual_balance_approach = True
 		# Manually construct battery loadshapes for outage.
-		dssTree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw = do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTree)
+		dssTree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw = do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTree, logger)
 		# Manual Balance Approach plotting call.
 		if manual_balance_approach == True:
 			fname = plot_manual_balance_approach(mg_key, 2019, outageStart, outageEnd, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw)
@@ -777,7 +782,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 	except:
 		pass #TODO: better detection of missing control data.
 	make_chart(f'{FPREFIX}_source_and_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Generator Output", "Average Hourly kW", batt_cycle_chart=True, fossil_loading_chart=True, vsource_ratings=big_gen_ratings, rengen_mgs=rengen_mgs)
-	plot_inrush_data(pathToDss, microgrids, f'{FPREFIX}_inrush_plot.html', outageStart, outageEnd, vsourceRatings=big_gen_ratings)
+	plot_inrush_data(pathToDss, microgrids, f'{FPREFIX}_inrush_plot.html', outageStart, outageEnd, logger, vsourceRatings=big_gen_ratings)
 	# Write final output file.
 	output_slug = '''	
 		<head>
@@ -793,6 +798,7 @@ def play(pathToDss, workDir, microgrids, faultedLine):
 			<iframe src="timezcontrol_source_and_gen.csv_battery_cycles.plot.html"></iframe>
 		</body>'''
 	print(f'Control microgrids count {len(microgrids)} and renewable count {len(rengen_fnames)}')
+	logger.warning(f'Control microgrids count {len(microgrids)} and renewable count {len(rengen_fnames)}')
 	if len(microgrids) != len(rengen_fnames):
 		output_slug = output_slug + '''<iframe src="timezcontrol_source_and_gen.csv_fossil_loading.plot.html"></iframe>
 			<iframe src="timezcontrol_source_and_gen.csv_fuel_consumption.plot.html"></iframe>'''

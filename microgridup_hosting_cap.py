@@ -71,7 +71,7 @@ def get_gen_ob_from_reopt(REOPT_FOLDER):
 	# print("gen_sizes:",gen_sizes)
 	return gen_sizes #dictionary of all gen sizes
 
-def mg_phase_and_kv(BASE_NAME, microgrid, mg_name):
+def mg_phase_and_kv(BASE_NAME, microgrid, mg_name, logger):
 	'''Returns a dict with the phases at the gen_bus and kv 
 	of the loads for a given microgrid.
 	TODO: If needing to set connection type explicitly, could use this function to check that all "conn=" are the same (wye or empty for default, or delta)'''
@@ -90,6 +90,7 @@ def mg_phase_and_kv(BASE_NAME, microgrid, mg_name):
 		load_phases = []
 		load_phases = bus_name_list[-(len(bus_name_list)-1):]
 		print("load_phases on bus_name: phases", load_phases, "on bus", bus_name)
+		logger.warning(f"load_phases on bus_name: phases {load_phases} on bus {bus_name}")
 		for phase in load_phases:
 			if phase not in load_phase_list:
 				load_phase_list.append(phase)
@@ -101,6 +102,7 @@ def mg_phase_and_kv(BASE_NAME, microgrid, mg_name):
 	if len(gen_bus_kv_list) > 1:
 		gen_bus_kv_message = f'More than one load voltage is specified on microgrid {mg_name}. Check Oneline diagram to verify that phases and voltages of {mg_loads} are correctly supported by gen_bus {gen_bus_name}.\n'
 		print(gen_bus_kv_message)
+		logger.warning(gen_bus_kv_message)
 		if path.exists("user_warnings.txt"):
 			with open("user_warnings.txt", "r+") as myfile:
 				if gen_bus_kv_message not in myfile.read():
@@ -116,6 +118,7 @@ def mg_phase_and_kv(BASE_NAME, microgrid, mg_name):
 	if load_phase_list[0] == '0':
 		load_phase_list = load_phase_list[1:]
 		print("load_phase_list after removal of ground phase:", load_phase_list)
+		logger.warning("load_phase_list after removal of ground phase:", load_phase_list)
 	out_dict['phases'] = load_phase_list
 	# Kv selection method prior to January 2022:
 	# Choose the maximum voltage based upon the phases that are supported, assuming all phases in mg can be supported from gen_bus and that existing tranformers will handle any kv change
@@ -130,9 +133,10 @@ def mg_phase_and_kv(BASE_NAME, microgrid, mg_name):
 	# TODO: match up the calculated kv at the gen_bus with the appropriate line to neutral or line to line kv from voltagebases from the BASE_NAME dss file so that PU voltages compute accurately
 	out_dict['kv'] = gen_bus_kv
 	print('mg_phase_and_kv out_dict:', out_dict)
+	logger.warning('mg_phase_and_kv out_dict:', out_dict)
 	return out_dict
 	
-def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_name):
+def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_name, logger):
 	'''Create new generator objects and shapes. 
 	Returns a list of generator objects formatted for reading into openDSS tree.
 	SIDE EFFECTS: creates GEN_NAME generator shape
@@ -150,7 +154,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 	gen_bus_name = mg_ob['gen_bus']
 	gen_obs_existing = mg_ob['gen_obs_existing']
 	#print("microgrid:", microgrid)
-	phase_and_kv = mg_phase_and_kv(BASE_NAME, microgrid, mg_name)
+	phase_and_kv = mg_phase_and_kv(BASE_NAME, microgrid, mg_name, logger)
 	tree = dssConvert.dssToTree(BASE_NAME)
 	gen_map = {x.get('object',''):i for i, x in enumerate(tree)}\
 	# Build new solar gen objects and loadshapes
@@ -310,6 +314,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 				gen_df_builder[f'{gen_ob_existing}'] = pd.Series(np.zeros(8760))
 				warning_message = f'Pre-existing battery {gen_ob_existing} will not be utilized to support loads in microgrid {mg_name}.\n'
 				print(warning_message)
+				logger.warning(warning_message)
 				with open("user_warnings.txt", "a") as myfile:
 					myfile.write(warning_message)
 			# if only additional energy storage (kWh) is recommended, scale the existing battery shape to the % of kwh storage capacity of the existing battery
@@ -341,7 +346,7 @@ def gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_FINAL):
 	ref_df_builder['wind_ref_shape'] = pd.Series(reopt_final_out.get(f'powerWind1'))/wind_size_total
 	ref_df_builder.to_csv(REF_NAME, index=False)
 
-def mg_add_cost(outputCsvName, microgrid, mg_name, BASE_NAME):
+def mg_add_cost(outputCsvName, microgrid, mg_name, BASE_NAME, logger):
 	'''Returns a costed csv of all switches and other upgrades needed to allow the microgrid 
 	to operate in islanded mode to support critical loads
 	TO DO: When critical load list references actual load buses instead of kw ratings,
@@ -378,6 +383,7 @@ def mg_add_cost(outputCsvName, microgrid, mg_name, BASE_NAME):
 					writer.writerow([mg_name, load, "3-phase relay", THREE_PHASE_RELAY_COST])
 					three_phase_message = 'Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.\n'
 					print(three_phase_message)
+					logger.warning(three_phase_message)
 					if path.exists("user_warnings.txt"):
 						with open("user_warnings.txt", "r+") as myfile:
 							if three_phase_message not in myfile.read():
@@ -389,6 +395,7 @@ def mg_add_cost(outputCsvName, microgrid, mg_name, BASE_NAME):
 					writer.writerow([mg_name, load, "AMI disconnect meter", AMI_COST])
 					ami_message = 'Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.\n'
 					print(ami_message)
+					logger.warning(ami_message)
 					if path.exists("user_warnings.txt"):
 						with open("user_warnings.txt", "r+") as myfile:
 							if ami_message not in myfile.read():
@@ -652,13 +659,14 @@ def make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, 
 	# Write new DSS file.
 	dssConvert.treeToDss(tree, FULL_NAME)
 
-def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, ADD_COST_NAME):
+def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_name, max_crit_load, ADD_COST_NAME, logger):
 	''' Generate a report on each microgrid '''
 	with open(REOPT_FOLDER + inputName) as file:
 		reopt_out = json.load(file)
 	# reopt_out = json.load(open(REOPT_FOLDER + inputName))
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER)
 	print("microgrid_report_csv() gen_sizes into CSV report:", gen_sizes)
+	logger.warning("microgrid_report_csv() gen_sizes into CSV report:", gen_sizes)
 	solar_size_total = gen_sizes.get('solar_size_total')
 	solar_size_new = gen_sizes.get('solar_size_new')
 	solar_size_existing = gen_sizes.get('solar_size_existing')
@@ -1004,9 +1012,10 @@ def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_st
 		)
 	plotly.offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
-def gen_powerflow_results(CIRCUIT_FILE, YEAR, QSTS_STEPS):
+def gen_powerflow_results(CIRCUIT_FILE, YEAR, QSTS_STEPS, logger):
 	''' Generate full powerflow results on a given circuit. '''
 	print('QSTS with ', CIRCUIT_FILE, 'AND CWD IS ', os.getcwd())
+	logger.warning(f'QSTS with {CIRCUIT_FILE} AND CWD IS {os.getcwd()}')
 	opendss.newQstsPlot(CIRCUIT_FILE,
 		stepSizeInMinutes=60, 
 		numberOfSteps=QSTS_STEPS,
@@ -1021,13 +1030,13 @@ def gen_powerflow_results(CIRCUIT_FILE, YEAR, QSTS_STEPS):
 	except:
 		pass #TODO: better detection of missing control data.
 
-def run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, REF_NAME, LOAD_NAME, FULL_NAME, ADD_COST_NAME, max_crit_load):
-	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name)
+def run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, REF_NAME, LOAD_NAME, FULL_NAME, ADD_COST_NAME, max_crit_load, logger):
+	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, logger)
 	gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_FINAL)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, microgrid)
 	# Generate microgrid control hardware costs.
-	mg_add_cost(ADD_COST_NAME, microgrid, mg_name, BASE_NAME)
-	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME)
+	mg_add_cost(ADD_COST_NAME, microgrid, mg_name, BASE_NAME, logger)
+	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, logger)
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME)
 	return mg_list_of_dicts_full
 

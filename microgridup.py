@@ -16,11 +16,21 @@ import jinja2 as j2
 import datetime
 import traceback
 import sys
+import logging
 
 MGU_FOLDER = os.path.abspath(os.path.dirname(__file__))
 if MGU_FOLDER == '/':
 	MGU_FOLDER = '' #workaround for docker root installs
 PROJ_FOLDER = f'{MGU_FOLDER}/data/projects'
+
+def setup_logging(log_file):
+    logger = logging.getLogger('custom_logger')
+    logger.setLevel(logging.WARNING)
+    formatter = logging.Formatter('%(asctime)s - %(message)s')
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    return logger
 
 def _walkTree(dirName):
 	listOfFiles = []
@@ -222,6 +232,12 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 	# Create initial files.
 	if not os.path.isdir(MODEL_DIR):
 		os.mkdir(MODEL_DIR)
+	# Setup logging.
+	log_file = f'{MODEL_DIR}/logs.txt'
+	if os.path.exists(log_file):
+		open(log_file, 'w').close()
+	logger = setup_logging(log_file)
+	logger.warning(f'Logging status updates for {MODEL_DIR}.')
 	try:
 		shutil.copyfile(BASE_DSS, f'{MODEL_DIR}/{MODEL_DSS}')
 		shutil.copyfile(LOAD_CSV, f'{MODEL_DIR}/{MODEL_LOAD_CSV}')
@@ -234,12 +250,14 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 			pass
 	except:
 		print('Rerunning existing project. DSS and CSV files not moved.')
+		logger.warning('Rerunning existing project. DSS and CSV files not moved.')
 	if DELETE_FILES:
 		for fname in [BASE_DSS, LOAD_CSV]:
 			try:
 				os.remove(fname)
 			except:
 				print(f'failed to delete {fname}')
+				logger.warning(f'failed to delete {fname}')
 	# HACK: work in directory because we're very picky about the current dir.
 	curr_dir = os.getcwd()
 	workDir = os.path.abspath(MODEL_DIR)
@@ -271,9 +289,9 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		mgs_name_sorted = sorted(MICROGRIDS.keys())
 		for i, mg_name in enumerate(mgs_name_sorted):
 			BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
-			microgridup_design.run(MODEL_LOAD_CSV, MICROGRIDS[mg_name], mg_name, BASE_DSS, REOPT_INPUTS, f'reopt_final_{i}', INVALIDATE_CACHE)
+			microgridup_design.run(MODEL_LOAD_CSV, MICROGRIDS[mg_name], mg_name, BASE_DSS, REOPT_INPUTS, f'reopt_final_{i}', logger, INVALIDATE_CACHE)
 			max_crit_load = sum(MICROGRIDS[mg_name]['critical_load_kws'])
-			microgridup_hosting_cap.run(f'reopt_final_{i}', GEN_NAME, MICROGRIDS[mg_name], BASE_DSS, mg_name, REF_NAME, MODEL_LOAD_CSV, f'circuit_plusmg_{i}.dss', f'mg_add_cost_{i}.csv', max_crit_load)
+			microgridup_hosting_cap.run(f'reopt_final_{i}', GEN_NAME, MICROGRIDS[mg_name], BASE_DSS, mg_name, REF_NAME, MODEL_LOAD_CSV, f'circuit_plusmg_{i}.dss', f'mg_add_cost_{i}.csv', max_crit_load, logger)
 		# Make OMD of fully detailed system.
 		dssConvert.dssToOmd(f'circuit_plusmg_{i}.dss', OMD_NAME, RADIUS=0.0002)
 		# Draw the circuit oneline.
@@ -281,10 +299,10 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		# Draw the map.
 		geo.map_omd(OMD_NAME, MAP_NAME, open_browser=False)
 		# Powerflow outputs.
-		microgridup_hosting_cap.gen_powerflow_results(f'circuit_plusmg_{i}.dss', REOPT_INPUTS['year'], QSTS_STEPS)
+		microgridup_hosting_cap.gen_powerflow_results(f'circuit_plusmg_{i}.dss', REOPT_INPUTS['year'], QSTS_STEPS, logger)
 		# Perform control sim.
 		new_mg_for_control = {name:MICROGRIDS[name] for name in mgs_name_sorted[0:i+1]}
-		microgridup_control.play(f'circuit_plusmg_{i}.dss', os.getcwd(), new_mg_for_control, FAULTED_LINE)
+		microgridup_control.play(f'circuit_plusmg_{i}.dss', os.getcwd(), new_mg_for_control, FAULTED_LINE, logger)
 		# Resilience simulation with outages. Optional. Skipped if no OUTAGE_CSV
 		if OUTAGE_CSV:
 			all_microgrid_loads = [x.get('loads',[]) for x in MICROGRIDS.values()]
@@ -354,6 +372,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 			os.system(f'open {FINAL_REPORT}')
 	except Exception:
 		print(traceback.format_exc())
+		logger.warning(traceback.format_exc())
 		os.system(f'touch "{MODEL_DIR}/0crashed.txt"')
 	finally:
 		os.chdir(curr_dir)

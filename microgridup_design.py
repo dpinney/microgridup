@@ -10,7 +10,7 @@ if MGU_FOLDER == '/':
 	MGU_FOLDER = '' #workaround for docker root installs
 PROJ_FOLDER = f'{MGU_FOLDER}/data/projects'
 
-def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
+def set_critical_load_percent(LOAD_NAME, microgrid, mg_name, logger):
 	''' Set the critical load percent input for REopt by finding the ratio of max critical load kws to the max kw of the loadshape of that mg'''
 	load_df = pd.read_csv(LOAD_NAME)
 	mg_load_df = pd.DataFrame()
@@ -21,21 +21,24 @@ def set_critical_load_percent(LOAD_NAME, microgrid, mg_name):
 			mg_load_df['load'] = mg_load_df['load'] + load_df[load_name]
 		except:
 			print('ERROR: loads in Load Data (.csv) do not match loads in circuit.')
+			logger.warning('ERROR: loads in Load Data (.csv) do not match loads in circuit.')
 	max_load = float(mg_load_df.max())
 	# add up all max kws from critical loads to support during an outage
 	max_crit_load = sum(microgrid['critical_load_kws'])
 	if max_crit_load > max_load:
 		warning_message = f'The critical loads specified for microgrid {mg_name} are larger than the max kw of the total loadshape.\n'
 		print(warning_message)
+		logger.warn(warning_message)
 		with open("user_warnings.txt", "a") as myfile:
 			myfile.write(warning_message)
 	critical_load_percent = max_crit_load/max_load
 	if critical_load_percent > 2:
 		print(f'This critical load percent of {critical_load_percent} is over 2.0, the maximum allowed. Setting critical load percent to 2.0.\n')
+		logger.warn(f'This critical load percent of {critical_load_percent} is over 2.0, the maximum allowed. Setting critical load percent to 2.0.\n')
 		critical_load_percent = 2.0
 	return critical_load_percent, max_crit_load
 
-def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid, critical_load_percent, INVALIDATE_CACHE=False):
+def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgrid, critical_load_percent, logger, INVALIDATE_CACHE=False):
 	''' Generate the microgrid specs with REOpt.
 	SIDE-EFFECTS: generates REOPT_FOLDER'''
 	with open(LOAD_NAME, "r") as file:
@@ -49,8 +52,11 @@ def reopt_gen_mg_specs(BASE_NAME, LOAD_NAME, REOPT_INPUTS, REOPT_FOLDER, microgr
 	if os.path.isdir(REOPT_FOLDER) and INVALIDATE_CACHE == False:
 		# Cached results detected, user does not want to invalidate them, exit.
 		print('**************************************************')
+		logger.warning('**************************************************')
 		print(f'** Using cached REopt results for {REOPT_FOLDER} **')
+		logger.warning(f'** Using cached REopt results for {REOPT_FOLDER} **')
 		print('**************************************************')
+		logger.warning('**************************************************')
 		return None
 	import omf.models
 	shutil.rmtree(REOPT_FOLDER, ignore_errors=True)
@@ -264,10 +270,10 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	with open(outputPath, 'w') as outFile:
 		outFile.write(mgd)
 
-def run(LOAD_FILE_PATH, MICROGRID_DICT, MG_NAME, DSS_FILE_PATH, REOPT_INPUTS, REOPT_FOLDER_FINAL, INVALIDATE_CACHE=False):
+def run(LOAD_FILE_PATH, MICROGRID_DICT, MG_NAME, DSS_FILE_PATH, REOPT_INPUTS, REOPT_FOLDER_FINAL, logger, INVALIDATE_CACHE=False):
 	''' Generate full microgrid design for given microgrid spec dictionary and circuit file (used to gather distribution assets).'''
-	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_FILE_PATH, MICROGRID_DICT, MG_NAME)
-	reopt_gen_mg_specs(DSS_FILE_PATH, LOAD_FILE_PATH, REOPT_INPUTS, REOPT_FOLDER_FINAL, MICROGRID_DICT, critical_load_percent, INVALIDATE_CACHE)
+	critical_load_percent, max_crit_load = set_critical_load_percent(LOAD_FILE_PATH, MICROGRID_DICT, MG_NAME, logger)
+	reopt_gen_mg_specs(DSS_FILE_PATH, LOAD_FILE_PATH, REOPT_INPUTS, REOPT_FOLDER_FINAL, MICROGRID_DICT, critical_load_percent, logger, INVALIDATE_CACHE)
 	microgrid_design_output(f'{REOPT_FOLDER_FINAL}/allOutputData.json', f'{REOPT_FOLDER_FINAL}/allInputData.json', f'{REOPT_FOLDER_FINAL}/cleanMicrogridDesign.html')
 
 def _tests():

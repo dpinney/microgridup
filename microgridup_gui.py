@@ -39,6 +39,17 @@ def verify_password(username, password):
 			return username
 	else:
 		return username
+	
+@app.route('/get_logs/<model_name>')
+def get_logs(model_name):
+    # Read the logs from the corresponding log file.
+    log_file = os.path.join('data/projects', model_name, 'logs.txt')
+    if os.path.exists(log_file):
+        with open(log_file, 'r') as file:
+            logs = file.readlines()
+    else:
+        logs = []
+    return jsonify({"logs": logs})
 
 def list_projects():
 	projects = [x for x in os.listdir(_projectDir) if os.path.isdir(f'{_projectDir}/{x}')]

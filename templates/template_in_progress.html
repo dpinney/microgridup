@@ -211,7 +211,7 @@
                 border-radius: 4px;
                 margin: 4px 2px 4px 2px;
             }
-            #holder {
+            .holder {
                 width: 93%;
                 margin-left: 4%;
             }
@@ -232,10 +232,14 @@
             </nav>
         </header>
         <main>
-            <div id="container">
-                <h2><em>Model Running. Please reload to check for completion.</em></h2>
+            <h2><em>Model Running. Please reload to check for completion.</em></h2>
+            <div class="container">
+                <h3>Logs</h3>
+                <div class="holder" id="logs-container"></div>
+            </div>
+            <div class="container">
                 <h3>Input Data</h3>
-                <div id="holder">
+                <div class="holder">
                     {% for k,v in in_data.items() %}
                         {% if v is mapping %}
                             {% for key,value in v.items() %}
@@ -257,5 +261,27 @@
                 </div>
             </div>
         </main>
+        <script>
+        // Function to fetch logs from the server and update the page.
+        function fetchLogs(modelName) {
+            fetch(`/get_logs/${modelName}`)
+                .then(response => response.json())
+                .then(data => {
+                    const logContainer = document.getElementById('logs-container');
+                    logContainer.innerHTML = data.logs.join('<br>');
+                })
+                .catch(error => console.error('Error fetching logs:', error));
+        }
+        // Function to update logs periodically.
+        function updateLogsPeriodically(modelName) {
+            fetchLogs(modelName);
+            setTimeout(() => updateLogsPeriodically(modelName), 5000); // Fetch logs every 5 seconds.
+        }
+        // Start fetching logs when the page loads.
+        window.onload = function () {
+            const modelName = "{{model_name}}";
+            updateLogsPeriodically(modelName);
+        };
+        </script>
     </body>
 </html>

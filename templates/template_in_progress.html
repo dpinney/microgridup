@@ -218,6 +218,14 @@
             h2, h3 {
                 margin-left: 4%;
             }
+            /* Spinner */
+            .header-container {
+                display: flex;
+                align-items: center;
+            }
+            .spinner-container {
+                margin-left: 10px;
+            }
         </style>
     </head>
     <body>
@@ -232,7 +240,12 @@
             </nav>
         </header>
         <main>
-            <h2><em>Model Running. Please reload to check for completion.</em></h2>
+            <div class="header-container">
+                <h2><em>Model Running. Please reload to check for completion.</em></h2>
+                <div class="spinner-container">
+                    <svg width="24" height="24" stroke="#000" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_V8m1{transform-origin:center;animation:spinner_zKoa 2s linear infinite}.spinner_V8m1 circle{stroke-linecap:round;animation:spinner_YpZS 1.5s ease-in-out infinite}@keyframes spinner_zKoa{100%{transform:rotate(360deg)}}@keyframes spinner_YpZS{0%{stroke-dasharray:0 150;stroke-dashoffset:0}47.5%{stroke-dasharray:42 150;stroke-dashoffset:-16}95%,100%{stroke-dasharray:42 150;stroke-dashoffset:-59}}</style><g class="spinner_V8m1"><circle cx="12" cy="12" r="9.5" fill="none" stroke-width="3"></circle></g></svg>
+                </div>
+            </div>
             <div class="container">
                 <h3>Logs</h3>
                 <div class="holder" id="logs-container"></div>
@@ -263,8 +276,8 @@
         </main>
         <script>
         // Function to fetch logs from the server and update the page.
-        function fetchLogs(modelName) {
-            fetch(`/get_logs/${modelName}`)
+        function fetchLogs(model_name) {
+            fetch(`/get_logs/${model_name}`)
                 .then(response => response.json())
                 .then(data => {
                     const logContainer = document.getElementById('logs-container');
@@ -273,15 +286,45 @@
                 .catch(error => console.error('Error fetching logs:', error));
         }
         // Function to update logs periodically.
-        function updateLogsPeriodically(modelName) {
-            fetchLogs(modelName);
-            setTimeout(() => updateLogsPeriodically(modelName), 5000); // Fetch logs every 5 seconds.
+        function updateLogsPeriodically(model_name) {
+            fetchLogs(model_name);
+            setTimeout(() => updateLogsPeriodically(model_name), 5000); // Fetch logs every 5 seconds.
         }
         // Start fetching logs when the page loads.
         window.onload = function () {
-            const modelName = "{{model_name}}";
-            updateLogsPeriodically(modelName);
+            const model_name = "{{model_name}}";
+            updateLogsPeriodically(model_name);
         };
+
+        function checkStatus() {
+            const model_name = "{{model_name}}";
+            const checkStatusUrl = `/check_status/${model_name}`;
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', checkStatusUrl, true);
+            // Event listener to process the response.
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const data = JSON.parse(xhr.responseText);
+                    if (data.status === 'complete') {
+                        window.location.href = data.url; // Redirect to 'output_final.html'.
+                    } else {
+                        setTimeout(checkStatus, 5000); // Check again after 5 seconds.
+                    }
+                } else {
+                    console.log('Error:', xhr.status);
+                }
+            };
+            // Handle network errors.
+            xhr.onerror = function () {
+                console.log('Network Error.');
+            };
+            // Send the request.
+            xhr.send();
+        }
+        // Start checking status when the page loads.
+        document.addEventListener('DOMContentLoaded', function () {
+            checkStatus();
+        });
         </script>
     </body>
 </html>

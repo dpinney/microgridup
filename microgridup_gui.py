@@ -94,6 +94,15 @@ def load(project):
 		return redirect(f'/data/projects/{project}/output_final.html')
 	else:
 		return 'Model is in an inconsistent state. Please delete and recreate.'
+	
+@app.route('/check_status/<project>')
+def check_status(project):
+    '''Used by template_in_progress.html to redirect to output_final.html once it exists.'''
+    files = os.listdir(f'{_projectDir}/{project}')
+    if 'output_final.html' in files and '0running.txt' not in files:
+        return jsonify(status='complete', url=f'/data/projects/{project}/output_final.html')
+    else:
+        return jsonify(status='in_progress')
 
 @app.route('/edit/<project>')
 def edit(project):

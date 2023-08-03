@@ -666,7 +666,7 @@ def microgrid_report_csv(inputName, outputCsvName, REOPT_FOLDER, microgrid, mg_n
 	# reopt_out = json.load(open(REOPT_FOLDER + inputName))
 	gen_sizes = get_gen_ob_from_reopt(REOPT_FOLDER)
 	print("microgrid_report_csv() gen_sizes into CSV report:", gen_sizes)
-	logger.warning("microgrid_report_csv() gen_sizes into CSV report:", gen_sizes)
+	logger.warning(f"microgrid_report_csv() gen_sizes into CSV report: {gen_sizes}")
 	solar_size_total = gen_sizes.get('solar_size_total')
 	solar_size_new = gen_sizes.get('solar_size_new')
 	solar_size_existing = gen_sizes.get('solar_size_existing')

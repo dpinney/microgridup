@@ -80,16 +80,16 @@ def rfile(project, filename):
 @app.route('/load/<project>')
 def load(project):
 	ana_files = os.listdir(f'{_projectDir}/{project}')
-	if '0crashed.txt' in ana_files:
-		return 'Model Crashed. Please delete and recreate.'
-	elif '0running.txt' in ana_files:
-		input_data_path = os.path.join(_projectDir, project, 'allInputData.json')
-		if os.path.exists(input_data_path):
-			with open(input_data_path) as json_file:
-				data = json.load(json_file)
-				return render_template('template_in_progress.html', model_name=project, in_data=data)
-		else:
-			return 'Model Running. Please reload to check for completion.'
+	input_data_path = os.path.join(_projectDir, project, 'allInputData.json')
+	if os.path.exists(input_data_path):
+		with open(input_data_path) as json_file:
+			data = json.load(json_file)
+	else:
+		print('Error: Input data failed to save.')
+	if '0running.txt' in ana_files:
+		return render_template('template_in_progress.html', model_name=project, in_data=data, crashed=False)
+	elif '0crashed.txt' in ana_files:
+		return render_template('template_in_progress.html', model_name=project, in_data=data, crashed=True)
 	elif 'output_final.html' in ana_files:
 		return redirect(f'/data/projects/{project}/output_final.html')
 	else:
@@ -97,12 +97,14 @@ def load(project):
 	
 @app.route('/check_status/<project>')
 def check_status(project):
-    '''Used by template_in_progress.html to redirect to output_final.html once it exists.'''
-    files = os.listdir(f'{_projectDir}/{project}')
-    if 'output_final.html' in files and '0running.txt' not in files:
-        return jsonify(status='complete', url=f'/data/projects/{project}/output_final.html')
-    else:
-        return jsonify(status='in_progress')
+	'''Used by template_in_progress.html to redirect to output_final.html once it exists.'''
+	files = os.listdir(f'{_projectDir}/{project}')
+	if 'output_final.html' in files and '0running.txt' not in files:
+		return jsonify(status='complete', url=f'/data/projects/{project}/output_final.html')
+	elif '0crashed.txt' in files:
+		return jsonify(status='crashed')
+	else:
+	    return jsonify(status='in_progress')
 
 @app.route('/edit/<project>')
 def edit(project):

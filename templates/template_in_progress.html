@@ -226,6 +226,25 @@
             .spinner-container {
                 margin-left: 10px;
             }
+            /* Buttons */
+            .button {
+                width:auto;
+                padding: 9px;
+                margin-right:5px;
+                font-size:small;
+                background:seagreen;
+                -webkit-border-radius: 5px;
+                -moz-border-radius: 5px;
+                border-radius: 5px;
+                border: none;
+                color: white;
+                cursor:pointer;
+                text-decoration: none;
+            }
+            .button-container {
+                width: 93%;
+                margin-left: 4%;
+            }
         </style>
     </head>
     <body>
@@ -235,16 +254,20 @@
                     <a href="/">
                         <span class="span--sectionTitle">MicrogridUp &raquo; {{model_name}} &raquo;</span>
                     </a>
-                    <span class="span--sectionTitle">In Progress</span>
+                    <span id="span--sectionTitle" class="span--sectionTitle">In Progress</span>
                 </div>
             </nav>
         </header>
         <main>
             <div class="header-container">
-                <h2><em>Model Running. Please reload to check for completion.</em></h2>
+                <h2 id="header-text"><em>Model Running. Please reload to check for completion.</em></h2>
                 <div class="spinner-container">
                     <svg width="24" height="24" stroke="#000" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_V8m1{transform-origin:center;animation:spinner_zKoa 2s linear infinite}.spinner_V8m1 circle{stroke-linecap:round;animation:spinner_YpZS 1.5s ease-in-out infinite}@keyframes spinner_zKoa{100%{transform:rotate(360deg)}}@keyframes spinner_YpZS{0%{stroke-dasharray:0 150;stroke-dashoffset:0}47.5%{stroke-dasharray:42 150;stroke-dashoffset:-16}95%,100%{stroke-dasharray:42 150;stroke-dashoffset:-59}}</style><g class="spinner_V8m1"><circle cx="12" cy="12" r="9.5" fill="none" stroke-width="3"></circle></g></svg>
                 </div>
+            </div>
+            <div class="button-container" hidden>
+                <a class="button" href='../edit/{{model_name}}'>Edit Model</a>
+                <a class="button" href='../delete/{{model_name}}' onclick='return confirmDelete(event)'>Delete Model</a>
             </div>
             <div class="container">
                 <h3>Logs</h3>
@@ -290,11 +313,6 @@
             fetchLogs(model_name);
             setTimeout(() => updateLogsPeriodically(model_name), 5000); // Fetch logs every 5 seconds.
         }
-        // Start fetching logs when the page loads.
-        window.onload = function () {
-            const model_name = "{{model_name}}";
-            updateLogsPeriodically(model_name);
-        };
 
         function checkStatus() {
             const model_name = "{{model_name}}";
@@ -307,6 +325,8 @@
                     const data = JSON.parse(xhr.responseText);
                     if (data.status === 'complete') {
                         window.location.href = data.url; // Redirect to 'output_final.html'.
+                    } else if (data.status === 'crashed') {
+                        modelCrashed();
                     } else {
                         setTimeout(checkStatus, 5000); // Check again after 5 seconds.
                     }
@@ -321,10 +341,36 @@
             // Send the request.
             xhr.send();
         }
-        // Start checking status when the page loads.
-        document.addEventListener('DOMContentLoaded', function () {
-            checkStatus();
-        });
+        function modelCrashed() {
+            document.querySelector('.spinner-container').style.display = 'none';
+            document.querySelector('.button-container').style.display = 'block';
+            var newHeaderText = 'Model crashed. Please see logs for details.';
+            document.getElementById('header-text').textContent = newHeaderText;
+            var newStatusText = 'Model Crashed';
+            document.getElementById('span--sectionTitle').textContent = newStatusText;
+        }
+
+        function confirmDelete(event) {
+            var confirmed = confirm("Are you sure you want to delete?");
+            if (!confirmed) {
+                event.preventDefault();
+            }
+        }
+        
+        window.onload = function () {
+            // Adjust content if model has already crashed. Fetch logs once.
+            var crashed = {% if crashed %}true{% else %}false{% endif %};
+            const model_name = "{{model_name}}";
+            if (crashed) {
+                modelCrashed();
+                fetchLogs(model_name);
+            } else {
+                // Start fetching logs when the page loads.
+                updateLogsPeriodically(model_name);
+                // Start checking run status when the page loads.
+                checkStatus();
+            }
+        };
         </script>
     </body>
 </html>

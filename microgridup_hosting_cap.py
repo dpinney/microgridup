@@ -7,6 +7,7 @@ from omf.solvers.opendss import dssConvert
 from omf.solvers import opendss
 import plotly
 import datetime
+import microgridup
 
 def _getByName(tree, name):
 	''' Return first object with name in tree as an OrderedDict. '''
@@ -1060,6 +1061,7 @@ def _tests():
 	if curr_dir != workDir:
 		os.chdir(workDir)
 	microgrids = control_test_args[_dir]
+	logger = microgridup.setup_logging(f'{MGU_FOLDER}/logs.txt')
 	# As many tests per directory as there are microgrids/REopt API calls per directory.
 	for run_count in range(len(microgrids)):
 		REOPT_FOLDER_FINAL = f'reopt_final_{run_count}'
@@ -1072,7 +1074,7 @@ def _tests():
 		FULL_NAME = f'circuit_plusmg_{run_count}.dss'
 		ADD_COST_NAME = f'mg_add_cost_{run_count}.csv'
 		max_crit_load = max_crit_loads[_dir][f'mg{run_count}']
-		run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, REF_NAME, LOAD_NAME, FULL_NAME, ADD_COST_NAME, max_crit_load)
+		run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, REF_NAME, LOAD_NAME, FULL_NAME, ADD_COST_NAME, max_crit_load, logger)
 	os.chdir(curr_dir)
 	return
 

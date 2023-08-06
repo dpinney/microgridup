@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 import pandas as pd
 from omf.solvers.opendss import dssConvert
 from omf.models.__neoMetaModel__ import csvValidateAndLoad
+import microgridup
 
 MGU_FOLDER = os.path.abspath(os.path.dirname(__file__))
 if MGU_FOLDER == '/':
@@ -291,15 +292,17 @@ def _tests():
 	if curr_dir != workDir:
 		os.chdir(workDir)
 	microgrids = control_test_args[_dir]
+	logger = microgridup.setup_logging(f'{MGU_FOLDER}/logs.txt')
+	print(f'----------Testing {_dir}----------')
 	for run_count in range(len(microgrids)):
 		LOAD_NAME = 'loads.csv'
 		microgrid = microgrids[f'mg{run_count}']
 		mg_name = f'mg{run_count}'
 		BASE_NAME = 'circuit.dss' if run_count == 0 else f'circuit_plusmg_{run_count - 1}.dss'
 		REOPT_FOLDER_FINAL = f'reopt_final_{run_count}'
-		run(LOAD_NAME, microgrid, mg_name, BASE_NAME, REOPT_INPUTS, REOPT_FOLDER_FINAL)
+		run(LOAD_NAME, microgrid, mg_name, BASE_NAME, REOPT_INPUTS, REOPT_FOLDER_FINAL, logger)
 	os.chdir(curr_dir)
-	return
+	print('Ran all tests for microgridup_design.py.')
 
 if __name__ == '__main__':
 	_tests()

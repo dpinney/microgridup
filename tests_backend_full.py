@@ -72,6 +72,8 @@ def test_1mg():
 	}
 	# Run model.
 	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
+	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
+		sys.exit(1)
 
 def test_2mg():
 	# Input data.
@@ -147,6 +149,8 @@ def test_2mg():
 	}
 	# Run model.
 	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True)
+	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
+		sys.exit(1)
 
 def test_3mg():
 	# Input data.
@@ -229,6 +233,8 @@ def test_3mg():
 	}
 	# Run model.
 	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True)
+	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
+		sys.exit(1)
 
 def test_4mg():
 	# Input data.
@@ -320,6 +326,8 @@ def test_4mg():
 	}
 	# Run model.
 	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
+	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
+		sys.exit(1)
 
 def test_auto3mg():
 	# Input data.
@@ -407,6 +415,8 @@ def test_auto3mg():
 	# }
 	# Run model.
 	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
+	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
+		sys.exit(1)
 
 if __name__ == '__main__':
 	test_1mg()

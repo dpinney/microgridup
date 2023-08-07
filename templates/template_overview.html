@@ -66,28 +66,6 @@
                 <!-- <pre>{{now}}</pre> -->
             </div>
             <div class="over_block">
-                <h3>Model Inputs</h3>
-                {% for k,v in inputs.items() %}
-                    {% if v is mapping %}
-                        {% for key,value in v.items() %}
-                            {% if value is mapping %}
-                                <br>
-                                <div class="chunk"><em>{{key}}: </em>
-                                {% for _key,_value in value.items() %}
-                                    <li><em>{{_key}}: </em>{{_value}}</li>
-                                {% endfor %}
-                                </div>
-                            {% else %}
-                                <div class="chunk"><em>{{key}}: </em>{{value}}</div>
-                            {% endif %}
-                        {% endfor %}    
-                    {% else %}
-                        <div class="chunk"><em>{{k}}: </em>{{v}}</div>
-                    {% endif %}
-                {% endfor %}
-                <!-- <pre>{{inputs}}</pre> -->
-            </div>
-            <div class="over_block">
                 <h3>User Warnings</h3>
                 <pre>{{warnings}}</pre>
             </div>

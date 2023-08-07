@@ -4,6 +4,9 @@
 	<title>MicrogridUP &raquo; New</title>
 	<script src="https://kit.fontawesome.com/92028f16c4.js" crossorigin="anonymous"></script>
 	<style type="text/css">
+        :root {
+            --topNavHeight: 64px;
+        }
 		body {
 			margin-top: 0px;
 			margin-left:0;
@@ -176,502 +179,566 @@
 			0%,100% { opacity: 1; }
 			50% { opacity: 0; }
 		}
+        header {
+            height: var(--topNavHeight);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1;
+        }
+        header span {
+            color: white;
+        }
+        main {
+            height: calc(100% - var(--topNavHeight));
+            {% if not iframe_mode %}
+            padding: var(--topNavHeight) 0px 0px 0px;
+            {% endif %}
+        }
+        span.span--sectionTitle {
+            font-family: sans-serif;
+            font-size: 2rem;
+            padding-left: 1rem;
+        }
+        div > span.span--sectionTitle:nth-child(2) {
+            padding-left: .5rem;
+        }
+        /* TOP NAV */
+        nav.js-nav--topNav {
+            background: black;
+            display: flex;
+            height: 100%;
+        }
+        /* TOP NAV ANCHORS */
+        nav.js-nav--topNav a {
+            text-decoration: none;
+        }
+        /* TOP NAV BUTTONS */
+        nav.js-nav--topNav button {
+            border: 0;
+            background-color: transparent;
+            cursor: pointer;
+            padding: 14px;
+            width: var(--topNavHeight);
+        }
+        nav.js-nav--topNav button:hover {
+            background-color: gray;
+            transition: background-color 0.2s ease-out;
+        }
+        /* TOP NAV SPANS */
+        nav.js-nav--topNav div {
+            align-items: center;
+            display: flex;
+        }
+        /* TOP NAV SVGS */
+        nav.js-nav--topNav svg {
+            fill: white;
+        }
 	</style>
 </head>
 <body>
     {% if not iframe_mode %}
-	<div style="height:40px; width:100%; background:black; line-height:40px; padding-left:10px;">
-		<p style="color:white; margin:0px"><a style="color:white; text-decoration:none" href="/"><b>MicrogridUP</b></a> &raquo; New</p>
-	</div>
+    <header>
+        <nav class="js-nav--topNav">
+            <div>
+                <a href="/">
+                    <span class="span--sectionTitle">MicrogridUp &raquo; New</span>
+                </a>
+            </div>
+        </nav>
+    </header>
     {% endif %}
-	<div id='introInfo' class='step'>
-		<h3>Step 1: Input model information</h3>
-		<form id="modelInfoForm" enctype="multipart/form-data">
-			<h5>Site and Energy Provider</h5>
-			<div class="chunk">
-				<label class="tooltip" for="MODEL_DIR">Model Name<span class="classic">Model names must be entirely lowercase.</span></label>
-				<input type="text" name="MODEL_DIR" value="{{in_data.MODEL_DIR}}" pattern="[a-z0-9_\-]+" required/>
-			</div>
-			<div class="chunk">
-				<label class="tooltip" for="latitude">Latitude<span class="classic">Specify the latitude of the load/grid.</span></label>
-				<input type="text" name="latitude" pattern="-?\d+\.?\d*" value="39.7817"/>
-			</div>
-			<div class="chunk">
-				<label class="tooltip" for="longitude">Longitude<span class="classic">Specify the longitude of the load/grid.</span></label>
-				<input type="text" name="longitude" pattern="-?\d+\.?\d*" value="-89.6501"/>
-			</div>
-			<div class="chunk">
-				<label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">TO DO: FILL TOOLTIP</span></label>
-				<input type="text" name="QSTS_STEPS" value="{{in_data.QSTS_STEPS}}" />
-			</div>
-			<div class="chunk">
-				<label class="tooltip" for="INVALIDATE_CACHE">Invalidate Cache<span class="classic">Cache from previous run (if applicable) is cleared when selected.</span></label>
-				<input type="checkbox" name="INVALIDATE_CACHE" value="True" {% if in_data.INVALIDATE_CACHE == "True" %}checked{% endif %}/>
-				<input type="hidden" name="INVALIDATE_CACHE" value="False">
-			</div>
-			<br>
-			<div class="chunk">
-				<label class="tooltip" for="DESCRIPTION">Description<span class="classic">Include an optional description of the project. Max 140 characters.</span></label>
-				<textarea id="DESCRIPTION" name="DESCRIPTION" rows="1" cols="30"></textarea>
-				<p id="characterCount" style="display:inline">0 / 140</p>
-			</div>
-			<div>
-				<i class="fa fa-plus-square"></i>
-				<a href="javascript:void(0)" class="toggle show">Optional inputs</a>
-				<div style="display:none">
-					<div class="chunk">
-						<label class="tooltip" for="energyCost">Energy Cost ($/kWh)<span class="classic">Specify the energy cost in $/kWh. Format 0.XX</span></label>
-						<input type="text" name="energyCost" value="0.12" pattern="^\d+\.?\d*?$"/>
-					</div>
-					<div class="chunk">
-						<label class="tooltip" for="wholesaleCost">Wholesale Cost ($/kWh)<span class="classic">Specify wholesale price for selling excess electricity back to the grid operator. Format 0.XX</span></label>
-						<input type="text" name="wholesaleCost" value="0.034" pattern="^\d+\.?\d*?$"/>
-					</div>
-					<div class="chunk">
-						<label class="tooltip" for="demandCost">Demand Cost ($/kW)<span class="classic">Specify the demand cost in $/kW. Format 0.XX</span></label>
-						<input type="text" name="demandCost" value="20" pattern="^\d+\.?\d*?$"/>
-					</div>
-					<div class="chunk">
-						<label class="tooltip" for="solarCanCurtail">DG Can Curtail<span class="classic">Allows for excess distributed generation to be automatically curtailed.</span></label>
-						<select id="solarCanCurtail" name="solarCanCurtail">
-							<option selected value="true">Yes</option>
-							<option value="false">No</option>
-						</select>
-					</div>
-					<div class="chunk">
-						<label class="tooltip" for="solarCanExport">DG Can Export<span class="classic">Allows for excess distributed generation to be sold back to the grid.</span></label>
-						<select id="solarCanExport" name="solarCanExport">
-							<option selected value="true">Yes</option>
-							<option value="false">No</option>
-						</select>
-					</div>
-					<div class="chunk">
-						<label class="tooltip" for="urdbLabelSwitch">Use URDB Rate?<span class="classic">Utilizing a rate from the Utility Rate Database overrides Cost of Energy and Cost of Demand rates above. See https://openei.org/services/<br>doc/rest/util_rates/</span></label>
-						<select id="urdbLabelSwitch" name="urdbLabelSwitch">
-							<option value="on">Yes</option>
-							<option selected value="off">No</option>
-						</select>
-					</div>
-					<div class="chunk">
-						<label class="tooltip" for="urdbLabel">URDB Label<span class="classic">Input the string found at the end of the URDB Rate URL, For example https://openei.org/apps/<br>IURDB/rate/view/<br> 5b75cfe95457a3454faf0aea <br> would yield "5b75cfe95457a3454faf0aea"</span></label>
-						<input type="text" name="urdbLabel" value="5b75cfe95457a3454faf0aea" />
-					</div>
-				</div>
-			</div>
-			<h5>Load Profile</h5>
-			<div class="chunk">
-				{% if in_data.get('LOAD_CSV') %}
-					<label class="tooltip" for="LOAD_CSV_NAME">Load Data (.csv)<span class="classic">Please enter the name of a .csv file representing the hourly load shape.</span></label>
-					<input type="text" name="LOAD_CSV_NAME" value="{{ in_data.get('LOAD_CSV') }}" class="file-input" readonly>
-					<button type="button" class="remove-btn">Remove File</button>
-				{% else %}
-					<label class="tooltip" for="LOAD_CSV">Load Data (.csv)<span class="classic">Please enter the name of a .csv file representing the hourly load shape.</span></label>
-				  	<input type="file" name="LOAD_CSV" class="file-input">
-				  	<button type="button" class="remove-btn">Remove File</button>
-				{% endif %}
-			</div>				
-			<div class="chunk">
-				<label class="tooltip" for="criticalLoadFactor">Critical Load Factor (% as decimal)<span class="classic">Please enter a number 0-1 for the fraction of total typical load that must be met during a grid outage. Format 0.XX</span></label>
-				<input type="text" name="criticalLoadFactor" value="1" step="0.01" min="0.0" max="1.0"/>
-			</div>
-			<div class="chunk">
-				<label class="tooltip" for="year">Year<span class="classic">Specify the year to which the load shape values correspond.</span></label>
-				<input type="text" name="year" value="2017" pattern="^\d{4}$"/>
-			</div>
-			<div>
-				<i class="fa fa-plus-square"></i>
-				<a href="javascript:void(0)" class="toggle show">Optional inputs</a>
-				<div style="display:none">
-					<div class="chunk">
-						<label class="tooltip" for="analysisYears">Analysis Period (years)<span class="classic">Specify the length of financial analysis in years.</span></label>
-						<input type="text" name="analysisYears" value="25" step="1" min="2" max="75"/>
-					</div>
-				</div>		
-			</div>
-			<h5>Resilience</h5>
-			<div class="chunk">
-				<label class="tooltip" for="FAULTED_LINE">Outage Location(s)<span class="classic">TO DO: FILL TOOLTIP</span></label>
-				<input type="text" name="FAULTED_LINE" value="{{in_data.FAULTED_LINE}}" />
-			</div>
-			<div class="chunk">
-				<label class="tooltip" for="outageDuration">Outage Duration (hours)<span class="classic">The added major outage is given this duration.</span></label>
-				<input type="text" name="outageDuration" value="48" min="1" max="8760"/>
-			</div>
-			<div class="chunk">
-				<label for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)</label>
-				<input type="file" name="HISTORICAL_OUTAGES" class="file-input" data-uploaded="{{ in_data.get('HISTORICAL_OUTAGES') }}">
-				<button type="button" class="remove-btn">Remove File</button>
-			  </div>
-			<div>
-				<i class="fa fa-plus-square"></i>
-				<a href="javascript:void(0)" class="toggle show">Optional inputs</a>
-				<div style="display:none;">
-					<div class="chunk">
-						<label class="tooltip" for="DIESEL_SAFETY_FACTOR">Fossil Safety Margin (%)<span class="classic">TO DO: FILL TOOLTIP</span></label>
-						<input type="text" name="DIESEL_SAFETY_FACTOR" value="{{in_data.DIESEL_SAFETY_FACTOR}}" />
-					</div>
-					<div class="chunk">
-						<label class="tooltip" for="FOSSIL_BACKUP_PERCENT">Allowed Fossil (% as decimal)<span class="classic">TO DO: FILL TOOLTIP</span></label>
-						<input type="text" name="FOSSIL_BACKUP_PERCENT" value="{{in_data.FOSSIL_BACKUP_PERCENT}}" />
-					</div>
-					<div class="chunk">
-						<label class="tooltip" for="outage_start_hour">Outage Start Hour<span class="classic">A major outage is added starting at this hour. Specify an hour greater than 0 but less than 8760 to trigger optimization for resilience and include fossil generation. If 0 is entered, the model will run an economic optimization without fossil generation.</span></label>
-						<input type="text" name="outage_start_hour" value="500" min="0" max="8760"/>
-					</div>
-					<div class="chunk">
-						<label class="tooltip" for="userCriticalLoadShape">User-supplied Critical Load Shape (.csv)?<span class="classic">Check "Yes" if user uploads Optional Critical Load Shape (.csv). Else, indicate "Critical Load Factor"</span></label>
-						<select id="userCriticalLoadShape" name="userCriticalLoadShape">
-							<option value="true">Yes</option>
-							<option selected value="false">No</option>
-						</select>
-					</div>
-					<div class="chunk">
-						<label class="tooltip" for="criticalLoadShapeFile">Optional Critical Load Shape (.csv)<span class="classic">Optional: Please enter the name of a .csv file representing the hourly critical load shape. Number of columns much match LoadShape file. Overrides "Critical Load Factor" if present.</span></label>
-						<input type="file" name="criticalLoadShapeFile" class="file-input" data-uploaded="{{ in_data.get('criticalLoadShapeFile') }}">
-						<button type="button" class="remove-btn">Remove File</button>
-					  </div>
-					<div>
-				</div>
-			</div>
-			<h5>Financial</h5>
-			<div class="chunk">
-				<label class="tooltip" for="value_of_lost_load">Value of Lost Load ($/kWh)<span class="classic">Specify the value of lost load during a power outage in $/kWh.</span></label>
-				<input type="text" name="value_of_lost_load" value="1" pattern="^\d+\.?\d*?$"/>
-			</div>
-			<div>
-				<i class="fa fa-plus-square"></i>
-				<a href="javascript:void(0)" class="toggle show">Optional inputs</a>
-				<div style="display:none">
-					<div class="chunk">
-						<label class="tooltip" for="omCostEscalator">O+M Escalation (% per year)<span class="classic">Please enter a number 0-1 for the Annual nominal O&M cost escalation rate. Format 0.XXX</span></label>
-						<input type="text" name="omCostEscalator" value="0.025" step="0.001" min="0.0" max="1.0"/>
-					</div>
-					<div class="chunk">
-						<label class="tooltip" for="discountRate">Discount Rate (% per year)<span class="classic">Please enter a number 0-1 for the Nominal energy offtaker discount rate. In single ownership model the offtaker is also the generation owner. Format 0.XXX</span></label>
-						<input type="text" name="discountRate" value="0.083" step="0.001" min="0.0" max="1.0"/>
-					</div>
-				</div>		
-			</div>
-		</form>
+    <main>
+        <!--<div style="height:40px; width:100%; background:black; line-height:40px; padding-left:10px;">
+            <p style="color:white; margin:0px"><a style="color:white; text-decoration:none" href="/"><b>MicrogridUP</b></a> &raquo; New</p>
+        </div>-->
+        <div id='introInfo' class='step'>
+            <h3>Step 1: Input model information</h3>
+            <form id="modelInfoForm" enctype="multipart/form-data">
+                <h5>Site and Energy Provider</h5>
+                <div class="chunk">
+                    <label class="tooltip" for="MODEL_DIR">Model Name<span class="classic">Model names must be entirely lowercase.</span></label>
+                    <input type="text" name="MODEL_DIR" value="{{in_data.MODEL_DIR}}" pattern="[a-z0-9_\-]+" required/>
+                </div>
+                <div class="chunk">
+                    <label class="tooltip" for="latitude">Latitude<span class="classic">Specify the latitude of the load/grid.</span></label>
+                    <input type="text" name="latitude" pattern="-?\d+\.?\d*" value="39.7817"/>
+                </div>
+                <div class="chunk">
+                    <label class="tooltip" for="longitude">Longitude<span class="classic">Specify the longitude of the load/grid.</span></label>
+                    <input type="text" name="longitude" pattern="-?\d+\.?\d*" value="-89.6501"/>
+                </div>
+                <div class="chunk">
+                    <label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">TO DO: FILL TOOLTIP</span></label>
+                    <input type="text" name="QSTS_STEPS" value="{{in_data.QSTS_STEPS}}" />
+                </div>
+                <div class="chunk">
+                    <label class="tooltip" for="INVALIDATE_CACHE">Invalidate Cache<span class="classic">Cache from previous run (if applicable) is cleared when selected.</span></label>
+                    <input type="checkbox" name="INVALIDATE_CACHE" value="True" {% if in_data.INVALIDATE_CACHE == "True" %}checked{% endif %}/>
+                    <input type="hidden" name="INVALIDATE_CACHE" value="False">
+                </div>
+                <br>
+                <div class="chunk">
+                    <label class="tooltip" for="DESCRIPTION">Description<span class="classic">Include an optional description of the project. Max 140 characters.</span></label>
+                    <textarea id="DESCRIPTION" name="DESCRIPTION" rows="1" cols="30"></textarea>
+                    <p id="characterCount" style="display:inline">0 / 140</p>
+                </div>
+                <div>
+                    <i class="fa fa-plus-square"></i>
+                    <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
+                    <div style="display:none">
+                        <div class="chunk">
+                            <label class="tooltip" for="energyCost">Energy Cost ($/kWh)<span class="classic">Specify the energy cost in $/kWh. Format 0.XX</span></label>
+                            <input type="text" name="energyCost" value="0.12" pattern="^\d+\.?\d*?$"/>
+                        </div>
+                        <div class="chunk">
+                            <label class="tooltip" for="wholesaleCost">Wholesale Cost ($/kWh)<span class="classic">Specify wholesale price for selling excess electricity back to the grid operator. Format 0.XX</span></label>
+                            <input type="text" name="wholesaleCost" value="0.034" pattern="^\d+\.?\d*?$"/>
+                        </div>
+                        <div class="chunk">
+                            <label class="tooltip" for="demandCost">Demand Cost ($/kW)<span class="classic">Specify the demand cost in $/kW. Format 0.XX</span></label>
+                            <input type="text" name="demandCost" value="20" pattern="^\d+\.?\d*?$"/>
+                        </div>
+                        <div class="chunk">
+                            <label class="tooltip" for="solarCanCurtail">DG Can Curtail<span class="classic">Allows for excess distributed generation to be automatically curtailed.</span></label>
+                            <select id="solarCanCurtail" name="solarCanCurtail">
+                                <option selected value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                        <div class="chunk">
+                            <label class="tooltip" for="solarCanExport">DG Can Export<span class="classic">Allows for excess distributed generation to be sold back to the grid.</span></label>
+                            <select id="solarCanExport" name="solarCanExport">
+                                <option selected value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                        <div class="chunk">
+                            <label class="tooltip" for="urdbLabelSwitch">Use URDB Rate?<span class="classic">Utilizing a rate from the Utility Rate Database overrides Cost of Energy and Cost of Demand rates above. See https://openei.org/services/<br>doc/rest/util_rates/</span></label>
+                            <select id="urdbLabelSwitch" name="urdbLabelSwitch">
+                                <option value="on">Yes</option>
+                                <option selected value="off">No</option>
+                            </select>
+                        </div>
+                        <div class="chunk">
+                            <label class="tooltip" for="urdbLabel">URDB Label<span class="classic">Input the string found at the end of the URDB Rate URL, For example https://openei.org/apps/<br>IURDB/rate/view/<br> 5b75cfe95457a3454faf0aea <br> would yield "5b75cfe95457a3454faf0aea"</span></label>
+                            <input type="text" name="urdbLabel" value="5b75cfe95457a3454faf0aea" />
+                        </div>
+                    </div>
+                </div>
+                <h5>Load Profile</h5>
+                <div class="chunk">
+                    {% if in_data.get('LOAD_CSV') %}
+                        <label class="tooltip" for="LOAD_CSV_NAME">Load Data (.csv)<span class="classic">Please enter the name of a .csv file representing the hourly load shape.</span></label>
+                        <input type="text" name="LOAD_CSV_NAME" value="{{ in_data.get('LOAD_CSV') }}" class="file-input" readonly>
+                        <button type="button" class="remove-btn">Remove File</button>
+                    {% else %}
+                        <label class="tooltip" for="LOAD_CSV">Load Data (.csv)<span class="classic">Please enter the name of a .csv file representing the hourly load shape.</span></label>
+                        <input type="file" name="LOAD_CSV" class="file-input">
+                        <button type="button" class="remove-btn">Remove File</button>
+                    {% endif %}
+                </div>
+                <div class="chunk">
+                    <label class="tooltip" for="criticalLoadFactor">Critical Load Factor (% as decimal)<span class="classic">Please enter a number 0-1 for the fraction of total typical load that must be met during a grid outage. Format 0.XX</span></label>
+                    <input type="text" name="criticalLoadFactor" value="1" step="0.01" min="0.0" max="1.0"/>
+                </div>
+                <div class="chunk">
+                    <label class="tooltip" for="year">Year<span class="classic">Specify the year to which the load shape values correspond.</span></label>
+                    <input type="text" name="year" value="2017" pattern="^\d{4}$"/>
+                </div>
+                <div>
+                    <i class="fa fa-plus-square"></i>
+                    <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
+                    <div style="display:none">
+                        <div class="chunk">
+                            <label class="tooltip" for="analysisYears">Analysis Period (years)<span class="classic">Specify the length of financial analysis in years.</span></label>
+                            <input type="text" name="analysisYears" value="25" step="1" min="2" max="75"/>
+                        </div>
+                    </div>
+                </div>
+                <h5>Resilience</h5>
+                <div class="chunk">
+                    <label class="tooltip" for="FAULTED_LINE">Outage Location(s)<span class="classic">TO DO: FILL TOOLTIP</span></label>
+                    <input type="text" name="FAULTED_LINE" value="{{in_data.FAULTED_LINE}}" />
+                </div>
+                <div class="chunk">
+                    <label class="tooltip" for="outageDuration">Outage Duration (hours)<span class="classic">The added major outage is given this duration.</span></label>
+                    <input type="text" name="outageDuration" value="48" min="1" max="8760"/>
+                </div>
+                <div class="chunk">
+                    <label for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)</label>
+                    <input type="file" name="HISTORICAL_OUTAGES" class="file-input" data-uploaded="{{ in_data.get('HISTORICAL_OUTAGES') }}">
+                    <button type="button" class="remove-btn">Remove File</button>
+                </div>
+                <div>
+                    <i class="fa fa-plus-square"></i>
+                    <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
+                    <div style="display:none;">
+                        <div class="chunk">
+                            <label class="tooltip" for="DIESEL_SAFETY_FACTOR">Fossil Safety Margin (%)<span class="classic">TO DO: FILL TOOLTIP</span></label>
+                            <input type="text" name="DIESEL_SAFETY_FACTOR" value="{{in_data.DIESEL_SAFETY_FACTOR}}" />
+                        </div>
+                        <div class="chunk">
+                            <label class="tooltip" for="FOSSIL_BACKUP_PERCENT">Allowed Fossil (% as decimal)<span class="classic">TO DO: FILL TOOLTIP</span></label>
+                            <input type="text" name="FOSSIL_BACKUP_PERCENT" value="{{in_data.FOSSIL_BACKUP_PERCENT}}" />
+                        </div>
+                        <div class="chunk">
+                            <label class="tooltip" for="outage_start_hour">Outage Start Hour<span class="classic">A major outage is added starting at this hour. Specify an hour greater than 0 but less than 8760 to trigger optimization for resilience and include fossil generation. If 0 is entered, the model will run an economic optimization without fossil generation.</span></label>
+                            <input type="text" name="outage_start_hour" value="500" min="0" max="8760"/>
+                        </div>
+                        <div class="chunk">
+                            <label class="tooltip" for="userCriticalLoadShape">User-supplied Critical Load Shape (.csv)?<span class="classic">Check "Yes" if user uploads Optional Critical Load Shape (.csv). Else, indicate "Critical Load Factor"</span></label>
+                            <select id="userCriticalLoadShape" name="userCriticalLoadShape">
+                                <option value="true">Yes</option>
+                                <option selected value="false">No</option>
+                            </select>
+                        </div>
+                        <div class="chunk">
+                            <label class="tooltip" for="criticalLoadShapeFile">Optional Critical Load Shape (.csv)<span class="classic">Optional: Please enter the name of a .csv file representing the hourly critical load shape. Number of columns much match LoadShape file. Overrides "Critical Load Factor" if present.</span></label>
+                            <input type="file" name="criticalLoadShapeFile" class="file-input" data-uploaded="{{ in_data.get('criticalLoadShapeFile') }}">
+                            <button type="button" class="remove-btn">Remove File</button>
+                        </div>
+                        <div>
+                    </div>
+                </div>
+                <h5>Financial</h5>
+                <div class="chunk">
+                    <label class="tooltip" for="value_of_lost_load">Value of Lost Load ($/kWh)<span class="classic">Specify the value of lost load during a power outage in $/kWh.</span></label>
+                    <input type="text" name="value_of_lost_load" value="1" pattern="^\d+\.?\d*?$"/>
+                </div>
+                <div>
+                    <i class="fa fa-plus-square"></i>
+                    <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
+                    <div style="display:none">
+                        <div class="chunk">
+                            <label class="tooltip" for="omCostEscalator">O+M Escalation (% per year)<span class="classic">Please enter a number 0-1 for the Annual nominal O&M cost escalation rate. Format 0.XXX</span></label>
+                            <input type="text" name="omCostEscalator" value="0.025" step="0.001" min="0.0" max="1.0"/>
+                        </div>
+                        <div class="chunk">
+                            <label class="tooltip" for="discountRate">Discount Rate (% per year)<span class="classic">Please enter a number 0-1 for the Nominal energy offtaker discount rate. In single ownership model the offtaker is also the generation owner. Format 0.XXX</span></label>
+                            <input type="text" name="discountRate" value="0.083" step="0.001" min="0.0" max="1.0"/>
+                        </div>
+                    </div>
+                </div>
+            </form>
 
-		<h3>Step 2: Specify existing circuit</h3>
-		<p>Please select your circuit creation method:</p>
-		<input type="radio" id="upload" name="circuit" value="Upload" />
-		<label for="upload">Upload circuit from file</label><br>
-		<input type="radio" id="wizard" name="circuit" value="Creator" />
-		<label for="wizard">Build circuit manually</label><br>
+            <h3>Step 2: Specify existing circuit</h3>
+            <p>Please select your circuit creation method:</p>
+            <input type="radio" id="upload" name="circuit" value="Upload" />
+            <label for="upload">Upload circuit from file</label><br>
+            <input type="radio" id="wizard" name="circuit" value="Creator" />
+            <label for="wizard">Build circuit manually</label><br>
 
-		<div id="circuitUpload" class="desc" style="margin-top:10px">
-			<div class="chunk">
-				<form id="upload-file" method="post" enctype="multipart/form-data">
-					{% if in_data.get('BASE_DSS') %}
-						<fieldset>
-							<label for="BASE_DSS_NAME">Circuit Definition (.dss)</label>
-							<input id="circuitPostCreation" type="text" name="BASE_DSS_NAME" value="{{in_data.BASE_DSS}}" class="file-input" readonly />
-						</fieldset>
-						<fieldset>
-							<button id="upload-file-btn" type="button" hidden>Upload</button>
-							<button type="button" class="remove-btn">Remove File</button>
-						</fieldset>
-					{% else %}
-						<fieldset>
-							<label for="BASE_DSS_NAME">Circuit Definition (.dss)</label>
-							<input name="BASE_DSS_NAME" type="file" class="file-input">
-						</fieldset>
-						<fieldset>
-							<button id="upload-file-btn" type="button">Upload</button>
-							<button type="button" class="remove-btn">Remove File</button>
-						</fieldset>
-					{% endif %}
-				</form>
-			</div>		
-		</div>
+            <div id="circuitUpload" class="desc" style="margin-top:10px">
+                <div class="chunk">
+                    <form id="upload-file" method="post" enctype="multipart/form-data">
+                        {% if in_data.get('BASE_DSS') %}
+                            <fieldset>
+                                <label for="BASE_DSS_NAME">Circuit Definition (.dss)</label>
+                                <input id="circuitPostCreation" type="text" name="BASE_DSS_NAME" value="{{in_data.BASE_DSS}}" class="file-input" readonly />
+                            </fieldset>
+                            <fieldset>
+                                <button id="upload-file-btn" type="button" hidden>Upload</button>
+                                <button type="button" class="remove-btn">Remove File</button>
+                            </fieldset>
+                        {% else %}
+                            <fieldset>
+                                <label for="BASE_DSS_NAME">Circuit Definition (.dss)</label>
+                                <input name="BASE_DSS_NAME" type="file" class="file-input">
+                            </fieldset>
+                            <fieldset>
+                                <button id="upload-file-btn" type="button">Upload</button>
+                                <button type="button" class="remove-btn">Remove File</button>
+                            </fieldset>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
 
-		<div id="circuitCreator" class="desc">
-			<dialog id="dialog">
-				<div id="dialogText"></div>
-				<select></select>
-				<button type="cancel" onclick="window.dialog.close();">Cancel</button>
-				<button type="button">Confirm</button>
-			</dialog>
+            <div id="circuitCreator" class="desc">
+                <dialog id="dialog">
+                    <div id="dialogText"></div>
+                    <select></select>
+                    <button type="cancel" onclick="window.dialog.close();">Cancel</button>
+                    <button type="button">Confirm</button>
+                </dialog>
 
 
-			<ul id="elements">
-				<li class="substation" data-editable><i class="fa fa-minus-square"></i> Substation: (click to name)</li>
-				<li class="feeder" data-editable><i class="fa fa-minus-square"></i> Feeder: (click to name)</li>
-				<li class="load" data-editable><i class="fa fa-minus-square"></i> Load: (click to name)</li>
-				<li class="solar" data-editable><i class="fa fa-minus-square"></i> Solar: (click to name)</li>
-				<li class="battery" data-editable><i class="fa fa-minus-square"></i> Battery: (click to name)</li>
-				<li class="fossil" data-editable><i class="fa fa-minus-square"></i> Fossil: (click to name)</li>
-			</ul>
-			<div id="dropdowns" class="dropdown">
-				<button class="dropbtn">Add element</button>
-				<div class="dropdown-content">
-					<div id="newSub" role="button" tabindex="0">Substation</div>
-				    <div id="newFeeder" role="button" tabindex="0">Feeder</div>
-				    <div id="newLoad" role="button" tabindex="0">Load</div>
-				    <div id="newSolar" role="button" tabindex="0">Solar</div>
-				    <div id="newWind" role="button" tabindex="0">Wind</div>
-				    <div id="newBattery" role="button" tabindex="0">Battery</div>
-				    <div id="newFossil" role="button" tabindex="0">Fossil</div>
-				</div>
-			</div>
-			<button id="toDss" type="button">Submit circuit</button>
-		</div>
+                <ul id="elements">
+                    <li class="substation" data-editable><i class="fa fa-minus-square"></i> Substation: (click to name)</li>
+                    <li class="feeder" data-editable><i class="fa fa-minus-square"></i> Feeder: (click to name)</li>
+                    <li class="load" data-editable><i class="fa fa-minus-square"></i> Load: (click to name)</li>
+                    <li class="solar" data-editable><i class="fa fa-minus-square"></i> Solar: (click to name)</li>
+                    <li class="battery" data-editable><i class="fa fa-minus-square"></i> Battery: (click to name)</li>
+                    <li class="fossil" data-editable><i class="fa fa-minus-square"></i> Fossil: (click to name)</li>
+                </ul>
+                <div id="dropdowns" class="dropdown">
+                    <button class="dropbtn">Add element</button>
+                    <div class="dropdown-content">
+                        <div id="newSub" role="button" tabindex="0">Substation</div>
+                        <div id="newFeeder" role="button" tabindex="0">Feeder</div>
+                        <div id="newLoad" role="button" tabindex="0">Load</div>
+                        <div id="newSolar" role="button" tabindex="0">Solar</div>
+                        <div id="newWind" role="button" tabindex="0">Wind</div>
+                        <div id="newBattery" role="button" tabindex="0">Battery</div>
+                        <div id="newFossil" role="button" tabindex="0">Fossil</div>
+                    </div>
+                </div>
+                <button id="toDss" type="button">Submit circuit</button>
+            </div>
 
-		<div id="critLoads">
-	    </div>
+            <div id="critLoads">
+            </div>
 
-	</div>
+        </div>
 
-	<div id="partitionPreviewerContainer" class="step">
-		<h3>Step 3: Partition circuit into microgrids</h3>
-		<div id="stepThree" class="chunk">
-			<label class="tooltip" for="MG_DEF_METHOD">Microgrid Definition Method<span class="classic">TO DO: FILL TOOLTIP</span></label>
-			<select id="partitionMethod" name="MG_DEF_METHOD" style="margin-right:6px" disabled>
-				<option value="" disabled selected>Select method</option>
-				<option value="manual" {% if in_data.MG_DEF_METHOD == 'manual' %}selected{% endif %}>Manual</option>
-				<option value="loadGrouping" {% if in_data.MG_DEF_METHOD == 'load_grouping' %}selected{% endif %}>Load Grouping</option>
-				<option value="lukes" {% if in_data.MG_DEF_METHOD == 'lukes' %}selected{% endif %}>Lukes</option>
-				<option value="branch" {% if in_data.MG_DEF_METHOD == 'branch' %}selected{% endif %}>Branch</option>
-				<option value="bottomUp" {% if in_data.MG_DEF_METHOD == 'bottom-up' %}selected{% endif %}>Bottom-Up</option>
-				<option value="criticalLoads" {% if in_data.MG_DEF_METHOD == 'critical_loads' %}selected{% endif %}>Critical Loads</option>
-			</select></br>
-			<form id="partitionManuallyForm" style="display: none;">
-				<label for="mgQuantity">How many microgrids?</label>
-				<input id="mgQuantity" type="text" autocomplete="off" placeholder="# of microgrids" />
-				<button id="makeDropdownsButton" type="button">Go</button><br>
-			</form>
-			<form id="minQuantMgsForm" style="display: none;">
-				<label for="mingQuantMgs">At least how many microgrids?</label>
-				<input id="minQuantMgs" type="text" autocomplete="off" placeholder="Min # of microgrids" />
-			</form>
-			<div id="dropDowns" class="chunk" style="display: none;">
-			</div>
-			<button id="previewPartitionsButton" type="button" disabled>Preview partitions</button>
-			<div id="partitionsPreviewDiv">
-			</div>
-		</div>
-	</div>
+        <div id="partitionPreviewerContainer" class="step">
+            <h3>Step 3: Partition circuit into microgrids</h3>
+            <div id="stepThree" class="chunk">
+                <label class="tooltip" for="MG_DEF_METHOD">Microgrid Definition Method<span class="classic">TO DO: FILL TOOLTIP</span></label>
+                <select id="partitionMethod" name="MG_DEF_METHOD" style="margin-right:6px" disabled>
+                    <option value="" disabled selected>Select method</option>
+                    <option value="manual" {% if in_data.MG_DEF_METHOD == 'manual' %}selected{% endif %}>Manual</option>
+                    <option value="loadGrouping" {% if in_data.MG_DEF_METHOD == 'load_grouping' %}selected{% endif %}>Load Grouping</option>
+                    <option value="lukes" {% if in_data.MG_DEF_METHOD == 'lukes' %}selected{% endif %}>Lukes</option>
+                    <option value="branch" {% if in_data.MG_DEF_METHOD == 'branch' %}selected{% endif %}>Branch</option>
+                    <option value="bottomUp" {% if in_data.MG_DEF_METHOD == 'bottom-up' %}selected{% endif %}>Bottom-Up</option>
+                    <option value="criticalLoads" {% if in_data.MG_DEF_METHOD == 'critical_loads' %}selected{% endif %}>Critical Loads</option>
+                </select></br>
+                <form id="partitionManuallyForm" style="display: none;">
+                    <label for="mgQuantity">How many microgrids?</label>
+                    <input id="mgQuantity" type="text" autocomplete="off" placeholder="# of microgrids" />
+                    <button id="makeDropdownsButton" type="button">Go</button><br>
+                </form>
+                <form id="minQuantMgsForm" style="display: none;">
+                    <label for="mingQuantMgs">At least how many microgrids?</label>
+                    <input id="minQuantMgs" type="text" autocomplete="off" placeholder="Min # of microgrids" />
+                </form>
+                <div id="dropDowns" class="chunk" style="display: none;">
+                </div>
+                <button id="previewPartitionsButton" type="button" disabled>Preview partitions</button>
+                <div id="partitionsPreviewDiv">
+                </div>
+            </div>
+        </div>
 
-	<div id='techSelect' class='step'>
-		<h3>Step 4: Select technologies to be used in microgrids</h3>
-		<form id="techParamForm" enctype="multipart/form-data">
-			<div class="chunk">
-				<label for="solar">Solar</label>
-				<input type="checkbox" name="solar" value="on" id="solar" {% if in_data.REOPT_INPUTS.solar == 'on' %}checked{% endif %}/>
-				<input type="hidden" name="solar" value="off">
-			</div>
-			<div class="chunk">
-				<label for="battery">Battery</label>
-				<input type="checkbox" name="battery" value="on" id="battery" {% if in_data.REOPT_INPUTS.battery == 'on' %}checked{% endif %}/>
-				<input type="hidden" name="battery" value="off">
-			</div>
-			<div class="chunk">
-				<label for="fossil">Fossil</label>
-				<input type="checkbox" name="fossil" value="on" id="fossil" {% if in_data.REOPT_INPUTS.fossil == 'on' %}checked{% endif %}/>
-				<input type="hidden" name="fossil" value="off">
-			</div>
-			<div class="chunk">
-				<label for="wind">Wind</label>
-				<input type="checkbox" name="wind" value="on" id="wind" {% if in_data.REOPT_INPUTS.wind == 'on' %}checked{% endif %}/>
-				<input type="hidden" name="wind" value="off">
-			</div>
+        <div id='techSelect' class='step'>
+            <h3>Step 4: Select technologies to be used in microgrids</h3>
+            <form id="techParamForm" enctype="multipart/form-data">
+                <div class="chunk">
+                    <label for="solar">Solar</label>
+                    <input type="checkbox" name="solar" value="on" id="solar" {% if in_data.REOPT_INPUTS.solar == 'on' %}checked{% endif %}/>
+                    <input type="hidden" name="solar" value="off">
+                </div>
+                <div class="chunk">
+                    <label for="battery">Battery</label>
+                    <input type="checkbox" name="battery" value="on" id="battery" {% if in_data.REOPT_INPUTS.battery == 'on' %}checked{% endif %}/>
+                    <input type="hidden" name="battery" value="off">
+                </div>
+                <div class="chunk">
+                    <label for="fossil">Fossil</label>
+                    <input type="checkbox" name="fossil" value="on" id="fossil" {% if in_data.REOPT_INPUTS.fossil == 'on' %}checked{% endif %}/>
+                    <input type="hidden" name="fossil" value="off">
+                </div>
+                <div class="chunk">
+                    <label for="wind">Wind</label>
+                    <input type="checkbox" name="wind" value="on" id="wind" {% if in_data.REOPT_INPUTS.wind == 'on' %}checked{% endif %}/>
+                    <input type="hidden" name="wind" value="off">
+                </div>
 
-			<div id="solarDiv" style="display:none">
-				<h5>Solar</h5>
-				<div class="chunk">
-					<label class="tooltip" for="solarCost">Solar Cost ($/kW-DC)<span class="classic">Specify the cost in $/kW.</span></label>
-					<input type="text" name="solarCost" value="1600" pattern="^\d+\.?\d*?$"/>
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="solarExisting">Solar Existing (kW-DC)<span class="classic">Specify the total capacity of any pre-existing solar arrays in kW. The outputted "Total Solar" will be inclusive of existing solar.</span></label>
-					<input type="text" name="solarExisting" value="0" />
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="solarMax">Solar Max (kW-DC)<span class="classic">Specify the maximum desired generation in kW. Leave at default for full optimization on solar power.</span></label>
-					<input type="text" name="solarMax" value="100000" />
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="solarMin">Solar Min (kW-DC)<span class="classic">Specify the minimum desired generation in kW.</span></label>
-					<input type="text" name="solarMin" value="0" />
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="solarMacrsOptionYears">Solar MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 5 and 7 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
-					<select id="solarMacrsOptionYears" name="solarMacrsOptionYears">
-						<option value="0">0</option>
-						<option selected value="5">5</option>
-						<option value="7">7</option>
-					</select>
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="solarItcPercent">Solar ITC (% as decimal)<span class="classic">Please enter a number 0-1 for the solar investment tax credit. Format 0.XX</span></label>
-					<input type="text" name="solarItcPercent" value="0.26" step="0.01" min="0.0" max="1.0"/>
-				</div>
-			</div>
-			<div id="batteryDiv" style="display:none">
-				<h5>Battery</h5>
-				<div class="chunk">
-					<label class="tooltip" for="batteryCapacityCost">Battery Capacity Cost ($/kWh)<span class="classic">Specify the cost in $/kWh.</span></label>
-					<input type="text" name="batteryCapacityCost" value="420" pattern="^\d+\.?\d*?$"/>
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="batteryCapacityMax">Battery Capacity Max (kWh)<span class="classic">Specify the maximum desired battery capacity in kWh.</span></label>
-					<input type="text" name="batteryCapacityMax" value="1000000" />
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="batteryCapacityMin">Battery Capacity Min (kWh)<span class="classic">Specify the minimum desired battery capacity in kWh.</span></label>
-					<input type="text" name="batteryCapacityMin" value="0" />
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="batteryKwhExisting">Battery Capacity Existing (kWh)<span class="classic">TO DO: FILL TOOLTIP</span></label>
-					<input type="text" name="batteryKwhExisting" value="0" />
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="batteryPowerCost">Battery Power Cost ($/kW)<span class="classic">Specify the cost in $/kW.</span></label>
-					<input type="text" name="batteryPowerCost" value="840" />
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="batteryPowerMax">Battery Power Max (kW)<span class="classic">Specify the maximum desired battery power in kW.</span></label>
-					<input type="text" name="batteryPowerMax" value="1000000" />
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="batteryPowerMin">Battery Power Min (kW)<span class="classic">Specify the minimum desired battery power in kW.</span></label>
-					<input type="text" name="batteryPowerMin" value="0" />
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="batteryKwExisting">Battery Power Existing (kW)<span class="classic">TO DO: FILL TOOLTIP</span></label>
-					<input type="text" name="batteryKwExisting" value="0" />
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="batteryMacrsOptionYears">Battery MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 5 and 7 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
-					<select id="batteryMacrsOptionYears" name="batteryMacrsOptionYears">
-						<option value="0">0</option>
-						<option value="5">5</option>
-						<option selected value="7">7</option>
-					</select>
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="batteryItcPercent">Battery ITC (% as decimal)<span class="classic">Please enter a number 0-1 for the battery investment tax credit. Format 0.XX</span></label>
-					<input type="text" name="batteryItcPercent" value="0" step="0.01" min="0.0" max="1.0"/>
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="batteryPowerCostReplace">Battery Replacement Power Cost ($/kW)<span class="classic">Specify the cost of replacing the battery inverter at the specified year in $/kW.</span></label>
-					<input type="text" name="batteryPowerCostReplace" value="410" pattern="^\d+\.?\d*?$"/>
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="batteryCapacityCostReplace">Battery Replacement Capacity Cost ($/kWh)<span class="classic">Specify the cost of replacing the battery capacity at the specified year in $/kWh.</span></label>
-					<input type="text" name="batteryCapacityCostReplace" value="200" pattern="^\d+\.?\d*?$"/>
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="batteryPowerReplaceYear">Battery Inverter Replacement (years)<span class="classic">Specify a year in which the battery inverter will be replaced at the cost specified in Battery Replacement Power Cost. Input is an integer less than or equal to the project period in years.</span></label>
-					<input type="text" name="batteryPowerReplaceYear" value="10" />
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="batteryCapacityReplaceYear">Battery Replacement (years)<span class="classic">Specify a year in which the battery cells will be replaced at the cost specified in Battery Replacement Capacity Cost. Input is an integer less than or equal to the project period in years.</span></label>
-					<input type="text" name="batteryCapacityReplaceYear" value="10" />
-				</div>
-			</div>
-			<div id=fossilDiv style="display:none">
-				<h5>Fossil</h5>
-				<div class="chunk">
-					<label class="tooltip" for="dieselGenCost">Fossil Gen Cost ($/kW)<span class="classic">Specify the cost in $/kWh.</span></label>
-					<input type="text" name="dieselGenCost" value="500" pattern="^\d+\.?\d*?$"/>
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="dieselMax">Fossil Max (kW)<span class="classic">Specify max fossil generation in kW. Only specify if needed, as the optimization runs best if left unedited.</span></label>
-					<input type="text" name="dieselMax" value="1000000" pattern="^\d+\.?\d*?$"/>
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="dieselMin">Fossil Min (kW)<span class="classic">Specify minimum fossil generation in kW. Only specify if needed, as the optimization runs best if left unedited.</span></label>
-					<input type="text" name="dieselMin" value="0" pattern="^\d+\.?\d*?$"/>
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="fuelAvailable">Fuel Available (Gal)<span class="classic">Specify the amount of fuel available for all new and pre-existing generators in gallons.</span></label>
-					<input type="text" name="fuelAvailable" value="50000" />
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="genExisting">Gen Existing (kW)<span class="classic">Specify the total capacity of any pre-existing generators in kW. The outputted "Total Fossil Gen" will be inclusive of existing fossil gen.</span></label>
-					<input type="text" name="genExisting" value="0" />
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="minGenLoading">Min Gen Loading (% as decimal)<span class="classic">Please enter a number 0-1 for the the minimum fraction of rated total kVA load that must be maintained by the generator. >/= 0.3 recommended for extended diesel operation. Set to 0 for highest likelihood of success in solving optimization. Format 0.XX</span></label>
-					<input type="text" name="minGenLoading" value="0.3" />
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="dieselFuelCostGal">Fossil Fuel Cost (diesel gal equiv)<span class="classic">Specify cost of fuel in $ per gallon. To convert $/MMBTU of Natural gas to gallons of diesel, divide $/MMBTU market rate by 4.85 to account for 50% lower efficiency of natural gas reciprocating engines and lower fuel density as compared to diesel. Format X.XX</span></label>
-					<input type="text" name="dieselFuelCostGal" value="3" pattern="^\d+\.?\d*?$"/>
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="dieselCO2Factor">Fossil Emissions Factor (lb CO2/gal)<span class="classic">Specify fossil emissions factor in pounds of carbon dioxide per gallon. Default 22.4 is for diesel. Natural gas can be modeled using 24.1</span></label>
-					<input type="text" name="dieselCO2Factor" value="22.4" pattern="^\d+\.?\d*?$"/>
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="dieselOMCostKw">Fossil O+M Cost ($/kW/year)<span class="classic">Specify annual operations and maintenance cost per kilowatt per year.</span></label>
-					<input type="text" name="dieselOMCostKw" value="10" pattern="^\d+\.?\d*?$"/>
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="dieselOMCostKwh">Fossil O+M Cost ($/kWh/year)<span class="classic">Specify annual operations and maintenance cost per kilowatt-hour per year. Format "X.XX"</span></label>
-					<input type="text" name="dieselOMCostKwh" value="0" pattern="^\d+\.?\d*?$"/>
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="dieselOnlyRunsDuringOutage">Fossil gen only runs during outage?<span class="classic">"No" signifies that fossil generator is enabled to run at any point in the year.</span></label>
-					<select id="dieselOnlyRunsDuringOutage" name="dieselOnlyRunsDuringOutage">
-						<option value="true">Yes</option>
-						<option selected value="false">No</option>
-					</select>
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="dieselMacrsOptionYears">Fossil MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 5 and 7 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
-					<select id="dieselMacrsOptionYears" name="dieselMacrsOptionYears">
-						<option selected value="0">0</option>
-						<option value="5">5</option>
-						<option value="7">7</option>
-					</select>
-				</div>
-			</div>
-			<div id="windDiv" style="display:none">
-				<h5>Wind</h5>
-				<div class="chunk">
-					<label class="tooltip" for="windCost">Wind Cost ($/kW)<span class="classic">Specify the cost in $/kW.</span></label>
-					<input type="text" name="windCost" value="4989" pattern="^\d+\.?\d*?$"/>
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="windExisting">Wind Existing (kW)<span class="classic">TO DO: FILL TOOLTIP</span></label>
-					<input type="text" name="windExisting" value="0" />
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="windMax">Wind Max (kW)<span class="classic">Specify the maximum desired generation in kW. Leave at default for full optimization on wind power.</span></label>
-					<input type="text" name="windMax" value="100000" />
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="windMin">Wind Min (kW)<span class="classic">Specify the minimum desired generation in kW.</span></label>
-					<input type="text" name="windMin" value="0" />
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="windMacrsOptionYears">Wind MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 5 and 7 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
-					<select id="windMacrsOptionYears" name="windMacrsOptionYears">
-						<option value="0">0</option>
-						<option selected value="5">5</option>
-						<option value="7">7</option>
-					</select>
-				</div>
-				<div class="chunk">
-					<label class="tooltip" for="windItcPercent">Wind ITC (% as deimal)<span class="classic">Please enter a number 0-1 for the wind investment tax credit. Format 0.XX</span></label>
-					<input type="text" name="windItcPercent" value="0.26" step="0.01" min="0.0" max="1.0"/>
-				</div>
-			</div>
+                <div id="solarDiv" style="display:none">
+                    <h5>Solar</h5>
+                    <div class="chunk">
+                        <label class="tooltip" for="solarCost">Solar Cost ($/kW-DC)<span class="classic">Specify the cost in $/kW.</span></label>
+                        <input type="text" name="solarCost" value="1600" pattern="^\d+\.?\d*?$"/>
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="solarExisting">Solar Existing (kW-DC)<span class="classic">Specify the total capacity of any pre-existing solar arrays in kW. The outputted "Total Solar" will be inclusive of existing solar.</span></label>
+                        <input type="text" name="solarExisting" value="0" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="solarMax">Solar Max (kW-DC)<span class="classic">Specify the maximum desired generation in kW. Leave at default for full optimization on solar power.</span></label>
+                        <input type="text" name="solarMax" value="100000" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="solarMin">Solar Min (kW-DC)<span class="classic">Specify the minimum desired generation in kW.</span></label>
+                        <input type="text" name="solarMin" value="0" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="solarMacrsOptionYears">Solar MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 5 and 7 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
+                        <select id="solarMacrsOptionYears" name="solarMacrsOptionYears">
+                            <option value="0">0</option>
+                            <option selected value="5">5</option>
+                            <option value="7">7</option>
+                        </select>
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="solarItcPercent">Solar ITC (% as decimal)<span class="classic">Please enter a number 0-1 for the solar investment tax credit. Format 0.XX</span></label>
+                        <input type="text" name="solarItcPercent" value="0.26" step="0.01" min="0.0" max="1.0"/>
+                    </div>
+                </div>
+                <div id="batteryDiv" style="display:none">
+                    <h5>Battery</h5>
+                    <div class="chunk">
+                        <label class="tooltip" for="batteryCapacityCost">Battery Capacity Cost ($/kWh)<span class="classic">Specify the cost in $/kWh.</span></label>
+                        <input type="text" name="batteryCapacityCost" value="420" pattern="^\d+\.?\d*?$"/>
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="batteryCapacityMax">Battery Capacity Max (kWh)<span class="classic">Specify the maximum desired battery capacity in kWh.</span></label>
+                        <input type="text" name="batteryCapacityMax" value="1000000" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="batteryCapacityMin">Battery Capacity Min (kWh)<span class="classic">Specify the minimum desired battery capacity in kWh.</span></label>
+                        <input type="text" name="batteryCapacityMin" value="0" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="batteryKwhExisting">Battery Capacity Existing (kWh)<span class="classic">TO DO: FILL TOOLTIP</span></label>
+                        <input type="text" name="batteryKwhExisting" value="0" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="batteryPowerCost">Battery Power Cost ($/kW)<span class="classic">Specify the cost in $/kW.</span></label>
+                        <input type="text" name="batteryPowerCost" value="840" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="batteryPowerMax">Battery Power Max (kW)<span class="classic">Specify the maximum desired battery power in kW.</span></label>
+                        <input type="text" name="batteryPowerMax" value="1000000" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="batteryPowerMin">Battery Power Min (kW)<span class="classic">Specify the minimum desired battery power in kW.</span></label>
+                        <input type="text" name="batteryPowerMin" value="0" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="batteryKwExisting">Battery Power Existing (kW)<span class="classic">TO DO: FILL TOOLTIP</span></label>
+                        <input type="text" name="batteryKwExisting" value="0" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="batteryMacrsOptionYears">Battery MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 5 and 7 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
+                        <select id="batteryMacrsOptionYears" name="batteryMacrsOptionYears">
+                            <option value="0">0</option>
+                            <option value="5">5</option>
+                            <option selected value="7">7</option>
+                        </select>
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="batteryItcPercent">Battery ITC (% as decimal)<span class="classic">Please enter a number 0-1 for the battery investment tax credit. Format 0.XX</span></label>
+                        <input type="text" name="batteryItcPercent" value="0" step="0.01" min="0.0" max="1.0"/>
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="batteryPowerCostReplace">Battery Replacement Power Cost ($/kW)<span class="classic">Specify the cost of replacing the battery inverter at the specified year in $/kW.</span></label>
+                        <input type="text" name="batteryPowerCostReplace" value="410" pattern="^\d+\.?\d*?$"/>
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="batteryCapacityCostReplace">Battery Replacement Capacity Cost ($/kWh)<span class="classic">Specify the cost of replacing the battery capacity at the specified year in $/kWh.</span></label>
+                        <input type="text" name="batteryCapacityCostReplace" value="200" pattern="^\d+\.?\d*?$"/>
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="batteryPowerReplaceYear">Battery Inverter Replacement (years)<span class="classic">Specify a year in which the battery inverter will be replaced at the cost specified in Battery Replacement Power Cost. Input is an integer less than or equal to the project period in years.</span></label>
+                        <input type="text" name="batteryPowerReplaceYear" value="10" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="batteryCapacityReplaceYear">Battery Replacement (years)<span class="classic">Specify a year in which the battery cells will be replaced at the cost specified in Battery Replacement Capacity Cost. Input is an integer less than or equal to the project period in years.</span></label>
+                        <input type="text" name="batteryCapacityReplaceYear" value="10" />
+                    </div>
+                </div>
+                <div id=fossilDiv style="display:none">
+                    <h5>Fossil</h5>
+                    <div class="chunk">
+                        <label class="tooltip" for="dieselGenCost">Fossil Gen Cost ($/kW)<span class="classic">Specify the cost in $/kWh.</span></label>
+                        <input type="text" name="dieselGenCost" value="500" pattern="^\d+\.?\d*?$"/>
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="dieselMax">Fossil Max (kW)<span class="classic">Specify max fossil generation in kW. Only specify if needed, as the optimization runs best if left unedited.</span></label>
+                        <input type="text" name="dieselMax" value="1000000" pattern="^\d+\.?\d*?$"/>
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="dieselMin">Fossil Min (kW)<span class="classic">Specify minimum fossil generation in kW. Only specify if needed, as the optimization runs best if left unedited.</span></label>
+                        <input type="text" name="dieselMin" value="0" pattern="^\d+\.?\d*?$"/>
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="fuelAvailable">Fuel Available (Gal)<span class="classic">Specify the amount of fuel available for all new and pre-existing generators in gallons.</span></label>
+                        <input type="text" name="fuelAvailable" value="50000" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="genExisting">Gen Existing (kW)<span class="classic">Specify the total capacity of any pre-existing generators in kW. The outputted "Total Fossil Gen" will be inclusive of existing fossil gen.</span></label>
+                        <input type="text" name="genExisting" value="0" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="minGenLoading">Min Gen Loading (% as decimal)<span class="classic">Please enter a number 0-1 for the the minimum fraction of rated total kVA load that must be maintained by the generator. >/= 0.3 recommended for extended diesel operation. Set to 0 for highest likelihood of success in solving optimization. Format 0.XX</span></label>
+                        <input type="text" name="minGenLoading" value="0.3" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="dieselFuelCostGal">Fossil Fuel Cost (diesel gal equiv)<span class="classic">Specify cost of fuel in $ per gallon. To convert $/MMBTU of Natural gas to gallons of diesel, divide $/MMBTU market rate by 4.85 to account for 50% lower efficiency of natural gas reciprocating engines and lower fuel density as compared to diesel. Format X.XX</span></label>
+                        <input type="text" name="dieselFuelCostGal" value="3" pattern="^\d+\.?\d*?$"/>
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="dieselCO2Factor">Fossil Emissions Factor (lb CO2/gal)<span class="classic">Specify fossil emissions factor in pounds of carbon dioxide per gallon. Default 22.4 is for diesel. Natural gas can be modeled using 24.1</span></label>
+                        <input type="text" name="dieselCO2Factor" value="22.4" pattern="^\d+\.?\d*?$"/>
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="dieselOMCostKw">Fossil O+M Cost ($/kW/year)<span class="classic">Specify annual operations and maintenance cost per kilowatt per year.</span></label>
+                        <input type="text" name="dieselOMCostKw" value="10" pattern="^\d+\.?\d*?$"/>
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="dieselOMCostKwh">Fossil O+M Cost ($/kWh/year)<span class="classic">Specify annual operations and maintenance cost per kilowatt-hour per year. Format "X.XX"</span></label>
+                        <input type="text" name="dieselOMCostKwh" value="0" pattern="^\d+\.?\d*?$"/>
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="dieselOnlyRunsDuringOutage">Fossil gen only runs during outage?<span class="classic">"No" signifies that fossil generator is enabled to run at any point in the year.</span></label>
+                        <select id="dieselOnlyRunsDuringOutage" name="dieselOnlyRunsDuringOutage">
+                            <option value="true">Yes</option>
+                            <option selected value="false">No</option>
+                        </select>
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="dieselMacrsOptionYears">Fossil MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 5 and 7 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
+                        <select id="dieselMacrsOptionYears" name="dieselMacrsOptionYears">
+                            <option selected value="0">0</option>
+                            <option value="5">5</option>
+                            <option value="7">7</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="windDiv" style="display:none">
+                    <h5>Wind</h5>
+                    <div class="chunk">
+                        <label class="tooltip" for="windCost">Wind Cost ($/kW)<span class="classic">Specify the cost in $/kW.</span></label>
+                        <input type="text" name="windCost" value="4989" pattern="^\d+\.?\d*?$"/>
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="windExisting">Wind Existing (kW)<span class="classic">TO DO: FILL TOOLTIP</span></label>
+                        <input type="text" name="windExisting" value="0" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="windMax">Wind Max (kW)<span class="classic">Specify the maximum desired generation in kW. Leave at default for full optimization on wind power.</span></label>
+                        <input type="text" name="windMax" value="100000" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="windMin">Wind Min (kW)<span class="classic">Specify the minimum desired generation in kW.</span></label>
+                        <input type="text" name="windMin" value="0" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="windMacrsOptionYears">Wind MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 5 and 7 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
+                        <select id="windMacrsOptionYears" name="windMacrsOptionYears">
+                            <option value="0">0</option>
+                            <option selected value="5">5</option>
+                            <option value="7">7</option>
+                        </select>
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="windItcPercent">Wind ITC (% as deimal)<span class="classic">Please enter a number 0-1 for the wind investment tax credit. Format 0.XX</span></label>
+                        <input type="text" name="windItcPercent" value="0.26" step="0.01" min="0.0" max="1.0"/>
+                    </div>
+                </div>
 
-			<br>
-		</form>
-        {% if not iframe_mode %}
-		<button id="submitEverything" type="submit">Run model</button>
-        {% endif %}
-	</div>
-	<div id="loading-background"></div>
-	<div id="loading-indicator">
-		<span>Loading...</span>
-	</div>
+                <br>
+            </form>
+            <button id="submitEverything" type="submit">Run model</button>
+        </div>
+        <div id="loading-background"></div>
+        <div id="loading-indicator">
+            <span>Loading...</span>
+        </div>
+    </main>
 	<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 	<script>
   // Function to check if a .file-input (can be a file input or read-only text input) has a value and show/hide the associated Remove File button.
@@ -809,11 +876,14 @@
 						$('#criticalLoadsSelect').append('<p>No loads to select from.</p>')
 					}
 					// Make directory uneditable. 
+                    {% if iframe_mode %}
+                    disableInputs();
+                    {% endif %}
 					$('input[name="MODEL_DIR"]').prop("readonly", true);
 				},
 				error: function(xhr, status, error) {
 					// Handle errors, if any.
-					console.error(error);
+                    console.error(error);
 				}
 			});
 		}
@@ -857,11 +927,10 @@
 					oldPartitionsDiv.prepend(img); 
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					alert(textStatus + ' : ' + errorThrown);
+					console.log(textStatus + ' : ' + errorThrown);
 				}
 			})
 			$('#partitionPreviewerContainer').append(oldPartitionsDiv);
-			{% if not iframe_mode %}
 			var partitionButton = $('<button>').text('Partition circuit differently');
 			oldPartitionsDiv.append(partitionButton);
 			
@@ -869,7 +938,6 @@
 				$('#stepThree').show();
 				oldPartitionsDiv.hide();
 			});
-			{% endif %}
 		}
 
 		// Editable text for circuit widget.
@@ -1018,7 +1086,7 @@
 					$("#partitionMethod option[value='manual']").remove();
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					alert(textStatus + ' : ' + errorThrown)
+					console.log(textStatus + ' : ' + errorThrown)
 				}
 			});
 		})
@@ -1182,7 +1250,7 @@
 					img.appendTo('#partitionsPreviewDiv'); 
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					alert(textStatus + ' : ' + errorThrown)
+					console.log(textStatus + ' : ' + errorThrown)
 				}
 			});
 		});
@@ -1213,7 +1281,6 @@
 		});
 
 		// Validate forms.
-        {% if not iframe_mode %}
 		$('#submitEverything').click(function() {
 			var form1 = document.getElementById("modelInfoForm");
 			var form2 = document.getElementById("techParamForm");
@@ -1235,9 +1302,26 @@
 				}
 				alert('Please correct the input fields higlighted with red borders.');
 			}
-		// }
 		});
+
+        {% if iframe_mode %}
+        disableInputs();
         {% endif %}
+
+        function disableInputs() {
+            [...document.getElementsByTagName('input')].forEach(input => {
+                input.disabled = true;
+            });
+            [...document.getElementsByTagName('button')].forEach(button => {
+                button.disabled = true;
+            });
+            [...document.getElementsByTagName('select')].forEach(select => {
+                select.disabled = true;
+            });
+            [...document.getElementsByTagName('textarea')].forEach(textArea => {
+                textArea.disabled = true;
+            });
+        }
 
 		function validateForm(form) {
 			var inputs = form.querySelectorAll("input");
@@ -1375,7 +1459,7 @@
 					// Hide loading indicator if server fails.
 					$('#loading-background').hide();
 					$("#loading-indicator").hide();
-					alert(textStatus + ' : ' + errorThrown)
+					console.log(textStatus + ' : ' + errorThrown)
 				}
 			})
 		}

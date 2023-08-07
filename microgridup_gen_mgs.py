@@ -12,7 +12,6 @@ from collections import defaultdict, deque
 CIRC_FILE = 'lehigh_base_3mg.dss'
 CRITICAL_LOADS = ['645_hangar','684_command_center', '611_runway','675a_hospital','634a_data_center', '634b_radar', '634c_atc_tower']
 ALGO = 'lukes' #'branch'
-_myDir = os.path.abspath(os.path.dirname(__file__))
 
 # Networkx helper functions
 def nx_get_branches(G):
@@ -390,6 +389,10 @@ def colorby_mgs(mg_group_dictionary):
 	return attachments_keys
 
 def _tests():
+	_myDir = os.path.abspath(os.path.dirname(__file__))
+	# - This is needed because these files are in the root of the Docker container and paths like "//" are invalid
+	if _myDir == '/':
+		_myDir = ''
 	with open('testfiles/test_params.json') as file:
 		test_params = json.load(file)
 	MG_MINES = test_params['MG_MINES']

@@ -814,6 +814,9 @@ def play(pathToDss, workDir, microgrids, faultedLine, logger):
 
 def _tests():
 	_myDir = os.path.abspath(os.path.dirname(__file__))
+	# - This is needed because these files are in the root of the Docker container and paths like "//" are invalid
+	if _myDir == '/':
+		_myDir = ''
 	FAULTED_LINE = 670671
 	with open('testfiles/test_params.json') as file:
 		test_params = json.load(file)

@@ -6,6 +6,7 @@ import microgridup_gen_mgs as gmg
 
 def test_1mg():
 	# Input data.
+	CRITICAL_LOADS = ['634a_data_center', '634b_radar', '634c_atc_tower', '675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2', '684_command_center', '652_residential', '611_runway']
 	MODEL_DIR = f'{PROJ_FOLDER}/lehigh1mg'
 	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_1mg.dss'
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
@@ -63,20 +64,21 @@ def test_1mg():
 	}
 	MICROGRIDS = {
 		'mg0': {
-			'loads': ['634a_data_center','634b_radar','634c_atc_tower','675a_hospital','675b_residential1','675c_residential1','692_warehouse2','684_command_center','652_residential','611_runway','645_hangar','646_office'],
+			'loads': ['634a_data_center', '634b_radar', '634c_atc_tower', '675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2', '684_command_center', '652_residential', '611_runway', '645_hangar', '646_office'],
 			'switch': '650632',
 			'gen_bus': '670',
 			'gen_obs_existing': ['solar_634_existing','solar_675_existing','fossil_684_existing', 'fossil_646_existing', 'battery_634_existing', 'battery_684_existing'],
-			'critical_load_kws': [70,90,10,150,200,200,400,20,30,70,0,0]
+			'critical_load_kws': [70, 90, 10, 150, 200, 200, 400, 20, 30, 70, 0, 0]
 		}
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
 	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
 		sys.exit(1)
 
 def test_2mg():
 	# Input data.
+	CRITICAL_LOADS = ['634a_data_center', '634b_radar', '634c_atc_tower', '675a_hospital', '675b_residential1', '675c_residential1']
 	MODEL_DIR = f'{PROJ_FOLDER}/lehigh2mgs'
 	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_2mg.dss'
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
@@ -133,27 +135,28 @@ def test_2mg():
 	}
 	MICROGRIDS = {
 		'mg0': {
-			'loads': ['634a_data_center','634b_radar','634c_atc_tower'],
+			'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'],
 			'switch': '632633',
 			'gen_bus': '634',
 		 	'gen_obs_existing': ['wind_634_existing'],
-			'critical_load_kws': [70,90,10]
+			'critical_load_kws': [70, 90, 10]
 		},
 		'mg1': {
-			'loads': ['675a_hospital','675b_residential1','675c_residential1','692_warehouse2'],
+			'loads': ['675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2'],
 			'switch': '671692',
 			'gen_bus': '675',
 			'gen_obs_existing': ['battery_675_existing', 'battery_675_2_existing'],
-			'critical_load_kws': [150,200,200]
+			'critical_load_kws': [150, 200, 200]
 		}
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS, open_results=True)
 	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
 		sys.exit(1)
 
 def test_3mg():
 	# Input data.
+	CRITICAL_LOADS = ['634a_data_center', '634b_radar', '634c_atc_tower', '675a_hospital', '675b_residential1', '675c_residential1', '645_hangar','646_office']
 	MODEL_DIR = f'{PROJ_FOLDER}/lehigh3mgs'
 	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_3mg.dss'
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
@@ -210,34 +213,35 @@ def test_3mg():
 	}
 	MICROGRIDS = {
 		'mg0': {
-			'loads': ['634a_data_center','634b_radar','634c_atc_tower'],
+			'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'],
 			'switch': '632633',
 			'gen_bus': '634',
 			'gen_obs_existing': ['solar_634_existing','battery_634_existing'],
-			'critical_load_kws': [70,90,10]
+			'critical_load_kws': [70, 90, 10]
 		},
 		'mg1': {
-			'loads': ['675a_hospital','675b_residential1','675c_residential1','692_warehouse2'],
+			'loads': ['675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2'],
 			'switch': '671692',
 			'gen_bus': '675',
 			'gen_obs_existing': ['fossil_675_existing'],
-			'critical_load_kws': [150,200,200]
+			'critical_load_kws': [150, 200, 200]
 		},
 		'mg2': {
 			'loads': ['645_hangar','646_office'],
 			'switch': '632645',
 			'gen_bus': '646',
 			'gen_obs_existing': [], #['fossil_684_existing'],
-			'critical_load_kws': [30,70]
+			'critical_load_kws': [30, 70]
 		}
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS, open_results=True)
 	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
 		sys.exit(1)
 
 def test_4mg():
 	# Input data.
+	CRITICAL_LOADS = ['634a_data_center', '634b_radar', '634c_atc_tower', '675a_hospital', '675b_residential1', '675c_residential1', '684_command_center', '652_residential', '645_hangar','646_office']
 	MODEL_DIR = f'{PROJ_FOLDER}/lehigh4mgs'
 	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_4mg.dss'
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
@@ -296,43 +300,43 @@ def test_4mg():
 	}
 	MICROGRIDS = {
 		'mg0': {
-			'loads': ['634a_data_center','634b_radar','634c_atc_tower'],
+			'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'],
 			'switch': '632633',
 			'gen_bus': '634',
 			'gen_obs_existing': ['solar_634_existing','battery_634_existing'],
-			'critical_load_kws': [70,90,10]
+			'critical_load_kws': [70, 90, 10]
 		},
 		'mg1': {
-			'loads': ['675a_hospital','675b_residential1','675c_residential1','692_warehouse2'],
+			'loads': ['675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2'],
 			'switch': '671692',
 			'gen_bus': '675',
 			'gen_obs_existing': ['solar_675_existing'],
-			'critical_load_kws': [150,200,200,0]
+			'critical_load_kws': [150, 200, 200, 0]
 		},
 		'mg2': {
 			'loads': ['684_command_center','652_residential','611_runway'],
 			'switch': '671684',
 			'gen_bus': '684',
 			'gen_obs_existing': ['fossil_684_existing','battery_684_existing'],
-			'critical_load_kws': [400,20,0]
+			'critical_load_kws': [400, 20, 0]
 		},
 		'mg3': {
 			'loads': ['645_hangar','646_office'],
 			'switch': '632645',
 			'gen_bus': '646',
 			'gen_obs_existing': ['battery_646_existing'],
-			'critical_load_kws': [30,70]
+			'critical_load_kws': [30, 70]
 		}
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
 	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
 		sys.exit(1)
 
 def test_auto3mg():
 	# Input data.
 	CIRC_FILE = f'{MGU_FOLDER}/testfiles/lehigh_base_3mg.dss'
-	CRITICAL_LOADS = ['645_hangar','684_command_center', '611_runway','675a_hospital','634a_data_center', '634b_radar', '634c_atc_tower']
+	CRITICAL_LOADS = ['645_hangar', '684_command_center', '611_runway', '675a_hospital', '634a_data_center', '634b_radar', '634c_atc_tower']
 	MODEL_DIR = f'{PROJ_FOLDER}/lehighauto_3mg'
 	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_3mg.dss'
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
@@ -414,7 +418,7 @@ def test_auto3mg():
 	# 	}
 	# }
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
 	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
 		sys.exit(1)
 

@@ -261,11 +261,11 @@
                     <input type="text" name="MODEL_DIR" value="{{in_data.MODEL_DIR}}" pattern="[a-z0-9_\-]+" required/>
                 </div>
                 <div class="chunk">
-                    <label class="tooltip" for="latitude">Latitude<span class="classic">Specify the latitude of the load/grid.</span></label>
+                    <label class="tooltip" for="latitude">Latitude<span class="classic">Specify the latitude of the load/grid as a decimal.</span></label>
                     <input type="text" name="latitude" pattern="-?\d+\.?\d*" value="39.7817"/>
                 </div>
                 <div class="chunk">
-                    <label class="tooltip" for="longitude">Longitude<span class="classic">Specify the longitude of the load/grid.</span></label>
+                    <label class="tooltip" for="longitude">Longitude<span class="classic">Specify the longitude of the load/grid as a decimal.</span></label>
                     <input type="text" name="longitude" pattern="-?\d+\.?\d*" value="-89.6501"/>
                 </div>
                 <div class="chunk">
@@ -288,7 +288,7 @@
                     <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
                     <div style="display:none">
                         <div class="chunk">
-                            <label class="tooltip" for="energyCost">Energy Cost ($/kWh)<span class="classic">Specify the energy cost in $/kWh. Format 0.XX</span></label>
+                            <label class="tooltip" for="energyCost">Energy Cost ($/kWh)<span class="classic">Specify the energy cost. Format 0.XX</span></label>
                             <input type="text" name="energyCost" value="0.12" pattern="^\d+\.?\d*?$"/>
                         </div>
                         <div class="chunk">
@@ -342,18 +342,18 @@
                     <label class="tooltip" for="criticalLoadFactor">Critical Load Factor (% as decimal)<span class="classic">Please enter a number 0-1 for the fraction of total typical load that must be met during a grid outage. Format 0.XX</span></label>
                     <input type="text" name="criticalLoadFactor" value="1" step="0.01" min="0.0" max="1.0"/>
                 </div>
-                <div class="chunk">
-                    <label class="tooltip" for="year">Year<span class="classic">Specify the year to which the load shape values correspond.</span></label>
-                    <input type="text" name="year" value="2017" pattern="^\d{4}$"/>
-                </div>
+				<div class="chunk">
+					<label class="tooltip" for="analysisYears">Analysis Period (years)<span class="classic">Specify the length of financial analysis in years.</span></label>
+					<input type="text" name="analysisYears" value="25" step="1" min="2" max="75"/>
+				</div>
                 <div>
                     <i class="fa fa-plus-square"></i>
                     <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
                     <div style="display:none">
-                        <div class="chunk">
-                            <label class="tooltip" for="analysisYears">Analysis Period (years)<span class="classic">Specify the length of financial analysis in years.</span></label>
-                            <input type="text" name="analysisYears" value="25" step="1" min="2" max="75"/>
-                        </div>
+						<div class="chunk">
+							<label class="tooltip" for="year">Year<span class="classic">Specify the year to which the load shape values correspond.</span></label>
+							<input type="text" name="year" value="2017" pattern="^\d{4}$"/>
+						</div>
                     </div>
                 </div>
                 <h5>Resilience</h5>
@@ -549,19 +549,19 @@
                 <div id="solarDiv" style="display:none">
                     <h5>Solar</h5>
                     <div class="chunk">
-                        <label class="tooltip" for="solarCost">Solar Cost ($/kW-DC)<span class="classic">Specify the cost in $/kW.</span></label>
+                        <label class="tooltip" for="solarCost">Solar Cost ($/kW-DC)<span class="classic">Specify the cost in $/kW-DC.</span></label>
                         <input type="text" name="solarCost" value="1600" pattern="^\d+\.?\d*?$"/>
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="solarExisting">Solar Existing (kW-DC)<span class="classic">Specify the total capacity of any pre-existing solar arrays in kW. The outputted "Total Solar" will be inclusive of existing solar.</span></label>
+                        <label class="tooltip" for="solarExisting">Solar Existing (kW-DC)<span class="classic">Specify the total capacity of any pre-existing solar arrays in kW-DC. The outputted "Total Solar" will be inclusive of existing solar.</span></label>
                         <input type="text" name="solarExisting" value="0" />
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="solarMax">Solar Max (kW-DC)<span class="classic">Specify the maximum desired generation in kW. Leave at default for full optimization on solar power.</span></label>
+                        <label class="tooltip" for="solarMax">Solar Max (kW-DC)<span class="classic">Specify the maximum desired generation in kW-DC. Leave at default for full optimization on solar power.</span></label>
                         <input type="text" name="solarMax" value="100000" />
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="solarMin">Solar Min (kW-DC)<span class="classic">Specify the minimum desired generation in kW.</span></label>
+                        <label class="tooltip" for="solarMin">Solar Min (kW-DC)<span class="classic">Specify the minimum desired generation in kW-DC.</span></label>
                         <input type="text" name="solarMin" value="0" />
                     </div>
                     <div class="chunk">
@@ -580,36 +580,36 @@
                 <div id="batteryDiv" style="display:none">
                     <h5>Battery</h5>
                     <div class="chunk">
-                        <label class="tooltip" for="batteryCapacityCost">Battery Capacity Cost ($/kWh)<span class="classic">Specify the cost in $/kWh.</span></label>
+                        <label class="tooltip" for="batteryCapacityCost">Battery Capacity Cost ($/kWh-AC)<span class="classic">Specify the cost in $/kWh.</span></label>
                         <input type="text" name="batteryCapacityCost" value="420" pattern="^\d+\.?\d*?$"/>
                     </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="batteryCapacityMax">Battery Capacity Max (kWh)<span class="classic">Specify the maximum desired battery capacity in kWh.</span></label>
-                        <input type="text" name="batteryCapacityMax" value="1000000" />
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="batteryCapacityMin">Battery Capacity Min (kWh)<span class="classic">Specify the minimum desired battery capacity in kWh.</span></label>
-                        <input type="text" name="batteryCapacityMin" value="0" />
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="batteryKwhExisting">Battery Capacity Existing (kWh)<span class="classic">TO DO: FILL TOOLTIP</span></label>
+					<div class="chunk">
+                        <label class="tooltip" for="batteryKwhExisting">Battery Capacity Existing (kWh-AC)<span class="classic">TO DO: FILL TOOLTIP</span></label>
                         <input type="text" name="batteryKwhExisting" value="0" />
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="batteryPowerCost">Battery Power Cost ($/kW)<span class="classic">Specify the cost in $/kW.</span></label>
-                        <input type="text" name="batteryPowerCost" value="840" />
+                        <label class="tooltip" for="batteryCapacityMax">Battery Capacity Max (kWh-AC)<span class="classic">Specify the maximum desired battery capacity in kWh.</span></label>
+                        <input type="text" name="batteryCapacityMax" value="1000000" />
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="batteryPowerMax">Battery Power Max (kW)<span class="classic">Specify the maximum desired battery power in kW.</span></label>
+                        <label class="tooltip" for="batteryCapacityMin">Battery Capacity Min (kWh-AC)<span class="classic">Specify the minimum desired battery capacity in kWh.</span></label>
+                        <input type="text" name="batteryCapacityMin" value="0" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="batteryPowerCost">Battery Power Cost ($/kW-AC)<span class="classic">Specify the cost in $/kW.</span></label>
+                        <input type="text" name="batteryPowerCost" value="840" />
+                    </div>
+					<div class="chunk">
+                        <label class="tooltip" for="batteryKwExisting">Battery Power Existing (kW-AC)<span class="classic">TO DO: FILL TOOLTIP</span></label>
+                        <input type="text" name="batteryKwExisting" value="0" />
+                    </div>
+                    <div class="chunk">
+                        <label class="tooltip" for="batteryPowerMax">Battery Power Max (kW-AC)<span class="classic">Specify the maximum desired battery power in kW.</span></label>
                         <input type="text" name="batteryPowerMax" value="1000000" />
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="batteryPowerMin">Battery Power Min (kW)<span class="classic">Specify the minimum desired battery power in kW.</span></label>
+                        <label class="tooltip" for="batteryPowerMin">Battery Power Min (kW-AC)<span class="classic">Specify the minimum desired battery power in kW.</span></label>
                         <input type="text" name="batteryPowerMin" value="0" />
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="batteryKwExisting">Battery Power Existing (kW)<span class="classic">TO DO: FILL TOOLTIP</span></label>
-                        <input type="text" name="batteryKwExisting" value="0" />
                     </div>
                     <div class="chunk">
                         <label class="tooltip" for="batteryMacrsOptionYears">Battery MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 5 and 7 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
@@ -624,34 +624,38 @@
                         <input type="text" name="batteryItcPercent" value="0" step="0.01" min="0.0" max="1.0"/>
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="batteryPowerCostReplace">Battery Replacement Power Cost ($/kW)<span class="classic">Specify the cost of replacing the battery inverter at the specified year in $/kW.</span></label>
+                        <label class="tooltip" for="batteryPowerCostReplace">Battery Replacement Power Cost ($/kW-AC)<span class="classic">Specify the cost of replacing the battery inverter at the specified year in $/kW.</span></label>
                         <input type="text" name="batteryPowerCostReplace" value="410" pattern="^\d+\.?\d*?$"/>
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="batteryCapacityCostReplace">Battery Replacement Capacity Cost ($/kWh)<span class="classic">Specify the cost of replacing the battery capacity at the specified year in $/kWh.</span></label>
+                        <label class="tooltip" for="batteryCapacityCostReplace">Battery Replacement Capacity Cost ($/kWh-AC)<span class="classic">Specify the cost of replacing the battery capacity at the specified year in $/kWh.</span></label>
                         <input type="text" name="batteryCapacityCostReplace" value="200" pattern="^\d+\.?\d*?$"/>
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="batteryPowerReplaceYear">Battery Inverter Replacement (years)<span class="classic">Specify a year in which the battery inverter will be replaced at the cost specified in Battery Replacement Power Cost. Input is an integer less than or equal to the project period in years.</span></label>
+                        <label class="tooltip" for="batteryPowerReplaceYear">Battery Power Replacement (years)<span class="classic">Specify a year in which the battery power will be replaced at the cost specified in Battery Replacement Power Cost. Input is an integer less than or equal to the project period in years.</span></label>
                         <input type="text" name="batteryPowerReplaceYear" value="10" />
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="batteryCapacityReplaceYear">Battery Replacement (years)<span class="classic">Specify a year in which the battery cells will be replaced at the cost specified in Battery Replacement Capacity Cost. Input is an integer less than or equal to the project period in years.</span></label>
+                        <label class="tooltip" for="batteryCapacityReplaceYear">Battery Capacity Replacement (years)<span class="classic">Specify a year in which the battery cells will be replaced at the cost specified in Battery Replacement Capacity Cost. Input is an integer less than or equal to the project period in years.</span></label>
                         <input type="text" name="batteryCapacityReplaceYear" value="10" />
                     </div>
                 </div>
                 <div id=fossilDiv style="display:none">
                     <h5>Fossil</h5>
                     <div class="chunk">
-                        <label class="tooltip" for="dieselGenCost">Fossil Gen Cost ($/kW)<span class="classic">Specify the cost in $/kWh.</span></label>
+                        <label class="tooltip" for="dieselGenCost">Genset Cost ($/kW)<span class="classic">Specify the cost in $/kWh.</span></label>
                         <input type="text" name="dieselGenCost" value="500" pattern="^\d+\.?\d*?$"/>
                     </div>
+					<div class="chunk">
+                        <label class="tooltip" for="genExisting">Gen Existing (kW)<span class="classic">Specify the total capacity of any pre-existing generators in kW. The outputted "Total Fossil Gen" will be inclusive of existing fossil gen.</span></label>
+                        <input type="text" name="genExisting" value="0" />
+                    </div>
                     <div class="chunk">
-                        <label class="tooltip" for="dieselMax">Fossil Max (kW)<span class="classic">Specify max fossil generation in kW. Only specify if needed, as the optimization runs best if left unedited.</span></label>
+                        <label class="tooltip" for="dieselMax">Genset Max (kW)<span class="classic">Specify max fossil generation in kW. Only specify if needed, as the optimization runs best if left unedited.</span></label>
                         <input type="text" name="dieselMax" value="1000000" pattern="^\d+\.?\d*?$"/>
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="dieselMin">Fossil Min (kW)<span class="classic">Specify minimum fossil generation in kW. Only specify if needed, as the optimization runs best if left unedited.</span></label>
+                        <label class="tooltip" for="dieselMin">Genset Min (kW)<span class="classic">Specify minimum fossil generation in kW. Only specify if needed, as the optimization runs best if left unedited.</span></label>
                         <input type="text" name="dieselMin" value="0" pattern="^\d+\.?\d*?$"/>
                     </div>
                     <div class="chunk">
@@ -659,31 +663,27 @@
                         <input type="text" name="fuelAvailable" value="50000" />
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="genExisting">Gen Existing (kW)<span class="classic">Specify the total capacity of any pre-existing generators in kW. The outputted "Total Fossil Gen" will be inclusive of existing fossil gen.</span></label>
-                        <input type="text" name="genExisting" value="0" />
-                    </div>
-                    <div class="chunk">
                         <label class="tooltip" for="minGenLoading">Min Gen Loading (% as decimal)<span class="classic">Please enter a number 0-1 for the the minimum fraction of rated total kVA load that must be maintained by the generator. >/= 0.3 recommended for extended diesel operation. Set to 0 for highest likelihood of success in solving optimization. Format 0.XX</span></label>
                         <input type="text" name="minGenLoading" value="0.3" />
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="dieselFuelCostGal">Fossil Fuel Cost (diesel gal equiv)<span class="classic">Specify cost of fuel in $ per gallon. To convert $/MMBTU of Natural gas to gallons of diesel, divide $/MMBTU market rate by 4.85 to account for 50% lower efficiency of natural gas reciprocating engines and lower fuel density as compared to diesel. Format X.XX</span></label>
+                        <label class="tooltip" for="dieselFuelCostGal">Fuel Cost (diesel gal equiv)<span class="classic">Specify cost of fuel in $ per gallon. To convert $/MMBTU of Natural gas to gallons of diesel, divide $/MMBTU market rate by 4.85 to account for 50% lower efficiency of natural gas reciprocating engines and lower fuel density as compared to diesel. Format X.XX</span></label>
                         <input type="text" name="dieselFuelCostGal" value="3" pattern="^\d+\.?\d*?$"/>
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="dieselCO2Factor">Fossil Emissions Factor (lb CO2/gal)<span class="classic">Specify fossil emissions factor in pounds of carbon dioxide per gallon. Default 22.4 is for diesel. Natural gas can be modeled using 24.1</span></label>
+                        <label class="tooltip" for="dieselCO2Factor">Genset Emissions Factor (lb CO2/gal)<span class="classic">Specify fossil emissions factor in pounds of carbon dioxide per gallon. Default 22.4 is for diesel. Natural gas can be modeled using 24.1</span></label>
                         <input type="text" name="dieselCO2Factor" value="22.4" pattern="^\d+\.?\d*?$"/>
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="dieselOMCostKw">Fossil O+M Cost ($/kW/year)<span class="classic">Specify annual operations and maintenance cost per kilowatt per year.</span></label>
+                        <label class="tooltip" for="dieselOMCostKw">Genset Annual O+M Cost ($/kW/year)<span class="classic">Specify annual operations and maintenance cost per kilowatt per year.</span></label>
                         <input type="text" name="dieselOMCostKw" value="10" pattern="^\d+\.?\d*?$"/>
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="dieselOMCostKwh">Fossil O+M Cost ($/kWh/year)<span class="classic">Specify annual operations and maintenance cost per kilowatt-hour per year. Format "X.XX"</span></label>
+                        <label class="tooltip" for="dieselOMCostKwh">Genset Hourly O+M Cost ($/kWh/year)<span class="classic">Specify annual operations and maintenance cost per kilowatt-hour per year. Format "X.XX"</span></label>
                         <input type="text" name="dieselOMCostKwh" value="0" pattern="^\d+\.?\d*?$"/>
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="dieselOnlyRunsDuringOutage">Fossil gen only runs during outage?<span class="classic">"No" signifies that fossil generator is enabled to run at any point in the year.</span></label>
+                        <label class="tooltip" for="dieselOnlyRunsDuringOutage">Genset only runs during outage?<span class="classic">"No" signifies that fossil generator is enabled to run at any point in the year.</span></label>
                         <select id="dieselOnlyRunsDuringOutage" name="dieselOnlyRunsDuringOutage">
                             <option value="true">Yes</option>
                             <option selected value="false">No</option>

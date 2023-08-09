@@ -249,11 +249,15 @@
             text-decoration: none;
         }
         div.box p.description {
-            color: mediumseagreen;
+            color: seagreen;
             font-size: 65%;
         }
         div.box p.timestamp {
-            color: seagreen;
+            color: mediumseagreen;
+            font-size: 60%;
+        }
+        div.box p.status {
+            color: rgb(66, 66, 66);
             font-size: 60%;
         }
         div.box a:visited {
@@ -271,7 +275,45 @@
             font-size:25px;
         }
     </style>
-    <script type="text/javascript">
+</head>
+<body>
+    <header>
+        <nav class="js-nav--topNav">
+            <div>
+                <a href="/">
+                    <span class="span--sectionTitle">MicrogridUp &raquo; Home</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <div id='container' style='margin-top:10px'>
+            {% for project in projects %}
+            <div class='box'>
+                <div class="clickable-container">
+                    <a class="project-name" href='load/{{project}}'>
+                        <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 48 48" width="48px" height="48px"><path d="M 8.5 8 C 6.0324991 8 4 10.032499 4 12.5 L 4 35.5 C 4 37.967501 6.0324991 40 8.5 40 L 39.5 40 C 41.967501 40 44 37.967501 44 35.5 L 44 17.5 C 44 15.032499 41.967501 13 39.5 13 L 24.042969 13 L 19.572266 9.2753906 C 18.584055 8.4521105 17.339162 8 16.052734 8 L 8.5 8 z M 8.5 11 L 16.052734 11 C 16.638307 11 17.202555 11.205358 17.652344 11.580078 L 21.15625 14.5 L 17.652344 17.419922 C 17.202555 17.794642 16.638307 18 16.052734 18 L 7 18 L 7 12.5 C 7 11.653501 7.6535009 11 8.5 11 z M 24.042969 16 L 39.5 16 C 40.346499 16 41 16.653501 41 17.5 L 41 35.5 C 41 36.346499 40.346499 37 39.5 37 L 8.5 37 C 7.6535009 37 7 36.346499 7 35.5 L 7 21 L 16.052734 21 C 17.339162 21 18.584055 20.547889 19.572266 19.724609 L 24.042969 16 z"/></svg>
+                        {{project}}
+                    </a>
+                </div>
+                <a href='javascript:duplicate("{{project}}")'>[dup]</a>
+                <a href='edit/{{project}}'>[edit]</a>
+                <a href='delete/{{project}}' onclick='return confirmDelete(event)'>[del]</a>
+                {% if project in project_timestamps %}
+                <p class="timestamp">Last updated: {{ project_timestamps[project].strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                {% endif %}
+                {% if project in project_descriptions %}
+                <p class="description">Description: {{ project_descriptions[project] }}</p>
+                {% endif %}
+                <p class="status">Checking status...</p>
+            </div>
+            {% endfor %}
+            <div class='box' style="border:1px black dashed">
+                <a href='/new' style="font-size:50px">+</a>
+            </div>
+        </div>
+    </main>
+    <script>
         function duplicate(project) {
             var new_name = prompt('Name for the duplicate?', '');
             var xhr = new XMLHttpRequest();
@@ -290,49 +332,51 @@
             xhr.send(contents);
             alert(contents);
         }
+
         function confirmDelete(event) {
             var confirmed = confirm("Are you sure you want to delete?");
             if (!confirmed) {
                 event.preventDefault();
             }
         }
+
+        function checkStatus(projects) {
+            for (let i = 0; i < projects.length; i++) {
+                const model_name = projects[i];
+                const projectLink = document.querySelector(`.clickable-container a[href='load/${model_name}']`);
+                const statusElement = projectLink ? projectLink.closest('.box').querySelector('.status') : null;
+                const checkStatusUrl = `/check_status/${model_name}`;
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', checkStatusUrl, true);
+                // Event listener to process the response.
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        const data = JSON.parse(xhr.responseText);
+                        if (data.status === 'complete') {
+                            statusElement.textContent = "Status: Finished";
+                        } else if (data.status === 'crashed') {
+                            statusElement.textContent = "Status: Crashed";
+                        } else {
+                            statusElement.textContent = "Status: In Progress";
+                            setTimeout(checkStatus(projects), 500); // Check again after 5 seconds.
+                        }
+                    } else {
+                        console.log('Error:', xhr.status);
+                    }
+                };
+                // Handle network errors.
+                xhr.onerror = function () {
+                    console.log('Network Error.');
+                };
+                // Send the request.
+                xhr.send();
+            }
+        }
+        window.onload = function () {
+            const projects_json = '{{ projects | tojson }}';
+            const projects = JSON.parse(projects_json)
+            checkStatus(projects);
+        }
     </script>
-</head>
-<body>
-    <header>
-        <nav class="js-nav--topNav">
-            <div>
-                <a href="/">
-                    <span class="span--sectionTitle">MicrogridUp &raquo; Home</span>
-                </a>
-            </div>
-        </nav>
-    </header>
-    <main>
-        <div id='container' style='margin-top:10px'>
-            {% for project in projects %}
-            <div class='box'>
-                <div class="clickable-container">
-                    <a class="project-name" style="font-size:40px" href='load/{{project}}'>
-                        <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 48 48" width="48px" height="48px"><path d="M 8.5 8 C 6.0324991 8 4 10.032499 4 12.5 L 4 35.5 C 4 37.967501 6.0324991 40 8.5 40 L 39.5 40 C 41.967501 40 44 37.967501 44 35.5 L 44 17.5 C 44 15.032499 41.967501 13 39.5 13 L 24.042969 13 L 19.572266 9.2753906 C 18.584055 8.4521105 17.339162 8 16.052734 8 L 8.5 8 z M 8.5 11 L 16.052734 11 C 16.638307 11 17.202555 11.205358 17.652344 11.580078 L 21.15625 14.5 L 17.652344 17.419922 C 17.202555 17.794642 16.638307 18 16.052734 18 L 7 18 L 7 12.5 C 7 11.653501 7.6535009 11 8.5 11 z M 24.042969 16 L 39.5 16 C 40.346499 16 41 16.653501 41 17.5 L 41 35.5 C 41 36.346499 40.346499 37 39.5 37 L 8.5 37 C 7.6535009 37 7 36.346499 7 35.5 L 7 21 L 16.052734 21 C 17.339162 21 18.584055 20.547889 19.572266 19.724609 L 24.042969 16 z"/></svg>
-                        {{project}}
-                    </a>
-                </div>
-                <a href='javascript:duplicate("{{project}}")'>[dup]</a>
-                <a href='edit/{{project}}'>[edit]</a>
-                <a href='delete/{{project}}' onclick='return confirmDelete(event)'>[del]</a>
-                {% if project in project_timestamps %}
-                <p class="timestamp">Last updated: {{ project_timestamps[project].strftime('%Y-%m-%d %H:%M:%S') }}</p>
-                {% endif %}
-                {% if project in project_descriptions %}
-                <p class="description">Description: {{ project_descriptions[project] }}</p>
-                {% endif %}         
-            </div>
-            {% endfor %}
-            <div class='box' style="border:1px black dashed">
-                <a href='/new' style="font-size:50px">+</a>
-            </div>
-        </div>
-    </main>
 </body>
 </html>

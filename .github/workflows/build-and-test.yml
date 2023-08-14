@@ -14,11 +14,9 @@ jobs:
         run: |
           docker build . -f Dockerfile -t mguim
           sudo apt-get install wget
-      - name: Test microgridup_gui.py server runs and returns successful response
+      - name: Run microgridup_gen_mgs._tests
         run: |
-          docker run -d -p 5000:5000 --name mgucont mguim
-          sleep 10
-          wget localhost:5000
+          docker run mguim -c "import microgridup_gen_mgs; microgridup_gen_mgs._tests()"
       - name: Run microgridup_design._tests
         run: |
           docker run mguim -c "import microgridup_design; microgridup_design._tests()"
@@ -37,3 +35,8 @@ jobs:
       - name: Run tests_backend_full.py
         run: |
           docker run mguim tests_backend_full.py
+      - name: Test microgridup_gui.py server runs and returns successful response
+        run: |
+          docker run -d -p 5000:5000 --name mgucont mguim
+          sleep 10
+          wget localhost:5000

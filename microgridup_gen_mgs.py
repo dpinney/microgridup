@@ -404,7 +404,11 @@ def _tests():
 			params = algo_params
 		else:
 			params = algo_params['pairings']
-		MINES_TEST = mg_group(f'{_myDir}/uploads/BASE_DSS_{_dir}', crit_loads, MG_MINES[_dir][1], params)
+		try:
+			_dir.index('wizard')
+			MINES_TEST = mg_group(f'{_myDir}/testfiles/wizard_base_3mg.dss', crit_loads, MG_MINES[_dir][1], params)
+		except ValueError as e:
+			MINES_TEST = mg_group(f'{_myDir}/testfiles/lehigh_base_3mg.dss', crit_loads, MG_MINES[_dir][1], params)
 		# Lukes algorithm outputs different configuration each time. Not repeatable. Also errors out later in the MgUP run.
 		if MG_MINES[_dir][1] != 'lukes':
 			assert MINES_TEST == MG_MINES[_dir][0], f'MGU_MINES_{_dir} did not match expected output.\nExpected output: {MG_MINES[_dir][0]}.\nReceived output: {MINES_TEST}.'

@@ -34,7 +34,7 @@ def test_browser_gui():
         if 'lehigh' in _dir:
             driver.find_element(By.ID, 'upload').click()
 
-            driver.find_element(By.NAME, 'file').send_keys(f'{MGU_FOLDER}/testfiles/lehigh_base_3mg.dss')
+            driver.find_element(By.NAME, 'BASE_DSS_NAME').send_keys(f'{MGU_FOLDER}/testfiles/lehigh_base_3mg.dss')
 
             driver.find_element(By.ID, 'upload-file-btn').click()
         
@@ -64,7 +64,7 @@ def test_browser_gui():
 
         if algo in ('loadGrouping','manual'):
             driver.find_element(By.ID, 'mgQuantity').send_keys('3')
-            driver.find_element(By.ID, 'makeDropdowns').click()
+            driver.find_element(By.ID, 'makeDropdownsButton').click()
             # Fill out dropdowns.
             pairings.pop('None','')
             for key in pairings:
@@ -80,9 +80,9 @@ def test_browser_gui():
                     driver.find_element(By.ID, f'{key.lower()}Genbus').send_keys(gen_bus[key])
         elif algo in ('bottomUp','criticalLoads'):
             driver.find_element(By.ID, 'minQuantMgs').send_keys('3')
-            driver.find_element(By.ID, 'previewPartitions').click()
+            driver.find_element(By.ID, 'previewPartitionsButton').click()
         else:
-            driver.find_element(By.ID, 'previewPartitions').click()
+            driver.find_element(By.ID, 'previewPartitionsButton').click()
 
         time.sleep(2)
 

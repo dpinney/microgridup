@@ -218,6 +218,31 @@ def summary_charts(stats):
 	all_html = money_summary_html + gen_load_html + gen_mix_html
 	return all_html
 
+def colorby_mgs(omd_path, mg_group_dictionary):
+	''' generate a colorby CSV/JSON that works with omf.geo map interface.
+	To use, set omd['attachments'] = function JSON output'''
+	attachments_keys = {
+		"coloringFiles": {
+			"microgridColoring.csv": {
+				"csv": "<content>",
+				"colorOnLoadColumnIndex": "1"
+			}
+		}
+	}
+	mg_keys = mg_group_dictionary.keys()
+	color_step = float(1/len(mg_keys))
+	output_csv = 'bus,color\n'
+	all_mg_elements = microgridup_control.get_all_mg_elements(None, mg_group_dictionary, omd_path) # Also I wrote this.
+	for i, mg_key in enumerate(mg_group_dictionary):
+		my_color = i * color_step
+		mg_ob = mg_group_dictionary[mg_key]
+		all_items = mg_ob['loads'] + mg_ob['gen_obs_existing'] + [mg_ob['gen_bus']]
+		all_items = list(all_mg_elements[mg_key]) # I wrote this.
+		for item in all_items:
+			output_csv += item + ',' + str(my_color) + '\n'
+	attachments_keys['coloringFiles']['microgridColoring.csv']['csv'] = output_csv
+	return attachments_keys
+
 def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS=None, DESCRIPTION='', INVALIDATE_CACHE=False, DELETE_FILES=False, open_results=False, OUTAGE_CSV=None):
 	''' Generate a full microgrid plan for the given inputs. '''
 	# Constants
@@ -296,8 +321,19 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		dssConvert.dssToOmd(f'circuit_plusmg_{i}.dss', OMD_NAME, RADIUS=0.0002)
 		# Draw the circuit oneline.
 		distNetViz.viz(OMD_NAME, forceLayout=False, outputPath='.', outputName=ONELINE_NAME, open_file=False)
+		
+		'''I am going to be adding some code here.'''
+		out = colorby_mgs(OMD_NAME, MICROGRIDS)
+		new_path = './color_test.omd'
+		omd = json.load(open(OMD_NAME))
+		omd['attachments'] = out
+		with open(new_path, 'w+') as out_file:
+			json.dump(omd, out_file, indent=4)
+		geo.map_omd(new_path, MAP_NAME, open_browser=False)
+		'''This is the end of the new code that I have added.'''
+		
 		# Draw the map.
-		geo.map_omd(OMD_NAME, MAP_NAME, open_browser=False)
+		# geo.map_omd(OMD_NAME, MAP_NAME, open_browser=False)
 		# Powerflow outputs.
 		microgridup_hosting_cap.gen_powerflow_results(f'circuit_plusmg_{i}.dss', REOPT_INPUTS['year'], QSTS_STEPS, logger)
 		# Perform control sim.

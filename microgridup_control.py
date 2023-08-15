@@ -10,31 +10,22 @@ from omf.solvers import opendss
 import microgridup
 
 def get_first_nodes_of_mgs(dssTree, microgrids):
-	# print('dssTree',dssTree)
-	# print('microgrids',microgrids)
 	nodes = {}
 	for key in microgrids:
-		# print('key',key)
 		switch = microgrids[key]['switch']
 		if type(switch) is list:
 			switch = switch[-1] if switch[-1] else switch[0]
 		bus2 = [obj.get('bus2') for obj in dssTree if f'line.{switch}' in obj.get('object','')]
-		# print('bus2 1st statement',bus2)
 		if not bus2:
 			bus2 = [obj.get('buses') for obj in dssTree if f'transformer.{switch}' in obj.get('object','')]
-			# print('bus2 2nd statement not sure why i didnt make a new variable',bus2)
 			bus2 = [bus2[0][1:-1].split(',')[1]]
-			# print('bus2 3rd statement not sure why i didnt make a new variable',bus2)
 		bus2 = bus2[0].split('.')[0]
-		# print('bus2 4th and final statement',bus2)
 		nodes[key] = bus2
 	return nodes
 
 def get_all_mg_elements(dssPath, microgrids, omdPath=None):
 	if not dssPath:
 		dssTree = opendss.dssConvert.omdToTree(omdPath)
-		# with open(omdPath) as file:
-		# 	omd_data = json.load(file)
 		G = opendss.dssConvert.dss_to_networkx(None, dssTree)
 	else:
 		dssTree = opendss.dssConvert.dssToTree(dssPath)

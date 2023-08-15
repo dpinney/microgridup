@@ -232,7 +232,7 @@ def colorby_mgs(omd_path, mg_group_dictionary):
 	mg_keys = mg_group_dictionary.keys()
 	color_step = float(1/len(mg_keys))
 	output_csv = 'bus,color\n'
-	all_mg_elements = microgridup_control.get_all_mg_elements(None, mg_group_dictionary, omd_path) # Also I wrote this.
+	all_mg_elements = microgridup_control.get_all_mg_elements(None, mg_group_dictionary, omd_path)
 	for i, mg_key in enumerate(mg_group_dictionary):
 		my_color = i * color_step
 		mg_ob = mg_group_dictionary[mg_key]
@@ -321,8 +321,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		dssConvert.dssToOmd(f'circuit_plusmg_{i}.dss', OMD_NAME, RADIUS=0.0002)
 		# Draw the circuit oneline.
 		distNetViz.viz(OMD_NAME, forceLayout=False, outputPath='.', outputName=ONELINE_NAME, open_file=False)
-		
-		'''I am going to be adding some code here.'''
+		# Draw the map.
 		out = colorby_mgs(OMD_NAME, MICROGRIDS)
 		new_path = './color_test.omd'
 		omd = json.load(open(OMD_NAME))
@@ -330,9 +329,6 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		with open(new_path, 'w+') as out_file:
 			json.dump(omd, out_file, indent=4)
 		geo.map_omd(new_path, MAP_NAME, open_browser=False)
-		'''This is the end of the new code that I have added.'''
-		
-		# Draw the map.
 		# geo.map_omd(OMD_NAME, MAP_NAME, open_browser=False)
 		# Powerflow outputs.
 		microgridup_hosting_cap.gen_powerflow_results(f'circuit_plusmg_{i}.dss', REOPT_INPUTS['year'], QSTS_STEPS, logger)

@@ -415,6 +415,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		os.system(f'rm "{workDir}/0running.txt"')
 
 def _tests():
+	''' Unit tests for this module. '''
 	with open('testfiles/test_params.json') as file:
 		test_params = json.load(file)
 	MG_MINES = test_params['MG_MINES']

@@ -219,28 +219,45 @@ def summary_charts(stats):
 	return all_html
 
 def colorby_mgs(omd_path, mg_group_dictionary, critical_loads):
-	''' generate a colorby CSV/JSON that works with omf.geo map interface.
-	To use, set omd['attachments'] = function JSON output'''
-	attachments_keys = {
-		"coloringFiles": {
-			"microgridColoring.csv": {
-				"csv": "<content>",
-				"colorOnLoadColumnIndex": "1"
-			}
-		}
-	}
-	mg_keys = mg_group_dictionary.keys()
-	color_step = float(1/len(mg_keys))
-	output_csv = 'bus,mg_color,crit_color\n'
-	all_mg_elements = microgridup_control.get_all_mg_elements(None, mg_group_dictionary, omd_path)
-	for i, mg_key in enumerate(mg_group_dictionary):
-		my_color = i * color_step
-		all_items = list(all_mg_elements[mg_key])
-		for item in all_items:
-			critical_binary = 1 if item in critical_loads else 0
-			output_csv += item + ',' + str(my_color) + ',' + str(critical_binary) + '\n'
-	attachments_keys['coloringFiles']['microgridColoring.csv']['csv'] = output_csv
-	return attachments_keys
+    ''' generate a colorby CSV/JSON that works with omf.geo map interface.
+    To use, set omd['attachments'] = function JSON output'''
+    attachments_keys = {
+        "coloringFiles": {
+            "microgridColoring.csv": {
+                "csv": "<content>",
+                "colorOnLoadColumnIndex": "1"
+            }
+        }
+    }
+    mg_keys = mg_group_dictionary.keys()
+    color_step = float(1/(len(mg_keys) + 1))
+    output_csv = 'bus,mg_color,crit_color\n'
+    all_mg_elements = microgridup_control.get_all_mg_elements(None, mg_group_dictionary, omd_path)
+    all_colorable_elements = get_all_colorable_elements(None, omd_path)
+    seen = set()
+    for i, mg_key in enumerate(mg_group_dictionary):
+        my_color = (i+1) * color_step
+        all_items = list(all_mg_elements[mg_key])
+        for item in all_items:
+            critical_binary = 1 if item in critical_loads else 0
+            output_csv += item + ',' + str(my_color) + ',' + str(critical_binary) + '\n'
+            seen.add(item)
+    # Color all circuit elements that aren't in an mg/critical as 0.
+    for item in all_colorable_elements:
+        name = item.get('bus') if item['!CMD'] == 'setbusxy' else item.get('object').split('.')[1]
+        if name not in seen:
+            output_csv += name + ',' + str(0) + ',' + str(0) + '\n'
+    attachments_keys['coloringFiles']['microgridColoring.csv']['csv'] = output_csv
+    return attachments_keys
+
+def get_all_colorable_elements(dss_path, omd_path=None):
+    if not dss_path:
+        tree = dssConvert.omdToTree(omd_path)
+        colorable_elements = [x for x in tree if x['!CMD'] in ('new','edit','setbusxy') and 'loadshape' not in x.get('object','') and 'line' not in x.get('object','')]
+    else:
+        tree = dssConvert.dssToTree(dss_path)
+    colorable_elements = [x for x in tree if x['!CMD'] in ('new','edit','setbusxy') and 'loadshape' not in x.get('object','') and 'line' not in x.get('object','')]
+    return colorable_elements
 
 def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS=None, DESCRIPTION='', INVALIDATE_CACHE=False, DELETE_FILES=False, open_results=False, OUTAGE_CSV=None):
 	''' Generate a full microgrid plan for the given inputs. '''

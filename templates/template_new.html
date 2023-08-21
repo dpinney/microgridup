@@ -329,11 +329,11 @@
                 <h5>Load Profile</h5>
                 <div class="chunk">
                     {% if in_data.get('LOAD_CSV') %}
-                        <label class="tooltip" for="LOAD_CSV_NAME">Load Data (.csv)<span class="classic">Please enter the name of a .csv file representing the hourly load shape.</span></label>
+                        <label class="tooltip" for="LOAD_CSV_NAME">Load Data (.csv)<span class="classic">Please upload a .csv file representing the hourly load shape. See https://github.com/dpinney/<br>microgridup/blob/main/docs<br>/input_formats.md for formatting details.</span></label>
                         <input type="text" name="LOAD_CSV_NAME" value="{{ in_data.get('LOAD_CSV') }}" class="file-input" readonly>
                         <button type="button" class="remove-btn">Remove File</button>
                     {% else %}
-                        <label class="tooltip" for="LOAD_CSV">Load Data (.csv)<span class="classic">Please enter the name of a .csv file representing the hourly load shape.</span></label>
+                        <label class="tooltip" for="LOAD_CSV">Load Data (.csv)<span class="classic">Please upload a .csv file representing the hourly load shape. See https://github.com/dpinney/<br>microgridup/blob/main/docs<br>/input_formats.md for formatting details.</span></label>
                         <input type="file" name="LOAD_CSV" class="file-input">
                         <button type="button" class="remove-btn">Remove File</button>
                     {% endif %}
@@ -366,7 +366,7 @@
                     <input type="text" name="outageDuration" value="48" min="1" max="8760"/>
                 </div>
                 <div class="chunk">
-                    <label for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)</label>
+                    <label class="tooltip" for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)<span class="classic">Please upload a .csv file representing historical outages. See https://github.com/dpinney/<br>microgridup/blob/main/docs<br>/input_formats.md for formatting details.</span></label>
                     <input type="file" name="HISTORICAL_OUTAGES" class="file-input" data-uploaded="{{ in_data.get('HISTORICAL_OUTAGES') }}">
                     <button type="button" class="remove-btn">Remove File</button>
                 </div>
@@ -1084,6 +1084,9 @@
 					$('input[name="MODEL_DIR"]').prop("readonly", true);	
 					// Remove manual option from partitioning options because switches and gen_bus are predetermined.
 					$("#partitionMethod option[value='manual']").remove();
+					// Enable partition selector.
+					$('#previewPartitionsButton').prop('disabled', false);
+					$('#partitionMethod').prop('disabled', false);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					console.log(textStatus + ' : ' + errorThrown)

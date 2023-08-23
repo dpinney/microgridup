@@ -1041,6 +1041,47 @@ def run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, REF_NAME, L
 	mg_list_of_dicts_full = microgrid_report_list_of_dicts('/allOutputData.json', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME)
 	return mg_list_of_dicts_full
 
+def get_microgrid_coordinates(dss_path, microgrid):
+	tree = dssConvert.dssToTree(dss_path)
+	evil_glm = dssConvert.evilDssTreeToGldTree(tree)
+	# using evil_glm to get around the fact that buses in openDSS are created in memory and do not exist in the BASE_NAME dss file
+	for ob in evil_glm.values():
+		ob_name = ob.get('name','')
+		ob_type = ob.get('object','')
+		# pull out long and lat of the gen_bus
+		if ob_type == "bus" and ob_name == microgrid['gen_bus']:
+			ob_lat = ob.get('latitude','')
+			ob_long = ob.get('longitude','')
+			return (ob_lat, ob_long)
+	raise Exception("Couldn't determine microgrid latitude and longitude")
+
+def get_microgrid_existing_generation_dict(dss_path, microgrid):
+	tree = dssConvert.dssToTree(dss_path)
+	load_map = {x.get('object',''):i for i, x in enumerate(tree)}
+	solar_kw_existing = []
+	fossil_kw_existing = []
+	battery_kw_existing = []
+	battery_kwh_existing = []
+	wind_kw_existing = []
+	gen_obs_existing = microgrid['gen_obs_existing']
+	for gen_ob in gen_obs_existing:
+		if gen_ob.startswith('solar_'):
+			solar_kw_existing.append(float(tree[load_map[f'generator.{gen_ob}']].get('kw')))
+		elif gen_ob.startswith('fossil_'):
+			fossil_kw_existing.append(float(tree[load_map[f'generator.{gen_ob}']].get('kw')))
+		elif gen_ob.startswith('wind_'):
+			wind_kw_existing.append(float(tree[load_map[f'generator.{gen_ob}']].get('kw')))
+		elif gen_ob.startswith('battery_'):
+			battery_kw_existing.append(float(tree[load_map[f'storage.{gen_ob}']].get('kwrated')))
+			battery_kwh_existing.append(float(tree[load_map[f'storage.{gen_ob}']].get('kwhrated')))
+	return {
+		'battery_kw_existing': sum(battery_kw_existing),
+		'battery_kwh_existing': sum(battery_kwh_existing),
+		'solar_kw_existing': sum(solar_kw_existing),
+		'wind_kw_existing': sum(wind_kw_existing),
+		'fossil_kw_existing': sum(fossil_kw_existing)
+	}
+
 def _tests():
 	# Load arguments from JSON.
 	with open('testfiles/test_params.json') as file:

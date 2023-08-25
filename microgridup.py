@@ -329,10 +329,10 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		# Generate the per-microgrid results and add each to the circuit iteratively.
 		mgs_name_sorted = sorted(MICROGRIDS.keys())
 		for i, mg_name in enumerate(mgs_name_sorted):
-			BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
 			existing_generation_dict = microgridup_hosting_cap.get_microgrid_existing_generation_dict(f'{MODEL_DIR}/{MODEL_DSS}', MICROGRIDS[mg_name])
 			lat, lon = microgridup_hosting_cap.get_microgrid_coordinates(f'{MODEL_DIR}/{MODEL_DSS}', MICROGRIDS[mg_name])
-			microgridup_design.run(MODEL_DIR, f'reopt_final_{i}', MICROGRIDS[mg_name], logger, REOPT_INPUTS, mg_name, lat, lon, existing_generation_dict)
+			microgridup_design.run(MODEL_DIR, f'reopt_final_{i}', MICROGRIDS[mg_name], logger, REOPT_INPUTS, mg_name, lat, lon, existing_generation_dict, INVALIDATE_CACHE=INVALIDATE_CACHE)
+			BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
 			max_crit_load = sum(MICROGRIDS[mg_name]['critical_load_kws'])
 			microgridup_hosting_cap.run(f'reopt_final_{i}', GEN_NAME, MICROGRIDS[mg_name], BASE_DSS, mg_name, REF_NAME, MODEL_LOAD_CSV, f'circuit_plusmg_{i}.dss', f'mg_add_cost_{i}.csv', max_crit_load, logger)
 		# Make OMD of fully detailed system.

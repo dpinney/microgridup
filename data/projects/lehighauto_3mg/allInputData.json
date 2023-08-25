@@ -1,9 +1,8 @@
 {
-    "MODEL_DIR": "/Users/dpinney/gdrive/LATERBASE/NRECA/MICROGRIDUP (MGU) ESTCP FY2020/del2.2.1K - Requirements and Specifications/microgridup mgu test system lehigh/data/projects/lehighauto_3mg",
-    "BASE_DSS": "/Users/dpinney/gdrive/LATERBASE/NRECA/MICROGRIDUP (MGU) ESTCP FY2020/del2.2.1K - Requirements and Specifications/microgridup mgu test system lehigh/testfiles/lehigh_base_3mg.dss",
-    "LOAD_CSV": "/Users/dpinney/gdrive/LATERBASE/NRECA/MICROGRIDUP (MGU) ESTCP FY2020/del2.2.1K - Requirements and Specifications/microgridup mgu test system lehigh/testfiles/lehigh_load.csv",
+    "MODEL_DIR": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehighauto_3mg",
+    "BASE_DSS": "/Users/austinchang/programming/repositories/microgridup/microgridup/testfiles/lehigh_base_3mg.dss",
+    "LOAD_CSV": "/Users/austinchang/programming/repositories/microgridup/microgridup/testfiles/lehigh_load.csv",
     "QSTS_STEPS": 480,
-    "FOSSIL_BACKUP_PERCENT": 0.5,
     "REOPT_INPUTS": {
         "solar": "on",
         "wind": "off",
@@ -124,9 +123,17 @@
         }
     },
     "FAULTED_LINE": "670671",
-    "DIESEL_SAFETY_FACTOR": false,
-    "OUTAGE_CSV": "/Users/dpinney/gdrive/LATERBASE/NRECA/MICROGRIDUP (MGU) ESTCP FY2020/del2.2.1K - Requirements and Specifications/microgridup mgu test system lehigh/testfiles/lehigh_random_outages.csv",
-    "CRITICAL_LOADS": null,
-    "CREATION_DATE": "2023-07-10 12:55:41",
-    "DESCRIPTION": ""
+    "OUTAGE_CSV": "/Users/austinchang/programming/repositories/microgridup/microgridup/testfiles/lehigh_random_outages.csv",
+    "CRITICAL_LOADS": [
+        "645_hangar",
+        "684_command_center",
+        "611_runway",
+        "675a_hospital",
+        "634a_data_center",
+        "634b_radar",
+        "634c_atc_tower"
+    ],
+    "CREATION_DATE": "2023-08-24 23:13:11",
+    "DESCRIPTION": "",
+    "INVALIDATE_CACHE": true
 }

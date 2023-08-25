@@ -1,5 +1,5 @@
 redirect "circuit_control.dss"
-set datapath="/Users/dpinney/gdrive/LATERBASE/NRECA/MICROGRIDUP (MGU) ESTCP FY2020/del2.2.1K - Requirements and Specifications/microgridup mgu test system lehigh/data/projects/lehigh3mgs"
+set datapath="/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh3mgs"
 set maxcontroliter=1000
 calcvoltagebases
 new object=monitor.monvsource-source element=vsource.source terminal=1 mode=0
@@ -23,18 +23,19 @@ new object=monitor.monload-670a_residential2 element=load.670a_residential2 term
 new object=monitor.monload-670b_residential2 element=load.670b_residential2 terminal=1 mode=0
 new object=monitor.monload-670c_residential2 element=load.670c_residential2 terminal=1 mode=0
 new object=monitor.mongenerator-solar_634_existing element=generator.solar_634_existing terminal=1 mode=1 ppolar=no
-new object=monitor.mongenerator-battery_634_existing element=storage.battery_634_existing terminal=1 mode=1 ppolar=no
 new object=monitor.monvsource-lead_gen_675_1_2_3 element=vsource.lead_gen_675_1_2_3 terminal=1 mode=0
 new object=monitor.moncapacitor-cap1 element=capacitor.cap1 terminal=1 mode=6
 new object=monitor.moncapacitor-cap2 element=capacitor.cap2 terminal=1 mode=6
 new object=monitor.mongenerator-battery_634 element=storage.battery_634 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-wind_634 element=generator.wind_634 terminal=1 mode=1 ppolar=no
 new object=monitor.monvsource-lead_gen_634_1 element=vsource.lead_gen_634_1 terminal=1 mode=0
 new object=monitor.mongenerator-solar_634 element=generator.solar_634 terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-battery_675 element=storage.battery_675 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-wind_675 element=generator.wind_675 terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-fossil_675 element=generator.fossil_675 terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-solar_675 element=generator.solar_675 terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-battery_646 element=storage.battery_646 terminal=1 mode=1 ppolar=no
-new object=monitor.monvsource-lead_gen_646_2 element=vsource.lead_gen_646_2 terminal=1 mode=0
+new object=monitor.mongenerator-wind_646 element=generator.wind_646 terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-solar_646 element=generator.solar_646 terminal=1 mode=1 ppolar=no
 set mode=yearly stepsize=60m 
 set number=1
@@ -43,9 +44,6 @@ set number=1
 				calcv
 			
 				open line.line_for_lead_gen_675_1_2_3
-				calcv
-			
-				open line.line_for_lead_gen_646_2
 				calcv
 			solve
 solve
@@ -128,10 +126,7 @@ solve
 			open object=line.632645 term=1
 			open object=line.632645 term=2
 			open object=line.632645 term=3
-		
-				close line.line_for_lead_gen_646_2
-				calcv
-			calcv
+		calcv
 solve
 solve
 solve
@@ -274,10 +269,7 @@ solve
 			close object=line.632645 term=1
 			close object=line.632645 term=2
 			close object=line.632645 term=3
-		
-				open line.line_for_lead_gen_646_2
-				calcv
-			calcv
+		calcv
 solve
 solve
 solve
@@ -420,16 +412,17 @@ export monitors monitorname=monload-670a_residential2
 export monitors monitorname=monload-670b_residential2
 export monitors monitorname=monload-670c_residential2
 export monitors monitorname=mongenerator-solar_634_existing
-export monitors monitorname=mongenerator-battery_634_existing
 export monitors monitorname=monvsource-lead_gen_675_1_2_3
 export monitors monitorname=moncapacitor-cap1
 export monitors monitorname=moncapacitor-cap2
 export monitors monitorname=mongenerator-battery_634
+export monitors monitorname=mongenerator-wind_634
 export monitors monitorname=monvsource-lead_gen_634_1
 export monitors monitorname=mongenerator-solar_634
 export monitors monitorname=mongenerator-battery_675
+export monitors monitorname=mongenerator-wind_675
 export monitors monitorname=mongenerator-fossil_675
 export monitors monitorname=mongenerator-solar_675
 export monitors monitorname=mongenerator-battery_646
-export monitors monitorname=monvsource-lead_gen_646_2
+export monitors monitorname=mongenerator-wind_646
 export monitors monitorname=mongenerator-solar_646

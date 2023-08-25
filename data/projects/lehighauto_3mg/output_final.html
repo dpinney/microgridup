@@ -37,6 +37,7 @@
         position: fixed;
         top: 0;
         width: 100%;
+        z-index: 1;
     }
     header span {
         color: white;
@@ -69,7 +70,7 @@
     span.span--sectionTitle {
         font-family: sans-serif;
         font-size: 2rem;
-        padding-left: 1rem;
+        /*padding-left: 1rem;*/
     }
     div > span.span--sectionTitle:nth-child(2) {
         padding-left: .5rem;
@@ -225,6 +226,23 @@
                 </a>
                 <span class="span--sectionTitle">Overview</span>
             </div>
+            <div style="padding-right: 1rem; margin-left: auto;">
+                <a href="/edit/lehighauto_3mg">
+                    <svg width="32px" height="32px" viewBox="0 0 24 20">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M21.1213 2.70705C19.9497 1.53548 18.0503 1.53547 16.8787 2.70705L15.1989
+                        4.38685L7.29289 12.2928C7.16473 12.421 7.07382 12.5816 7.02986 12.7574L6.02986 16.7574C5.94466 17.0982 6.04451 17.4587 6.29289
+                        17.707C6.54127 17.9554 6.90176 18.0553 7.24254 17.9701L11.2425 16.9701C11.4184 16.9261 11.5789 16.8352 11.7071 16.707L19.5556
+                        8.85857L21.2929 7.12126C22.4645 5.94969 22.4645 4.05019 21.2929 2.87862L21.1213 2.70705ZM18.2929 4.12126C18.6834 3.73074 19.3166
+                        3.73074 19.7071 4.12126L19.8787 4.29283C20.2692 4.68336 20.2692 5.31653 19.8787 5.70705L18.8622 6.72357L17.3068 5.10738L18.2929
+                        4.12126ZM15.8923 6.52185L17.4477 8.13804L10.4888 15.097L8.37437 15.6256L8.90296 13.5112L15.8923 6.52185ZM4 7.99994C4 7.44766
+                        4.44772 6.99994 5 6.99994H10C10.5523 6.99994 11 6.55223 11 5.99994C11 5.44766 10.5523 4.99994 10 4.99994H5C3.34315 4.99994 2
+                        6.34309 2 7.99994V18.9999C2 20.6568 3.34315 21.9999 5 21.9999H16C17.6569 21.9999 19 20.6568 19 18.9999V13.9999C19 13.4477 18.5523
+                        12.9999 18 12.9999C17.4477 12.9999 17 13.4477 17 13.9999V18.9999C17 19.5522 16.5523 19.9999 16 19.9999H5C4.44772 19.9999 4 19.5522
+                        4 18.9999V7.99994Z" fill="#FFFFFF"/>
+                    </svg>
+                    <span class="span--sectionTitle">Edit</span>
+                </a>
+            </div>
         </nav>
     </header>
     <main class="loading">
@@ -237,7 +255,8 @@
                 </svg>
                 <span>Overview</span>
             </button>
-<!--             <button data-content="Oneline">
+            <!--
+            <button data-content="Oneline">
                 <svg width="100%" height="100%" viewBox="0 0 462.782 462.782">
                     <path d="M350.272,323.014c-5.974,0-11.411-3.556-13.783-9.091l-50.422-117.65l-40.505,116.662
                     c-2.08,5.989-7.699,10.023-14.038,10.08c-0.044,0-0.089,0-0.133,0c-6.286,0-11.911-3.921-14.081-9.831l-41.979-114.358
@@ -249,7 +268,8 @@
                 </svg>
                 <span>Oneline</span>
             </button>
- -->            <button data-content="Map">
+            -->
+            <button data-content="Map">
                 <svg width="100%" height="100%" viewBox="0 0 58 58">
                     <path style="stroke:#000000;stroke-width:1.5;" d="M51,1.5c-3.519,0-6.432,2.613-6.92,6H13.92c-0.488-3.387-3.401-6-6.92-6c-3.859,0-7,3.14-7,7v41c0,3.86,3.141,7,7,7h44
                         c3.859,0,7-3.14,7-7v-41C58,4.64,54.859,1.5,51,1.5z M2,8.5c0-2.757,2.243-5,5-5s5,2.243,5,5v36.105
@@ -396,6 +416,21 @@
                 </svg>
                 <span>Files</span>
             </button>
+            <button data-content="Inputs">
+                <svg width="100%" height="100%" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M21.1213 2.70705C19.9497 1.53548 18.0503 1.53547 16.8787 2.70705L15.1989
+                    4.38685L7.29289 12.2928C7.16473 12.421 7.07382 12.5816 7.02986 12.7574L6.02986 16.7574C5.94466 17.0982 6.04451 17.4587 6.29289
+                    17.707C6.54127 17.9554 6.90176 18.0553 7.24254 17.9701L11.2425 16.9701C11.4184 16.9261 11.5789 16.8352 11.7071 16.707L19.5556
+                    8.85857L21.2929 7.12126C22.4645 5.94969 22.4645 4.05019 21.2929 2.87862L21.1213 2.70705ZM18.2929 4.12126C18.6834 3.73074 19.3166
+                    3.73074 19.7071 4.12126L19.8787 4.29283C20.2692 4.68336 20.2692 5.31653 19.8787 5.70705L18.8622 6.72357L17.3068 5.10738L18.2929
+                    4.12126ZM15.8923 6.52185L17.4477 8.13804L10.4888 15.097L8.37437 15.6256L8.90296 13.5112L15.8923 6.52185ZM4 7.99994C4 7.44766
+                    4.44772 6.99994 5 6.99994H10C10.5523 6.99994 11 6.55223 11 5.99994C11 5.44766 10.5523 4.99994 10 4.99994H5C3.34315 4.99994 2
+                    6.34309 2 7.99994V18.9999C2 20.6568 3.34315 21.9999 5 21.9999H16C17.6569 21.9999 19 20.6568 19 18.9999V13.9999C19 13.4477 18.5523
+                    12.9999 18 12.9999C17.4477 12.9999 17 13.4477 17 13.9999V18.9999C17 19.5522 16.5523 19.9999 16 19.9999H5C4.44772 19.9999 4 19.5522
+                    4 18.9999V7.99994Z" fill="#000000"/>
+                </svg>
+                <span>Inputs</span>
+            </button>
         </nav>
         <div class="js-div--sideNavCover loading">
             <span id="loading_indicator" class="span--sectionTitle">Loading...</span>
@@ -404,9 +439,11 @@
             <section data-content="Overview">
                 <iframe src="overview.html"></iframe>
             </section>
-            <!-- <section class="loading" data-content="Oneline">
+            <!--
+            <section class="loading" data-content="Oneline">
                 <iframe src="circuit_oneline.html"></iframe>
-            </section> -->
+            </section>
+            -->
             <section class="loading" data-content="Map">
                 <iframe src="circuit_map/geoJson_offline.html"></iframe>
             </section>
@@ -442,9 +479,7 @@
             <section class="loading" data-content="Files">
                 <ul style="font-family:sans-serif; column-width: 400px; margin-right: 12px;">
                     
-                    <li><a href='/rfile/lehighauto_3mg/./output_full_3.html' target="_blank">./output_full_3.html</a></li>
-                    
-                    <li><a href='/rfile/lehighauto_3mg/./ultimate_rep_circuit_plusmg_3.dss.csv' target="_blank">./ultimate_rep_circuit_plusmg_3.dss.csv</a></li>
+                    <li><a href='/rfile/lehighauto_3mg/./logs.txt' target="_blank">./logs.txt</a></li>
                     
                     <li><a href='/rfile/lehighauto_3mg/./timezcontrol_control.csv.plot.html' target="_blank">./timezcontrol_control.csv.plot.html</a></li>
                     
@@ -454,19 +489,19 @@
                     
                     <li><a href='/rfile/lehighauto_3mg/./loads.csv' target="_blank">./loads.csv</a></li>
                     
+                    <li><a href='/rfile/lehighauto_3mg/./color_test.omd' target="_blank">./color_test.omd</a></li>
+                    
                     <li><a href='/rfile/lehighauto_3mg/./output_resilience.html' target="_blank">./output_resilience.html</a></li>
                     
                     <li><a href='/rfile/lehighauto_3mg/./ref_gen_loads.csv' target="_blank">./ref_gen_loads.csv</a></li>
                     
                     <li><a href='/rfile/lehighauto_3mg/./timeseries_control.csv' target="_blank">./timeseries_control.csv</a></li>
                     
-                    <li><a href='/rfile/lehighauto_3mg/./.DS_Store' target="_blank">./.DS_Store</a></li>
+                    <li><a href='/rfile/lehighauto_3mg/./view_inputs.html' target="_blank">./view_inputs.html</a></li>
                     
                     <li><a href='/rfile/lehighauto_3mg/./timezcontrol_inrush_plot.html' target="_blank">./timezcontrol_inrush_plot.html</a></li>
                     
                     <li><a href='/rfile/lehighauto_3mg/./ultimate_rep_circuit_plusmg_2.dss.csv' target="_blank">./ultimate_rep_circuit_plusmg_2.dss.csv</a></li>
-                    
-                    <li><a href='/rfile/lehighauto_3mg/./mg2_gen_load_storage.plot.html' target="_blank">./mg2_gen_load_storage.plot.html</a></li>
                     
                     <li><a href='/rfile/lehighauto_3mg/./circuit_control.dss' target="_blank">./circuit_control.dss</a></li>
                     
@@ -485,8 +520,6 @@
                     <li><a href='/rfile/lehighauto_3mg/./circuit.dss' target="_blank">./circuit.dss</a></li>
                     
                     <li><a href='/rfile/lehighauto_3mg/./ultimate_rep_circuit_plusmg_0.dss.csv' target="_blank">./ultimate_rep_circuit_plusmg_0.dss.csv</a></li>
-                    
-                    <li><a href='/rfile/lehighauto_3mg/./circuit_plusmg_3.dss' target="_blank">./circuit_plusmg_3.dss</a></li>
                     
                     <li><a href='/rfile/lehighauto_3mg/./timezcontrol_load.csv' target="_blank">./timezcontrol_load.csv</a></li>
                     
@@ -514,15 +547,11 @@
                     
                     <li><a href='/rfile/lehighauto_3mg/./volts.csv' target="_blank">./volts.csv</a></li>
                     
-                    <li><a href='/rfile/lehighauto_3mg/./Voltage Profile [PU].png' target="_blank">./Voltage Profile [PU].png</a></li>
-                    
                     <li><a href='/rfile/lehighauto_3mg/./0running.txt' target="_blank">./0running.txt</a></li>
                     
                     <li><a href='/rfile/lehighauto_3mg/./timeseries_load.csv.plot.html' target="_blank">./timeseries_load.csv.plot.html</a></li>
                     
                     <li><a href='/rfile/lehighauto_3mg/./timezcontrol_source_and_gen.csv_battery_cycles.plot.html' target="_blank">./timezcontrol_source_and_gen.csv_battery_cycles.plot.html</a></li>
-                    
-                    <li><a href='/rfile/lehighauto_3mg/./coords.csv' target="_blank">./coords.csv</a></li>
                     
                     <li><a href='/rfile/lehighauto_3mg/./timeseries_source.csv' target="_blank">./timeseries_source.csv</a></li>
                     
@@ -542,8 +571,6 @@
                     
                     <li><a href='/rfile/lehighauto_3mg/./mg_add_cost_2.csv' target="_blank">./mg_add_cost_2.csv</a></li>
                     
-                    <li><a href='/rfile/lehighauto_3mg/./mg_add_cost_3.csv' target="_blank">./mg_add_cost_3.csv</a></li>
-                    
                     <li><a href='/rfile/lehighauto_3mg/./mg_add_cost_1.csv' target="_blank">./mg_add_cost_1.csv</a></li>
                     
                     <li><a href='/rfile/lehighauto_3mg/./mg_add_cost_0.csv' target="_blank">./mg_add_cost_0.csv</a></li>
@@ -551,8 +578,6 @@
                     <li><a href='/rfile/lehighauto_3mg/./allInputData.json' target="_blank">./allInputData.json</a></li>
                     
                     <li><a href='/rfile/lehighauto_3mg/./timezcontrol_source_and_gen.csv.plot.html' target="_blank">./timezcontrol_source_and_gen.csv.plot.html</a></li>
-                    
-                    <li><a href='/rfile/lehighauto_3mg/./reopt_final_1/inlineTemplate.html' target="_blank">./reopt_final_1/inlineTemplate.html</a></li>
                     
                     <li><a href='/rfile/lehighauto_3mg/./reopt_final_1/resultsResilience.json' target="_blank">./reopt_final_1/resultsResilience.json</a></li>
                     
@@ -572,10 +597,6 @@
                     
                     <li><a href='/rfile/lehighauto_3mg/./circuit_map/geoJson_offline.html' target="_blank">./circuit_map/geoJson_offline.html</a></li>
                     
-                    <li><a href='/rfile/lehighauto_3mg/./circuit_map/geoJsonMap_offline.html' target="_blank">./circuit_map/geoJsonMap_offline.html</a></li>
-                    
-                    <li><a href='/rfile/lehighauto_3mg/./reopt_final_0/inlineTemplate.html' target="_blank">./reopt_final_0/inlineTemplate.html</a></li>
-                    
                     <li><a href='/rfile/lehighauto_3mg/./reopt_final_0/resultsResilience.json' target="_blank">./reopt_final_0/resultsResilience.json</a></li>
                     
                     <li><a href='/rfile/lehighauto_3mg/./reopt_final_0/Scenario_test_POST.json' target="_blank">./reopt_final_0/Scenario_test_POST.json</a></li>
@@ -591,8 +612,6 @@
                     <li><a href='/rfile/lehighauto_3mg/./reopt_final_0/criticalLoadShape.csv' target="_blank">./reopt_final_0/criticalLoadShape.csv</a></li>
                     
                     <li><a href='/rfile/lehighauto_3mg/./reopt_final_0/allInputData.json' target="_blank">./reopt_final_0/allInputData.json</a></li>
-                    
-                    <li><a href='/rfile/lehighauto_3mg/./reopt_final_2/inlineTemplate.html' target="_blank">./reopt_final_2/inlineTemplate.html</a></li>
                     
                     <li><a href='/rfile/lehighauto_3mg/./reopt_final_2/resultsResilience.json' target="_blank">./reopt_final_2/resultsResilience.json</a></li>
                     
@@ -612,9 +631,13 @@
                     
                 </ul>
             </section>
+            <section class="loading" data-content="Inputs">
+                <div>
+                    <iframe src="view_inputs.html"></iframe>
+                </div>
+            </section>
         </article>
     </main>
-    <!-- <script src="/main.js"></script> -->
     <script>
     'use strict';
 

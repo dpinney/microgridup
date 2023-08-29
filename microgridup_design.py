@@ -11,7 +11,7 @@ if MGU_FOLDER == '/':
 	MGU_FOLDER = '' #workaround for docker root installs
 PROJ_FOLDER = f'{MGU_FOLDER}/data/projects'
 
-def run(MODEL_DIR, REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, lon, existing_generation_dict, INVALIDATE_CACHE=False):
+def run(MODEL_DIR, REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, lon, existing_generation_dict, api_key, INVALIDATE_CACHE=False):
 	'''
     Generate full microgrid design for given microgrid spec dictionary and circuit file (used to gather distribution assets) Generate the microgrid
     specs for REOpt. SIDE-EFFECTS: generates REOPT_FOLDER
@@ -42,7 +42,7 @@ def run(MODEL_DIR, REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, 
 	set_allinputdata_load_shape_parameters(REOPT_FOLDER, f'{MODEL_DIR}/loads.csv', microgrid, logger)
 	set_allinputdata_outage_parameters(REOPT_FOLDER, f'{REOPT_FOLDER}/loadShape.csv', REOPT_INPUTS["outageDuration"])
 	critical_load_percent = get_critical_load_percent(f'{REOPT_FOLDER}/loadShape.csv', microgrid, mg_name, logger)
-	set_allinputdata_user_parameters(REOPT_FOLDER, REOPT_INPUTS, critical_load_percent, lat, lon)
+	set_allinputdata_user_parameters(REOPT_FOLDER, REOPT_INPUTS, critical_load_percent, lat, lon, api_key)
 	set_allinputdata_battery_parameters(REOPT_FOLDER, existing_generation_dict['battery_kw_existing'], existing_generation_dict['battery_kwh_existing'])
 	set_allinputdata_solar_parameters(REOPT_FOLDER, existing_generation_dict['solar_kw_existing'])
 	set_allinputdata_wind_parameters(REOPT_FOLDER, existing_generation_dict['wind_kw_existing'])
@@ -116,7 +116,7 @@ def get_critical_load_percent(loadshape_csv_path, microgrid, mg_name, logger):
 		critical_load_percent = 2.0
 	return critical_load_percent
 
-def set_allinputdata_user_parameters(REOPT_FOLDER, REOPT_INPUTS, critical_load_percent, lat, lon):
+def set_allinputdata_user_parameters(REOPT_FOLDER, REOPT_INPUTS, critical_load_percent, lat, lon, api_key):
 	with open(REOPT_FOLDER + '/allInputData.json') as f:
 		allInputData = json.load(f)
 	# Pulling user defined inputs from REOPT_INPUTS.
@@ -125,6 +125,7 @@ def set_allinputdata_user_parameters(REOPT_FOLDER, REOPT_INPUTS, critical_load_p
 	allInputData['criticalLoadFactor'] = str(critical_load_percent)
 	allInputData['latitude'] = float(lat)
 	allInputData['longitude'] = float(lon)
+	allInputData['api_key'] = api_key
 	with open(REOPT_FOLDER + '/allInputData.json', 'w') as f:
 		json.dump(allInputData, f, indent=4)
 

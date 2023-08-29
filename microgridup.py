@@ -17,6 +17,9 @@ import datetime
 import traceback
 import sys
 import logging
+import random
+import concurrent.futures
+from omf.solvers.REopt import REOPT_API_KEYS
 
 MGU_FOLDER = os.path.abspath(os.path.dirname(__file__))
 if MGU_FOLDER == '/':
@@ -327,11 +330,10 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 			}
 			json.dump(inputs, inputs_file, indent=4)
 		# Generate the per-microgrid results and add each to the circuit iteratively.
+		# - Multi-threaded REopt execution
+		run_reopt_threads(MODEL_DIR, MICROGRIDS, logger, REOPT_INPUTS, INVALIDATE_CACHE)
 		mgs_name_sorted = sorted(MICROGRIDS.keys())
 		for i, mg_name in enumerate(mgs_name_sorted):
-			existing_generation_dict = microgridup_hosting_cap.get_microgrid_existing_generation_dict(f'{MODEL_DIR}/{MODEL_DSS}', MICROGRIDS[mg_name])
-			lat, lon = microgridup_hosting_cap.get_microgrid_coordinates(f'{MODEL_DIR}/{MODEL_DSS}', MICROGRIDS[mg_name])
-			microgridup_design.run(MODEL_DIR, f'reopt_final_{i}', MICROGRIDS[mg_name], logger, REOPT_INPUTS, mg_name, lat, lon, existing_generation_dict, INVALIDATE_CACHE=INVALIDATE_CACHE)
 			BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
 			max_crit_load = sum(MICROGRIDS[mg_name]['critical_load_kws'])
 			microgridup_hosting_cap.run(f'reopt_final_{i}', GEN_NAME, MICROGRIDS[mg_name], BASE_DSS, mg_name, REF_NAME, MODEL_LOAD_CSV, f'circuit_plusmg_{i}.dss', f'mg_add_cost_{i}.csv', max_crit_load, logger)
@@ -427,6 +429,64 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 	finally:
 		os.chdir(curr_dir)
 		os.system(f'rm "{workDir}/0running.txt"')
+
+
+def run_reopt_threads(model_dir, microgrids, logger, reopt_inputs, invalidate_cache):
+	'''
+	:param model_dir: the path to the outermost model directory of the circuit shared by all of the microgrids
+	:type model_dir: string
+	:param microgrids: all of the microgrid definitions (as defined by microgrid_gen_mgs.py) for the given circuit
+	:type microgrids: dict
+	:param logger: a logger
+	:type logger: logger
+	:param reopt_inputs: REopt inputs that must be set by the user. All microgrids for a given circuit share these same REopt parameters. All threads
+	    should only read from this dict, so it's fine that they're sharing the same dict
+	:type reopt_inputs: dict
+	:param invalidate_cache: whether to ignore an existing directory of cached REopt results for all of the microgrids of a circuit
+	:return: don't return anything once all the threads have completed. Instead, just read the corresponding allInputData.json and allOutputData.json
+		file for each microgrid to build a new DSS file in microgridup_hosting_cap.py
+	:rtype: None
+	'''
+	assert isinstance(model_dir, str)
+	assert isinstance(microgrids, dict)
+	assert isinstance(logger, logging.Logger)
+	assert isinstance(reopt_inputs, dict)
+	assert isinstance(invalidate_cache, bool)
+	# - Shuffle the api keys so we don't use them in the same order every time
+	api_keys = random.sample(REOPT_API_KEYS, len(REOPT_API_KEYS))
+	# - Generate the correct arguments for each REopt thread to be run
+	thread_argument_lists = []
+	for i, mg_name in enumerate(sorted(microgrids.keys())):
+		# - Generate a set of arguments for a single thread
+		thread_argument_lists.append([model_dir, microgrids[mg_name], i, logger, reopt_inputs, mg_name, api_keys[i % len(api_keys)], invalidate_cache])
+	# - Re-try a thread that throws an exception a maximum of two times after the initial attempt
+	future_lists = ([], [], [])
+	argument_lists = (thread_argument_lists, [], [])
+	with concurrent.futures.ThreadPoolExecutor() as executor:
+		# - Build the first list of Future objects
+		for args_list in argument_lists[0]:
+			future_lists[0].append(executor.submit(run_reopt_thread, *args_list))
+		for future_list_idx, future_list in enumerate(future_lists):
+			for f in concurrent.futures.as_completed(future_list):
+				if f.exception() is not None:
+					future_idx = future_list.index(f)
+					#print(f'The Future at index {future_idx} raised an exception')
+					#print(future_list)
+					if future_list_idx + 1 < len(future_lists):
+						args_list = argument_lists[future_list_idx][future_idx]
+						args_list[-1] = True
+						# - "Re-try" the exception-throwing Future object by adding a new Future object with the same arguments to the next list
+						future_lists[future_list_idx + 1].append(executor.submit(run_reopt_thread, *args_list))
+						argument_lists[future_list_idx + 1].append(args_list)
+					else:
+						# - Re-raise the first available exception from one of the threads that failed after retries
+						print(f'Thread for microgrid "{args_list[5]}" for circuit "{args_list[0]}" raised an exception:')
+						raise f.exception()
+
+def run_reopt_thread(model_dir, microgrid, microgrid_index, logger, reopt_inputs, mg_name, api_key, invalidate_cache):
+	existing_generation_dict = microgridup_hosting_cap.get_microgrid_existing_generation_dict(f'{model_dir}/circuit.dss', microgrid)
+	lat, lon = microgridup_hosting_cap.get_microgrid_coordinates(f'{model_dir}/circuit.dss', microgrid)
+	microgridup_design.run(model_dir, f'reopt_final_{microgrid_index}', microgrid, logger, reopt_inputs, mg_name, lat, lon, existing_generation_dict, api_key, invalidate_cache)
 
 def _tests():
 	''' Unit tests for this module. '''

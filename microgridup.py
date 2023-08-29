@@ -401,7 +401,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		with open('overview.html', 'w') as overfile:
 			overfile.write(over)
 		# Write view_inputs iframe
-		with open(f'{MODEL_DIR}/allInputData.json') as f:
+		with open(f'allInputData.json') as f:
 			in_data = json.load(f)
 			in_data['MODEL_DIR'] = in_data['MODEL_DIR'].split('/')[-1]
 		with open(f'{MGU_FOLDER}/templates/template_new.html') as f:

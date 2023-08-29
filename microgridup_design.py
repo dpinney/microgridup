@@ -5,6 +5,7 @@ import pandas as pd
 from omf.solvers.opendss import dssConvert
 import microgridup
 import microgridup_hosting_cap
+from omf.solvers.REopt import REOPT_API_KEYS
 
 MGU_FOLDER = os.path.abspath(os.path.dirname(__file__))
 if MGU_FOLDER == '/':
@@ -319,7 +320,7 @@ def _tests():
 		dss_filename = 'circuit.dss' if run_count == 0 else f'circuit_plusmg_{run_count-1}.dss'
 		existing_generation_dict = microgridup_hosting_cap.get_microgrid_existing_generation_dict(f'{MODEL_DIR}/{dss_filename}', microgrids[f'mg{run_count}'])
 		lat, lon = microgridup_hosting_cap.get_microgrid_coordinates(f'{MODEL_DIR}/{dss_filename}', microgrids[f'mg{run_count}'])
-		run(MODEL_DIR, f'reopt_final_{run_count}', microgrids[f'mg{run_count}'], logger, REOPT_INPUTS, f'mg{run_count}', lat, lon, existing_generation_dict)
+		run(MODEL_DIR, f'reopt_final_{run_count}', microgrids[f'mg{run_count}'], logger, REOPT_INPUTS, f'mg{run_count}', lat, lon, existing_generation_dict, REOPT_API_KEYS[0])
 	os.chdir(curr_dir)
 	print('Ran all tests for microgridup_design.py.')
 

@@ -484,8 +484,9 @@ def run_reopt_threads(model_dir, microgrids, logger, reopt_inputs, invalidate_ca
 						raise f.exception()
 
 def run_reopt_thread(model_dir, microgrid, microgrid_index, logger, reopt_inputs, mg_name, api_key, invalidate_cache):
-	existing_generation_dict = microgridup_hosting_cap.get_microgrid_existing_generation_dict(f'{model_dir}/circuit.dss', microgrid)
-	lat, lon = microgridup_hosting_cap.get_microgrid_coordinates(f'{model_dir}/circuit.dss', microgrid)
+	print('THIS DIR FOR THREADS', os.getcwd())
+	existing_generation_dict = microgridup_hosting_cap.get_microgrid_existing_generation_dict('circuit.dss', microgrid)
+	lat, lon = microgridup_hosting_cap.get_microgrid_coordinates('circuit.dss', microgrid)
 	microgridup_design.run(model_dir, f'reopt_final_{microgrid_index}', microgrid, logger, reopt_inputs, mg_name, lat, lon, existing_generation_dict, api_key, invalidate_cache)
 
 def _tests():

@@ -272,7 +272,7 @@
                     <input type="text" name="longitude" pattern="-?\d+\.?\d*" value="-89.6501"/>
                 </div>
                 <div class="chunk">
-                    <label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">TO DO: FILL TOOLTIP</span></label>
+                    <label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">Defines the length of the interconnection analysis. Example – if time steps are 15 minutes, 480 would define a five day analysis.</span></label>
                     <input type="text" name="QSTS_STEPS" value="{{in_data.QSTS_STEPS}}" />
                 </div>
                 <div class="chunk">
@@ -361,7 +361,7 @@
                 </div>
                 <h5>Resilience</h5>
                 <div class="chunk">
-                    <label class="tooltip" for="FAULTED_LINE">Outage Location(s)<span class="classic">TO DO: FILL TOOLTIP</span></label>
+                    <label class="tooltip" for="FAULTED_LINE">Outage Location(s)<span class="classic">Node number in distribution map where typical outage would take place.</span></label>
                     <input type="text" name="FAULTED_LINE" value="{{in_data.FAULTED_LINE}}" />
                 </div>
                 <div class="chunk">
@@ -377,10 +377,6 @@
                     <i class="fa fa-plus-square"></i>
                     <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
                     <div style="display:none;">
-                        <div class="chunk">
-                            <label class="tooltip" for="DIESEL_SAFETY_FACTOR">Fossil Safety Margin (%)<span class="classic">TO DO: FILL TOOLTIP</span></label>
-                            <input type="text" name="DIESEL_SAFETY_FACTOR" value="{{in_data.DIESEL_SAFETY_FACTOR}}" />
-                        </div>
                         <div class="chunk">
                             <label class="tooltip" for="FOSSIL_BACKUP_PERCENT">Allowed Fossil (% as decimal)<span class="classic">TO DO: FILL TOOLTIP</span></label>
                             <input type="text" name="FOSSIL_BACKUP_PERCENT" value="{{in_data.FOSSIL_BACKUP_PERCENT}}" />
@@ -418,7 +414,7 @@
                             <input type="text" name="omCostEscalator" value="0.025" step="0.001" min="0.0" max="1.0"/>
                         </div>
                         <div class="chunk">
-                            <label class="tooltip" for="discountRate">Discount Rate (% per year)<span class="classic">Please enter a number 0-1 for the Nominal energy offtaker discount rate. In single ownership model the offtaker is also the generation owner. Format 0.XXX</span></label>
+                            <label class="tooltip" for="discountRate">Discount Rate (% per year)<span class="classic">Please enter a number 0-1 for the rate used to discount future cash flows in a net present value analysis. In single ownership model the offtaker is also the generation owner. Format 0.XXX</span></label>
                             <input type="text" name="discountRate" value="0.083" step="0.001" min="0.0" max="1.0"/>
                         </div>
                     </div>
@@ -498,7 +494,7 @@
         <div id="partitionPreviewerContainer" class="step">
             <h3>Step 3: Partition circuit into microgrids</h3>
             <div id="stepThree" class="chunk">
-                <label class="tooltip" for="MG_DEF_METHOD">Microgrid Definition Method<span class="classic">TO DO: FILL TOOLTIP</span></label>
+                <label class="tooltip" for="MG_DEF_METHOD">Microgrid Definition Method<span class="classic">Select a method by which the circuit should be partitioned into microgrids.</span></label>
                 <select id="partitionMethod" name="MG_DEF_METHOD" style="margin-right:6px" disabled>
                     <option value="" disabled selected>Select method</option>
                     <option value="manual" {% if in_data.MG_DEF_METHOD == 'manual' %}selected{% endif %}>Manual</option>
@@ -556,15 +552,15 @@
                         <input type="text" name="solarCost" value="1600" pattern="^\d+\.?\d*?$"/>
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="solarExisting">Solar Existing (kW-DC)<span class="classic">Specify the total capacity of any pre-existing solar arrays in kW-DC. The outputted "Total Solar" will be inclusive of existing solar.</span></label>
+                        <label class="tooltip" for="solarExisting">Solar Power Existing (kW-DC)<span class="classic">Specify the total capacity of any pre-existing solar arrays in kW-DC. The outputted "Total Solar" will be inclusive of existing solar.</span></label>
                         <input type="text" name="solarExisting" value="0" />
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="solarMax">Solar Max (kW-DC)<span class="classic">Specify the maximum desired generation in kW-DC. Leave at default for full optimization on solar power.</span></label>
+                        <label class="tooltip" for="solarMax">Solar Power Max (kW-DC)<span class="classic">Specify the maximum desired generation in kW-DC. Leave at default for full optimization on solar power.</span></label>
                         <input type="text" name="solarMax" value="100000" />
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="solarMin">Solar Min (kW-DC)<span class="classic">Specify the minimum desired generation in kW-DC.</span></label>
+                        <label class="tooltip" for="solarMin">Solar Power Min (kW-DC)<span class="classic">Specify the minimum desired generation in kW-DC.</span></label>
                         <input type="text" name="solarMin" value="0" />
                     </div>
                     <div class="chunk">
@@ -587,7 +583,7 @@
                         <input type="text" name="batteryCapacityCost" value="420" pattern="^\d+\.?\d*?$"/>
                     </div>
 					<div class="chunk">
-                        <label class="tooltip" for="batteryKwhExisting">Battery Capacity Existing (kWh-AC)<span class="classic">TO DO: FILL TOOLTIP</span></label>
+                        <label class="tooltip" for="batteryKwhExisting">Battery Capacity Existing (kWh-AC)<span class="classic">The usable energy storage of existing batteries which will be used in the microgrid(s). Value is in kilowatt-hours-AC.</span></label>
                         <input type="text" name="batteryKwhExisting" value="0" />
                     </div>
                     <div class="chunk">
@@ -603,7 +599,7 @@
                         <input type="text" name="batteryPowerCost" value="840" />
                     </div>
 					<div class="chunk">
-                        <label class="tooltip" for="batteryKwExisting">Battery Power Existing (kW-AC)<span class="classic">TO DO: FILL TOOLTIP</span></label>
+                        <label class="tooltip" for="batteryKwExisting">Battery Power Existing (kW-AC)<span class="classic">The usable inverter power rating of existing batteries which will be used in the microgrid(s). Value is in kilowatts-AC.</span></label>
                         <input type="text" name="batteryKwExisting" value="0" />
                     </div>
                     <div class="chunk">
@@ -708,15 +704,15 @@
                         <input type="text" name="windCost" value="4989" pattern="^\d+\.?\d*?$"/>
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="windExisting">Wind Existing (kW)<span class="classic">TO DO: FILL TOOLTIP</span></label>
+                        <label class="tooltip" for="windExisting">Wind Power Existing (kW)<span class="classic">The usable power rating of existing wind turbines which will be used in the microgrid(s). Value is in kilowatts-AC.</span></label>
                         <input type="text" name="windExisting" value="0" />
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="windMax">Wind Max (kW)<span class="classic">Specify the maximum desired generation in kW. Leave at default for full optimization on wind power.</span></label>
+                        <label class="tooltip" for="windMax">Wind Power Max (kW)<span class="classic">Specify the maximum desired generation in kW. Leave at default for full optimization on wind power.</span></label>
                         <input type="text" name="windMax" value="100000" />
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="windMin">Wind Min (kW)<span class="classic">Specify the minimum desired generation in kW.</span></label>
+                        <label class="tooltip" for="windMin">Wind Power Min (kW)<span class="classic">Specify the minimum desired generation in kW.</span></label>
                         <input type="text" name="windMin" value="0" />
                     </div>
                     <div class="chunk">

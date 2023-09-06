@@ -96,7 +96,11 @@ def main(in_csv, out_csv, mg_supported_loads, in_dss, out_html):
 	)
 	stats_fig.update_layout(
 		title = 'Original and Adjusted Resilience Metrics',
-		legend = legend_spec
+		legend = legend_spec,
+		font = dict(
+			family="sans-serif",
+			color="black"
+		)
 	)
 	# Generate outage table
 	df_init = pd.read_csv(in_csv) 
@@ -129,7 +133,11 @@ def main(in_csv, out_csv, mg_supported_loads, in_dss, out_html):
 	)
 	fig.update_layout(
 		title = 'Outage Timeline, Original and Microgrid',
-		legend = legend_spec
+		legend = legend_spec,
+		font = dict(
+			family="sans-serif",
+			color="black"
+		)
 	)
 	chart_html = fig.to_html(default_height='600px')
 	stats_chart_html = stats_fig.to_html(default_height='300px')

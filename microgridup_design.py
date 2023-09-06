@@ -225,7 +225,11 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 		fig = go.Figure(chart_data)
 		fig.update_layout(
 			title = k,
-			legend = legend_spec
+			legend = legend_spec,
+			font = dict(
+				family="sans-serif",
+				color="black"
+			)
 		)
 		fig_html = fig.to_html(default_height='600px')
 		all_html = all_html + fig_html
@@ -249,7 +253,11 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	)
 	generation_fig.update_layout(
 		title = 'Generation Overview',
-		legend = legend_spec
+		legend = legend_spec,
+		font = dict(
+			family="sans-serif",
+			color="black"
+		)
 	)
 	generation_fig_html = generation_fig.to_html(default_height='600px')
 	all_html = generation_fig_html + all_html
@@ -280,7 +288,11 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	)
 	fin_fig.update_layout(
 		title = 'Lifetime Financial Comparison Overview',
-		legend = legend_spec
+		legend = legend_spec,
+		font = dict(
+			family="sans-serif",
+			color="black"
+		)
 	)
 	fin_fig_html = fin_fig.to_html(default_height='600px')
 	all_html = fin_fig_html + all_html

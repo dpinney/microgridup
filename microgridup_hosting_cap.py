@@ -840,7 +840,11 @@ def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_st
 		#title = f'{csvName} Output',
 		title = chart_name,
 		xaxis = dict(title="Date"),
-		yaxis = dict(title=y_axis_name)
+		yaxis = dict(title=y_axis_name),
+		font = dict(
+			family="sans-serif",
+			color="black"
+		)
 		#yaxis = dict(title = str(y_list))
 	)
 	fig = plotly.graph_objs.Figure(data, layout)

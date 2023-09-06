@@ -137,7 +137,11 @@ def summary_charts(stats):
 	gen_load_fig.update_layout(
 		title = 'Microgrid Load and Generation',
 		legend = legend_spec,
-		yaxis = {'ticksuffix': " kW"}
+		yaxis = {'ticksuffix': " kW"},
+		font=dict(
+			family="sans-serif",
+			color="black"
+		)
 	)
 	gen_load_html = gen_load_fig.to_html(default_height=chart_height)
 	# Renewable versus fossil chart.
@@ -185,7 +189,11 @@ def summary_charts(stats):
 	gen_mix_fig.update_layout(
 		title = 'Microgrid Generation Mix, Existing and New',
 		legend = legend_spec,
-		yaxis = {'ticksuffix': " kW/kWh"}
+		yaxis = {'ticksuffix': " kW/kWh"},
+		font = dict(
+			family="sans-serif",
+			color="black"
+		)
 	)
 	gen_mix_html = gen_mix_fig.to_html(default_height=chart_height)
 	# Financial Summary
@@ -215,7 +223,11 @@ def summary_charts(stats):
 	money_summary_fig.update_layout(
 		title = 'Financial Summary',
 		legend = legend_spec,
-		yaxis = {'tickprefix': "$"}
+		yaxis = {'tickprefix': "$"},
+		font = dict(
+			family="sans-serif",
+			color="black"
+		)
 	)
 	money_summary_html = money_summary_fig.to_html(default_height=chart_height)
 	all_html = money_summary_html + gen_load_html + gen_mix_html

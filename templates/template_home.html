@@ -275,6 +275,9 @@
             text-align:center;
             font-size:25px;
         }
+        #newModelBox a:hover {
+            color:mediumseagreen;
+        }
     </style>
 </head>
 <body>
@@ -309,7 +312,7 @@
                 <p class="status">Checking status...</p>
             </div>
             {% endfor %}
-            <div class='box' style="border:1px black dashed">
+            <div class="box" id="newModelBox" style="border:1px black dashed">
                 <a href='/new' style="font-size:50px">+</a>
             </div>
         </div>

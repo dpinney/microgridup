@@ -172,13 +172,17 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 		elif obType == 'load':
 			dssString += f'new object=load.{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 conn=wye model=1 kv=2.4 kw=1155 kvar=660 \n'
 		elif obType == 'solar':
-			dssString += f'new object=generator.{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 kv=0.277 kw=440 pf=1 \n'
+			prefix = '' if obName.startswith('solar_') else 'solar_'
+			dssString += f'new object=generator.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 kv=0.277 kw=440 pf=1 \n'
 		elif obType == 'wind':
-			dssString += f'new object=generator.{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 kv=0.277 kw=200 pf=1 \n'
+			prefix = '' if obName.startswith('wind_') else 'wind_'
+			dssString += f'new object=generator.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 kv=0.277 kw=200 pf=1 \n'
 		elif obType == 'battery':
-			dssString += f'new object=storage.{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 kv=0.277 kwrated=79 kwhstored=307 kwhrated=307 dispmode=follow %charge=100 %discharge=100 %effcharge=96 %effdischarge=96 \n'
+			prefix = '' if obName.startswith('battery_') else 'battery_'
+			dssString += f'new object=storage.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 kv=0.277 kwrated=79 kwhstored=307 kwhrated=307 dispmode=follow %charge=100 %discharge=100 %effcharge=96 %effdischarge=96 \n'
 		elif obType == 'fossil':
-			dssString += f'new object=generator.{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 kw=265 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 \n'	
+			prefix = '' if obName.startswith('fossil_') else 'fossil_'
+			dssString += f'new object=generator.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 kw=265 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 \n'	
 	# Convert dssString to a networkx graph.
 	tree = dssConvert.dssToTree(dssString, is_path=False)
 	G = dssConvert.dss_to_networkx('', tree=tree)

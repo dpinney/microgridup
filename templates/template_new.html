@@ -110,15 +110,15 @@
 			max-width: 700px;
 			padding: 10px;
 		}
-		.dropbtn {
+		.wizard-dropbutton {
 		  color: white;
 		  border: none;
 		}
-		.dropdown {
+		.wizard-dropdown {
 		  position: relative;
 		  display: inline-block;
 		}
-		.dropdown-content {
+		.wizard-dropdown-content {
 		  display: none;
 		  position: absolute;
 		  background-color: #f1f1f1;
@@ -126,15 +126,15 @@
 		  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 		  z-index: 1;
 		}
-		.dropdown-content div {
+		.wizard-dropdown-content div {
 		  color: black;
 		  padding: 12px 16px;
 		  text-decoration: none;
 		  display: block;
 		}
-		.dropdown-content div:hover {background-color: #ddd; cursor: pointer;}
-		.dropdown:hover .dropdown-content {display: block;}
-		.dropdown:hover .dropbtn {background-color: #3e8e41;}
+		.wizard-dropdown-content div:hover {background-color: #ddd; cursor: pointer;}
+		.wizard-dropdown:hover .wizard-dropdown-content {display: block;}
+		.wizard-dropdown:hover .wizard-dropbutton {background-color: mediumseagreen;}
 		.substation {
 		    padding-left: 0px;
 		    list-style: none;
@@ -377,9 +377,9 @@
                     <i class="fa fa-plus-square"></i>
                     <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
                     <div style="display:none;">
-                        <div class="chunk">
-                            <label class="tooltip" for="FOSSIL_BACKUP_PERCENT">Allowed Fossil (% as decimal)<span class="classic">TO DO: FILL TOOLTIP</span></label>
-                            <input type="text" name="FOSSIL_BACKUP_PERCENT" value="{{in_data.FOSSIL_BACKUP_PERCENT}}" />
+						<div class="chunk">
+                            <label class="tooltip" for="DIESEL_SAFETY_FACTOR">Fossil Safety Margin (%)<span class="classic">TO DO: FILL TOOLTIP</span></label>
+                            <input type="text" name="DIESEL_SAFETY_FACTOR" value="{{in_data.DIESEL_SAFETY_FACTOR}}" />
                         </div>
                         <div class="chunk">
                             <label class="tooltip" for="outage_start_hour">Outage Start Hour<span class="classic">A major outage is added starting at this hour. Specify an hour greater than 0 but less than 8760 to trigger optimization for resilience and include fossil generation. If 0 is entered, the model will run an economic optimization without fossil generation.</span></label>
@@ -458,7 +458,7 @@
                 <dialog id="dialog">
                     <div id="dialogText"></div>
                     <select></select>
-                    <button type="cancel" onclick="window.dialog.close();">Cancel</button>
+                    <button type="cancel">Cancel</button>
                     <button type="button">Confirm</button>
                 </dialog>
 
@@ -471,9 +471,9 @@
                     <li class="battery" data-editable><i class="fa fa-minus-square"></i> Battery: (click to name)</li>
                     <li class="fossil" data-editable><i class="fa fa-minus-square"></i> Fossil: (click to name)</li>
                 </ul>
-                <div id="dropdowns" class="dropdown">
-                    <button class="dropbtn">Add element</button>
-                    <div class="dropdown-content">
+                <div class="wizard-dropdown">
+                    <button id="wizard-dropbutton" class="wizard-dropbutton" type="button">Add element</button>
+                    <div class="wizard-dropdown-content">
                         <div id="newSub" role="button" tabindex="0">Substation</div>
                         <div id="newFeeder" role="button" tabindex="0">Feeder</div>
                         <div id="newLoad" role="button" tabindex="0">Load</div>
@@ -1009,7 +1009,12 @@
 				window.dialog.showModal();
 			}
 		});
-		// Close dialog and add non-substation element.
+		// Close diagol if user clicks Cancel.
+		$('#dialog button[type="cancel"]').on('click', function(event) {
+			event.preventDefault();
+			window.dialog.close();
+		});
+		// Close dialog and add non-substation element if user clicks Confirm.
 		$('#dialog button[type="button"]').on('click', function() {
 			window.dialog.close()
 			let parentName = $('#dialog select').val();

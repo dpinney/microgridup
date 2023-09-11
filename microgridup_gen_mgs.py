@@ -261,7 +261,12 @@ def manual_groups(G, pairings):
 	pairings.pop('None', None)
 	for mg in pairings:
 		pairs = pairings[mg]
-		cur_lca = lcas.get((pairs[0],pairs[1]),lcas.get((pairs[1],pairs[0])))
+		if len(pairs) > 1:
+			cur_lca = lcas.get((pairs[0],pairs[1]),lcas.get((pairs[1],pairs[0])))
+		elif len(pairs) == 1: # If there is only one load in a mg, use its parent as LCA. TO DO: Verify this assumption.
+			cur_lca = list(G.predecessors(pairs[0]))[0]
+		else:
+			print('Error: Amount of loads in each microgrid must be greater than 0.')
 		for idx in range(2,len(pairs)):
 			cur_lca = lcas.get((cur_lca,pairs[idx]),lcas.get((pairs[idx],cur_lca)))
 		mgs[mg] = list(nx.nodes(nx.dfs_tree(G, cur_lca)))
@@ -364,32 +369,6 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 		return {}
 	MG_MINES = helper(MG_GROUPS, switch, gen_bus)
 	return MG_MINES
-
-# def colorby_mgs(mg_group_dictionary):
-# 	''' generate a colorby CSV/JSON that works with omf.geo map interface.
-# 	To use, set omd['attachments'] = function JSON output'''
-# 	attachments_keys = {
-# 		"coloringFiles": {
-# 			"microgridColoring.csv": {
-# 				"csv": "<content>",
-# 				"colorOnLoadColumnIndex": "1" 
-# 			}
-# 		}
-# 	}
-# 	mg_keys = mg_group_dictionary.keys()
-# 	color_step = float(1/len(mg_keys))
-# 	output_csv = 'bus,color\n'
-# 	for i, mg_key in enumerate(mg_group_dictionary):
-# 		my_color = i * color_step
-# 		mg_ob = mg_group_dictionary[mg_key]
-# 		all_items = mg_ob['loads'] + mg_ob['gen_obs_existing'] + [mg_ob['gen_bus']]
-# 		# TODO: find all buses in the interior of the microgrid and add them to the list.
-# 		# TODO: also find new generation objects
-# 		# TODO: also  make all other objects gray or something.
-# 		for item in all_items:
-# 			output_csv += item + ',' + str(my_color) + '\n'
-# 	attachments_keys['coloringFiles']['microgridColoring.csv']['csv'] = output_csv
-# 	return attachments_keys
 
 def _tests():
 	_myDir = os.path.abspath(os.path.dirname(__file__))

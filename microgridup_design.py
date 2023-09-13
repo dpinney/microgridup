@@ -40,7 +40,7 @@ def run(MODEL_DIR, REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, 
 	import omf.models
 	shutil.rmtree(REOPT_FOLDER, ignore_errors=True)
 	omf.models.microgridDesign.new(REOPT_FOLDER)
-	set_allinputdata_load_shape_parameters(REOPT_FOLDER, f'{MODEL_DIR}/loads.csv', microgrid, logger)
+	set_allinputdata_load_shape_parameters(REOPT_FOLDER, f'loads.csv', microgrid, logger)
 	set_allinputdata_outage_parameters(REOPT_FOLDER, f'{REOPT_FOLDER}/loadShape.csv', REOPT_INPUTS["outageDuration"])
 	critical_load_percent = get_critical_load_percent(f'{REOPT_FOLDER}/loadShape.csv', microgrid, mg_name, logger)
 	set_allinputdata_user_parameters(REOPT_FOLDER, REOPT_INPUTS, critical_load_percent, lat, lon, api_key)

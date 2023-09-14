@@ -29,7 +29,7 @@
 			margin-left: 5px;
 		}
 		form {
-			width: 100%;
+			/* width: 100%; */
 			margin-left: 5px;
 		}
 		button, input[type='submit'], label.fileButton {
@@ -438,7 +438,7 @@
                             </fieldset>
                             <fieldset>
                                 <button id="upload-file-btn" type="button" hidden>Upload</button>
-                                <button type="button" class="remove-btn">Remove File</button>
+                                <button id="remove-ciruit-button" type="button" class="remove-btn">Remove File</button>
                             </fieldset>
                         {% else %}
                             <fieldset>
@@ -785,6 +785,10 @@
 			fileInput.val('');
 			$(this).hide();
 			toggleRemoveButton(chunk, this);
+
+			if ($(this).attr('id') == 'remove-ciruit-button') {
+				$('#wizard').prop('disabled', false);
+			}
 		});
 
 		// Function to check if a .file-input has a value and show/hide the associated Remove button after a new file is selected.
@@ -936,6 +940,8 @@
 			partitionButton.on('click', function() {
 				$('#stepThree').show();
 				oldPartitionsDiv.hide();
+				$('#previewPartitionsButton').prop('disabled', false);
+				$('#partitionMethod').prop('disabled', false);
 			});
 		}
 
@@ -1372,9 +1378,6 @@
 				alert('Please specify a partitioning method.')
 				return 
 			}
-			// Show loading indicator.
-			$('#loading-background').show();
-			$("#loading-indicator").show();
 			var form1 = new FormData(document.getElementById("modelInfoForm"));
 			var form2 = new FormData(document.getElementById("techParamForm"));
 			for (var pair of form2.entries()) {
@@ -1414,11 +1417,7 @@
 					}
 					console.log(this);
 					var load = $(this).text().split(' ')[1]
-					console.log('load');
-					console.log(load);
 					var mg = $(this).find(':selected').text()
-					console.log('mg');
-					console.log(mg);
 					if (method === 'loadGrouping') {
 						MICROGRIDS[mg] ??= [];
 						MICROGRIDS[mg].push(load);
@@ -1429,6 +1428,20 @@
 						MICROGRIDS['pairings'][mg].push(load); 
 					}
 				} )
+				// Do not proceed if no loads are in microgrids.
+				if ('pairings' in MICROGRIDS) {
+					const pairings = MICROGRIDS.pairings;
+					if (typeof pairings === 'object' && Object.keys(pairings).length === 1 && 'None' in pairings) {
+						alert('At least one load should be placed in a microgrid. Please return to step 3.')
+						return
+					}
+				} else {
+					const keys = Object.keys(MICROGRIDS);
+					if (keys.length === 1 && keys[0] === 'None') {
+						alert('At least one load should be placed in a microgrid. Please return to step 3.')
+						return
+					}
+				}
 				// If manual is selected, append switch and gen_bus values.
 				var counter = 0;
 				$('#switchGenbus input').each( function() {
@@ -1452,6 +1465,10 @@
 			// Append mgQuantity. 
 			var mgQuantity = $('#minQuantMgs').val() ? $('#minQuantMgs').val() : 0;
 			form1.append('mgQuantity',JSON.stringify(mgQuantity));
+
+			// Show loading indicator.
+			$('#loading-background').show();
+			$("#loading-indicator").show();
 
 			$.ajax({
 				url: '/run',

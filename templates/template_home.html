@@ -362,7 +362,6 @@
                             statusElement.textContent = "Status: Crashed";
                         } else {
                             statusElement.textContent = "Status: In Progress";
-                            setTimeout(checkStatus(projects), 800); // Check again after 8 seconds.
                         }
                     } else {
                         console.log('Error:', xhr.status);
@@ -378,8 +377,8 @@
         }
         window.onload = function () {
             const projects_json = '{{ projects | tojson }}';
-            const projects = JSON.parse(projects_json)
-            checkStatus(projects);
+            const projects = JSON.parse(projects_json);
+            setInterval(checkStatus(projects), 8000); // Check status each 8 seconds.
         }
     </script>
 </body>

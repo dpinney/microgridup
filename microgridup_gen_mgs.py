@@ -56,7 +56,8 @@ def only_child(G, mgs):
 			mgs[parent[0]].extend(mgs[siblings[0]])
 			del mgs[siblings[0]]
 			parent = list(G.predecessors(parent[0]))
-			if not parent or len(parent) > 1:
+			grandparent = list(G.predecessors(parent[-1]))
+			if not parent or len(parent) > 1 or not grandparent:
 				break
 			siblings = list(G.successors(parent[0]))
 	return mgs

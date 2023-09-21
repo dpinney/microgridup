@@ -458,6 +458,10 @@ def run_reopt_threads(model_dir, microgrids, logger, reopt_inputs, invalidate_ca
 	:return: don't return anything once all the threads have completed. Instead, just read the corresponding allInputData.json and allOutputData.json
 		file for each microgrid to build a new DSS file in microgridup_hosting_cap.py
 	:rtype: None
+
+	This function will not retry a REopt thread that returned an exception due to an optimization timeout. Instead, it will immediately raise the
+	optimization timeout exception. This function will retry a REopt thread that returned an exception due to something other than an optimization
+	timeout.
 	'''
 	assert isinstance(model_dir, str)
 	assert isinstance(microgrids, dict)
@@ -471,29 +475,34 @@ def run_reopt_threads(model_dir, microgrids, logger, reopt_inputs, invalidate_ca
 	for i, mg_name in enumerate(sorted(microgrids.keys())):
 		# - Generate a set of arguments for a single thread
 		thread_argument_lists.append([model_dir, microgrids[mg_name], i, logger, reopt_inputs, mg_name, api_keys[i % len(api_keys)], invalidate_cache])
-	# - Re-try a thread that throws an exception a maximum of two times after the initial attempt
+	# - Retry a thread that throws an exception a maximum of two times after the initial attempt
 	future_lists = ([], [], [])
 	argument_lists = (thread_argument_lists, [], [])
 	with concurrent.futures.ThreadPoolExecutor() as executor:
-		# - Build the first list of Future objects
 		for args_list in argument_lists[0]:
 			future_lists[0].append(executor.submit(run_reopt_thread, *args_list))
 		for future_list_idx, future_list in enumerate(future_lists):
 			for f in concurrent.futures.as_completed(future_list):
 				if f.exception() is not None:
+					# - omf.__neoMetaModel__.py captures any exception thrown by a model's work() function and writes it to stderr.txt within the
+					#   model's working directory. Any exception detected here is caused by a side-effect of REopt failing, namely that
+					#   reopt_final_i/allOutputData.json does not exist. But that file could not exist for various reasons, and we only retry a thread
+					#   if it did not fail due to an optimization timeout. Therefore, we have to read stderr.txt to get the original exception
+					#   information
 					future_idx = future_list.index(f)
-					#print(f'The Future at index {future_idx} raised an exception')
-					#print(future_list)
+					args_list = argument_lists[future_list_idx][future_idx]
+					stderr_filepath = f'reopt_final_{args_list[2]}/stderr.txt'
+					if os.path.isfile(stderr_filepath):
+						with open(stderr_filepath) as f:
+							string = f.read()
+							if string.find('Optimization exceeded timeout') > -1:
+								raise Exception(f'Thread for microgrid "{args_list[5]}" for circuit "{args_list[0]}" failed due to REopt reaching an optimization timeout of 420 seconds.')
+					# - If the thread failed due to some other reason, retry it twice
 					if future_list_idx + 1 < len(future_lists):
-						args_list = argument_lists[future_list_idx][future_idx]
+						# - Always invalidate the cache when retrying
 						args_list[-1] = True
-						# - "Re-try" the exception-throwing Future object by adding a new Future object with the same arguments to the next list
 						future_lists[future_list_idx + 1].append(executor.submit(run_reopt_thread, *args_list))
 						argument_lists[future_list_idx + 1].append(args_list)
-					else:
-						# - Re-raise the first available exception from one of the threads that failed after retries
-						print(f'Thread for microgrid "{args_list[5]}" for circuit "{args_list[0]}" raised an exception:')
-						raise f.exception()
 
 def run_reopt_thread(model_dir, microgrid, microgrid_index, logger, reopt_inputs, mg_name, api_key, invalidate_cache):
 	print('THIS DIR FOR THREADS', os.getcwd())

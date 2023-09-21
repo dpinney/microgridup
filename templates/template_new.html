@@ -1470,6 +1470,7 @@
 			$('#loading-background').show();
 			$("#loading-indicator").show();
 
+			const model_dir = $('input[name="MODEL_DIR"]').val();
 			$.ajax({
 				url: '/run',
 				type: 'POST',
@@ -1477,7 +1478,8 @@
 				processData: false,
 				contentType: false,
 				success: function(data) {
-					window.location.href = '/';
+					// window.location.href = '/';
+					window.location.href = `/load/${model_dir}`;
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					// Hide loading indicator if server fails.

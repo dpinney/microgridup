@@ -468,6 +468,12 @@ def run_reopt_threads(model_dir, microgrids, logger, reopt_inputs, invalidate_ca
 	assert isinstance(logger, logging.Logger)
 	assert isinstance(reopt_inputs, dict)
 	assert isinstance(invalidate_cache, bool)
+	# - Set invalidate_cache
+	if not os.path.isfile('output_final.html'):
+		invalidate_cache = True
+	for i, mg_name in enumerate(sorted(microgrids.keys())):
+		if not os.path.isfile(f'reopt_final_{i}/allOutputData.json'):
+			invalidate_cache = True
 	# - Shuffle the api keys so we don't use them in the same order every time
 	api_keys = random.sample(REOPT_API_KEYS, len(REOPT_API_KEYS))
 	# - Generate the correct arguments for each REopt thread to be run

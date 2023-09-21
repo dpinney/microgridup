@@ -14,32 +14,28 @@ PROJ_FOLDER = f'{MGU_FOLDER}/data/projects'
 
 def run(MODEL_DIR, REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, lon, existing_generation_dict, api_key, INVALIDATE_CACHE=False):
 	'''
-    Generate full microgrid design for given microgrid spec dictionary and circuit file (used to gather distribution assets) Generate the microgrid
-    specs for REOpt. SIDE-EFFECTS: generates REOPT_FOLDER
+	Generate full microgrid design for given microgrid spec dictionary and circuit file (used to gather distribution assets) Generate the microgrid
+	specs for REOpt. SIDE-EFFECTS: generates REOPT_FOLDER
 
 	- MODEL_DIR: the outermost model directory
 	- REOPT_FOLDER: a inner directory within the outermost model directory for running REopt on a particular microgrid
-    - microgrid: a microgrid dict
-    - logger: a logger instance
-    - REOPT_INPUTS: arbitrarily set user input parameters
-    - mg_name: the name of the microgrid
-    - lat: latitude
-    - lon: longitude
-    - existing_generation_dict: a dict that contains generation information from the circuit
-    - INVALIDATE_CACHE: whether to reuse existing REopt results
+	- microgrid: a microgrid dict
+	- logger: a logger instance
+	- REOPT_INPUTS: arbitrarily set user input parameters
+	- mg_name: the name of the microgrid
+	- lat: latitude
+	- lon: longitude
+	- existing_generation_dict: a dict that contains generation information from the circuit
+	- INVALIDATE_CACHE: whether to reuse existing REopt results
 	'''
-	if os.path.isdir(REOPT_FOLDER):
-		# - Even if a REopt folder for a particular microgrid exists from a previous circuit's run, we force all microgrids to re-query REopt if the
-		#   previous circuit run crashed for any reason (i.e. there is no "output_final.html" file)
-		if INVALIDATE_CACHE == False and os.path.isfile('output_final.html'):
-			# Cached results detected, user does not want to invalidate them, exit.
-			print('**************************************************')
-			print(f'** Using cached REopt results for {REOPT_FOLDER} **')
-			print('**************************************************')
-			logger.warning('**************************************************')
-			logger.warning(f'** Using cached REopt results for {REOPT_FOLDER} **')
-			logger.warning('**************************************************')
-			return
+	if os.path.isdir(REOPT_FOLDER) and INVALIDATE_CACHE == False:
+		print('**************************************************')
+		print(f'** Using cached REopt results for {REOPT_FOLDER} **')
+		print('**************************************************')
+		logger.warning('**************************************************')
+		logger.warning(f'** Using cached REopt results for {REOPT_FOLDER} **')
+		logger.warning('**************************************************')
+		return
 	import omf.models
 	shutil.rmtree(REOPT_FOLDER, ignore_errors=True)
 	omf.models.microgridDesign.new(REOPT_FOLDER)

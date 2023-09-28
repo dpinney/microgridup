@@ -481,9 +481,9 @@ def run_reopt_threads(model_dir, microgrids, logger, reopt_inputs, invalidate_ca
 	for i, mg_name in enumerate(sorted(microgrids.keys())):
 		# - Generate a set of arguments for a single thread
 		thread_argument_lists.append([model_dir, microgrids[mg_name], i, logger, reopt_inputs, mg_name, api_keys[i % len(api_keys)], invalidate_cache])
-	# - Retry a thread that throws an exception a maximum of two times after the initial attempt
-	future_lists = ([], [], [])
-	argument_lists = (thread_argument_lists, [], [])
+	# - Retry a thread that throws an exception
+	future_lists = ([], [])
+	argument_lists = (thread_argument_lists, [])
 	with concurrent.futures.ThreadPoolExecutor() as executor:
 		for args_list in argument_lists[0]:
 			future_lists[0].append(executor.submit(run_reopt_thread, *args_list))

@@ -165,11 +165,11 @@
         "solarMax": "100000",
         "solarMin": "0",
         "batteryCapacityCost": "420",
-        "batteryCapacityMax": "125000",
+        "batteryCapacityMax": "1000000",
         "batteryCapacityMin": "0",
         "batteryKwhExisting": "0",
         "batteryPowerCost": "840",
-        "batteryPowerMax": "125000",
+        "batteryPowerMax": "1000000",
         "batteryPowerMin": "0",
         "batteryKwExisting": "0",
         "dieselGenCost": "500",
@@ -197,7 +197,7 @@
         {
             "!CMD": "new",
             "object": "vsource.sub",
-            "basekv": "115",
+            "basekv": "2.4",
             "bus1": "sub_bus.1.2.3",
             "pu": "1.00",
             "r1": "0",
@@ -217,8 +217,8 @@
         {
             "!CMD": "new",
             "object": "load.684_command_center",
-            "bus1": "regnone_end.1",
-            "phases": "1",
+            "bus1": "regnone_end.1.2.3",
+            "phases": "3",
             "conn": "wye",
             "model": "1",
             "kv": "2.4",
@@ -228,8 +228,8 @@
         {
             "!CMD": "new",
             "object": "load.692_warehouse2",
-            "bus1": "regnone_end.1",
-            "phases": "1",
+            "bus1": "regnone_end.1.2.3",
+            "phases": "3",
             "conn": "wye",
             "model": "1",
             "kv": "2.4",
@@ -239,8 +239,8 @@
         {
             "!CMD": "new",
             "object": "load.611_runway",
-            "bus1": "regnone_end.1",
-            "phases": "1",
+            "bus1": "regnone_end.1.2.3",
+            "phases": "3",
             "conn": "wye",
             "model": "1",
             "kv": "2.4",
@@ -250,8 +250,8 @@
         {
             "!CMD": "new",
             "object": "load.652_residential",
-            "bus1": "regnone_end.1",
-            "phases": "1",
+            "bus1": "regnone_end.1.2.3",
+            "phases": "3",
             "conn": "wye",
             "model": "1",
             "kv": "2.4",
@@ -261,8 +261,8 @@
         {
             "!CMD": "new",
             "object": "load.670a_residential2",
-            "bus1": "regnone_end.1",
-            "phases": "1",
+            "bus1": "regnone_end.1.2.3",
+            "phases": "3",
             "conn": "wye",
             "model": "1",
             "kv": "2.4",
@@ -272,8 +272,8 @@
         {
             "!CMD": "new",
             "object": "load.670b_residential2",
-            "bus1": "regnone_end.1",
-            "phases": "1",
+            "bus1": "regnone_end.1.2.3",
+            "phases": "3",
             "conn": "wye",
             "model": "1",
             "kv": "2.4",
@@ -283,8 +283,8 @@
         {
             "!CMD": "new",
             "object": "load.670c_residential2",
-            "bus1": "regnone_end.1",
-            "phases": "1",
+            "bus1": "regnone_end.1.2.3",
+            "phases": "3",
             "conn": "wye",
             "model": "1",
             "kv": "2.4",
@@ -303,8 +303,8 @@
         {
             "!CMD": "new",
             "object": "load.634a_data_center",
-            "bus1": "reg0_end.1",
-            "phases": "1",
+            "bus1": "reg0_end.1.2.3",
+            "phases": "3",
             "conn": "wye",
             "model": "1",
             "kv": "2.4",
@@ -314,8 +314,8 @@
         {
             "!CMD": "new",
             "object": "load.634b_radar",
-            "bus1": "reg0_end.1",
-            "phases": "1",
+            "bus1": "reg0_end.1.2.3",
+            "phases": "3",
             "conn": "wye",
             "model": "1",
             "kv": "2.4",
@@ -325,8 +325,8 @@
         {
             "!CMD": "new",
             "object": "load.634c_atc_tower",
-            "bus1": "reg0_end.1",
-            "phases": "1",
+            "bus1": "reg0_end.1.2.3",
+            "phases": "3",
             "conn": "wye",
             "model": "1",
             "kv": "2.4",
@@ -336,18 +336,18 @@
         {
             "!CMD": "new",
             "object": "generator.solar_634_existing",
-            "bus1": "reg0_end.1",
-            "phases": "1",
-            "kv": "0.277",
+            "bus1": "reg0_end.1.2.3",
+            "phases": "3",
+            "kv": "2.4",
             "kw": "440",
             "pf": "1"
         },
         {
             "!CMD": "new",
             "object": "storage.battery_634_existing",
-            "bus1": "reg0_end.1",
-            "phases": "1",
-            "kv": "0.277",
+            "bus1": "reg0_end.1.2.3",
+            "phases": "3",
+            "kv": "2.4",
             "kwrated": "79",
             "kwhstored": "307",
             "kwhrated": "307",
@@ -369,8 +369,8 @@
         {
             "!CMD": "new",
             "object": "load.675a_hospital",
-            "bus1": "reg1_end.1",
-            "phases": "1",
+            "bus1": "reg1_end.1.2.3",
+            "phases": "3",
             "conn": "wye",
             "model": "1",
             "kv": "2.4",
@@ -380,8 +380,8 @@
         {
             "!CMD": "new",
             "object": "load.675b_residential1",
-            "bus1": "reg1_end.1",
-            "phases": "1",
+            "bus1": "reg1_end.1.2.3",
+            "phases": "3",
             "conn": "wye",
             "model": "1",
             "kv": "2.4",
@@ -391,8 +391,8 @@
         {
             "!CMD": "new",
             "object": "load.675c_residential1",
-            "bus1": "reg1_end.1",
-            "phases": "1",
+            "bus1": "reg1_end.1.2.3",
+            "phases": "3",
             "conn": "wye",
             "model": "1",
             "kv": "2.4",
@@ -423,8 +423,8 @@
         {
             "!CMD": "new",
             "object": "load.645_hangar",
-            "bus1": "reg2_end.1",
-            "phases": "1",
+            "bus1": "reg2_end.1.2.3",
+            "phases": "3",
             "conn": "wye",
             "model": "1",
             "kv": "2.4",
@@ -434,8 +434,8 @@
         {
             "!CMD": "new",
             "object": "load.646_office",
-            "bus1": "reg2_end.1",
-            "phases": "1",
+            "bus1": "reg2_end.1.2.3",
+            "phases": "3",
             "conn": "wye",
             "model": "1",
             "kv": "2.4",
@@ -448,20 +448,39 @@
         {
             "!CMD": "setbusxy",
             "bus": "sub_bus",
-            "y": "39.780499999999996",
-            "x": "-89.6528749"
+            "y": "39.780781000000005",
+            "x": "-89.65277054999999"
         },
         {
             "!CMD": "setbusxy",
             "bus": "regnone_end",
-            "y": "39.783882999999996",
-            "x": "-89.6516439"
+            "y": "39.776230500000004",
+            "x": "-89.65465554999999"
         },
         {
             "!CMD": "setbusxy",
             "bus": "reg0_end",
-            "y": "39.779875",
-            "x": "-89.6564204"
+            "y": "39.7805155",
+            "x": "-89.64792154999999"
+        },
+        {
+            "!CMD": "setbusxy",
+            "bus": "reg1_end",
+            "y": "39.783620000000006",
+            "x": "-89.65664154999999"
+        },
+        {
+            "!CMD": "setbusxy",
+            "bus": "reg2_end",
+            "y": "39.784825000000005",
+            "x": "-89.65162554999999"
+        },
+        {
+            "!CMD": "set",
+            "voltagebases": "[115,4.16,0.48]"
+        },
+        {
+            "!CMD": "calcvoltagebases"
         }
     ],
     "MG_MINES": {

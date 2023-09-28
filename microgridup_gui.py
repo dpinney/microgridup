@@ -162,7 +162,7 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 		obName = ob['text']
 		if obType == 'substation':
 			lastSub = obName.replace(' ','')
-			dssString += f'new object=vsource.{lastSub} basekv=115 bus1={lastSub}_bus.1.2.3 pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001 \n'
+			dssString += f'new object=vsource.{lastSub} basekv=2.4 bus1={lastSub}_bus.1.2.3 pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001 \n'
 			busList.append(f'{lastSub}_bus')
 		elif obType == 'feeder':
 			# Add a feeder, a gen_bus, and a capacitor.
@@ -170,16 +170,16 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 			dssString += f'new object=line.{lastFeeder} phases=3 bus1={lastSub}_bus.1.2.3 bus2={lastFeeder}_end.1.2.3 length=1333 units=ft \n'
 			busList.append(f'{lastFeeder}_end')
 		elif obType == 'load':
-			dssString += f'new object=load.{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 conn=wye model=1 kv=2.4 kw=1155 kvar=660 \n'
+			dssString += f'new object=load.{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 conn=wye model=1 kv=2.4 kw=1155 kvar=660 \n'
 		elif obType == 'solar':
 			prefix = '' if obName.startswith('solar_') else 'solar_'
-			dssString += f'new object=generator.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 kv=0.277 kw=440 pf=1 \n'
+			dssString += f'new object=generator.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 kv=2.4 kw=440 pf=1 \n'
 		elif obType == 'wind':
 			prefix = '' if obName.startswith('wind_') else 'wind_'
-			dssString += f'new object=generator.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 kv=0.277 kw=200 pf=1 \n'
+			dssString += f'new object=generator.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 kv=2.4 kw=200 pf=1 \n'
 		elif obType == 'battery':
 			prefix = '' if obName.startswith('battery_') else 'battery_'
-			dssString += f'new object=storage.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 kv=0.277 kwrated=79 kwhstored=307 kwhrated=307 dispmode=follow %charge=100 %discharge=100 %effcharge=96 %effdischarge=96 \n'
+			dssString += f'new object=storage.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 kv=2.4 kwrated=79 kwhstored=307 kwhrated=307 dispmode=follow %charge=100 %discharge=100 %effcharge=96 %effdischarge=96 \n'
 		elif obType == 'fossil':
 			prefix = '' if obName.startswith('fossil_') else 'fossil_'
 			dssString += f'new object=generator.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 kw=265 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 \n'	

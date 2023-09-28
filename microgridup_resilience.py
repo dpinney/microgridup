@@ -108,7 +108,7 @@ def main(in_csv, out_csv, mg_supported_loads, in_dss, out_html):
 	df_with_mg = df_with_mg.rename(columns={
 		'Duration_min':'Microgrid Duration_min',
 		'Meters Affected':'Microgrid Meters Affected'
-	}).drop(['ComponentAff', 'Start', 'Finish'], 1)
+	}).drop(['ComponentAff', 'Start', 'Finish'], axis=1)
 	df_full = pd.concat([df_init, df_with_mg], axis=1)
 	df_full['Date'] = pd.to_datetime(df_full['Start']).dt.date
 	print(df_full.head())

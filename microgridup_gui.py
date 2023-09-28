@@ -162,7 +162,7 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 		obName = ob['text']
 		if obType == 'substation':
 			lastSub = obName.replace(' ','')
-			dssString += f'new object=vsource.{lastSub} basekv=115 bus1={lastSub}_bus.1.2.3 pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001 \n'
+			dssString += f'new object=vsource.{lastSub} basekv=2.4 bus1={lastSub}_bus.1.2.3 pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001 \n'
 			busList.append(f'{lastSub}_bus')
 		elif obType == 'feeder':
 			# Add a feeder, a gen_bus, and a capacitor.
@@ -170,16 +170,16 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 			dssString += f'new object=line.{lastFeeder} phases=3 bus1={lastSub}_bus.1.2.3 bus2={lastFeeder}_end.1.2.3 length=1333 units=ft \n'
 			busList.append(f'{lastFeeder}_end')
 		elif obType == 'load':
-			dssString += f'new object=load.{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 conn=wye model=1 kv=2.4 kw=1155 kvar=660 \n'
+			dssString += f'new object=load.{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 conn=wye model=1 kv=2.4 kw=1155 kvar=660 \n'
 		elif obType == 'solar':
 			prefix = '' if obName.startswith('solar_') else 'solar_'
-			dssString += f'new object=generator.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 kv=0.277 kw=440 pf=1 \n'
+			dssString += f'new object=generator.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 kv=2.4 kw=440 pf=1 \n'
 		elif obType == 'wind':
 			prefix = '' if obName.startswith('wind_') else 'wind_'
-			dssString += f'new object=generator.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 kv=0.277 kw=200 pf=1 \n'
+			dssString += f'new object=generator.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 kv=2.4 kw=200 pf=1 \n'
 		elif obType == 'battery':
 			prefix = '' if obName.startswith('battery_') else 'battery_'
-			dssString += f'new object=storage.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1 phases=1 kv=0.277 kwrated=79 kwhstored=307 kwhrated=307 dispmode=follow %charge=100 %discharge=100 %effcharge=96 %effdischarge=96 \n'
+			dssString += f'new object=storage.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 kv=2.4 kwrated=79 kwhstored=307 kwhrated=307 dispmode=follow %charge=100 %discharge=100 %effcharge=96 %effdischarge=96 \n'
 		elif obType == 'fossil':
 			prefix = '' if obName.startswith('fossil_') else 'fossil_'
 			dssString += f'new object=generator.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 kw=265 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 \n'	
@@ -306,15 +306,15 @@ def previewPartitions():
 def run():
 	model_dir = request.form['MODEL_DIR']
 	print(f'-------------------------------Running {model_dir}.-------------------------------')
+	all_files = request.files
 	if 'LOAD_CSV_NAME' in request.form:
 		print('We are editing an existing model.')
 		# Editing an existing model.
 		dss_path = f'{_mguDir}/uploads/BASE_DSS_{model_dir}'
 		csv_path = f'{_mguDir}/uploads/LOAD_CSV_{model_dir}'
-		all_files = 'Using Existing Files'
+		HISTORICAL_OUTAGES_PATH = f'{_mguDir}/uploads/HISTORICAL_OUTAGES_{model_dir}'
+		criticalLoadShapeFile_PATH = f'{_mguDir}/uploads/criticalLoadShapeFile_{model_dir}'
 	else:
-		# New files uploaded. 
-		all_files = request.files
 		# Save the files.
 		if not os.path.isdir(f'{_mguDir}/uploads'):
 			os.mkdir(f'{_mguDir}/uploads')
@@ -327,9 +327,11 @@ def run():
 		HISTORICAL_OUTAGES = all_files['HISTORICAL_OUTAGES']
 		if HISTORICAL_OUTAGES.filename != '':
 			HISTORICAL_OUTAGES.save(f'{_mguDir}/uploads/HISTORICAL_OUTAGES_{model_dir}')
+			HISTORICAL_OUTAGES_PATH = f'{_mguDir}/uploads/HISTORICAL_OUTAGES_{model_dir}'
 		criticalLoadShapeFile = all_files['criticalLoadShapeFile']
 		if criticalLoadShapeFile.filename != '':
 			criticalLoadShapeFile.save(f'{_mguDir}/uploads/criticalLoadShapeFile_{model_dir}')
+			criticalLoadShapeFile_PATH = f'{_mguDir}/uploads/criticalLoadShapeFile_{model_dir}'
 	# Handle arguments to our main function.
 	crit_loads = json.loads(request.form['CRITICAL_LOADS'])
 	mg_method = request.form['MG_DEF_METHOD']
@@ -352,24 +354,24 @@ def run():
 		microgrids = json.loads(request.form['MICROGRIDS'])
 	# Form REOPT_INPUTS. 
 	REOPT_INPUTS = {
-		# 'latitude':request.form['latitude'],
-		# 'longitude':request.form['longitude'],
+		'latitude':request.form['latitude'],
+		'longitude':request.form['longitude'],
 		'energyCost':request.form['energyCost'],
 		'wholesaleCost':request.form['wholesaleCost'],
 		'demandCost':request.form['demandCost'],
 		'solarCanCurtail':(request.form['solarCanCurtail'] == 'true'),
 		'solarCanExport':(request.form['solarCanExport'] == 'true'),
-		# 'urdbLabelSwitch':request.form['urdbLabelSwitch'],
-		# 'urdbLabel':request.form['urdbLabel'],
+		'urdbLabelSwitch':request.form['urdbLabelSwitch'],
+		'urdbLabel':request.form['urdbLabel'],
 		'criticalLoadFactor':request.form['criticalLoadFactor'],
 		'year':request.form['year'],
-		# 'analysisYears':request.form['analysisYears'],
+		'analysisYears':request.form['analysisYears'],
 		'outageDuration':request.form['outageDuration'],
-		# 'outage_start_hour':request.form['outage_start_hour'],
-		# 'userCriticalLoadShape':request.form['userCriticalLoadShape'],
+		'outage_start_hour':request.form['outage_start_hour'],
+		'userCriticalLoadShape':request.form['userCriticalLoadShape'],
 		'value_of_lost_load':request.form['value_of_lost_load'],
-		# 'omCostEscalator':request.form['omCostEscalator'],
-		# 'discountRate':request.form['discountRate'],
+		'omCostEscalator':request.form['omCostEscalator'],
+		'discountRate':request.form['discountRate'],
 
 		'solar':request.form['solar'],
 		'battery':request.form['battery'],
@@ -379,8 +381,8 @@ def run():
 		'solarExisting':request.form['solarExisting'],
 		'solarMax':request.form['solarMax'],
 		'solarMin':request.form['solarMin'],
-		# 'solarMacrsOptionYears':request.form['solarMacrsOptionYears'],
-		# 'solarItcPercent':request.form['solarItcPercent'],
+		'solarMacrsOptionYears':request.form['solarMacrsOptionYears'],
+		'solarItcPercent':request.form['solarItcPercent'],
 		'batteryCapacityCost':request.form['batteryCapacityCost'],
 		'batteryCapacityMax':request.form['batteryCapacityMax'],
 		'batteryCapacityMin':request.form['batteryCapacityMin'],
@@ -389,31 +391,33 @@ def run():
 		'batteryPowerMax':request.form['batteryPowerMax'],
 		'batteryPowerMin':request.form['batteryPowerMin'],
 		'batteryKwExisting':request.form['batteryKwExisting'],
-		# 'batteryMacrsOptionYears':request.form['batteryMacrsOptionYears'],
-		# 'batteryItcPercent':request.form['batteryItcPercent'],
-		# 'batteryPowerCostReplace':request.form['batteryPowerCostReplace'],
-		# 'batteryCapacityCostReplace':request.form['batteryCapacityCostReplace'],
-		# 'batteryPowerReplaceYear':request.form['batteryPowerReplaceYear'],
-		# 'batteryCapacityReplaceYear':request.form['batteryCapacityReplaceYear'],
+		'batteryMacrsOptionYears':request.form['batteryMacrsOptionYears'],
+		'batteryItcPercent':request.form['batteryItcPercent'],
+		'batteryPowerCostReplace':request.form['batteryPowerCostReplace'],
+		'batteryCapacityCostReplace':request.form['batteryCapacityCostReplace'],
+		'batteryPowerReplaceYear':request.form['batteryPowerReplaceYear'],
+		'batteryCapacityReplaceYear':request.form['batteryCapacityReplaceYear'],
 		'dieselGenCost':request.form['dieselGenCost'],
 		'dieselMax':request.form['dieselMax'],
-		# 'dieselMin':request.form['dieselMin'],
+		'dieselMin':request.form['dieselMin'],
 		'fuelAvailable':request.form['fuelAvailable'],
 		'genExisting':request.form['genExisting'],
 		'minGenLoading':request.form['minGenLoading'],
-		# 'dieselFuelCostGal':request.form['dieselFuelCostGal'],
-		# 'dieselCO2Factor':request.form['dieselCO2Factor'],
-		# 'dieselOMCostKw':request.form['dieselOMCostKw'],
-		# 'dieselOMCostKwh':request.form['dieselOMCostKwh'],
-		# 'dieselOnlyRunsDuringOutage':request.form['dieselOnlyRunsDuringOutage'],
-		# 'dieselMacrsOptionYears':request.form['dieselMacrsOptionYears'],
+		'dieselFuelCostGal':request.form['dieselFuelCostGal'],
+		'dieselCO2Factor':request.form['dieselCO2Factor'],
+		'dieselOMCostKw':request.form['dieselOMCostKw'],
+		'dieselOMCostKwh':request.form['dieselOMCostKwh'],
+		'dieselOnlyRunsDuringOutage':request.form['dieselOnlyRunsDuringOutage'],
+		'dieselMacrsOptionYears':request.form['dieselMacrsOptionYears'],
 		'windCost':request.form['windCost'],
 		'windExisting':request.form['windExisting'],
 		'windMax':request.form['windMax'],
 		'windMin':request.form['windMin'],
-		# 'windMacrsOptionYears':request.form['windMacrsOptionYears'],
-		# 'windItcPercent':request.form['windItcPercent'],
+		'windMacrsOptionYears':request.form['windMacrsOptionYears'],
+		'windItcPercent':request.form['windItcPercent'],
 	}
+	have_HISTORICAL_OUTAGES = bool(all_files['HISTORICAL_OUTAGES'].filename != '')
+	have_critLoadShapeFile = bool(all_files['criticalLoadShapeFile'].filename != '')
 	mgu_args = [
 		f'{_projectDir}/{request.form["MODEL_DIR"]}',
 		dss_path,
@@ -424,7 +428,9 @@ def run():
 		request.form['FAULTED_LINE'],
 		crit_loads,
 		request.form['DESCRIPTION'],
-		True if request.form['INVALIDATE_CACHE'] == 'True' else False
+		True if request.form['INVALIDATE_CACHE'] == 'True' else False,
+		HISTORICAL_OUTAGES_PATH if have_HISTORICAL_OUTAGES else None,
+		criticalLoadShapeFile_PATH if have_critLoadShapeFile else None
 	]
 	# Kickoff the run
 	new_proc = multiprocessing.Process(target=full, args=mgu_args)

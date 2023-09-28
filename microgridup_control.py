@@ -143,6 +143,7 @@ def gradual_load_pickup(dssTree, loads, motor_perc=0.5):
 	return max_load_inrush + sum(all_transformer_inrush.values())
 
 def calc_transformer_inrush(dssTransformerDict, default_resistance_transformer='[0.55,0.55]'):
+	'''Formula source: https://www.electrical4u.net/transformer/transformer-inrush-current-calculator-with-formula/'''
 	# TO DO: figure out if inrushes should be calculated separately for each winding. Current calculates separately but then adds together for one inrush per transformer. 
 	# I(peak) = 1.414 Vm / R(ohms) 
 	inrush = 0
@@ -161,6 +162,7 @@ def calc_all_transformer_inrush(dssTree):
 	return transformer_inrushes
 
 def calc_motor_inrush(dssLoadDict, motor_perc=0.5):
+	'''Formula source: http://waterheatertimer.org/calculate-inrush-for-3-phase-motor.html'''
 	voltage = float(dssLoadDict.get('kv'))
 	power = float(dssLoadDict.get('kw'))
 	if dssLoadDict.get('phases') == 3:

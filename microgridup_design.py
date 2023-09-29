@@ -12,7 +12,7 @@ if MGU_FOLDER == '/':
 	MGU_FOLDER = '' #workaround for docker root installs
 PROJ_FOLDER = f'{MGU_FOLDER}/data/projects'
 
-def run(MODEL_DIR, REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, lon, existing_generation_dict, api_key, INVALIDATE_CACHE=False):
+def run(MODEL_DIR, REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, lon, existing_generation_dict, api_key, INVALIDATE_CACHE):
 	'''
 	Generate full microgrid design for given microgrid spec dictionary and circuit file (used to gather distribution assets) Generate the microgrid
 	specs for REOpt. SIDE-EFFECTS: generates REOPT_FOLDER
@@ -28,7 +28,9 @@ def run(MODEL_DIR, REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, 
 	- existing_generation_dict: a dict that contains generation information from the circuit
 	- INVALIDATE_CACHE: whether to reuse existing REopt results
 	'''
+	assert isinstance(INVALIDATE_CACHE, bool)
 	if os.path.isdir(REOPT_FOLDER) and INVALIDATE_CACHE == False:
+		# - The cache is only for testing purposes
 		print('**************************************************')
 		print(f'** Using cached REopt results for {REOPT_FOLDER} **')
 		print('**************************************************')
@@ -334,7 +336,7 @@ def _tests():
 		dss_filename = 'circuit.dss' if run_count == 0 else f'circuit_plusmg_{run_count-1}.dss'
 		existing_generation_dict = microgridup_hosting_cap.get_microgrid_existing_generation_dict(f'{MODEL_DIR}/{dss_filename}', microgrids[f'mg{run_count}'])
 		lat, lon = microgridup_hosting_cap.get_microgrid_coordinates(f'{MODEL_DIR}/{dss_filename}', microgrids[f'mg{run_count}'])
-		run(MODEL_DIR, f'reopt_final_{run_count}', microgrids[f'mg{run_count}'], logger, REOPT_INPUTS, f'mg{run_count}', lat, lon, existing_generation_dict, REOPT_API_KEYS[0])
+		run(MODEL_DIR, f'reopt_final_{run_count}', microgrids[f'mg{run_count}'], logger, REOPT_INPUTS, f'mg{run_count}', lat, lon, existing_generation_dict, REOPT_API_KEYS[0], False)
 	os.chdir(curr_dir)
 	print('Ran all tests for microgridup_design.py.')
 

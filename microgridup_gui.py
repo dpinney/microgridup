@@ -428,7 +428,7 @@ def run():
 		request.form['FAULTED_LINE'],
 		crit_loads,
 		request.form['DESCRIPTION'],
-		True if request.form['INVALIDATE_CACHE'] == 'True' else False,
+		True,
 		HISTORICAL_OUTAGES_PATH if have_HISTORICAL_OUTAGES else None,
 		criticalLoadShapeFile_PATH if have_critLoadShapeFile else None
 	]

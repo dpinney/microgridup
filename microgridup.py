@@ -274,7 +274,7 @@ def get_all_colorable_elements(dss_path, omd_path=None):
     colorable_elements = [x for x in tree if x['!CMD'] in ('new','edit','setbusxy') and 'loadshape' not in x.get('object','') and 'line' not in x.get('object','')]
     return colorable_elements
 
-def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS=None, DESCRIPTION='', INVALIDATE_CACHE=False, OUTAGE_CSV=None, CRIT_LOADSHAPE_CSV=None, DELETE_FILES=False, open_results=False):
+def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS=None, DESCRIPTION='', INVALIDATE_CACHE=True, OUTAGE_CSV=None, CRIT_LOADSHAPE_CSV=None, DELETE_FILES=False, open_results=False):
 	''' Generate a full microgrid plan for the given inputs. '''
 	# Constants
 	MODEL_DSS = 'circuit.dss'
@@ -472,12 +472,6 @@ def run_reopt_threads(model_dir, microgrids, logger, reopt_inputs, invalidate_ca
 	assert isinstance(logger, logging.Logger)
 	assert isinstance(reopt_inputs, dict)
 	assert isinstance(invalidate_cache, bool)
-	# - Set invalidate_cache
-	if not os.path.isfile('output_final.html'):
-		invalidate_cache = True
-	for i, mg_name in enumerate(sorted(microgrids.keys())):
-		if not os.path.isfile(f'reopt_final_{i}/allOutputData.json'):
-			invalidate_cache = True
 	# - Shuffle the api keys so we don't use them in the same order every time
 	api_keys = random.sample(REOPT_API_KEYS, len(REOPT_API_KEYS))
 	# - Generate the correct arguments for each REopt thread to be run
@@ -539,7 +533,7 @@ def _tests():
 			mgu_args = [f'{PROJ_FOLDER}/{_dir}', f'{MGU_FOLDER}/testfiles/wizard_base_3mg.dss']
 		except ValueError as e:
 			mgu_args = [f'{PROJ_FOLDER}/{_dir}', f'{MGU_FOLDER}/testfiles/lehigh_base_3mg.dss']
-		mgu_args.extend([f'{MGU_FOLDER}/testfiles/lehigh_load.csv', QSTS_STEPS, REOPT_INPUTS, MG_MINES[_dir][0], FAULTED_LINE, CRITICAL_LOADS])
+		mgu_args.extend([f'{MGU_FOLDER}/testfiles/lehigh_load.csv', QSTS_STEPS, REOPT_INPUTS, MG_MINES[_dir][0], FAULTED_LINE, CRITICAL_LOADS, '', False])
 		print(f'---------------------------------------------------------\nBeginning end-to-end backend test of {_dir}.\n---------------------------------------------------------')
 		full(*mgu_args)
 		if untested.count(_dir) == 0 and os.path.isfile(f'{PROJ_FOLDER}/{_dir}/0crashed.txt'):

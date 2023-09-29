@@ -72,7 +72,7 @@ def test_1mg():
 		}
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS, INVALIDATE_CACHE=False, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
 	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
 		sys.exit(1)
 
@@ -150,7 +150,7 @@ def test_2mg():
 		}
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS, open_results=True)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS, INVALIDATE_CACHE=False, open_results=True)
 	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
 		sys.exit(1)
 
@@ -235,7 +235,7 @@ def test_3mg():
 		}
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS, open_results=True)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS, INVALIDATE_CACHE=False, open_results=True)
 	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
 		sys.exit(1)
 
@@ -329,7 +329,7 @@ def test_4mg():
 		}
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS, INVALIDATE_CACHE=False, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
 	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
 		sys.exit(1)
 
@@ -418,7 +418,7 @@ def test_auto3mg():
 	# 	}
 	# }
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS, INVALIDATE_CACHE=False, open_results=True, OUTAGE_CSV=OUTAGE_CSV)
 	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
 		sys.exit(1)
 

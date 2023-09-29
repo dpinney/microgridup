@@ -275,11 +275,6 @@
                     <label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">Defines the length of the interconnection analysis. Example – if time steps are 15 minutes, 480 would define a five day analysis.</span></label>
                     <input type="text" name="QSTS_STEPS" value="{{in_data.QSTS_STEPS}}" />
                 </div>
-                <div class="chunk">
-                    <label class="tooltip" for="INVALIDATE_CACHE">Invalidate Cache<span class="classic">Cache from previous run (if applicable) is cleared when selected.</span></label>
-                    <input type="checkbox" name="INVALIDATE_CACHE" value="True" {% if in_data.INVALIDATE_CACHE == "True" %}checked{% endif %}/>
-                    <input type="hidden" name="INVALIDATE_CACHE" value="False">
-                </div>
                 <br>
                 <div class="chunk">
                     <label class="tooltip" for="DESCRIPTION">Description<span class="classic">Include an optional description of the project. Max 140 characters.</span></label>

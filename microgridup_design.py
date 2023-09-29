@@ -197,7 +197,9 @@ def set_allinputdata_generator_parameters(REOPT_FOLDER, fossil_kw_existing):
 	with open(REOPT_FOLDER + '/allInputData.json') as f:
 		allInputData = json.load(f)
 	allInputData['genExisting'] = str(fossil_kw_existing)
-	#TODO: read fossil = "yes"/"no" and set diesel max parameters appropriately, which omf.models.microgridDesign should understand.
+	fossil_status = allInputData['fossil']
+	if fossil_status == 'off':
+		allInputData['dieselMax'] = '0'
 	with open(REOPT_FOLDER + '/allInputData.json', 'w') as f:
 		json.dump(allInputData, f, indent=4)
 

@@ -152,37 +152,36 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 		lon = float(request.form['longitude'])
 	if not elements:
 		elements = json.loads(request.form['json'])
+
 	# Convert to DSS and return loads.
 	dssString = f'clear \nset defaultbasefrequency=60 \nnew object=circuit.{model_dir} \n'
-	# Name substation bus after substation itself. Name gen bus after the feeder. Having parent/child connections could be a useful shortcut + add robustness.
-	lastSub, lastFeeder = None, None
 	busList = []
+	# Name substation bus after substation itself. Name gen bus after the feeder
 	for ob in elements:
-		obType = ob['class']
-		obName = ob['text']
-		if obType == 'substation':
-			lastSub = obName.replace(' ','')
-			dssString += f'new object=vsource.{lastSub} basekv=2.4 bus1={lastSub}_bus.1.2.3 pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001 \n'
-			busList.append(f'{lastSub}_bus')
+		obType = ob['type']
+		obName = ob['name']
+		if obType == 'substation': 
+			dssString += f'new object=vsource.{obName} basekv=2.4 bus1={obName}_bus.1.2.3 pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001 \n'
+			busList.append(f'{obName}_bus')
 		elif obType == 'feeder':
-			# Add a feeder, a gen_bus, and a capacitor.
-			lastFeeder = obName.replace(' ','')
-			dssString += f'new object=line.{lastFeeder} phases=3 bus1={lastSub}_bus.1.2.3 bus2={lastFeeder}_end.1.2.3 length=1333 units=ft \n'
-			busList.append(f'{lastFeeder}_end')
+			dssString += f'new object=line.{obName} phases=3 bus1={ob["parent"].split(".")[1]}_bus.1.2.3 bus2={obName}_end.1.2.3 length=1333 units=ft \n'
+			busList.append(f'{obName}_end')
 		elif obType == 'load':
-			dssString += f'new object=load.{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 conn=wye model=1 kv=2.4 kw=1155 kvar=660 \n'
+			dssString += f'new object=load.{obName} bus1={ob["parent"].split(".")[1]}_end.1.2.3 phases=3 conn=wye model=1 kv=2.4 kw={ob["kw"]} kvar=660 \n'
 		elif obType == 'solar':
 			prefix = '' if obName.startswith('solar_') else 'solar_'
-			dssString += f'new object=generator.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 kv=2.4 kw=440 pf=1 \n'
+			dssString += f'new object=generator.{prefix}{obName} bus1={ob["parent"].split(".")[1]}_end.1.2.3 phases=3 kv=2.4 kw={ob["kw"]} pf=1 \n'
 		elif obType == 'wind':
 			prefix = '' if obName.startswith('wind_') else 'wind_'
-			dssString += f'new object=generator.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 kv=2.4 kw=200 pf=1 \n'
+			dssString += f'new object=generator.{prefix}{obName} bus1={ob["parent"].split(".")[1]}_end.1.2.3 phases=3 kv=2.4 kw={ob["kw"]} pf=1 \n'
 		elif obType == 'battery':
 			prefix = '' if obName.startswith('battery_') else 'battery_'
-			dssString += f'new object=storage.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 kv=2.4 kwrated=79 kwhstored=307 kwhrated=307 dispmode=follow %charge=100 %discharge=100 %effcharge=96 %effdischarge=96 \n'
+			dssString += f'new object=storage.{prefix}{obName} bus1={ob["parent"].split(".")[1]}_end.1.2.3 phases=3 kv=2.4 kwrated={ob["kw"]} kwhstored={ob["kwh"]} kwhrated={ob["kwh"]} dispmode=follow %charge=100 %discharge=100 %effcharge=96 %effdischarge=96 \n'
 		elif obType == 'fossil':
 			prefix = '' if obName.startswith('fossil_') else 'fossil_'
-			dssString += f'new object=generator.{prefix}{obName.replace(" ","")} bus1={lastFeeder}_end.1.2.3 phases=3 kw=265 pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 \n'	
+			dssString += f'new object=generator.{prefix}{obName} bus1={ob["parent"].split(".")[1]}_end.1.2.3 phases=3 kw={ob["kw"]} pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 \n'
+		else:
+			raise Exception(f'Unknown object type "{obType}"')
 	# Convert dssString to a networkx graph.
 	tree = dssConvert.dssToTree(dssString, is_path=False)
 	G = dssConvert.dss_to_networkx('', tree=tree)

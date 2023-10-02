@@ -2,6 +2,11 @@
 <html>
 <head>
 	<title>MicrogridUP &raquo; New</title>
+    <link rel="stylesheet" href="/data/static/circuitBuilder/modals/modal.css">
+    <script type="module" src="/data/static/circuitBuilder/modals/circuitBuilder.js"></script>
+    <script src="/data/static/circuitBuilder/graphology-library.min.js"></script>
+    <script src="/data/static/circuitBuilder/graphology.min.js"></script>
+    <script src="/data/static/circuitBuilder/papaparse.min.js"></script>
 	<script src="https://kit.fontawesome.com/92028f16c4.js" crossorigin="anonymous"></script>
 	<style type="text/css">
         :root {
@@ -331,9 +336,7 @@
                         <input type="text" name="LOAD_CSV_NAME" value="{{ in_data.get('LOAD_CSV') }}" class="file-input" readonly>
                         <button type="button" class="remove-btn">Remove File</button>
                     {% else %}
-                        <label class="tooltip" for="LOAD_CSV">Load Data (.csv)<span class="classic">Please upload a .csv file representing the hourly load shape. See https://github.com/dpinney/<br>microgridup/blob/main/docs<br>/input_formats.md for formatting details.</span></label>
-                        <input type="file" name="LOAD_CSV" class="file-input">
-                        <button type="button" class="remove-btn">Remove File</button>
+                        <div id='csvLoadParserInsert'></div>
                     {% endif %}
                 </div>
                 <div class="chunk">
@@ -460,38 +463,7 @@
                     </form>
                 </div>
             </div>
-
-            <div id="circuitCreator" class="desc">
-                <dialog id="dialog">
-                    <div id="dialogText"></div>
-                    <select></select>
-                    <button type="cancel">Cancel</button>
-                    <button type="button">Confirm</button>
-                </dialog>
-
-
-                <ul id="elements">
-                    <li class="substation" data-editable><i class="fa fa-minus-square"></i> Substation: (click to name)</li>
-                    <li class="feeder" data-editable><i class="fa fa-minus-square"></i> Feeder: (click to name)</li>
-                    <li class="load" data-editable><i class="fa fa-minus-square"></i> Load: (click to name)</li>
-                    <li class="solar" data-editable><i class="fa fa-minus-square"></i> Solar: (click to name)</li>
-                    <li class="battery" data-editable><i class="fa fa-minus-square"></i> Battery: (click to name)</li>
-                    <li class="fossil" data-editable><i class="fa fa-minus-square"></i> Fossil: (click to name)</li>
-                </ul>
-                <div class="wizard-dropdown">
-                    <button id="wizard-dropbutton" class="wizard-dropbutton" type="button">Add element</button>
-                    <div class="wizard-dropdown-content">
-                        <div id="newSub" role="button" tabindex="0">Substation</div>
-                        <div id="newFeeder" role="button" tabindex="0">Feeder</div>
-                        <div id="newLoad" role="button" tabindex="0">Load</div>
-                        <div id="newSolar" role="button" tabindex="0">Solar</div>
-                        <div id="newWind" role="button" tabindex="0">Wind</div>
-                        <div id="newBattery" role="button" tabindex="0">Battery</div>
-                        <div id="newFossil" role="button" tabindex="0">Fossil</div>
-                    </div>
-                </div>
-                <button id="toDss" type="button">Submit circuit</button>
-            </div>
+            <div id="circuitCreator" class="desc"></div>
 
             <div id="critLoads">
             </div>
@@ -780,9 +752,12 @@
 		}
 	}
 
+	// - Make circuitIsSpecified a global variable
+	window.circuitIsSpecified = false;
+	// - Make filename a global variable
+	window.filename = '';
+
 	$(document).ready(function() {
-		var circuitIsSpecified = false;
-		var filename = '';
 
 		$('.chunk').each(function () {
 			toggleRemoveButton(this);
@@ -853,6 +828,7 @@
 
 		// Enable circuit definition method choice.
 		$("div.desc").hide();
+		[...document.querySelectorAll('input[type="radio"][name="circuit"]')].forEach(input => input.checked = false);
 		$("input[name$='circuit']").click(function() {
 			var test = $(this).val();
 
@@ -867,7 +843,7 @@
 				method: 'POST',
 				data: { path: filePath },
 				success: function(response) {
-					circuitIsSpecified = true;
+					window.circuitIsSpecified = true;
 					const loads = response.loads;
 					$('#critLoads').empty();
 					$('#critLoads').append('<p>Please select all critical loads:</p>')
@@ -907,17 +883,17 @@
 			$('#circuitUpload').show();
 			$('#upload').prop('checked', true);
 			$('#wizard').attr('disabled', true);
-			circuitIsSpecified = true;
-			filename = $('#circuitPostCreation').val();
+			window.circuitIsSpecified = true;
+			window.filename = $('#circuitPostCreation').val();
 			// Get allDataInputs.json params from Jinja as variables in the script.
 			var in_data = JSON.parse('{{ in_data | tojson | safe }}');
 			var criticalLoads = in_data['CRITICAL_LOADS'];
 			var MG_MINES = in_data['MICROGRIDS'];
 			// Also populate critical load selection div.
-			getLoadsFromExistingFile(filename, criticalLoads);
+			getLoadsFromExistingFile(window.filename, criticalLoads);
 
 			// Also populate partitioning preview div from original run.
-			showOldPartitions(filename, MG_MINES)
+			showOldPartitions(window.filename, MG_MINES)
 		}
 
 		function showOldPartitions(filename, MG_MINES) {
@@ -1042,79 +1018,6 @@
 			$('<li class="'+type+'" data-editable><i class="fa fa-minus-square"></i>'+child+'</li>').insertAfter('#elements li:contains('+parent+')')
 		});
 
-		// Create DSS from manually built circuit. Get loads.
-		$('#toDss').click(function() {
-			// Do not proceed if model has no name.
-			if ($('input[name="MODEL_DIR"]').val() === '') {
-				alert('Please specify a model name.')
-				return 
-			}
-			// First, convert to list. Then, convert to JSON.
-			var list = [];
-			$('#elements li').each(function(idx, item){
-				var fullName = item.textContent;
-				var startIdx = fullName.indexOf(':') + 2;
-				list.push({
-					class: $(item).attr('class'),
-					text: fullName.slice(startIdx)
-				});
-			});
-			json = JSON.stringify(list, null, "  ");
-			// console.log(json)
-
-			// Add MODEL_DIR to json.
-			const form_data = new FormData();
-			form_data.append('json',json);
-			var model_dir = $('input[name="MODEL_DIR"]').val()
-			form_data.append('MODEL_DIR',model_dir)
-
-			// Add latitude and longitude to json.
-			var latitude = $('input[name="latitude"]').val()
-			form_data.append('latitude',latitude)
-			var longitude = $('input[name="longitude"]').val()
-			form_data.append('longitude',longitude)
-
-			// Next, make AJAX POST to backend. 
-			$.ajax({
-				url:'/jsonToDss',
-				type:'POST',
-				contentType: false,
-				data: form_data,
-				processData : false,
-				success: function(data) {
-					circuitIsSpecified = true;
-					const loads = data.loads;
-					$('#critLoads').empty();
-					$('#critLoads').append('<p>Please select all critical loads:</p>')
-					$('#dropDowns').empty();
-					$('#dropDowns').hide();
-					jQuery('<form>', {
-						id: 'criticalLoadsSelect',
-						class: 'chunk'
-					}).appendTo('#critLoads');
-					for (let i=0; i<loads.length; i++) {
-						$('#criticalLoadsSelect').append('<label><input type="checkbox">'+loads[i]+'</label>')
-						$('#dropDowns').append('<label><select></select> '+loads[i]+'</label><br>')
-					}
-					if (loads.length === 0) {
-						$('#criticalLoadsSelect').append('<p>No loads to select from.</p>')
-					}
-					// Set filename.
-					filename = data.filename;
-					// Make directory uneditable. 
-					$('input[name="MODEL_DIR"]').prop("readonly", true);	
-					// Remove manual option from partitioning options because switches and gen_bus are predetermined.
-					$("#partitionMethod option[value='manual']").remove();
-					// Enable partition selector.
-					$('#previewPartitionsButton').prop('disabled', false);
-					$('#partitionMethod').prop('disabled', false);
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					console.log(textStatus + ' : ' + errorThrown)
-				}
-			});
-		})
-
 		// Upload DSS circuit. Get loads.
 		$('#upload-file-btn').click(function() {
 			// Do not proceed if model has no name.
@@ -1133,7 +1036,7 @@
 				cache: false,
 				processData: false,
 				success: function(data) {
-					circuitIsSpecified = true;
+					window.circuitIsSpecified = true;
 					const loads = data.loads;
 					$('#critLoads').empty();
 					$('#critLoads').append('<p>Please select all critical loads:</p>')
@@ -1155,7 +1058,7 @@
 					$('#partitionMethod').prop('disabled', false);
 					
 					// Set filename.
-					filename = data.filename;
+					window.filename = data.filename;
 					// Make directory uneditable. 
 					$('input[name="MODEL_DIR"]').prop("readonly", true);
 				}
@@ -1164,7 +1067,7 @@
 
 		// Manual partitioning dynamic dropdown creation. 
 		$('#makeDropdownsButton').on('click', function() {
-			if (circuitIsSpecified === false) {
+			if (window.circuitIsSpecified === false) {
 				alert('Please complete step 2.')
 				return
 			}
@@ -1232,7 +1135,7 @@
 
 		// Grab partitioning preview.
 		$('#previewPartitionsButton').click(function() {
-			if (circuitIsSpecified === false) {
+			if (window.circuitIsSpecified === false) {
 				alert('Please complete step 2.')
 				return
 			}
@@ -1246,7 +1149,7 @@
 			});
 			// console.log(critLoads);
 			// 2. Get dss file name.
-			// console.log(filename);
+			//console.log(window.filename);
 			// 3. Get partitioning method.
 			var method = $( "#partitionMethod option:selected" ).val();
 			// console.log(method);
@@ -1262,7 +1165,7 @@
 				type: 'POST',
 				data: {
 					critLoads : JSON.stringify(critLoads),
-					fileName : JSON.stringify(filename),
+					fileName : JSON.stringify(window.filename),
 					method : JSON.stringify(method),
 					mgQuantity : JSON.stringify(mgQuantity)
 				},
@@ -1375,7 +1278,7 @@
 		// Submit everything. 
 		function submitEverything() {
 			// Do not proceed if no circuit is specified.
-			if (filename === '') {
+			if (window.filename === '') {
 				alert('Please specify a circuit.')
 				return 
 			}
@@ -1395,10 +1298,9 @@
 					form1.append(pair[0], pair[1]);
 				}
 			// Append BASE_DSS as either uploaded file or creation.dss.
-			var fileStringArray = [ filename ];
-			var fileName = filename;
+			var fileStringArray = [ window.filename ];
 			var blobAttrs = { type: 'application/octet-stream' };
-			var file = new File(fileStringArray, fileName, blobAttrs);
+			var file = new File(fileStringArray, window.fileName, blobAttrs);
 			form1.append('BASE_DSS', file, file.name);
 			// Append CRITICAL_LOADS.
 			critLoads = new Array();
@@ -1521,6 +1423,70 @@
 			$('#elements').replaceWith(elements);
 		};
 	}) (jQuery);
-	</script>
+</script>
+    <script type='module'>
+        import { CircuitElement, CircuitModel, CircuitController, CircuitTableView, CircuitUserControlsView, CsvLoadParser } from '/data/static/circuitBuilder/modals/circuitBuilder.js';
+        const circuitElements = [
+            {
+                name: 'substation_1',
+                namespace: 'element',
+                type: 'substation',
+            },
+            {
+                name: 'feeder_1',
+                namespace: 'element',
+                type: 'feeder',
+                parent: 'element.substation_1',
+            },
+            {
+                name: 'solar_1',
+                namespace: 'element',
+                type: 'solar',
+                parent: 'element.feeder_1',
+                kw: 440
+            },
+            {
+                name: 'wind_1',
+                namespace: 'element',
+                type: 'wind',
+                parent: 'element.feeder_1',
+                kw: 200
+            },
+            {
+                name: 'fossil_1',
+                namespace: 'element',
+                type: 'fossil',
+                parent: 'element.feeder_1',
+                kw: 265
+            },
+            {
+                name: 'battery_1',
+                namespace: 'element',
+                type: 'battery',
+                parent: 'element.feeder_1',
+                kwh: 307,
+                kw: 79
+            },
+        ].map(element => new CircuitElement(element));
+        const model = new CircuitModel();
+        circuitElements.forEach(e => model.addElement(e));
+        const controller = new CircuitController(model);
+        const table = new CircuitTableView(controller);
+        model.addObserver(table);
+        const csvLoadParser = new CsvLoadParser();
+        const controls = new CircuitUserControlsView(controller, csvLoadParser);
+        model.addObserver(controls);
+        csvLoadParser.addObserver(controls);
+        circuitElements.forEach(e => {
+            model.addObserver(table, e.fullName);
+            model.addObserver(controls, e.fullName);
+        });
+        document.getElementById('circuitCreator').append(table.modal.divElement);
+        document.getElementById('circuitCreator').append(controls.modal.divElement);
+        const csvLoadParserInsert = document.getElementById('csvLoadParserInsert');
+        if (csvLoadParserInsert !== null) {
+            csvLoadParserInsert.replaceWith(csvLoadParser.modal.divElement);
+        }
+    </script>
 </body>
 </html>

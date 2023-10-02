@@ -495,7 +495,8 @@
                     "switch": "reg0",
                     "gen_bus": "reg0_end",
                     "gen_obs_existing": [
-                        "solar_634_existing"
+                        "solar_634_existing",
+                        "battery_634_existing"
                     ],
                     "critical_load_kws": [
                         1155.0,
@@ -657,7 +658,8 @@
                     "switch": "reg0",
                     "gen_bus": "reg0_end",
                     "gen_obs_existing": [
-                        "solar_634_existing"
+                        "solar_634_existing",
+                        "battery_634_existing"
                     ],
                     "critical_load_kws": [
                         1155.0,
@@ -744,7 +746,8 @@
                     "switch": "reg0",
                     "gen_bus": "reg0_end",
                     "gen_obs_existing": [
-                        "solar_634_existing"
+                        "solar_634_existing",
+                        "battery_634_existing"
                     ],
                     "critical_load_kws": [
                         1155.0,
@@ -862,7 +865,8 @@
                     "switch": "632633",
                     "gen_bus": "634",
                     "gen_obs_existing": [
-                        "solar_634_existing"
+                        "solar_634_existing",
+                        "battery_634_existing"
                     ],
                     "critical_load_kws": [
                         160.0,
@@ -923,7 +927,8 @@
                     "switch": "xfm1",
                     "gen_bus": "634",
                     "gen_obs_existing": [
-                        "solar_634_existing"
+                        "solar_634_existing",
+                        "battery_634_existing"
                     ],
                     "critical_load_kws": [
                         160.0,
@@ -1047,7 +1052,8 @@
                     "switch": "632633",
                     "gen_bus": "633",
                     "gen_obs_existing": [
-                        "solar_634_existing"
+                        "solar_634_existing",
+                        "battery_634_existing"
                     ],
                     "critical_load_kws": [
                         160.0,
@@ -1138,7 +1144,8 @@
                     "switch": "632633",
                     "gen_bus": "633",
                     "gen_obs_existing": [
-                        "solar_634_existing"
+                        "solar_634_existing",
+                        "battery_634_existing"
                     ],
                     "critical_load_kws": [
                         160.0,

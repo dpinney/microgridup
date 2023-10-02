@@ -333,7 +333,7 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 				'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
 				'switch': this_switch, 
 				'gen_bus': this_gen_bus,
-				'gen_obs_existing': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') in ('generator','pvsystem')],
+				'gen_obs_existing': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') in ('generator','storage')],
 				'critical_load_kws': [0.0 if ob.get('name') not in CRITICAL_LOADS else float(ob.get('kw','0')) for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
 				'max_potential': '700', #TODO: this and other vars, how to set? Ask Matt.
 				'max_potential_diesel': '1000000',

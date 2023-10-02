@@ -274,18 +274,19 @@ def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTre
 	# Slice to outage length.
 	new_batt_loadshape = new_batt_loadshape[outageStart:outageEnd]
 
-	# Option 1: Find battery's starting capacity based on charge and discharge history by the start of the outage.
-	cumulative_existing_batt_shapes = pd.Series(dtype='float64')
-	# Get existing battery's(ies') loadshapes. 
-	for obj in batt_obj:
-		batt_loadshape_name = obj.get("yearly")
-		full_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")]
-		ds_full_loadshape = pd.Series([float(shape) for shape in full_loadshape[0][1:-1].split(",")])
-		cumulative_existing_batt_shapes = cumulative_existing_batt_shapes.add(ds_full_loadshape, fill_value=0)
-	starting_capacity = batt_kwh + sum(cumulative_existing_batt_shapes[:outageStart])
-
-	# Option 2: Set starting_capacity to the batt_kwh, assuming the battery starts the outage at full charge. 
-	starting_capacity = batt_kwh
+	try:
+		# Option 1: Find battery's starting capacity based on charge and discharge history by the start of the outage.
+		cumulative_existing_batt_shapes = pd.Series(dtype='float64')
+		# Get existing battery's(ies') loadshapes. 
+		for obj in batt_obj:
+			batt_loadshape_name = obj.get("yearly")
+			full_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")]
+			ds_full_loadshape = pd.Series([float(shape) for shape in full_loadshape[0][1:-1].split(",")])
+			cumulative_existing_batt_shapes = cumulative_existing_batt_shapes.add(ds_full_loadshape, fill_value=0)
+		starting_capacity = batt_kwh + sum(cumulative_existing_batt_shapes[:outageStart])
+	except:
+		# Option 2: Set starting_capacity to the batt_kwh, assuming the battery starts the outage at full charge. 
+		starting_capacity = batt_kwh
 
 	# Currently unused variable for tracking unsupported load in kwh.
 	unsupported_load_kwh = 0

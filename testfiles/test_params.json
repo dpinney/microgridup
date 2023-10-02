@@ -59,91 +59,132 @@
         },
         {
             "class": "feeder",
-            "text": "regNone"
+            "text": "regnone",
+            "parent": "element.sub"
         },
         {
             "class": "load",
-            "text": "684_command_center"
+            "text": "684_command_center",
+            "parent": "element.regnone",
+            "kw": "1155"
         },
         {
             "class": "load",
-            "text": "692_warehouse2"
+            "text": "692_warehouse2",
+            "parent": "element.regnone",
+            "kw": "1155"
         },
         {
             "class": "load",
-            "text": "611_runway"
+            "text": "611_runway",
+            "parent": "element.regnone",
+            "kw": "1155"
         },
         {
             "class": "load",
-            "text": "652_residential"
+            "text": "652_residential",
+            "parent": "element.regnone",
+            "kw": "1155"
         },
         {
             "class": "load",
-            "text": "670a_residential2"
+            "text": "670a_residential2",
+            "parent": "element.regnone",
+            "kw": "1155"
         },
         {
             "class": "load",
-            "text": "670b_residential2"
+            "text": "670b_residential2",
+            "parent": "element.regnone",
+            "kw": "1155"
         },
         {
             "class": "load",
-            "text": "670c_residential2"
+            "text": "670c_residential2",
+            "parent": "element.regnone",
+            "kw": "1155"
         },
         {
             "class": "feeder",
-            "text": "reg0"
+            "text": "reg0",
+            "parent": "element.sub"
         },
         {
             "class": "load",
-            "text": "634a_data_center"
+            "text": "634a_data_center",
+            "parent": "element.reg0",
+            "kw": "1155"
         },
         {
             "class": "load",
-            "text": "634b_radar"
+            "text": "634b_radar",
+            "parent": "element.reg0",
+            "kw": "1155"
         },
         {
             "class": "load",
-            "text": "634c_atc_tower"
+            "text": "634c_atc_tower",
+            "parent": "element.reg0",
+            "kw": "1155"
         },
         {
             "class": "solar",
-            "text": "solar_634_existing"
+            "text": "solar_634_existing",
+            "parent": "element.reg0",
+            "kw": "440"
         },
         {
             "class": "battery",
-            "text": "battery_634_existing"
+            "text": "battery_634_existing",
+            "parent": "element.reg0",
+            "kwh": "307",
+            "kw": "79"
         },
         {
             "class": "feeder",
-            "text": "reg1"
+            "text": "reg1",
+            "parent": "element.sub"
         },
         {
             "class": "load",
-            "text": "675a_hospital"
+            "text": "675a_hospital",
+            "parent": "element.reg1",
+            "kw": "1155"
         },
         {
             "class": "load",
-            "text": "675b_residential1"
+            "text": "675b_residential1",
+            "parent": "element.reg1",
+            "kw": "1155"
         },
         {
             "class": "load",
-            "text": "675c_residential1"
+            "text": "675c_residential1",
+            "parent": "element.reg1",
+            "kw": "1155"
         },
         {
             "class": "fossil",
-            "text": "fossil_675_existing"
+            "text": "fossil_675_existing",
+            "parent": "element.reg1",
+            "kw": "265"
         },
         {
             "class": "feeder",
-            "text": "reg2"
+            "text": "reg2",
+            "parent": "element.sub"
         },
         {
             "class": "load",
-            "text": "645_hangar"
+            "text": "645_hangar",
+            "parent": "element.reg2",
+            "kw": "1155"
         },
         {
             "class": "load",
-            "text": "646_office"
+            "text": "646_office",
+            "parent": "element.reg2",
+            "kw": "1155"
         }
     ],
     "REOPT_INPUTS": {

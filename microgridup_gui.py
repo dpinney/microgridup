@@ -475,6 +475,9 @@ def _tests():
 	MG_MINES = test_params['MG_MINES']
 	wizard_dir = [_dir for _dir in MG_MINES if 'wizard' in _dir]
 	elements = test_params['elements']
+	for e in elements:
+		e['type'] = e['class']
+		e['name'] = e['text']
 	templateDssTree = [OrderedDict(item) for item in test_params['templateDssTree']]
 	# Testing jsonToDss().
 	for _dir in wizard_dir:

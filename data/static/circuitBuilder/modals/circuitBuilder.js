@@ -981,49 +981,57 @@ class CircuitUserControlsView {
                 return;
             }   
             formData.append('longitude', longitudeInput.value.trim());
-            const ary = this.#controller.model.getElements((e) => true).map(e => e.getProperties());
+            const ary = [];
+            for (const e of this.#controller.model.getElements(e => true)) {
+                const element = e.getProperties();
+                if (e.hasProperty('parent')) {
+                    const parentName = e.getProperty('parent').split('.')[1];
+                    element['parent'] = parentName;
+                }
+                ary.push(element);
+            }
             formData.append('json', JSON.stringify(ary));
             const that = this;
             $.ajax({
-				url: '/jsonToDss',
-				type: 'POST',
-				contentType: false,
-				data: formData,
-				processData : false,
-				success: function(data) {
+                url: '/jsonToDss',
+                type: 'POST',
+                contentType: false,
+                data: formData,
+                processData : false,
+                success: function(data) {
                     // - Global variable!
-					window.circuitIsSpecified = true;
-					const loads = data.loads;
-					$('#critLoads').empty();
-					$('#critLoads').append('<p>Please select all critical loads:</p>')
-					$('#dropDowns').empty();
-					$('#dropDowns').hide();
-					jQuery('<form>', {
-						id: 'criticalLoadsSelect',
-						class: 'chunk'
-					}).appendTo('#critLoads');
-					for (let i=0; i<loads.length; i++) {
-						$('#criticalLoadsSelect').append('<label><input type="checkbox">'+loads[i]+'</label>')
-						$('#dropDowns').append('<label><select></select> '+loads[i]+'</label><br>')
-					}
-					if (loads.length === 0) {
-						$('#criticalLoadsSelect').append('<p>No loads to select from.</p>')
-					}
-					// Global variable!
-					window.filename = data.filename;
-					// Make directory uneditable. 
-					$('input[name="MODEL_DIR"]').prop("readonly", true);	
-					// Remove manual option from partitioning options because switches and gen_bus are predetermined.
-					$("#partitionMethod option[value='manual']").remove();
-					// Enable partition selector.
-					$('#previewPartitionsButton').prop('disabled', false);
-					$('#partitionMethod').prop('disabled', false);
+                    window.circuitIsSpecified = true;
+                    const loads = data.loads;
+                    $('#critLoads').empty();
+                    $('#critLoads').append('<p>Please select all critical loads:</p>')
+                    $('#dropDowns').empty();
+                    $('#dropDowns').hide();
+                    jQuery('<form>', {
+                        id: 'criticalLoadsSelect',
+                        class: 'chunk'
+                    }).appendTo('#critLoads');
+                    for (let i=0; i<loads.length; i++) {
+                        $('#criticalLoadsSelect').append('<label><input type="checkbox">'+loads[i]+'</label>')
+                        $('#dropDowns').append('<label><select></select> '+loads[i]+'</label><br>')
+                    }
+                    if (loads.length === 0) {
+                        $('#criticalLoadsSelect').append('<p>No loads to select from.</p>')
+                    }
+                    // Global variable!
+                    window.filename = data.filename;
+                    // Make directory uneditable.
+                    $('input[name="MODEL_DIR"]').prop("readonly", true);
+                    // Remove manual option from partitioning options because switches and gen_bus are predetermined.
+                    $("#partitionMethod option[value='manual']").remove();
+                    // Enable partition selector.
+                    $('#previewPartitionsButton').prop('disabled', false);
+                    $('#partitionMethod').prop('disabled', false);
                     that.modal.setBanner('', ['hidden']);
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
                     that.modal.setBanner(`${textStatus}: ${errorThrown}`, ['caution']);
-				}
-			});
+                }
+            });
         });
         modal.divElement.append(div);
     }

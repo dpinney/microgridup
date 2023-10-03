@@ -254,6 +254,8 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 		if wind_size_total > 0:
 			windToBat = pd.Series(reopt_out.get(f'powerWindToBattery{mg_num}'))
 		battery_load = batToLoad - gridToBat - pVToBat - fossilToBat - windToBat
+	else:
+		battery_load = 0
 	# get DSS objects and loadshapes for new battery
 	# if additional battery power is recommended by REopt, add in full sized new battery
 	if battery_pow_new > 0:
@@ -323,7 +325,10 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, BASE_NAME, mg_
 			# if no new battery has been built, existing battery takes the full battery load, using 0-1 scale
 			else:
 				# print("build_new_gen() storage 6", gen_ob_existing)
-				gen_df_builder[f'{gen_ob_existing}'] = battery_load/battery_pow_total
+				if battery_pow_total <= 0:
+					gen_df_builder[f'{gen_ob_existing}'] = 0.0
+				else:
+					gen_df_builder[f'{gen_ob_existing}'] = battery_load/battery_pow_total
 	gen_df_builder.to_csv(GEN_NAME, index=False)
 	return gen_obs
 

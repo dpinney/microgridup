@@ -217,9 +217,12 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 		'Solar Generation Detail':'solarData1',
 		'Wind Generation Detail':'windData1',
 		'Fossil Generation Detail':'dieselData1',
-		'Storage Charge Source':'batteryData1',
-		'Storage State of Charge':'batteryChargeData1'}
+	}
 	# Sometimes missing, so only add if available.
+	if 'batteryData1' in allOutData and allOutData['batteryData1'] != '[]':
+		plotlyData['Storage Charge Source'] = 'batteryData1'
+	if 'batteryChargeData1' in allOutData:
+		plotlyData['Storage State of Charge'] = 'batteryChargeData1'
 	if 'resilienceData1' in allOutData:
 		plotlyData['Resilience Overview'] = 'resilienceData1'
 	if 'resilienceProbData1' in allOutData:

@@ -1170,11 +1170,15 @@
 					mgQuantity : JSON.stringify(mgQuantity)
 				},
 				success: function(data, status) {
-					/* creating image */
-					var img = $('<img id="previewImage">');
-					img.attr('src', 'data:image/gif;base64,' + data);
-					$('#partitionsPreviewDiv').empty();
-					img.appendTo('#partitionsPreviewDiv'); 
+					if (data === 'Invalid partitioning method') {
+						alert('Selected partitioning method produced invalid results. Please choose a different partitioning method.');
+					} else {
+						// Create image.
+						var img = $('<img id="previewImage">');
+						img.attr('src', 'data:image/gif;base64,' + data);
+						$('#partitionsPreviewDiv').empty();
+						img.appendTo('#partitionsPreviewDiv'); 
+					}
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					console.log(textStatus + ' : ' + errorThrown)

@@ -290,6 +290,11 @@ def previewPartitions():
 	else:
 		print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", or "criticalLoads". No mgs generated.')
 		return {}
+	MG_MINES = mg_group(CIRC_FILE, CRITICAL_LOADS, METHOD, algo_params={'num_mgs':MGQUANT})
+	for mg in MG_MINES:
+		if not MG_MINES[mg]['switch']:
+			print(f'Selected partitioning method produced invalid results. Please choose a different partitioning method.')
+			return jsonify('Invalid partitioning method')
 	plt.switch_backend('Agg')
 	plt.figure(figsize=(15,9))
 	pos_G = nice_pos(G)

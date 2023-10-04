@@ -661,6 +661,8 @@ class CircuitUserControlsView {
         this.#circuitElementParentNameSelect = null;
         this.#userInputDiv = null;
         this.renderContent();
+
+        this.controller = this.#controller;
     }
 
     /**
@@ -983,7 +985,7 @@ class CircuitUserControlsView {
             formData.append('longitude', longitudeInput.value.trim());
             const ary = [];
             for (const e of this.#controller.model.getElements(e => true)) {
-                const element = e.getProperties();
+                const element = structuredClone(e.getProperties());
                 if (e.hasProperty('parent')) {
                     const parentName = e.getProperty('parent').split('.')[1];
                     element['parent'] = parentName;

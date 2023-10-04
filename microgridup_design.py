@@ -224,7 +224,7 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	if 'batteryChargeData1' in allOutData:
 		plotlyData['Storage State of Charge'] = 'batteryChargeData1'
 	if 'resilienceData1' in allOutData:
-		plotlyData['Resilience Overview'] = 'resilienceData1'
+		plotlyData['Resilience Overview - Longest Outage Survived'] = 'resilienceData1'
 	if 'resilienceProbData1' in allOutData:
 		plotlyData['Outage Survival Probability'] = 'resilienceProbData1'
 	for k,v in plotlyData.items():
@@ -238,6 +238,9 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 				color="black"
 			)
 		)
+		if k == 'Resilience Overview - Longest Outage Survived':
+			fig.update_xaxes(title_text="Hour of year when outage starts")
+			fig.update_yaxes(title_text="Hours")
 		fig_html = fig.to_html(default_height='600px')
 		all_html = all_html + fig_html
 	# Make generation overview chart

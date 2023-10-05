@@ -1,4 +1,4 @@
-import os, json, shutil
+import os, json, shutil, statistics
 import jinja2 as j2
 import plotly.graph_objects as go
 import pandas as pd
@@ -239,6 +239,16 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 			)
 		)
 		if k == 'Resilience Overview - Longest Outage Survived':
+			min_ = format(min(chart_data[0]['y']), '.3f')
+			max_ = format(max(chart_data[0]['y']), '.3f')
+			mean = statistics.mean(chart_data[0]['y'])
+			stdev = statistics.stdev(chart_data[0]['y'])
+			fig.add_annotation(x=8500, y=170, text=f'Min hours: {min_}', showarrow=False, xanchor="right")
+			fig.add_annotation(x=8500, y=164, text=f'Max hours: {max_}', showarrow=False, xanchor="right")
+			fig.add_annotation(x=8500, y=158, text=f'Mean hours: {format(mean, ".3f")}', showarrow=False, xanchor="right")
+			fig.add_annotation(x=8500, y=152, text=f'Mean + 1σ hours: {format(mean + stdev, ".3f")}', showarrow=False, xanchor="right")
+			fig.add_annotation(x=8500, y=146, text=f'Mean + 2σ hours: {format(mean + (2 * stdev), ".3f")}', showarrow=False, xanchor="right")
+			fig.add_annotation(x=8500, y=140, text=f'Mean + 3σ hours: {format(mean + (3 * stdev), ".3f")}', showarrow=False, xanchor="right")
 			fig.update_xaxes(title_text="Hour of year when outage starts")
 			fig.update_yaxes(title_text="Hours")
 		fig_html = fig.to_html(default_height='600px')

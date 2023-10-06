@@ -339,10 +339,6 @@
                         <div id='csvLoadParserInsert'></div>
                     {% endif %}
                 </div>
-                <div class="chunk">
-                    <label class="tooltip" for="criticalLoadFactor">Critical Load Factor (% as decimal)<span class="classic">Please enter a number 0-1 for the fraction of total typical load that must be met during a grid outage. Format 0.XX</span></label>
-                    <input type="text" name="criticalLoadFactor" value="{{ in_data.REOPT_INPUTS.get('criticalLoadFactor','1') }}" step="0.01" min="0.0" max="1.0"/>
-                </div>
 				<div class="chunk">
 					<label class="tooltip" for="analysisYears">Analysis Period (years)<span class="classic">Specify the length of financial analysis in years.</span></label>
 					<input type="text" name="analysisYears" value="{{ in_data.REOPT_INPUTS.get('analysisYears','25') }}" step="1" min="2" max="75"/>
@@ -389,25 +385,6 @@
                             <label class="tooltip" for="outage_start_hour">Outage Start Hour<span class="classic">A major outage is added starting at this hour. Specify an hour greater than 0 but less than 8760 to trigger optimization for resilience and include fossil generation. If 0 is entered, the model will run an economic optimization without fossil generation.</span></label>
                             <input type="text" name="outage_start_hour" value="{{ in_data.REOPT_INPUTS.get('outage_start_hour','500') }}" min="0" max="8760"/>
                         </div>
-                        <div class="chunk">
-                            <label class="tooltip" for="userCriticalLoadShape">User-supplied Critical Load Shape (.csv)?<span class="classic">Check "Yes" if user uploads Optional Critical Load Shape (.csv). Else, indicate "Critical Load Factor"</span></label>
-                            <select id="userCriticalLoadShape" name="userCriticalLoadShape">
-                                <option {% if in_data.REOPT_INPUTS.userCriticalLoadShape == "true" %}selected{% endif %} value="true">Yes</option>
-                                <option {% if 'userCriticalLoadShape' not in in_data.REOPT_INPUTS or in_data.REOPT_INPUTS.userCriticalLoadShape == "false" %}selected{% endif %} value="false">No</option>
-                            </select>
-                        </div>
-						<div class="chunk">
-							{% if in_data.get('criticalLoadShapeFile') %}
-								<label class="tooltip" for="criticalLoadShapeFile">Optional Critical Load Shape (.csv)<span class="classic">Optional: Please enter the name of a .csv file representing the hourly critical load shape. Number of columns much match LoadShape file. Overrides "Critical Load Factor" if present.</span></label>
-								<input type="text" name="criticalLoadShapeFile" value="{{ in_data.get('criticalLoadShapeFile') }}" class="file-input" readonly>
-								<button type="button" class="remove-btn">Remove File</button>
-							{% else %}
-								<label class="tooltip" for="criticalLoadShapeFile">Optional Critical Load Shape (.csv)<span class="classic">Optional: Please enter the name of a .csv file representing the hourly critical load shape. Number of columns much match LoadShape file. Overrides "Critical Load Factor" if present.</span></label>
-								<input type="file" name="criticalLoadShapeFile" class="file-input">
-								<button type="button" class="remove-btn">Remove File</button>
-							{% endif %}
-                		</div>
-                        <div>
                     </div>
                 </div>
                 <h5>Financial</h5>

@@ -317,7 +317,6 @@ def run():
 		dss_path = f'{_mguDir}/uploads/BASE_DSS_{model_dir}'
 		csv_path = f'{_mguDir}/uploads/LOAD_CSV_{model_dir}'
 		HISTORICAL_OUTAGES_PATH = f'{_mguDir}/uploads/HISTORICAL_OUTAGES_{model_dir}'
-		criticalLoadShapeFile_PATH = f'{_mguDir}/uploads/criticalLoadShapeFile_{model_dir}'
 	else:
 		# Save the files.
 		if not os.path.isdir(f'{_mguDir}/uploads'):
@@ -327,15 +326,11 @@ def run():
 		csv_file.save(f'{_mguDir}/uploads/LOAD_CSV_{model_dir}')
 		dss_path = f'{_mguDir}/uploads/BASE_DSS_{model_dir}'
 		csv_path = f'{_mguDir}/uploads/LOAD_CSV_{model_dir}'
-		# Handle uploaded CSVs for HISTORICAL_OUTAGES and criticalLoadShapeFile. Put both in models folder.    
+		# Handle uploaded CSVs for HISTORICAL_OUTAGES. Put both in models folder.    
 		HISTORICAL_OUTAGES = all_files['HISTORICAL_OUTAGES']
 		if HISTORICAL_OUTAGES.filename != '':
 			HISTORICAL_OUTAGES.save(f'{_mguDir}/uploads/HISTORICAL_OUTAGES_{model_dir}')
 			HISTORICAL_OUTAGES_PATH = f'{_mguDir}/uploads/HISTORICAL_OUTAGES_{model_dir}'
-		criticalLoadShapeFile = all_files['criticalLoadShapeFile']
-		if criticalLoadShapeFile.filename != '':
-			criticalLoadShapeFile.save(f'{_mguDir}/uploads/criticalLoadShapeFile_{model_dir}')
-			criticalLoadShapeFile_PATH = f'{_mguDir}/uploads/criticalLoadShapeFile_{model_dir}'
 	# Handle arguments to our main function.
 	crit_loads = json.loads(request.form['CRITICAL_LOADS'])
 	mg_method = request.form['MG_DEF_METHOD']
@@ -367,12 +362,10 @@ def run():
 		'solarCanExport':(request.form['solarCanExport'] == 'true'),
 		'urdbLabelSwitch':request.form['urdbLabelSwitch'],
 		'urdbLabel':request.form['urdbLabel'],
-		'criticalLoadFactor':request.form['criticalLoadFactor'],
 		'year':request.form['year'],
 		'analysisYears':request.form['analysisYears'],
 		'outageDuration':request.form['outageDuration'],
 		'outage_start_hour':request.form['outage_start_hour'],
-		'userCriticalLoadShape':request.form['userCriticalLoadShape'],
 		'value_of_lost_load':request.form['value_of_lost_load'],
 		'omCostEscalator':request.form['omCostEscalator'],
 		'discountRate':request.form['discountRate'],
@@ -420,8 +413,11 @@ def run():
 		'windMacrsOptionYears':request.form['windMacrsOptionYears'],
 		'windItcPercent':request.form['windItcPercent'],
 	}
-	have_HISTORICAL_OUTAGES = bool(all_files['HISTORICAL_OUTAGES'].filename != '')
-	have_critLoadShapeFile = bool(all_files['criticalLoadShapeFile'].filename != '')
+	# Check for HISTORICAL_OUTAGES and critLoadShapeFile.
+	if all_files.get('HISTORICAL_OUTAGES'):
+		have_HISTORICAL_OUTAGES = bool(all_files['HISTORICAL_OUTAGES'].filename != '')
+	else: 
+		have_HISTORICAL_OUTAGES = False
 	mgu_args = [
 		f'{_projectDir}/{request.form["MODEL_DIR"]}',
 		dss_path,
@@ -433,8 +429,7 @@ def run():
 		crit_loads,
 		request.form['DESCRIPTION'],
 		True,
-		HISTORICAL_OUTAGES_PATH if have_HISTORICAL_OUTAGES else None,
-		criticalLoadShapeFile_PATH if have_critLoadShapeFile else None
+		HISTORICAL_OUTAGES_PATH if have_HISTORICAL_OUTAGES else None
 	]
 	# Kickoff the run
 	new_proc = multiprocessing.Process(target=full, args=mgu_args)

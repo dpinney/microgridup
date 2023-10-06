@@ -274,7 +274,7 @@ def get_all_colorable_elements(dss_path, omd_path=None):
     colorable_elements = [x for x in tree if x['!CMD'] in ('new','edit','setbusxy') and 'loadshape' not in x.get('object','') and 'line' not in x.get('object','')]
     return colorable_elements
 
-def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS=None, DESCRIPTION='', INVALIDATE_CACHE=True, OUTAGE_CSV=None, CRIT_LOADSHAPE_CSV=None, DELETE_FILES=False, open_results=False):
+def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS=None, DESCRIPTION='', INVALIDATE_CACHE=True, OUTAGE_CSV=None, DELETE_FILES=False, open_results=False):
 	''' Generate a full microgrid plan for the given inputs. '''
 	# Constants
 	MODEL_DSS = 'circuit.dss'
@@ -299,8 +299,6 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		shutil.copyfile(LOAD_CSV, f'{MODEL_DIR}/{MODEL_LOAD_CSV}')
 		if OUTAGE_CSV:
 			shutil.copyfile(OUTAGE_CSV, f'{MODEL_DIR}/outages.csv')
-		if CRIT_LOADSHAPE_CSV:
-			shutil.copyfile(OUTAGE_CSV, f'{MODEL_DIR}/crit_loadshape.csv')
 		os.system(f'touch "{MODEL_DIR}/0running.txt"')
 		try:
 			os.remove(f"{MODEL_DIR}/0crashed.txt")
@@ -341,8 +339,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 				'CREATION_DATE':CREATION_DATE,
 				'DESCRIPTION':DESCRIPTION,
 				'INVALIDATE_CACHE':INVALIDATE_CACHE,
-				'HISTORICAL_OUTAGES':f'{MODEL_DIR}/outages.csv' if OUTAGE_CSV else None,
-				'criticalLoadShapeFile':f'{MODEL_DIR}/crit_loadshape.csv' if CRIT_LOADSHAPE_CSV else None
+				'HISTORICAL_OUTAGES':f'{MODEL_DIR}/outages.csv' if OUTAGE_CSV else None
 			}
 			json.dump(inputs, inputs_file, indent=4)
 		# Generate the per-microgrid results and add each to the circuit iteratively.

@@ -498,7 +498,7 @@ def run_reopt_threads(model_dir, microgrids, logger, reopt_inputs, invalidate_ca
 							string = f.read()
 							if string.find('Optimization exceeded timeout') > -1:
 								raise Exception(f'Thread for microgrid "{args_list[5]}" for circuit "{args_list[0]}" failed due to REopt reaching an optimization timeout of 420 seconds.')
-					# - If the thread failed due to some other reason, retry it twice
+					# - If the thread failed due to some other reason, retry it once
 					if future_list_idx + 1 < len(future_lists):
 						# - Always invalidate the cache when retrying
 						args_list[-1] = True

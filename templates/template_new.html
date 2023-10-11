@@ -508,10 +508,6 @@
                         <input type="text" name="solarCost" value="{{ in_data.REOPT_INPUTS.get('solarCost','1600') }}" pattern="^\d+\.?\d*?$"/>
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="solarExisting">Solar Power Existing (kW-DC)<span class="classic">Specify the total capacity of any pre-existing solar arrays in kW-DC. The outputted "Total Solar" will be inclusive of existing solar.</span></label>
-                        <input type="text" name="solarExisting" value="{{ in_data.REOPT_INPUTS.get('solarExisting','0') }}"/>
-                    </div>
-                    <div class="chunk">
                         <label class="tooltip" for="solarMax">Solar Power Max (kW-DC)<span class="classic">Specify the maximum desired generation in kW-DC. Leave at default for full optimization on solar power.</span></label>
                         <input type="text" name="solarMax" value="{{ in_data.REOPT_INPUTS.get('solarMax','100000') }}"/>
                     </div>
@@ -538,10 +534,6 @@
                         <label class="tooltip" for="batteryCapacityCost">Battery Capacity Cost ($/kWh-AC)<span class="classic">Specify the cost in $/kWh.</span></label>
                         <input type="text" name="batteryCapacityCost" value="{{ in_data.REOPT_INPUTS.get('batteryCapacityCost','420') }}" pattern="^\d+\.?\d*?$"/>
                     </div>
-					<div class="chunk">
-                        <label class="tooltip" for="batteryKwhExisting">Battery Capacity Existing (kWh-AC)<span class="classic">The usable energy storage of existing batteries which will be used in the microgrid(s). Value is in kilowatt-hours-AC.</span></label>
-                        <input type="text" name="batteryKwhExisting" value="{{ in_data.REOPT_INPUTS.get('batteryKwhExisting','0') }}"/>
-                    </div>
                     <div class="chunk">
                         <label class="tooltip" for="batteryCapacityMax">Battery Capacity Max (kWh-AC)<span class="classic">Specify the maximum desired battery capacity in kWh.</span></label>
                         <input type="text" name="batteryCapacityMax" value="{{ in_data.REOPT_INPUTS.get('batteryCapacityMax','1000000') }}"/>
@@ -553,10 +545,6 @@
                     <div class="chunk">
                         <label class="tooltip" for="batteryPowerCost">Battery Power Cost ($/kW-AC)<span class="classic">Specify the cost in $/kW.</span></label>
                         <input type="text" name="batteryPowerCost" value="{{ in_data.REOPT_INPUTS.get('batteryPowerCost','840') }}"/>
-                    </div>
-					<div class="chunk">
-                        <label class="tooltip" for="batteryKwExisting">Battery Power Existing (kW-AC)<span class="classic">The usable inverter power rating of existing batteries which will be used in the microgrid(s). Value is in kilowatts-AC.</span></label>
-                        <input type="text" name="batteryKwExisting" value="{{ in_data.REOPT_INPUTS.get('batteryKwExisting','0') }}"/>
                     </div>
                     <div class="chunk">
                         <label class="tooltip" for="batteryPowerMax">Battery Power Max (kW-AC)<span class="classic">Specify the maximum desired battery power in kW.</span></label>
@@ -600,10 +588,6 @@
                     <div class="chunk">
                         <label class="tooltip" for="dieselGenCost">Genset Cost ($/kW)<span class="classic">Specify the cost in $/kWh.</span></label>
                         <input type="text" name="dieselGenCost" value="{{ in_data.REOPT_INPUTS.get('dieselGenCost','500') }}" pattern="^\d+\.?\d*?$"/>
-                    </div>
-					<div class="chunk">
-                        <label class="tooltip" for="genExisting">Gen Existing (kW)<span class="classic">Specify the total capacity of any pre-existing generators in kW. The outputted "Total Fossil Gen" will be inclusive of existing fossil gen.</span></label>
-                        <input type="text" name="genExisting" value="{{ in_data.REOPT_INPUTS.get('genExisting','0') }}"/>
                     </div>
                     <div class="chunk">
                         <label class="tooltip" for="dieselMax">Genset Max (kW)<span class="classic">Specify max fossil generation in kW. Only specify if needed, as the optimization runs best if left unedited.</span></label>
@@ -658,10 +642,6 @@
                     <div class="chunk">
                         <label class="tooltip" for="windCost">Wind Cost ($/kW)<span class="classic">Specify the cost in $/kW.</span></label>
                         <input type="text" name="windCost" value="{{ in_data.REOPT_INPUTS.get('windCost','4989') }}" pattern="^\d+\.?\d*?$"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="windExisting">Wind Power Existing (kW)<span class="classic">The usable power rating of existing wind turbines which will be used in the microgrid(s). Value is in kilowatts-AC.</span></label>
-                        <input type="text" name="windExisting" value="{{ in_data.REOPT_INPUTS.get('windExisting','0') }}"/>
                     </div>
                     <div class="chunk">
                         <label class="tooltip" for="windMax">Wind Power Max (kW)<span class="classic">Specify the maximum desired generation in kW. Leave at default for full optimization on wind power.</span></label>

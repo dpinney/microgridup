@@ -249,8 +249,21 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 			fig.add_annotation(x=8500, y=152, text=f'Mean + 1σ hours: {format(mean + stdev, ".3f")}', showarrow=False, xanchor="right")
 			fig.add_annotation(x=8500, y=146, text=f'Mean + 2σ hours: {format(mean + (2 * stdev), ".3f")}', showarrow=False, xanchor="right")
 			fig.add_annotation(x=8500, y=140, text=f'Mean + 3σ hours: {format(mean + (3 * stdev), ".3f")}', showarrow=False, xanchor="right")
-			fig.update_xaxes(title_text="Hour of year when outage starts")
-			fig.update_yaxes(title_text="Hours")
+			fig.update_xaxes(title_text='Hour of year when outage starts')
+			fig.update_yaxes(title_text='Hours')
+		if k == 'Outage Survival Probability':
+			fig.update_xaxes(title_text='Length of outage (hours)')
+			fig.update_yaxes(title_text='Probability')
+		if k == 'Generation Serving Load':
+			fig.update_yaxes(title_text='kW')
+		if k == 'Solar Generation Detail':
+			fig.update_yaxes(title_text='kW')
+		if k == 'Wind Generation Detail':
+			fig.update_yaxes(title_text='kW')
+		if k == 'Fossil Generation Detail':
+			fig.update_yaxes(title_text='kW')
+		if k == 'Storage Charge Source':
+			fig.update_yaxes(title_text='kW')
 		fig_html = fig.to_html(default_height='600px')
 		all_html = all_html + fig_html
 	# Make generation overview chart

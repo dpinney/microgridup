@@ -429,7 +429,8 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 			raw_files = _walkTree('.'),
 			model_name =  os.path.basename(MODEL_DIR),
 			mg_names_and_reopt_folders = names_and_folders,
-			resilience_show = (OUTAGE_CSV is not None)
+			resilience_show = (OUTAGE_CSV is not None),
+			timeseries_control_csv_plot_html_show = os.path.isfile('timeseries_control.csv.plot.html'),
 		)
 		with open(FINAL_REPORT,'w') as outFile:
 			outFile.write(out)

@@ -821,8 +821,11 @@ def play(pathToDss, workDir, microgrids, faultedLine, logger):
 		</head>
 		<body style="margin:0px">
 			<iframe src="timezcontrol_source_and_gen.csv.plot.html"></iframe>
-			<iframe src="timezcontrol_load.csv.plot.html"></iframe>
-			<iframe src="timezcontrol_control.csv.plot.html"></iframe>
+			<iframe src="timezcontrol_load.csv.plot.html"></iframe>'''
+	if os.path.isfile('timezcontrol_control.csv.plot.html'):
+		output_slug +='''
+			<iframe src="timezcontrol_control.csv.plot.html"></iframe>'''
+	output_slug +='''
 			<iframe src="timezcontrol_source_and_gen.csv_battery_cycles.plot.html"></iframe>
 		</body>'''
 	print(f'Control microgrids count {len(microgrids)} and renewable count {len(rengen_fnames)}')

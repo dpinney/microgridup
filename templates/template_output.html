@@ -449,7 +449,9 @@
                     <iframe src="timeseries_gen.csv.plot.html"></iframe>
                     <iframe src="timeseries_load.csv.plot.html"></iframe>
                     <iframe src="timeseries_source.csv.plot.html"></iframe>
+                    {% if timeseries_control_csv_plot_html_show %}
                     <iframe src="timeseries_control.csv.plot.html"></iframe>
+                    {% endif %}
                 </div>
             </section>
             <section class="loading" data-content="Control">

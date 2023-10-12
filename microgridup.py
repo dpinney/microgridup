@@ -296,17 +296,25 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 	logger.warning(f'Logging status updates for {MODEL_DIR}.')
 	try:
 		shutil.copyfile(BASE_DSS, f'{MODEL_DIR}/{MODEL_DSS}')
-		shutil.copyfile(LOAD_CSV, f'{MODEL_DIR}/{MODEL_LOAD_CSV}')
-		if OUTAGE_CSV:
-			shutil.copyfile(OUTAGE_CSV, f'{MODEL_DIR}/outages.csv')
-		os.system(f'touch "{MODEL_DIR}/0running.txt"')
-		try:
-			os.remove(f"{MODEL_DIR}/0crashed.txt")
-		except:
-			pass
 	except:
-		print('Rerunning existing project. DSS and CSV files not moved.')
-		logger.warning('Rerunning existing project. DSS and CSV files not moved.')
+		print('Rerunning existing project. DSS file not moved.')
+		logger.warning('Rerunning existing project. DSS file not moved.')
+	try:
+		shutil.copyfile(LOAD_CSV, f'{MODEL_DIR}/{MODEL_LOAD_CSV}')
+	except:
+		print('Rerunning existing project. Load CSV file not moved.')
+		logger.warning('Rerunning existing project. Load CSV file not moved.')
+	if OUTAGE_CSV:
+		try:
+			shutil.copyfile(OUTAGE_CSV, f'{MODEL_DIR}/outages.csv')
+		except:
+			print('Rerunning existing project. Outages CSV file not moved.')
+			logger.warning('Rerunning existing project. Outages CSV file not moved.')
+	os.system(f'touch "{MODEL_DIR}/0running.txt"')
+	try:
+		os.remove(f"{MODEL_DIR}/0crashed.txt")
+	except:
+		pass
 	if DELETE_FILES:
 		for fname in [BASE_DSS, LOAD_CSV]:
 			try:

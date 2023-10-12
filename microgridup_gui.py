@@ -308,29 +308,57 @@ def previewPartitions():
 
 @app.route('/run', methods=["POST"])
 def run():
+	# Make the uploads directory if it doesn't already exist.
+	if not os.path.isdir(f'{_mguDir}/uploads'):
+		os.mkdir(f'{_mguDir}/uploads')
+	# Get directory, get files, and print status.
 	model_dir = request.form['MODEL_DIR']
-	print(f'-------------------------------Running {model_dir}.-------------------------------')
 	all_files = request.files
-	if 'LOAD_CSV_NAME' in request.form:
-		print('We are editing an existing model.')
-		# Editing an existing model.
-		dss_path = f'{_mguDir}/uploads/BASE_DSS_{model_dir}'
-		csv_path = f'{_mguDir}/uploads/LOAD_CSV_{model_dir}'
-		HISTORICAL_OUTAGES_PATH = f'{_mguDir}/uploads/HISTORICAL_OUTAGES_{model_dir}'
-	else:
-		# Save the files.
-		if not os.path.isdir(f'{_mguDir}/uploads'):
-			os.mkdir(f'{_mguDir}/uploads')
-		# Note: Uploaded circuit stored separately.
+	print(f'-------------------------------Running {model_dir}.-------------------------------')
+
+	# Check to see if new loads were uploaded. If so, add those to uploads folder. Set path to uploads folder.
+	if all_files.get('LOAD_CSV'):
+		print('New loads uploaded.')
 		csv_file = all_files['LOAD_CSV']
 		csv_file.save(f'{_mguDir}/uploads/LOAD_CSV_{model_dir}')
-		dss_path = f'{_mguDir}/uploads/BASE_DSS_{model_dir}'
 		csv_path = f'{_mguDir}/uploads/LOAD_CSV_{model_dir}'
-		# Handle uploaded CSVs for HISTORICAL_OUTAGES. Put both in models folder.    
-		HISTORICAL_OUTAGES = all_files['HISTORICAL_OUTAGES']
-		if HISTORICAL_OUTAGES.filename != '':
-			HISTORICAL_OUTAGES.save(f'{_mguDir}/uploads/HISTORICAL_OUTAGES_{model_dir}')
-			HISTORICAL_OUTAGES_PATH = f'{_mguDir}/uploads/HISTORICAL_OUTAGES_{model_dir}'
+	elif request.form['LOAD_CSV_NAME']:
+		# If we're reusing an old loads or dss file, set path to project directory.
+		print('Reusing loads.csv in project directory.')
+		csv_path = f'{_mguDir}/data/projects/{model_dir}/loads.csv'
+	else:
+		print('Error: unable to set path to loads csv.')
+	
+	# Check to see if new dss was uploaded. If so, add to uploads folder. Set path to uploads folder. If reusing a circuit, set dss path to circuit.dss in project directory.
+	dss_indicator = request.form['DSS_PATH']
+	if dss_indicator == 'Direct to uploads folder.':
+		dss_path = f'{_mguDir}/uploads/BASE_DSS_{model_dir}'
+		print('New circuit uploaded.')
+	else:
+		dss_path = f'{_mguDir}/data/projects/{model_dir}/circuit.dss'
+		print('Reusing circuit.dss in project directory.')
+
+	# Check to see if user uploaded new outages. If so, add to upload folder. Set path to uploads folder.
+	outages_indicator = request.form['OUTAGES_PATH']
+	if outages_indicator == 'Check files':
+		# No file is being reused.
+		outages_filename = all_files['HISTORICAL_OUTAGES'].filename
+		if outages_filename != '':
+			# New outages file that must be saved.
+			all_files['HISTORICAL_OUTAGES'].save(f'{_mguDir}/uploads/HISTORICAL_OUTAGES_{model_dir}')
+			outages_path = f'{_mguDir}/uploads/HISTORICAL_OUTAGES_{model_dir}'
+			have_outages = True
+			print('New outages uploaded.')
+		else:
+			# No outages file.
+			print('No outages uploaded.')
+			have_outages = False
+	else:
+		# If we're reusing an old outages file, set path to project directory.
+		outages_path = f'{_mguDir}/{model_dir}/outages.csv'
+		have_outages = True
+		print('Reusing outages.csv in project directory.')
+
 	# Handle arguments to our main function.
 	crit_loads = json.loads(request.form['CRITICAL_LOADS'])
 	mg_method = request.form['MG_DEF_METHOD']
@@ -413,11 +441,6 @@ def run():
 		'windMacrsOptionYears':request.form['windMacrsOptionYears'],
 		'windItcPercent':request.form['windItcPercent'],
 	}
-	# Check for HISTORICAL_OUTAGES and critLoadShapeFile.
-	if all_files.get('HISTORICAL_OUTAGES'):
-		have_HISTORICAL_OUTAGES = bool(all_files['HISTORICAL_OUTAGES'].filename != '')
-	else: 
-		have_HISTORICAL_OUTAGES = False
 	mgu_args = [
 		f'{_projectDir}/{request.form["MODEL_DIR"]}',
 		dss_path,
@@ -429,7 +452,7 @@ def run():
 		crit_loads,
 		request.form['DESCRIPTION'],
 		True,
-		HISTORICAL_OUTAGES_PATH if have_HISTORICAL_OUTAGES else None
+		outages_path if have_outages else None
 	]
 	# Kickoff the run
 	new_proc = multiprocessing.Process(target=full, args=mgu_args)

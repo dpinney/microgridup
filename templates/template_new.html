@@ -1258,11 +1258,20 @@
 			for (var pair of form2.entries()) {
 					form1.append(pair[0], pair[1]);
 				}
-			// Append BASE_DSS as either uploaded file or creation.dss.
-			var fileStringArray = [ window.filename ];
-			var blobAttrs = { type: 'application/octet-stream' };
-			var file = new File(fileStringArray, window.fileName, blobAttrs);
-			form1.append('BASE_DSS', file, file.name);
+			// Specificy circuit location.
+			const dss_path = $('#circuitPostCreation').val();
+			if (dss_path == undefined) {
+				form1.append('DSS_PATH','Direct to uploads folder.');
+			} else {
+				form1.append('DSS_PATH',dss_path);
+			}
+			// Specify outages path if reused.
+			const outages_path = document.getElementsByName('HISTORICAL_OUTAGES')[0].value;
+			if (outages_path == '' || outages_path.includes('fakepath')) {
+				form1.append('OUTAGES_PATH','Check files');
+			} else {
+				form1.append('OUTAGES_PATH',outages_path);
+			}
 			// Append CRITICAL_LOADS.
 			critLoads = new Array();
 			$('#criticalLoadsSelect label').each(function() {

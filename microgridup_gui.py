@@ -379,6 +379,7 @@ def run():
 		microgrids = mg_group(dss_path, crit_loads, 'criticalLoads', algo_params={'num_mgs':MGQUANT})
 	elif mg_method == '': 
 		microgrids = json.loads(request.form['MICROGRIDS'])
+	print('microgrids',microgrids)
 	# Form REOPT_INPUTS. 
 	REOPT_INPUTS = {
 		'latitude':request.form['latitude'],
@@ -444,7 +445,6 @@ def run():
 		REOPT_INPUTS,
 		microgrids,
 		request.form['FAULTED_LINE'],
-		crit_loads,
 		request.form['DESCRIPTION'],
 		True,
 		outages_path if have_outages else None

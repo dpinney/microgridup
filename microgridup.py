@@ -274,7 +274,7 @@ def get_all_colorable_elements(dss_path, omd_path=None):
     colorable_elements = [x for x in tree if x['!CMD'] in ('new','edit','setbusxy') and 'loadshape' not in x.get('object','') and 'line' not in x.get('object','')]
     return colorable_elements
 
-def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, CRITICAL_LOADS=None, DESCRIPTION='', INVALIDATE_CACHE=True, OUTAGE_CSV=None, DELETE_FILES=False, open_results=False):
+def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, DESCRIPTION='', INVALIDATE_CACHE=True, OUTAGE_CSV=None, DELETE_FILES=False, open_results=False):
 	''' Generate a full microgrid plan for the given inputs. '''
 	# Constants
 	MODEL_DSS = 'circuit.dss'
@@ -330,6 +330,14 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 	if os.path.exists("user_warnings.txt"):
 		os.remove("user_warnings.txt")
 	CREATION_DATE = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+	# Find cricital loads from microgrids data structure.
+	CRITICAL_LOADS = []
+	for mg in MICROGRIDS:
+		loads = MICROGRIDS[mg]['loads']
+		critical_load_kws = MICROGRIDS[mg]['critical_load_kws']
+		for l, c in zip(loads, critical_load_kws):
+			if c != 0 or c != '0':
+				CRITICAL_LOADS.append(l)
 	# Run the full MicrogridUP analysis.
 	try:
 		# Dump the inputs for future reference.

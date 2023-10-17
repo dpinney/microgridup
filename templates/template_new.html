@@ -691,20 +691,23 @@
 			if ($(fileInput).attr('type') === 'text') {
 				if ($(fileInput).attr('name') === 'LOAD_CSV_NAME') {
 					var nameAttribute = 'LOAD_CSV';
+					chunk[0].replaceChildren(window.csvLoadParser.modal.divElement);
+					const removeBtn = $(chunk).find('button.remove-btn');
+					removeBtn.hide();
 				} else {
 					const oldNameAttribute = $(fileInput).attr('name');
 					var nameAttribute = oldNameAttribute;
+					// Replace the read-only text input with a new file input.
+					const newFileInput = $('<input type="file" class="file-input">').attr('name', nameAttribute);
+					fileInput.replaceWith(newFileInput);
+					// Set up the new file input for further functionality.
+					newFileInput.on('change', function () {
+						toggleRemoveButton(chunk, this);
+					});
+					toggleRemoveButton(chunk, newFileInput);
+					// Show the upload button if user wants to upload new circuit.
+					$('#upload-file-btn').show();
 				}
-				// Replace the read-only text input with a new file input.
-				const newFileInput = $('<input type="file" class="file-input">').attr('name', nameAttribute);
-				fileInput.replaceWith(newFileInput);
-				// Set up the new file input for further functionality.
-				newFileInput.on('change', function () {
-					toggleRemoveButton(chunk, this);
-				});
-				toggleRemoveButton(chunk, newFileInput);
-				// Show the upload button if user wants to upload new circuit.
-				$('#upload-file-btn').show();
 			};
 		}
 	}
@@ -1369,6 +1372,8 @@
 	const csvLoadParserInsert = document.getElementById('csvLoadParserInsert');
 	if (csvLoadParserInsert !== null) {
 		csvLoadParserInsert.replaceWith(csvLoadParser.modal.divElement);
+	} else {
+		window.csvLoadParser = csvLoadParser;
 	}
 	</script>
 </body>

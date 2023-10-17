@@ -536,7 +536,6 @@ def _tests():
 	REOPT_INPUTS = test_params['REOPT_INPUTS']
 	QSTS_STEPS = 480.0
 	FAULTED_LINE = '670671'
-	CRITICAL_LOADS = test_params['crit_loads']
 	# Test of full().
 	successful_tests = []
 	failed_tests = []
@@ -547,7 +546,7 @@ def _tests():
 			mgu_args = [f'{PROJ_FOLDER}/{_dir}', f'{MGU_FOLDER}/testfiles/wizard_base_3mg.dss']
 		except ValueError as e:
 			mgu_args = [f'{PROJ_FOLDER}/{_dir}', f'{MGU_FOLDER}/testfiles/lehigh_base_3mg.dss']
-		mgu_args.extend([f'{MGU_FOLDER}/testfiles/lehigh_load.csv', QSTS_STEPS, REOPT_INPUTS, MG_MINES[_dir][0], FAULTED_LINE, CRITICAL_LOADS, '', False])
+		mgu_args.extend([f'{MGU_FOLDER}/testfiles/lehigh_load.csv', QSTS_STEPS, REOPT_INPUTS, MG_MINES[_dir][0], FAULTED_LINE, '', False])
 		print(f'---------------------------------------------------------\nBeginning end-to-end backend test of {_dir}.\n---------------------------------------------------------')
 		full(*mgu_args)
 		if untested.count(_dir) == 0 and os.path.isfile(f'{PROJ_FOLDER}/{_dir}/0crashed.txt'):

@@ -1089,7 +1089,7 @@
 				}
 			})
 		} else if (($('#circuitPostCreation').length) && (method == '')) {
-			var MICROGRIDS = in_data['MICROGRIDS'];
+			var MICROGRIDS = JSON.parse('{{ in_data.MICROGRIDS | tojson | safe }}');
 		}
 		form1.append('MICROGRIDS',JSON.stringify(MICROGRIDS));
 		// Append mgQuantity. 

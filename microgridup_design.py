@@ -235,20 +235,19 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 			legend = legend_spec,
 			font = dict(
 				family="sans-serif",
-				color="black"
-			)
-		)
+				color="black"))
 		if k == 'Resilience Overview - Longest Outage Survived':
-			min_ = format(min(chart_data[0]['y']), '.3f')
-			max_ = format(max(chart_data[0]['y']), '.3f')
+			min_ = min(chart_data[0]['y'])
+			max_ = max(chart_data[0]['y'])
 			mean = statistics.mean(chart_data[0]['y'])
 			stdev = statistics.stdev(chart_data[0]['y'])
-			fig.add_annotation(x=8500, y=170, text=f'Min hours: {min_}', showarrow=False, xanchor="right")
-			fig.add_annotation(x=8500, y=164, text=f'Max hours: {max_}', showarrow=False, xanchor="right")
-			fig.add_annotation(x=8500, y=158, text=f'Mean hours: {format(mean, ".3f")}', showarrow=False, xanchor="right")
-			fig.add_annotation(x=8500, y=152, text=f'Mean + 1σ hours: {format(mean + stdev, ".3f")}', showarrow=False, xanchor="right")
-			fig.add_annotation(x=8500, y=146, text=f'Mean + 2σ hours: {format(mean + (2 * stdev), ".3f")}', showarrow=False, xanchor="right")
-			fig.add_annotation(x=8500, y=140, text=f'Mean + 3σ hours: {format(mean + (3 * stdev), ".3f")}', showarrow=False, xanchor="right")
+			stat_y_spacing = [(max_ * 1.25) - (i * (((max_ * 1.25) - max_) / 6)) for i in range(1, 6)]
+			fig.add_annotation(x=8500, y=(max_ * 1.25), text=f'Min hours: {format(min_, ".3f")}', showarrow=False, xanchor="right")
+			fig.add_annotation(x=8500, y=stat_y_spacing[0], text=f'Max hours: {format(max_, ".3f")}', showarrow=False, xanchor="right")
+			fig.add_annotation(x=8500, y=stat_y_spacing[1], text=f'Mean hours: {format(mean, ".3f")}', showarrow=False, xanchor="right")
+			fig.add_annotation(x=8500, y=stat_y_spacing[2], text=f'Mean + 1σ hours: {format(mean + stdev, ".3f")}', showarrow=False, xanchor="right")
+			fig.add_annotation(x=8500, y=stat_y_spacing[3], text=f'Mean + 2σ hours: {format(mean + (2 * stdev), ".3f")}', showarrow=False, xanchor="right")
+			fig.add_annotation(x=8500, y=stat_y_spacing[4], text=f'Mean + 3σ hours: {format(mean + (3 * stdev), ".3f")}', showarrow=False, xanchor="right")
 			fig.update_xaxes(title_text='Hour of year when outage starts')
 			fig.update_yaxes(title_text='Hours')
 		if k == 'Outage Survival Probability':

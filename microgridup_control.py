@@ -77,13 +77,13 @@ def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, logg
 		loads = [obj for obj in dssTree if 'load.' in obj.get('object','') and obj.get('object','').split('.')[1] in microgrids[key]['loads']]
 		transformers = [obj for obj in dssTree if 'transformer.' in obj.get('object','') and obj.get('object','').split('.')[1] in all_mg_elements[key]]
 		expected_inrush = estimate_inrush(loads + transformers, motor_perc)
-		data['Expected In-rush (kW)'].append(sum(expected_inrush.values()))
+		data['Expected In-rush (kW)'].append(round(sum(expected_inrush.values()), 3))
 
 		# Expected In-rush (kW) from transformers
-		data['In-rush (kW) from transformers'].append(sum([expected_inrush[ob] for ob in expected_inrush if 'transformer' in ob]))
+		data['In-rush (kW) from transformers'].append(round(sum([expected_inrush[ob] for ob in expected_inrush if 'transformer' in ob]), 3))
 
 		# Expected In-rush (kW) from loads
-		data['Expected In-rush (kW) from loads'].append(sum([expected_inrush[ob] for ob in expected_inrush if 'load' in ob]))
+		data['Expected In-rush (kW) from loads'].append(round(sum([expected_inrush[ob] for ob in expected_inrush if 'load' in ob]), 3))
 
 		# In-rush as % of total generation
 		gen_bus = microgrids[key]['gen_bus']
@@ -91,17 +91,17 @@ def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, logg
 		total_generation = 0
 		for ob in all_generation:
 			total_generation += float(ob.get('kw'))
-		data['In-rush as % of total generation'].append(100*sum(expected_inrush.values())/total_generation)
+		data['In-rush as % of total generation'].append(round(100*sum(expected_inrush.values())/total_generation, 3))
 
 		# Soft Start load (kW)
-		data['Soft Start load (kW)'].append(gradual_load_pickup(dssTree, loads, motor_perc))
+		data['Soft Start load (kW)'].append(round(gradual_load_pickup(dssTree, loads, motor_perc), 3))
 
 		# Super-cap Sizing
-		data['Super-cap Sizing ($)'].append(super_cap_size(sum(expected_inrush.values())))
+		data['Super-cap Sizing ($)'].append(round(super_cap_size(sum(expected_inrush.values())), 3))
 
 		# Total fossil surge. Send total fossil kW power per mg to function, return product after multiplication by surge factor. 
 		fossilGens = [ob for ob in dssTree if ob.get('bus1','x.x').split('.')[0] == gen_bus and 'generator.fossil' in ob.get('object','')]
-		data['Total fossil surge (kW)'].append(calculate_fossil_surge_power(fossilGens, vsourceRatings, gen_bus))
+		data['Total fossil surge (kW)'].append(round(calculate_fossil_surge_power(fossilGens, vsourceRatings, gen_bus), 3))
 	
 	df = pd.DataFrame(data)
 	

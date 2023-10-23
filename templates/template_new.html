@@ -381,10 +381,6 @@
                             <label class="tooltip" for="DIESEL_SAFETY_FACTOR">Fossil Safety Margin (%)<span class="classic">TO DO: FILL TOOLTIP</span></label>
                             <input type="text" name="DIESEL_SAFETY_FACTOR" value="{{in_data.DIESEL_SAFETY_FACTOR}}" />
                         </div>
-                        <div class="chunk">
-                            <label class="tooltip" for="outage_start_hour">Outage Start Hour<span class="classic">A major outage is added starting at this hour. Specify an hour greater than 0 but less than 8760 to trigger optimization for resilience and include fossil generation. If 0 is entered, the model will run an economic optimization without fossil generation.</span></label>
-                            <input type="text" name="outage_start_hour" value="{{ in_data.REOPT_INPUTS.get('outage_start_hour','500') }}" min="0" max="8760"/>
-                        </div>
                     </div>
                 </div>
                 <h5>Financial</h5>

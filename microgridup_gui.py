@@ -400,7 +400,6 @@ def run():
 		'value_of_lost_load':request.form['value_of_lost_load'],
 		'omCostEscalator':request.form['omCostEscalator'],
 		'discountRate':request.form['discountRate'],
-
 		'solar':request.form['solar'],
 		'battery':request.form['battery'],
 		'fossil':request.form['fossil'],

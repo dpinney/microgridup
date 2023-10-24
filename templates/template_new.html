@@ -734,11 +734,11 @@
 	}
 
 	// Populate critical load selection div if editing an existing circuit.
-	function getLoadsFromExistingFile(filePath, criticalLoads) {
+	function getLoadsFromExistingFile(MODEL_DIR, criticalLoads) {
 		$.ajax({
 			url: '/getLoadsFromExistingFile',
 			method: 'POST',
-			data: { path: filePath },
+			data: {MODEL_DIR: MODEL_DIR},
 			success: function(response) {
 				window.circuitIsSpecified = true;
 				const loads = response.loads;
@@ -776,12 +776,12 @@
 	}
 
 	// Function to show previously selected partitions on edit flow.
-	function showOldPartitions(filename, MG_MINES) {
+	function showOldPartitions(MODEL_DIR, MG_MINES) {
 		$('#stepThree').hide();
 		var oldPartitionsDiv = $('<div>').attr('id','oldPartitionDiv').addClass('chunk');
 		// Grab a NetworkX diagram of current partition layout.
 		var data = {
-			filename: filename,
+			MODEL_DIR: MODEL_DIR,
 			MG_MINES: MG_MINES
 		};
 		$.ajax({
@@ -1202,14 +1202,15 @@
 			$('#wizard').attr('disabled', true);
 			window.circuitIsSpecified = true;
 			window.filename = $('#circuitPostCreation').val();
+			const MODEL_DIR = document.getElementsByName('MODEL_DIR')[0].value;
 			// Get allDataInputs.json params from Jinja as variables in the script.
 			var in_data = JSON.parse('{{ in_data | tojson | safe }}');
 			var criticalLoads = in_data['CRITICAL_LOADS'];
 			var MG_MINES = in_data['MICROGRIDS'];
 			// Also populate critical load selection div.
-			getLoadsFromExistingFile(window.filename, criticalLoads);
+			getLoadsFromExistingFile(MODEL_DIR, criticalLoads);
 			// Also populate partitioning preview div from original run.
-			showOldPartitions(window.filename, MG_MINES)
+			showOldPartitions(MODEL_DIR, MG_MINES);
 		}
 
 		// Upload DSS circuit. Get loads.

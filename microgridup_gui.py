@@ -236,14 +236,18 @@ def uploadDss():
 
 @app.route('/getLoadsFromExistingFile', methods=['POST'])
 def getLoadsFromExistingFile():
-	path = request.form.get('path')
+	# path = request.form.get('path')
+	model_dir = request.form['MODEL_DIR']
+	path = f'{_mguDir}/data/projects/{model_dir}/circuit.dss'
 	loads = getLoads(path)
 	return jsonify(loads=loads)
 
 @app.route('/previewOldPartitions', methods=['POST'])
 def previewOldPartitions():
 	data = request.get_json()
-	filename = data['filename']
+	# filename = data['filename']
+	model_dir = data['MODEL_DIR']
+	filename = f'{_mguDir}/data/projects/{model_dir}/circuit.dss'
 	MG_MINES = data['MG_MINES']
 	G = dssConvert.dss_to_networkx(filename)
 
@@ -379,7 +383,6 @@ def run():
 		microgrids = mg_group(dss_path, crit_loads, 'criticalLoads', algo_params={'num_mgs':MGQUANT})
 	elif mg_method == '': 
 		microgrids = json.loads(request.form['MICROGRIDS'])
-	print('microgrids',microgrids)
 	# Form REOPT_INPUTS. 
 	REOPT_INPUTS = {
 		'latitude':request.form['latitude'],
@@ -394,7 +397,6 @@ def run():
 		'year':request.form['year'],
 		'analysisYears':request.form['analysisYears'],
 		'outageDuration':request.form['outageDuration'],
-		'outage_start_hour':request.form['outage_start_hour'],
 		'value_of_lost_load':request.form['value_of_lost_load'],
 		'omCostEscalator':request.form['omCostEscalator'],
 		'discountRate':request.form['discountRate'],

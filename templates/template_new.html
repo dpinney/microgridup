@@ -333,7 +333,8 @@
                 <div class="chunk">
                     {% if in_data.get('LOAD_CSV') %}
                         <label class="tooltip" for="LOAD_CSV_NAME">Load Data (.csv)<span class="classic">Please upload a .csv file representing the hourly load shape. See https://github.com/dpinney/<br>microgridup/blob/main/docs<br>/input_formats.md for formatting details.</span></label>
-                        <input type="text" name="LOAD_CSV_NAME" value="{{ in_data.get('LOAD_CSV') }}" class="file-input" readonly>
+						{% set load_path_as_list = in_data.get('LOAD_CSV').split('/') %}
+                        <input type="text" name="LOAD_CSV_NAME" value="{{ load_path_as_list[-1] }}" class="file-input" readonly>
                         <button type="button" class="remove-btn">Remove File</button>
                     {% else %}
                         <div id='csvLoadParserInsert'></div>
@@ -363,9 +364,10 @@
                     <input type="text" name="outageDuration" value="{{ in_data.REOPT_INPUTS.get('outageDuration','48') }}" min="1" max="8760"/>
                 </div>
 				<div class="chunk">
-                    {% if in_data.get('HISTORICAL_OUTAGES') %}
+                    {% if in_data.get('OUTAGE_CSV') %}
                         <label class="tooltip" for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)<span class="classic">Please upload a .csv file representing historical outages. See https://github.com/dpinney/<br>microgridup/blob/main/docs<br>/input_formats.md for formatting details.</span></label>
-                        <input type="text" name="HISTORICAL_OUTAGES" value="{{ in_data.get('HISTORICAL_OUTAGES') }}" class="file-input" readonly>
+						{% set outages_path_as_list = in_data.get('OUTAGE_CSV').split('/') %}
+                        <input type="text" name="HISTORICAL_OUTAGES" value="{{ outages_path_as_list[-1] }}" class="file-input" readonly>
                         <button type="button" class="remove-btn">Remove File</button>
                     {% else %}
                         <label class="tooltip" for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)<span class="classic">Please upload a .csv file representing historical outages. See https://github.com/dpinney/<br>microgridup/blob/main/docs<br>/input_formats.md for formatting details.</span></label>
@@ -417,7 +419,8 @@
                         {% if in_data.get('BASE_DSS') %}
                             <fieldset>
                                 <label for="BASE_DSS_NAME">Circuit Definition (.dss)</label>
-                                <input id="circuitPostCreation" type="text" name="BASE_DSS_NAME" value="{{in_data.BASE_DSS}}" class="file-input" readonly />
+								{% set dss_path_as_list = in_data.get('BASE_DSS').split('/') %}
+                                <input id="circuitPostCreation" type="text" name="BASE_DSS_NAME" value="{{ dss_path_as_list[-1] }}" class="file-input" readonly />
                             </fieldset>
                             <fieldset>
                                 <button id="upload-file-btn" type="button" hidden>Upload</button>

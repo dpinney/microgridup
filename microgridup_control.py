@@ -354,7 +354,7 @@ def plot_manual_balance_approach(mg_key, year, outageStart, outageEnd, new_batt_
 	for idx in range(len(plotting_variables)):
 		# Traces for gen, load, storage.
 		trace = graph_objects.Scatter(
-			x = pd.to_datetime(range(lengthOfOutage), unit = 'h', origin = start_time), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
+			x = pd.to_datetime(range(lengthOfOutage), unit = 'h', origin = start_time),
 			y = plotting_variables[idx],
 			showlegend = True,
 			name = y_axis_names[idx],
@@ -377,8 +377,7 @@ def plot_manual_balance_approach(mg_key, year, outageStart, outageEnd, new_batt_
 	offline.plot(fig, filename=out_name, auto_open=False)
 	return out_name
 
-def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_name, y_axis_name, ansi_bands=False, batt_cycle_chart=False, fossil_loading_chart=False, vsource_ratings=None, rengen_mgs=None):
-	(outageStart, lengthOfOutage, switchingTime) = 60, 120, 30
+def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_name, y_axis_name, outageStart, lengthOfOutage, ansi_bands=False, batt_cycle_chart=False, fossil_loading_chart=False, vsource_ratings=None, rengen_mgs=None):
 	outageEnd = outageStart + lengthOfOutage
 	gen_data = pd.read_csv(csvName)
 	data = []
@@ -494,8 +493,10 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 					mmbtu_dict[legend_group] = mmbtu_consumption_outage
 				# Make fossil loading percentages traces.
 				fossil_percent_loading = [(x / float(fossil_kw_rating)) * -100 for x in this_series[y_name]] if "fossil_" in ob_name else [(x / float(fossil_kw_rating)) * 100 for x in this_series[y_name]]
+				graph_start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outageStart-24)
 				fossil_trace = graph_objects.Scatter(
-					x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
+					# x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
+					x = pd.to_datetime(range(lengthOfOutage+48), unit = 'h', origin = graph_start_time),
 					y = fossil_percent_loading,
 					legendgroup=legend_group,
 					legendgrouptitle_text=legend_group,
@@ -551,8 +552,10 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 			except:
 				pass
 			if not this_series[y_name].isnull().values.any():
+				graph_start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outageStart-24)
 				trace = graph_objects.Scatter(
-					x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
+					# x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
+					x = pd.to_datetime(range(lengthOfOutage+48), unit = 'h', origin = graph_start_time),
 					y = y_axis,
 					legendgroup=plot_legend_group,
 					legendgrouptitle_text=plot_legend_group,
@@ -641,10 +644,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 	fig.add_vline(x=end_time, line=outage_line_style)
 	offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
-def play(pathToDss, workDir, microgrids, faultedLine, logger):
-	# TODO: do we need non-default outage timing?
-	(outageStart, lengthOfOutage, switchingTime) = 60, 120, 30
-	outageEnd = outageStart + lengthOfOutage
+def play(pathToDss, workDir, microgrids, faultedLine, i, logger):
 	actions = {}
 	print('CONTROLLING ON', microgrids)
 	logger.warning(f'CONTROLLING ON {microgrids}')
@@ -653,6 +653,12 @@ def play(pathToDss, workDir, microgrids, faultedLine, logger):
 	workDir = os.path.abspath(workDir)
 	if curr_dir != workDir:
 		os.chdir(workDir)
+	# Read in inputs.
+	with open(f'reopt_final_{i}/allInputData.json') as file:
+		inputs = json.load(file)
+	outageStart = int(inputs['outage_start_hour'])
+	lengthOfOutage = int(inputs['outageDuration'])
+	outageEnd = outageStart + lengthOfOutage
 	# Read in the circuit information.
 	dssTree = opendss.dssConvert.dssToTree(pathToDss)
 	# Add the fault, modeled as a 3 phase open, to the actions.
@@ -776,7 +782,7 @@ def play(pathToDss, workDir, microgrids, faultedLine, logger):
 	opendss.newQstsPlot(
 		'circuit_control.dss',
 		stepSizeInMinutes=60, 
-		numberOfSteps=300,
+		numberOfSteps=8760,
 		keepAllFiles=False,
 		actions=actions,
 		filePrefix=FPREFIX
@@ -802,14 +808,12 @@ def play(pathToDss, workDir, microgrids, faultedLine, logger):
 				for line in reader:
 					writer.writerow(line)
 	# Generate the output charts.
-	# make_chart(f'{FPREFIX}_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Generator Output", "Average hourly kW", batt_cycle_chart=True)
-	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, dssTree, "Load Voltage", "PU", ansi_bands=True, rengen_mgs=rengen_mgs)
-	# make_chart(f'{FPREFIX}_source.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Voltage Source Output", "Average hourly kW", vsource_ratings=big_gen_ratings)
+	make_chart(f'{FPREFIX}_source_and_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Generator Output", "Average Hourly kW", outageStart, lengthOfOutage, batt_cycle_chart=True, fossil_loading_chart=True, vsource_ratings=big_gen_ratings, rengen_mgs=rengen_mgs)
+	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, dssTree, "Load Voltage", "PU", outageStart, lengthOfOutage, ansi_bands=True, rengen_mgs=rengen_mgs)
 	try:
-		make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], 2019, microgrids, dssTree, "Tap Position", "PU")
+		make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], 2019, microgrids, dssTree, "Tap Position", "PU", outageStart, lengthOfOutage)
 	except:
 		pass #TODO: better detection of missing control data.
-	make_chart(f'{FPREFIX}_source_and_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Generator Output", "Average Hourly kW", batt_cycle_chart=True, fossil_loading_chart=True, vsource_ratings=big_gen_ratings, rengen_mgs=rengen_mgs)
 	plot_inrush_data(pathToDss, microgrids, f'{FPREFIX}_inrush_plot.html', outageStart, outageEnd, logger, vsourceRatings=big_gen_ratings)
 	# Write final output file.
 	output_slug = '''	
@@ -858,7 +862,7 @@ def _tests():
 			continue # NOTE: Remove this statement if support for lukes (multiple points of connection) is added.
 		final_run_count = len(control_test_args[_dir]) - 1 # FULL_NAME is based on the count of the microgrid in the final run.
 		print(f'---------------------------------------------------------\nRunning test of microgridup_control.play() on {_dir}.\n---------------------------------------------------------')
-		play(f'circuit_plusmg_{final_run_count}.dss', f'{_myDir}/data/projects/{_dir}', control_test_args[_dir], FAULTED_LINE, logger)
+		play(f'circuit_plusmg_{final_run_count}.dss', f'{_myDir}/data/projects/{_dir}', control_test_args[_dir], FAULTED_LINE, final_run_count, logger)
 	return print('Ran all tests for microgridup_control.py.')
 
 if __name__ == '__main__':

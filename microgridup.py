@@ -354,8 +354,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 				'CRITICAL_LOADS':CRITICAL_LOADS,
 				'CREATION_DATE':CREATION_DATE,
 				'DESCRIPTION':DESCRIPTION,
-				'INVALIDATE_CACHE':INVALIDATE_CACHE,
-				'HISTORICAL_OUTAGES':f'{MODEL_DIR}/outages.csv' if OUTAGE_CSV else None
+				'INVALIDATE_CACHE':INVALIDATE_CACHE
 			}
 			json.dump(inputs, inputs_file, indent=4)
 		# Generate the per-microgrid results and add each to the circuit iteratively.
@@ -383,7 +382,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		microgridup_hosting_cap.gen_powerflow_results(f'circuit_plusmg_{i}.dss', REOPT_INPUTS['year'], QSTS_STEPS, logger)
 		# Perform control sim.
 		new_mg_for_control = {name:MICROGRIDS[name] for name in mgs_name_sorted[0:i+1]}
-		microgridup_control.play(f'circuit_plusmg_{i}.dss', os.getcwd(), new_mg_for_control, FAULTED_LINE, logger)
+		microgridup_control.play(f'circuit_plusmg_{i}.dss', os.getcwd(), new_mg_for_control, FAULTED_LINE, i, logger)
 		# Resilience simulation with outages. Optional. Skipped if no OUTAGE_CSV
 		if OUTAGE_CSV:
 			all_microgrid_loads = [x.get('loads',[]) for x in MICROGRIDS.values()]

@@ -495,9 +495,8 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 				fossil_percent_loading = [(x / float(fossil_kw_rating)) * -100 for x in this_series[y_name]] if "fossil_" in ob_name else [(x / float(fossil_kw_rating)) * 100 for x in this_series[y_name]]
 				graph_start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outageStart-24)
 				fossil_trace = graph_objects.Scatter(
-					# x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
 					x = pd.to_datetime(range(lengthOfOutage+48), unit = 'h', origin = graph_start_time),
-					y = fossil_percent_loading,
+					y = fossil_percent_loading[outageStart-24: outageStart+lengthOfOutage+48],
 					legendgroup=legend_group,
 					legendgrouptitle_text=legend_group,
 					showlegend=True,
@@ -551,12 +550,12 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 					plot_legend_group = legend_group
 			except:
 				pass
+			# Add traces for gen, load, and control to list of Scatter objects.
 			if not this_series[y_name].isnull().values.any():
 				graph_start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outageStart-24)
 				trace = graph_objects.Scatter(
-					# x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
 					x = pd.to_datetime(range(lengthOfOutage+48), unit = 'h', origin = graph_start_time),
-					y = y_axis,
+					y = y_axis[outageStart-24: outageStart+lengthOfOutage+48],
 					legendgroup=plot_legend_group,
 					legendgrouptitle_text=plot_legend_group,
 					showlegend = True,
@@ -574,7 +573,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 				family="sans-serif",
 				color="black"
 			)
-			)
+		)
 		fossil_fig = graph_objects.Figure(fossil_traces, new_layout)
 		offline.plot(fossil_fig, filename=f'{csvName}_fossil_loading.plot.html', auto_open=False)
 

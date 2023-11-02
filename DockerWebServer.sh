@@ -1,5 +1,4 @@
 #!/bin/sh
-# A nice way to download, and start, and then gracefully close a docker container.
 
 # First, open docker and wait for it to start.
 if (! docker stats --no-stream); then
@@ -11,23 +10,26 @@ if (! docker stats --no-stream); then
     done
 fi
 
-# Build from Dockerfile.
-docker build . -f Dockerfile -t mguim
+# Target directory for git clone
+TARGET_DIR=~/Documents/microgridup/
 
-# Clone repo locally to preserve sample data when creating bind mount.
-mkdir -p ~/Desktop/MicrogridUP/ && cd ~/Desktop/MicrogridUP/ && git clone https://github.com/dpinney/microgridup.git
+# Check to see if folder 'microgridup' exists in current directory, if not clone.
+if [ -d "$TARGET_DIR" ]; then
+    echo "microgridup folder exists, skipping git clone."
+else
+    echo "microgridup folder does not exist, cloning repo..."
+    cd $TARGET_DIR && git clone --depth=1 https://github.com/dpinney/microgridup.git
+fi
 
-# Compose file as a variable.
-# MUST USE SPACES TO INDENT!!!
+# Compose file as a variable. MUST USE SPACES TO INDENT!!!
 COMPOSE_FILE=$(cat <<-END
 version: "3.9"
 services:
     mguim:
-        build: .
-        image: mguim
-        volumes:
-            - ~/Desktop/MicrogridUP/microgridup/data/projects:/data/projects
+        image: ghcr.io/dpinney/microgridup:main
         container_name: mgucont
+        volumes:
+            - $TARGET_DIR/data/projects:/data/projects
         ports:
             - "5000:5000"
 END
@@ -54,6 +56,10 @@ case "$OSTYPE" in
     *)        echo "unknown: $OSTYPE" ;;
 esac
 
+# Sleep for 10 seconds to give server time to start
+sleep 10
+
+# Stop container on user input
 read -n1 -r -p "Server Running at http://localhost:5000. Press any key to stop..." key
 echo "Gracefully stopping docker container..."
 docker stop mgucont

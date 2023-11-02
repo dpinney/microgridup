@@ -11,8 +11,11 @@ if (! docker stats --no-stream); then
     done
 fi
 
-# Build.
+# Build from Dockerfile.
 docker build . -f Dockerfile -t mguim
+
+# Clone repo locally to preserve sample data when creating bind mount.
+mkdir -p ~/Desktop/MicrogridUP/ && cd ~/Desktop/MicrogridUP/ && git clone https://github.com/dpinney/microgridup.git
 
 # Compose file as a variable.
 # MUST USE SPACES TO INDENT!!!
@@ -23,7 +26,7 @@ services:
         build: .
         image: mguim
         volumes:
-            - ~/Desktop/MicrogridUP/:/mgudata
+            - ~/Desktop/MicrogridUP/microgridup/data/projects:/data/projects
         container_name: mgucont
         ports:
             - "5000:5000"
@@ -51,7 +54,6 @@ case "$OSTYPE" in
     *)        echo "unknown: $OSTYPE" ;;
 esac
 
-# echo "Server Running at http://localhost:5000. ctrl+C to quit."
 read -n1 -r -p "Server Running at http://localhost:5000. Press any key to stop..." key
 echo "Gracefully stopping docker container..."
 docker stop mgucont

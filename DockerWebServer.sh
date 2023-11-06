@@ -11,10 +11,11 @@ if (! docker stats --no-stream); then
 fi
 
 # Target directory for git clone
-TARGET_DIR=~/Documents/microgridup/
+TARGET_DIR=~/Documents/
+PROJ_DIR=microgridup/
 
 # Check to see if folder 'microgridup' exists in current directory, if not clone.
-if [ -d "$TARGET_DIR" ]; then
+if [ -d "${TARGET_DIR}${PROJ_DIR}" ]; then
     echo "microgridup folder exists, skipping git clone."
 else
     echo "microgridup folder does not exist, cloning repo..."
@@ -29,7 +30,7 @@ services:
         image: ghcr.io/dpinney/microgridup:main
         container_name: mgucont
         volumes:
-            - $TARGET_DIR/data/projects:/data/projects
+            - ${TARGET_DIR}${PROJ_DIR}/data/projects:/data/projects
         ports:
             - "5000:5000"
 END
@@ -44,6 +45,9 @@ echo "$COMPOSE_FILE" | docker compose -p mguproj -f /dev/stdin up -d
 # https://stackoverflow.com/questions/22807714/why-i-am-not-getting-signal-sigkill-on-kill-9-command-in-bash
 trap "docker stop mgucont" SIGKILL SIGINT SIGTERM
 
+# Sleep for 10 seconds to give server time to start
+sleep 10
+
 # Open browser
 # Cross platform switching logic, https://stackoverflow.com/questions/394230/how-to-detect-the-os-from-a-bash-script
 case "$OSTYPE" in
@@ -55,9 +59,6 @@ case "$OSTYPE" in
     cygwin*)  start "http://localhost:5000" ;;
     *)        echo "unknown: $OSTYPE" ;;
 esac
-
-# Sleep for 10 seconds to give server time to start
-sleep 10
 
 # Stop container on user input
 read -n1 -r -p "Server Running at http://localhost:5000. Press any key to stop..." key

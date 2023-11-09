@@ -3,6 +3,7 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Overview</title>
+        <link rel="stylesheet" href="/static/microgridup.css">
         <style type="text/css">
             * {
                 font-family:sans-serif
@@ -23,15 +24,6 @@
                 white-space: pre-wrap;
                 margin-top: 0px;
             }
-            th {
-                font-size:8pt;
-            }
-            #tablediv {
-                width: 98vw;
-                margin-top: 10px;
-                margin-bottom: 10px;
-                overflow-x: scroll
-            }
             .chunk {
                 display: inline-block;
                 background-color: lightgray;
@@ -43,16 +35,16 @@
     </head>
     <body>
         {{chart_html}}
-        <div id="tablediv">
+        <div class="tableDiv">
             <h3>Overview of Microgrid Results</h3>
             <table>
                 {% for k in summary.keys() %} <th>{{k}}</th>{% endfor %}
                 {% for i in range(summary["Microgrid Name"] | length) %}
                     <tr>
                         {% for k in summary.keys() %}
-                            {% if summary[k][i] is string %}<td style="text-align:right">{{ summary[k][i] }}</td>
-                            {% elif summary[k][i] is not none %}<td style="text-align:right">{{ '{:,}'.format(summary[k][i]) }}</td>
-                            {% else %}<td style="text-align:right">{{ summary[k][i] }}</td>
+                            {% if summary[k][i] is string %}<td>{{ summary[k][i] }}</td>
+                            {% elif summary[k][i] is not none %}<td>{{ '{:,}'.format(summary[k][i]) }}</td>
+                            {% else %}<td>{{ summary[k][i] }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -79,9 +71,9 @@
                         <th>Cost Estimate ($)</th>
                     </tr>{% for row in add_cost_rows %}
                     <tr>{% for col_value in row %}
-                        {% if col_value is string %}<td style="text-align:right">{{ col_value }}</td>
-                        {% elif col_value is not none %}<td style="text-align:right">{{ '{:,}'.format(col_value) }}</td>
-                        {% else %}<td style="text-align:right">{{ col_value }}</td>{% endif %}
+                        {% if col_value is string %}<td>{{ col_value }}</td>
+                        {% elif col_value is not none %}<td>{{ '{:,}'.format(col_value) }}</td>
+                        {% else %}<td>{{ col_value }}</td>{% endif %}
                     {% endfor %}</tr>{% endfor %}
                 </table>
             </div>

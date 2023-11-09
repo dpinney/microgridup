@@ -2,12 +2,14 @@ import csv, json, os
 import pandas as pd
 import numpy as np
 from os import path
+from pathlib import Path
 from omf.solvers import opendss
 from omf.solvers.opendss import dssConvert
 from omf.solvers import opendss
 import plotly
 import datetime
 import microgridup
+import omf.models
 
 def _getByName(tree, name):
 	''' Return first object with name in tree as an OrderedDict. '''
@@ -932,6 +934,59 @@ def get_microgrid_existing_generation_dict(dss_path, microgrid):
 		'wind_kw_existing': sum(wind_kw_existing),
 		'fossil_kw_existing': sum(fossil_kw_existing)
 	}
+
+def run_hosting_capacity(dss_filename):
+	'''
+	Run the traditional algorithm in omf.models.hostingCapacity() on the final dss file
+
+	:type dss_filename: str
+	:param dss_filename: the filename of the dss file (e.g. circuit_plusmg_{i}.dss)
+	:rtype: None
+	'''
+	assert type(dss_filename) == str
+	omf.models.hostingCapacity.new('hosting_capacity')
+	with open('hosting_capacity/allInputData.json') as f:
+		all_input_data = json.load(f)
+	# - Disable AMI algorithm
+	all_input_data['runAmiAlgorithm'] = 'off'
+	# - Remove omd file that was copied by default into the hosting_capacity/ directory because we replace it with a different omd
+	os.remove(f"hosting_capacity/{all_input_data['feederName1']}.omd")
+	# - Create and set the new omd file
+	dssConvert.dssToOmd(dss_filename, f'hosting_capacity/{dss_filename}.omd')
+	all_input_data['feederName1'] = dss_filename
+	# - To be explicit, delete keys that aren't relevant for traditional hosting capacity algorithm
+	del all_input_data['mohcaAlgorithm']
+	del all_input_data['inputDataFileName']
+	del all_input_data['inputDataFileContent']
+	with open('hosting_capacity/allInputData.json', 'w') as f:
+		json.dump(all_input_data, f, indent=4)
+	omf.models.__neoMetaModel__.runForeground('hosting_capacity')
+	with open('hosting_capacity/allOutputData.json') as f:
+		data = json.load(f)
+	# - Create graph
+	fig = plotly.io.from_json(data['traditionalGraphData'])
+	fig.update_traces(width=.1)
+	fig.update_layout(title='Traditional Hosting Capacity By Bus', font=dict(family="sans-serif", color="black"))
+	fig.write_html('hosting_capacity/traditionalGraphData.html')
+	# - Create table
+	headings =  f"<tr>{''.join([f'<th>{th}</th>' for th in data['traditionalHCTableHeadings']])}</tr>"
+	values = ''.join([f"<tr>{''.join(row_)}</tr>" for row_ in [[f'<td>{val}</td>' for val in row] for row in data['traditionalHCTableValues']]])
+	html = (
+        '<html>'
+            '<head>'
+                '<link rel="stylesheet" href="/static/microgridup.css">'
+            '</head>'
+            '<body>'
+                '<div class="tableDiv">'
+                    '<table>'
+                        f'{headings}'
+                        f'{values}'
+                    '</table>'
+                '</div>'
+            '</body>'
+		'</html>')
+	with open('hosting_capacity/traditionalGraphTable.html', 'w') as f:
+		f.write(html)
 
 def _tests():
 	# Load arguments from JSON.

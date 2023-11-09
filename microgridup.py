@@ -369,17 +369,22 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		dssConvert.dssToOmd(f'circuit_plusmg_{i}.dss', OMD_NAME, RADIUS=0.0002)
 		# Draw the circuit oneline.
 		distNetViz.viz(OMD_NAME, forceLayout=False, outputPath='.', outputName=ONELINE_NAME, open_file=False)
+		# Powerflow outputs.
+		microgridup_hosting_cap.gen_powerflow_results(f'circuit_plusmg_{i}.dss', REOPT_INPUTS['year'], QSTS_STEPS, logger)
+		# Hosting capacity
+		microgridup_hosting_cap.run_hosting_capacity(f'circuit_plusmg_{i}.dss')
 		# Draw the map.
 		out = colorby_mgs(OMD_NAME, MICROGRIDS, CRITICAL_LOADS)
 		new_path = './color_test.omd'
 		omd = json.load(open(OMD_NAME))
 		omd['attachments'] = out
+		with open('hosting_capacity/color_by.csv') as f:
+			omd['attachments']['coloringFiles']['color_by.csv'] = {
+				'csv': f.read()
+			}
 		with open(new_path, 'w+') as out_file:
 			json.dump(omd, out_file, indent=4)
 		geo.map_omd(new_path, MAP_NAME, open_browser=False)
-		# geo.map_omd(OMD_NAME, MAP_NAME, open_browser=False)
-		# Powerflow outputs.
-		microgridup_hosting_cap.gen_powerflow_results(f'circuit_plusmg_{i}.dss', REOPT_INPUTS['year'], QSTS_STEPS, logger)
 		# Perform control sim.
 		new_mg_for_control = {name:MICROGRIDS[name] for name in mgs_name_sorted[0:i+1]}
 		microgridup_control.play(f'circuit_plusmg_{i}.dss', os.getcwd(), new_mg_for_control, FAULTED_LINE, i, logger)

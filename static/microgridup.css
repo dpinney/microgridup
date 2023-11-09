@@ -1,0 +1,25 @@
+/************/
+/* ELEMENTS */
+/************/
+
+td {
+    text-align: right;
+}
+th {
+    font-size: 8pt;
+}
+
+/***********/
+/* Classes */
+/***********/
+
+div.tableDiv {
+    width: 98vw;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    overflow-x: scroll
+}
+
+div.tableDiv > table {
+    margin: auto;
+}

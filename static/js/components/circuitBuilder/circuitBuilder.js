@@ -1,5 +1,5 @@
 export { CircuitElement, CircuitModel, CircuitController, CircuitTableView, CircuitUserControlsView, CsvLoadParser };
-import { Modal, getTrashCanSvg } from './modal.js';
+import { Modal, getTrashCanSvg } from '../modal.js';
 
 class CircuitElement {
     

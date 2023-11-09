@@ -11,13 +11,16 @@ from flask import send_from_directory
 from pathlib import Path
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
+from blueprint import data_dir_blueprint
 
 _mguDir = os.path.abspath(os.path.dirname(__file__))
 if _mguDir == '/':
 	_mguDir = '' #workaround for rooted installs through e.g. docker.
 _projectDir = f'{_mguDir}/data/projects'
 
-app = Flask(__name__, static_folder='data', template_folder='templates')
+app = Flask(__name__)
+# - Use a blueprint to add another directory to serve static assets (i.e. the "data/" directory)
+app.register_blueprint(data_dir_blueprint)
 auth = HTTPBasicAuth()
 
 users = {} # if blank then no authentication.
@@ -127,7 +130,7 @@ def delete(project):
 
 @app.route('/new')
 def newGui():
-	with open(f'{_mguDir}/data/static/lehigh_3mg_inputs.json') as default_in_file:
+	with open(f'{_mguDir}/static/lehigh_3mg_inputs.json') as default_in_file:
 		default_in = json.load(default_in_file)
 	return render_template('template_new.html', in_data=default_in, iframe_mode=False, editing=False)
 

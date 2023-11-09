@@ -30,7 +30,7 @@ services:
         image: ghcr.io/dpinney/microgridup:main
         container_name: mgucont
         volumes:
-            - ${TARGET_DIR}${PROJ_DIR}/data/projects:/data/projects
+            - ${TARGET_DIR}${PROJ_DIR}data/projects:/data/projects
         ports:
             - "5000:5000"
 END

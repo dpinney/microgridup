@@ -915,7 +915,8 @@
 					critLoads : JSON.stringify(critLoads),
 					fileName : JSON.stringify(window.filename),
 					method : JSON.stringify(method),
-					mgQuantity : JSON.stringify(mgQuantity)
+					mgQuantity : JSON.stringify(mgQuantity),
+					modelDir: JSON.stringify("{{in_data['MODEL_DIR']}}")
 				},
 				success: function(data, status) {
 					if (data === 'Invalid partitioning method') {

@@ -280,6 +280,8 @@ def previewOldPartitions():
 @app.route('/edit/previewPartitions', methods = ['GET','POST'])
 def previewPartitions():
 	CIRC_FILE = json.loads(request.form['fileName'])
+	if not CIRC_FILE.startswith('/'):
+		CIRC_FILE = str(Path(_projectDir).resolve(True) / json.loads(request.form['modelDir']) / CIRC_FILE)
 	CRITICAL_LOADS = json.loads(request.form['critLoads'])
 	METHOD = json.loads(request.form['method'])
 	MGQUANT = int(json.loads(request.form['mgQuantity']))

@@ -60,7 +60,8 @@ def test_1mg():
 		"value_of_lost_load": "100",
 		"solarCanCurtail": True,
 		"solarCanExport": True,
-		"dieselOnlyRunsDuringOutage": False
+		"dieselOnlyRunsDuringOutage": False,
+		"mgParameterOverrides": {"mg0":{}}
 	}
 	MICROGRIDS = {
 		'mg0': {
@@ -131,7 +132,8 @@ def test_2mg():
 		"value_of_lost_load": "100",
 		"solarCanCurtail": True,
 		"solarCanExport": True,
-		"dieselOnlyRunsDuringOutage": True
+		"dieselOnlyRunsDuringOutage": True,
+		"mgParameterOverrides": {"mg0":{}, "mg1":{}}
 	}
 	MICROGRIDS = {
 		'mg0': {
@@ -209,7 +211,8 @@ def test_3mg():
 		"value_of_lost_load": "100",
 		"solarCanCurtail": True,
 		"solarCanExport": True,
-		"dieselOnlyRunsDuringOutage": True
+		"dieselOnlyRunsDuringOutage": True,
+		"mgParameterOverrides": {"mg0":{}, "mg1":{}, "mg2":{}}
 	}
 	MICROGRIDS = {
 		'mg0': {
@@ -295,8 +298,9 @@ def test_4mg():
 		"value_of_lost_load": "100",
 		"solarCanCurtail": True,
 		"solarCanExport": True,
-		"dieselOnlyRunsDuringOutage": False
-		# "batteryMacrsOptionYears": 0
+		"dieselOnlyRunsDuringOutage": False,
+		# "batteryMacrsOptionYears": 0,
+		"mgParameterOverrides": {"mg0":{}, "mg1":{}, "mg2":{}, "mg3":{}}
 	}
 	MICROGRIDS = {
 		'mg0': {
@@ -390,7 +394,8 @@ def test_auto3mg():
 		"value_of_lost_load": "100",
 		"solarCanCurtail": True,
 		"solarCanExport": True,
-		"dieselOnlyRunsDuringOutage": True
+		"dieselOnlyRunsDuringOutage": True,
+		"mgParameterOverrides": {"mg0":{}, "mg1": {}, "mg2":{}}
 	}
 	ALGO = 'branch' #'lukes'
 	MICROGRIDS = gmg.mg_group(CIRC_FILE, CRITICAL_LOADS, ALGO)

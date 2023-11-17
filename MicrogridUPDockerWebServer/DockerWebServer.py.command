@@ -1,20 +1,24 @@
-import docker, os, time, signal, subprocess, webbrowser
+#!/usr/bin/python3
+import os, time, signal, subprocess, webbrowser
 
 def is_docker_running():
-    '''Returns True if Docker daemon is running, otherwise False.'''
-    try:
-        client = docker.from_env()
-        return True
-    except docker.errors.DockerException:
+    command = "docker stats --no-stream"
+    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    if "Cannot connect to the Docker daemon" in output.decode():
         return False
-    
+    else:
+        return True
+
 def signal_handler():
     '''Stops Docker container in event of SIGINT, SIGTERM.'''
-    client.containers.get('mgucont').stop()
+    subprocess.run(['docker', 'stop', 'mgucont'])
     exit(0)
 
 # Check to see if Docker is running.
 if not is_docker_running():
+    ''' Start docker if it is not running. '''
+    #TODO: why isn't docker starting?
     subprocess.run(['open', '-a', 'Docker'])
     print('Waiting for Docker to launch...')
     while not is_docker_running():
@@ -48,9 +52,6 @@ services:
             - "5000:5000"
 '''
 
-# Initialize Docker client.
-client = docker.from_env()
-
 # Create a subprocess and feed the Compose file string to stdin.
 subprocess.run(['docker-compose', '-p', 'mguproj', '-f', '-', 'up','-d'], input=DOCKER_COMPOSE_FILE, text=True)
 
@@ -66,6 +67,5 @@ webbrowser.open('http://localhost:5000')
 
 # Stop container on user input. 
 subprocess.run(['read', '-n1', '-r', '-p', 'Server Running at http://localhost:5000. Press any key to stop...', 'key'])
-# subprocess.run(['docker', 'stop', 'mgucont'])
 print('Gracefully stopping docker container...')
-client.containers.get('mgucont').stop()
+subprocess.run(['docker', 'stop', 'mgucont'])

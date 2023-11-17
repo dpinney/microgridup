@@ -663,7 +663,8 @@
                         <input type="text" name="windItcPercent" value="{{ in_data.REOPT_INPUTS.get('windItcPercent','0.26') }}" step="0.01" min="0.0" max="1.0"/>
                     </div>
                 </div>
-
+                <h3>Step 5 (Optional): Override technology parameters per-microgrid</h3>
+                <div id="microgridParameterMVC" class="chunk"></div>
                 <br>
             </form>
             <button id="submitEverything" type="submit">Run model</button>
@@ -924,9 +925,10 @@
 					} else {
 						// Create image.
 						var img = $('<img id="previewImage">');
-						img.attr('src', 'data:image/gif;base64,' + data);
+						img.attr('src', 'data:image/gif;base64,' + data.pic_hash);
 						$('#partitionsPreviewDiv').empty();
-						img.appendTo('#partitionsPreviewDiv'); 
+						img.appendTo('#partitionsPreviewDiv');
+						createMicrogridParameterMVC(data.MG_MINES);
 					}
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
@@ -1095,6 +1097,10 @@
 		// Append mgQuantity. 
 		var mgQuantity = $('#minQuantMgs').val() ? $('#minQuantMgs').val() : 0;
 		form1.append('mgQuantity',JSON.stringify(mgQuantity));
+
+		// Append microgrid parameter overrides
+		const mgParameterOverrides = window.microgridParameterModel.getExportData();
+		form1.append('mgParameterOverrides', JSON.stringify(mgParameterOverrides));
 
 		// Show loading indicator.
 		$('#loading-background').show();
@@ -1313,6 +1319,8 @@
 	</script>
 	<script type='module'>
 	import { CircuitElement, CircuitModel, CircuitController, CircuitTableView, CircuitUserControlsView, CsvLoadParser } from '/static/js/components/circuitBuilder/circuitBuilder.js';
+	import { MicrogridParameterModel, MicrogridParameterController, MicrogridParameterView } from '/static/js/components/microgridParameterMVC/microgridParameterMVC.js'
+	// - CircuitBuilder
 	const circuitElements = [
 		{
 			name: 'substation_1',
@@ -1355,26 +1363,34 @@
 			kw: 79
 		},
 	].map(element => new CircuitElement(element));
-	const model = new CircuitModel();
+	let model = new CircuitModel();
 	circuitElements.forEach(e => model.addElement(e));
-	const controller = new CircuitController(model);
-	const table = new CircuitTableView(controller);
-	model.addObserver(table);
+	let controller = new CircuitController(model);
+	let view = new CircuitTableView(controller);
+	model.addObserver(view);
 	const csvLoadParser = new CsvLoadParser();
 	const controls = new CircuitUserControlsView(controller, csvLoadParser);
 	model.addObserver(controls);
 	csvLoadParser.addObserver(controls);
 	circuitElements.forEach(e => {
-		model.addObserver(table, e.fullName);
+		model.addObserver(view, e.fullName);
 		model.addObserver(controls, e.fullName);
 	});
-	document.getElementById('circuitCreator').append(table.modal.divElement);
+	document.getElementById('circuitCreator').append(view.modal.divElement);
 	document.getElementById('circuitCreator').append(controls.modal.divElement);
 	const csvLoadParserInsert = document.getElementById('csvLoadParserInsert');
 	if (csvLoadParserInsert !== null) {
 		csvLoadParserInsert.replaceWith(csvLoadParser.modal.divElement);
 	} else {
 		window.csvLoadParser = csvLoadParser;
+	}
+	// - MicrogridParameterMVC
+	window.createMicrogridParameterMVC = function createMicrogridParameterMVC(MG_MINES) {
+		model = new MicrogridParameterModel(Object.keys(MG_MINES));
+		controller = new MicrogridParameterController(model);
+		view = new MicrogridParameterView(controller);
+		document.getElementById('microgridParameterMVC').replaceChildren(view.modal.divElement);
+		window.microgridParameterModel = model;
 	}
 	</script>
 </body>

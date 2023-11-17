@@ -18,6 +18,7 @@ import traceback
 import sys
 import logging
 import random
+from copy import deepcopy
 import concurrent.futures
 from omf.solvers.REopt import REOPT_API_KEYS
 
@@ -495,8 +496,13 @@ def run_reopt_threads(model_dir, microgrids, logger, reopt_inputs, invalidate_ca
 	# - Generate the correct arguments for each REopt thread to be run
 	thread_argument_lists = []
 	for i, mg_name in enumerate(sorted(microgrids.keys())):
+		# - Apply microgrid parameter overrides
+		mg_specific_reopt_inputs = deepcopy(reopt_inputs)
+		for param, val in mg_specific_reopt_inputs['mgParameterOverrides'][mg_name].items():
+			mg_specific_reopt_inputs[param] = str(val)
+		del mg_specific_reopt_inputs['mgParameterOverrides']
 		# - Generate a set of arguments for a single thread
-		thread_argument_lists.append([model_dir, microgrids[mg_name], i, logger, reopt_inputs, mg_name, api_keys[i % len(api_keys)], invalidate_cache])
+		thread_argument_lists.append([model_dir, microgrids[mg_name], i, logger, mg_specific_reopt_inputs, mg_name, api_keys[i % len(api_keys)], invalidate_cache])
 	# - Retry a thread that throws an exception
 	future_lists = ([], [])
 	argument_lists = (thread_argument_lists, [])

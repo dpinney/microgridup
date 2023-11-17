@@ -1,4 +1,4 @@
-export { Modal, getTrashCanSvg };
+export { Modal, getTrashCanSvg, getCirclePlusSvg };
 
 class Modal {
     
@@ -12,7 +12,7 @@ class Modal {
      * @returns {undefined}
      * @param {string} [initialTablePosition='prepend']
      */
-    constructor(initialTablePosition='prepend') {
+    constructor(initialTablePosition='append') {
         if (!['prepend', 'append'].includes(initialTablePosition)) {
             throw TypeError('"initialTablePosition" argument must be "prepend" or "append".');
         }
@@ -219,6 +219,34 @@ function getTrashCanSvg() {
     path.setAttribute('stroke-width', '1.5');
     path.setAttribute('stroke-linecap', 'round');
     path.setAttribute('stroke-linejoin', 'round');
+    svg.appendChild(path);
+    return svg;
+}
+
+function getCirclePlusSvg() {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('width', '22px');
+    svg.setAttribute('height', '22px');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('fill', 'none');
+    let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', 'M9 12H15');
+    path.setAttribute('stroke', '#FFFFFF');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('stroke-linejoin', 'round');
+    svg.appendChild(path);
+    path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', 'M12 9L12 15');
+    path.setAttribute('stroke', '#FFFFFF');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('stroke-linejoin', 'round');
+    svg.appendChild(path);
+    path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', 'M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z');
+    path.setAttribute('stroke', '#FFFFFF');
+    path.setAttribute('stroke-width', '2');
     svg.appendChild(path);
     return svg;
 }

@@ -312,8 +312,8 @@ def previewPartitions():
 	pic_IObytes = io.BytesIO()
 	plt.savefig(pic_IObytes,  format='png')
 	pic_IObytes.seek(0)
-	pic_hash = base64.b64encode(pic_IObytes.read())
-	return pic_hash
+	pic_hash = base64.b64encode(pic_IObytes.read()).decode('ascii')
+	return jsonify({'pic_hash': pic_hash, 'MG_MINES': MG_MINES})
 
 @app.route('/run', methods=["POST"])
 def run():
@@ -442,6 +442,7 @@ def run():
 		'windMin':request.form['windMin'],
 		'windMacrsOptionYears':request.form['windMacrsOptionYears'],
 		'windItcPercent':request.form['windItcPercent'],
+		'mgParameterOverrides': json.loads(request.form['mgParameterOverrides'])
 	}
 	mgu_args = [
 		f'{_projectDir}/{request.form["MODEL_DIR"]}',

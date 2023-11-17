@@ -9,18 +9,18 @@
 #circuitTableView {
     max-width: 780px;
 }
-#circuitUserControlsView {
-    /*max-width: 780px;*/
-}
 #csvLoadParserView {
     max-width: 780px;
+}
+#microgridParameterMVC {
+    width: 780px;
 }
 
 /* Banner styling */
 
 div.div--modalBanner {
     padding: .5rem;
-    text-align: center;
+    /*text-align: center;*/
 }
 div.div--modalBanner.caution {
     background-color: hsla(50, 100%, 70%, 1);
@@ -37,15 +37,15 @@ div.div--modal button {
     border-radius: 5px;
     color: white;
     cursor: pointer;
-    /*max-width: 400px;*/
-    /*padding: .25rem;*/
+}
+div.div--modal td button {
+    padding: .25rem;
 }
 div.div--modal button:hover {
     background-color: mediumseagreen;
 }
 div.div--modal button.delete {
     background-color: crimson;
-    padding: .25rem;
 }
 div.div--modal button.delete:hover {
     background-color: red;
@@ -87,7 +87,7 @@ div.div--modal div.div--singleButtonDiv {
 
 div.div--modal table input {
     font-size: 1rem;
-    width: 50%;
+    min-width: 50%;
 }
 
 /* Span styling */
@@ -113,35 +113,37 @@ div.div--modal select {
 
 /* Table styling */
 
-div.div--modal table {
+div#circuitTableView div.div--modal table {
     table-layout: fixed;
     width: 100%;
 }
-div.div--modal table td {
+div#circuitTableView div.div--modal table td {
     padding: 0;
 }
-div.div--modal table td:first-child {
+div#circuitTableView div.div--modal table td:first-child {
     width: 48px;
 }
-div.div--modal table td:nth-child(2) {
+div#circuitTableView div.div--modal table td:nth-child(2) {
     width: 150px;
 }
-div.div--modal.indent-level-1 td:nth-child(1) {
+div#circuitTableView div.div--modal.indent-level-1 td:nth-child(1) {
     padding-left: 1rem;
 }
-div.div--modal.indent-level-1 td:nth-child(2) {
+div#circuitTableView div.div--modal.indent-level-1 td:nth-child(2) {
     padding-left: 1rem;
 }
-div.div--modal.indent-level-2 td:nth-child(1) {
+div#circuitTableView div.div--modal.indent-level-2 td:nth-child(1) {
     padding-left: 2rem;
 }
-div.div--modal.indent-level-2 td:nth-child(2) {
+div#circuitTableView div.div--modal.indent-level-2 td:nth-child(2) {
     padding-left: 2rem;
 }
-div.div--modal.indent-level-3 td:nth-child(2) {
+div#circuitTableView div.div--modal.indent-level-3 td:nth-child(2) {
     padding-left: 3rem;
 }
-
+div#microgridParameterMVC div.div--modal table td:nth-child(2) {
+    width: 260px;
+}
 /* Title stying */
 
 div.div--modalTitle {
@@ -149,7 +151,7 @@ div.div--modalTitle {
     font-size: 26px;
     font-weight: bold;
     padding: var(--regularFontPadding);
-    text-align: center;
+    /*text-align: center;*/
 }
 
 /* Classes */

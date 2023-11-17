@@ -324,7 +324,6 @@ class MicrogridParameterTable {
 
     renderContent() {
         const modal = new Modal();
-        modal.setBanner('');
         modal.divElement.id = 'parameterTableModal'
         modal.divElement.classList.add('bg-slate-100', 'py-5', 'rounded-md', 'border-2', 'border-solid');
         modal.insertTBodyRow([this.#getPlusButton(), 'Parameter', 'Value'], 'append');
@@ -424,10 +423,10 @@ class MicrogridParameterTable {
                 microgridParameter.value = this.value.trim();
                 that.#controller.setProperty([that.#observable], paramKey, microgridParameter);
                 oldVal = microgridParameter.value;
-                that.modal.setBanner('');
+                that.modal.setBanner('', ['hidden']);
             } catch (e) {
                 this.value = oldVal;
-                that.modal.setBanner(e.message);
+                that.modal.setBanner(e.message, ['caution']);
             }
         });
         const span = document.createElement('span');

@@ -274,7 +274,7 @@ def previewOldPartitions():
 	plt.savefig(pic_IObytes,  format='png')
 	pic_IObytes.seek(0)
 	pic_hash = base64.b64encode(pic_IObytes.getvalue()).decode('utf-8')
-	return pic_hash
+	return jsonify({'pic_hash': pic_hash, 'MG_MINES': MG_MINES})
 
 @app.route('/previewPartitions', methods = ['GET','POST'])
 @app.route('/edit/previewPartitions', methods = ['GET','POST'])

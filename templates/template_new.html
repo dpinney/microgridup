@@ -795,9 +795,10 @@
 			contentType: 'application/json',
 			success: function(data, status) {
 				var img = $('<img id="oldPartitionPreview">');
-				img.attr('src', 'data:image/gif;base64,' + data);
+				img.attr('src', 'data:image/gif;base64,' + data.pic_hash);
 				oldPartitionsDiv.prepend('<br>')
 				oldPartitionsDiv.prepend(img); 
+				createMicrogridParameterMVC(data.MG_MINES);
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log(textStatus + ' : ' + errorThrown);

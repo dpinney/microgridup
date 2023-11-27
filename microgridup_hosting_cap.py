@@ -954,6 +954,14 @@ def run_hosting_capacity(dss_filename):
 	# - Create and set the new omd file
 	dssConvert.dssToOmd(dss_filename, f'hosting_capacity/{dss_filename}.omd')
 	all_input_data['feederName1'] = dss_filename
+	# - New approach to finding hosting capacity bounds
+	timeseries_signature1 = ((8760 ** 2 ) + 8760) / 2
+	timeseries_signature2 = ((8759 ** 2 ) + 8759) / 2
+	load_df = pd.read_csv('loads.csv')
+	if [timeseries_signature1, timeseries_signature2].count(load_df.iloc[:8760, 0].sum()) > 0:
+		load_df = load_df.iloc[:, 1:]
+	# - Since traditionalHCSteps is 10 by default, this will check 10 steps to the limit
+	all_input_data['traditionalHCkW'] = load_df.apply(np.max).sum() * 3
 	# - To be explicit, delete keys that aren't relevant for traditional hosting capacity algorithm
 	del all_input_data['mohcaAlgorithm']
 	del all_input_data['inputDataFileName']

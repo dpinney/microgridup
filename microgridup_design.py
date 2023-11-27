@@ -297,13 +297,11 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	fin_data_bau = {
 		'Demand Cost ($)':allOutData["demandCostBAU1"],
 		'Energy Cost ($)':allOutData["energyCostBAU1"],
-		'Total Cost ($)':allOutData["totalCostBAU1"],
-		'Avg. Outage Survived (H)': None}
+		'Total Cost ($)':allOutData["totalCostBAU1"]}
 	fin_data_microgrid = {
 		'Demand Cost ($)':allOutData["demandCost1"],
 		'Energy Cost ($)':allOutData["energyCost1"],
-		'Total Cost ($)':allOutData["totalCost1"],
-		'Avg. Outage Survived (H)': allOutData.get("avgOutage1",None) }
+		'Total Cost ($)':allOutData["totalCost1"]}
 	fin_fig = go.Figure(
 		data=[
 			go.Bar(

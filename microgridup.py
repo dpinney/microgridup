@@ -358,6 +358,8 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 				'INVALIDATE_CACHE':INVALIDATE_CACHE
 			}
 			json.dump(inputs, inputs_file, indent=4)
+		# Hosting capacity
+		microgridup_hosting_cap.run_hosting_capacity(MODEL_DSS)
 		# Generate the per-microgrid results and add each to the circuit iteratively.
 		# - Multi-threaded REopt execution
 		run_reopt_threads(MODEL_DIR, MICROGRIDS, logger, REOPT_INPUTS, INVALIDATE_CACHE)
@@ -372,8 +374,6 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		distNetViz.viz(OMD_NAME, forceLayout=False, outputPath='.', outputName=ONELINE_NAME, open_file=False)
 		# Powerflow outputs.
 		microgridup_hosting_cap.gen_powerflow_results(f'circuit_plusmg_{i}.dss', REOPT_INPUTS['year'], QSTS_STEPS, logger)
-		# Hosting capacity
-		microgridup_hosting_cap.run_hosting_capacity(f'circuit_plusmg_{i}.dss')
 		# Draw the map.
 		out = colorby_mgs(OMD_NAME, MICROGRIDS, CRITICAL_LOADS)
 		new_path = './color_test.omd'

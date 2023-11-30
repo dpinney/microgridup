@@ -960,8 +960,8 @@ def run_hosting_capacity(dss_filename):
 	load_df = pd.read_csv('loads.csv')
 	if [timeseries_signature1, timeseries_signature2].count(load_df.iloc[:8760, 0].sum()) > 0:
 		load_df = load_df.iloc[:, 1:]
-	# - Since traditionalHCSteps is 10 by default, this will check 10 steps to the limit
-	all_input_data['traditionalHCkW'] = load_df.apply(np.max).sum() * 3
+	# - Instead of testing each bus up to 50000 kW, just test up to 4x the peak load across all meters to speed up the calculation
+	all_input_data['traditionalHCMaxTestkw'] = load_df.apply(np.max).sum() * 4
 	# - To be explicit, delete keys that aren't relevant for traditional hosting capacity algorithm
 	del all_input_data['mohcaAlgorithm']
 	del all_input_data['inputDataFileName']

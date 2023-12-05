@@ -889,7 +889,7 @@ def run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, REF_NAME, L
 	gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_FINAL)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, microgrid)
 	# Generate microgrid control hardware costs.
-	mg_add_cost(ADD_COST_NAME, microgrid, mg_name, BASE_NAME, logger, float(REOPT_INPUTS['single_phase_relay_cost']), float(REOPT_INPUTS['three_phase_relay_cost']))
+	mg_add_cost(ADD_COST_NAME, microgrid, mg_name, BASE_NAME, logger, int(REOPT_INPUTS['single_phase_relay_cost']), int(REOPT_INPUTS['three_phase_relay_cost']))
 	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, logger)
 
 def get_microgrid_coordinates(dss_path, microgrid):

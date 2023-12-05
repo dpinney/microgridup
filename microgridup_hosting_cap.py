@@ -1027,7 +1027,11 @@ def _tests():
 		FULL_NAME = f'circuit_plusmg_{run_count}.dss'
 		ADD_COST_NAME = f'mg_add_cost_{run_count}.csv'
 		max_crit_load = max_crit_loads[_dir][f'mg{run_count}']
-		run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, REF_NAME, LOAD_NAME, FULL_NAME, ADD_COST_NAME, max_crit_load, logger)
+		REOPT_INPUTS = {
+			'single_phase_relay_cost': 300,
+			'three_phase_relay_cost': 20000
+		}
+		run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, REF_NAME, LOAD_NAME, FULL_NAME, ADD_COST_NAME, max_crit_load, logger, REOPT_INPUTS)
 	os.chdir(curr_dir)
 	return
 

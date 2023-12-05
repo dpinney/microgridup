@@ -351,13 +351,11 @@ def gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_FINAL):
 	ref_df_builder['wind_ref_shape'] = pd.Series(reopt_final_out.get(f'powerWind1'))/wind_size_total
 	ref_df_builder.to_csv(REF_NAME, index=False)
 
-def mg_add_cost(outputCsvName, microgrid, mg_name, BASE_NAME, logger):
+def mg_add_cost(outputCsvName, microgrid, mg_name, BASE_NAME, logger, SINGLE_PHASE_RELAY_COST, THREE_PHASE_RELAY_COST):
 	'''Returns a costed csv of all switches and other upgrades needed to allow the microgrid 
 	to operate in islanded mode to support critical loads
 	TO DO: When critical load list references actual load buses instead of kw ratings,
 	use the DSS tree structure to find the location of the load buses and the SCADA disconnect switches'''
-	AMI_COST = 500
-	THREE_PHASE_RELAY_COST = 20000
 	SCADA_COST = 50000
 	MG_CONTROL_COST = 100000
 	MG_DESIGN_COST = 100000
@@ -396,7 +394,7 @@ def mg_add_cost(outputCsvName, microgrid, mg_name, BASE_NAME, logger):
 						with open("user_warnings.txt", "a") as myfile:
 							myfile.write(three_phase_message)		
 				else:
-					writer.writerow([mg_name, load, "AMI disconnect meter", AMI_COST])
+					writer.writerow([mg_name, load, "AMI disconnect meter", SINGLE_PHASE_RELAY_COST])
 					ami_message = 'Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.\n'
 					print(ami_message)
 					logger.warning(ami_message)
@@ -886,12 +884,12 @@ def gen_powerflow_results(CIRCUIT_FILE, YEAR, QSTS_STEPS, logger):
 	except:
 		pass #TODO: better detection of missing control data.
 
-def run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, REF_NAME, LOAD_NAME, FULL_NAME, ADD_COST_NAME, max_crit_load, logger):
+def run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, REF_NAME, LOAD_NAME, FULL_NAME, ADD_COST_NAME, max_crit_load, logger, REOPT_INPUTS):
 	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, BASE_NAME, mg_name, logger)
 	gen_existing_ref_shapes(REF_NAME, REOPT_FOLDER_FINAL)
 	make_full_dss(BASE_NAME, GEN_NAME, LOAD_NAME, FULL_NAME, REF_NAME, gen_obs, microgrid)
 	# Generate microgrid control hardware costs.
-	mg_add_cost(ADD_COST_NAME, microgrid, mg_name, BASE_NAME, logger)
+	mg_add_cost(ADD_COST_NAME, microgrid, mg_name, BASE_NAME, logger, float(REOPT_INPUTS['single_phase_relay_cost']), float(REOPT_INPUTS['three_phase_relay_cost']))
 	microgrid_report_csv('/allOutputData.json', f'ultimate_rep_{FULL_NAME}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, max_crit_load, ADD_COST_NAME, logger)
 
 def get_microgrid_coordinates(dss_path, microgrid):

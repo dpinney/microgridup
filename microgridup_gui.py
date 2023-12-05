@@ -403,6 +403,8 @@ def run():
 		'analysisYears':request.form['analysisYears'],
 		'outageDuration':request.form['outageDuration'],
 		'value_of_lost_load':request.form['value_of_lost_load'],
+		'single_phase_relay_cost':request.form['single_phase_relay_cost'],
+		'three_phase_relay_cost':request.form['three_phase_relay_cost'],
 		'omCostEscalator':request.form['omCostEscalator'],
 		'discountRate':request.form['discountRate'],
 		'solar':request.form['solar'],

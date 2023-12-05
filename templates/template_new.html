@@ -390,6 +390,14 @@
                     <label class="tooltip" for="value_of_lost_load">Value of Lost Load ($/kWh)<span class="classic">Specify the value of lost load during a power outage in $/kWh.</span></label>
                     <input type="text" name="value_of_lost_load" value="{{ in_data.REOPT_INPUTS.get('value_of_lost_load','1') }}" pattern="^\d+\.?\d*?$"/>
                 </div>
+                <div class="chunk">
+                    <label class="tooltip" for="single_phase_relay_cost">Single-phase Relay Cost ($)<span class="classic">Specify the cost of a single-phase relay in $.</span></label>
+                    <input type="text" name="single_phase_relay_cost" value="{{ in_data.REOPT_INPUTS.get('single_phase_relay_cost','300') }}" pattern="^\d+\.?\d*?$"/>
+                </div>
+                <div class="chunk">
+                    <label class="tooltip" for="three_phase_relay_cost">Three-phase Relay Cost ($)<span class="classic">Specify the cost of a three-phase relay in $.</span></label>
+                    <input type="text" name="three_phase_relay_cost" value="{{ in_data.REOPT_INPUTS.get('three_phase_relay_cost','20000') }}" pattern="^\d+\.?\d*?$"/>
+                </div>
                 <div>
                     <i class="fa fa-plus-square"></i>
                     <a href="javascript:void(0)" class="toggle show">Optional inputs</a>

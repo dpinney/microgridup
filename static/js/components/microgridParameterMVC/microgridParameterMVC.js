@@ -153,6 +153,11 @@ class MicrogridParameterModel {
         'wind': {
             'windMax': () => new MicrogridParameter('Wind Power Max (kW)', 1.0e9, 0, 'windMax', 'float'),
             'windMin': () => new MicrogridParameter('Wind Power Min (kW)', 1.0e9, 0, 'windMin', 'float')
+        },
+        'financial': {
+            // - Technially, there's no max for single_phase_relay_cost or three_phase_relay_cost
+            'single_phase_relay_cost': () => new MicrogridParameter('Single-Phase Relay Cost ($)', 1.0e9, 0, 'single_phase_relay_cost', 'int'),
+            'three_phase_relay_cost': () => new MicrogridParameter('Three-Phase Relay Cost ($)', 1.0e9, 0, 'three_phase_relay_cost', 'int')
         }
     }
     #microgrids;
@@ -257,8 +262,6 @@ class MicrogridParameterView {
         microgridDropdownInstructions.textContent = 'Select microgrid to override parameters for';
         modal.divElement.append(microgridDropdownInstructions);
         const microgridSelect = document.createElement('select');
-        microgridSelect.classList.add('rounded-md', 'py-1');
-        microgridSelect.classList.add('mt-5');
         const option = document.createElement('option');
         option.label = '<Select Microgrid>';
         option.value = '<Select Microgrid>';
@@ -319,13 +322,12 @@ class MicrogridParameterTable {
     }
 
     handleUpdatedProperty(observable, propertyKey, oldPropertyValue) {
-        this.renderContent();
+        this.refreshContent();
     }
 
     renderContent() {
         const modal = new Modal();
         modal.divElement.id = 'parameterTableModal'
-        modal.divElement.classList.add('bg-slate-100', 'py-5', 'rounded-md', 'border-2', 'border-solid');
         modal.insertTBodyRow([this.#getPlusButton(), 'Parameter', 'Value'], 'append');
         const that = this;
         for (const [key, param] of Object.entries(this.#observable.getProperties())) {
@@ -339,14 +341,34 @@ class MicrogridParameterTable {
             this.modal = modal;
         }
     }
+
+    refreshContent() {
+        // - Currently, this function only needs to handle property deletions
+        for (const span of [...this.modal.divElement.querySelectorAll('span[data-microgrid-property-parameter-name]')]) {
+            const spanParamName = span.dataset.microgridPropertyParameterName;
+            if (!this.#observable.hasProperty(spanParamName)) {
+                let parentElement = span.parentElement;
+                while (!(parentElement instanceof HTMLTableRowElement)) {
+                    parentElement = parentElement.parentElement;
+                }
+                parentElement.remove();
+            }
+        }
+        if (document.body.contains(this.#parameterSelect)) {
+            const newParameterSelect = this.#getParameterSelect();
+            this.#parameterSelect.replaceWith(newParameterSelect);
+            this.#parameterSelect = newParameterSelect;
+        }
+    }
     
     #getPlusButton() {
         const button = document.createElement('button');
-        button.classList.add('bg-green-700', 'hover:bg-green-600');
         button.append(getCirclePlusSvg());
         button.addEventListener('click', (e) => {
             if (!document.body.contains(this.#parameterSelect)) {
-                this.modal.insertTBodyRow([this.#getDeletePropertyButton(''), this.#getParameterSelect()], 'append');
+                const newParameterSelect = this.#getParameterSelect();
+                this.modal.insertTBodyRow([this.#getDeletePropertyButton(''), newParameterSelect], 'append');
+                this.#parameterSelect = newParameterSelect;
             }
             e.preventDefault();
         });
@@ -367,33 +389,30 @@ class MicrogridParameterTable {
         const that = this;
         button.addEventListener('click', function(e) {
             that.#controller.deleteProperty([that.#observable], propertyKey);
-            // - Delete button for property select also needs to remove its table row
-            that.renderContent();
-            //let parentElement = this.parentElement;
-            //while (!(parentElement instanceof HTMLTableRowElement)) {
-            //    parentElement = parentElement.parentElement;
-            //}
-            //parentElement.remove();
-            e.stopPropagation();
+            let parentElement = this.parentElement;
+            while (!(parentElement instanceof HTMLTableRowElement)) {
+                parentElement = parentElement.parentElement;
+            }
+            parentElement.remove();
+            e.preventDefault();
         });
         return button;
     }
 
     #getParameterSelect() {
         const select = document.createElement('select');
-        select.classList.add('rounded-md', 'py-1');
         const option = document.createElement('option');
         option.label = '<Select Parameter>';
         option.value = '<Select Parameter>';
         select.add(option);
-        for (const id of ['solar', 'battery', 'fossil', 'wind']) {
-            for (const [key, param] of Object.entries(MicrogridParameterModel.microgridParameters[id])) {
-                const existingRows = [...document.querySelectorAll('span[data-microgrid-property-parameter-name]')].map(span => span.dataset.microgridPropertyParameterName);
-                if (!existingRows.includes(key)) {
+        for (const [paramNamespaceName, paramNamespace] of Object.entries(MicrogridParameterModel.microgridParameters)) {
+            for (const [paramKey, param] of Object.entries(paramNamespace)) {
+                const existingRows = [...this.modal.divElement.querySelectorAll('span[data-microgrid-property-parameter-name]')].map(span => span.dataset.microgridPropertyParameterName);
+                if (!existingRows.includes(paramKey)) {
                     const option = document.createElement('option');
                     option.label = param().displayName;
-                    option.value = `${id}:${key}`;
-                    select.add(option); 
+                    option.value = `${paramNamespaceName}:${paramKey}`;
+                    select.add(option);
                 }
             }
         }
@@ -408,13 +427,11 @@ class MicrogridParameterTable {
             }
             parentElement.remove();
         });
-        this.#parameterSelect = select;
         return select;
     }
 
     #insertPropertyRow(modal, paramKey, microgridParameter) {
         const input = document.createElement('input');
-        input.classList.add('border-2', 'border-black', 'rounded-md');
         let oldVal = microgridParameter.value;
         input.value = oldVal;
         const that = this;

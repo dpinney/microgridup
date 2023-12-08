@@ -775,9 +775,6 @@
 					$('#criticalLoadsSelect').append('<p>No loads to select from.</p>')
 				}
 				// Make directory uneditable. 
-				{% if iframe_mode %}
-				disableInputs();
-				{% endif %}
 				$('input[name="MODEL_DIR"]').prop("readonly", true);
 			},
 			error: function(xhr, status, error) {
@@ -807,6 +804,9 @@
 				oldPartitionsDiv.prepend('<br>')
 				oldPartitionsDiv.prepend(img); 
 				createMicrogridParameterMVC(data.MG_MINES);
+				{% if iframe_mode %}
+				window.disableInputs();
+				{% endif %}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log(textStatus + ' : ' + errorThrown);
@@ -951,21 +951,6 @@
 				e.preventDefault();
 				$('#previewPartitionsButton').click();
 			}
-		});
-	}
-
-	function disableInputs() {
-		[...document.getElementsByTagName('input')].forEach(input => {
-			input.disabled = true;
-		});
-		[...document.getElementsByTagName('button')].forEach(button => {
-			button.disabled = true;
-		});
-		[...document.getElementsByTagName('select')].forEach(select => {
-			select.disabled = true;
-		});
-		[...document.getElementsByTagName('textarea')].forEach(textArea => {
-			textArea.disabled = true;
 		});
 	}
 
@@ -1320,10 +1305,6 @@
 				alert('Please correct the input fields higlighted with red borders.');
 			}
 		});
-
-        {% if iframe_mode %}
-        disableInputs();
-        {% endif %}
 	});
 	</script>
 	<script type='module'>
@@ -1400,7 +1381,24 @@
 		view = new MicrogridParameterView(controller);
 		document.getElementById('microgridParameterMVC').replaceChildren(view.modal.divElement);
 		window.microgridParameterModel = model;
-	}
+	};
+	{% if iframe_mode %}
+	window.disableInputs = function() {
+		[...document.getElementsByTagName('input')].forEach(input => {
+			input.disabled = true;
+		});
+		[...document.getElementsByTagName('button')].forEach(button => {
+			button.disabled = true;
+		});
+		[...document.getElementsByTagName('select')].forEach(select => {
+			select.disabled = true;
+		});
+		[...document.getElementsByTagName('textarea')].forEach(textArea => {
+			textArea.disabled = true;
+		});
+	};
+	window.disableInputs();
+	{% endif %}
 	</script>
 </body>
 </html>

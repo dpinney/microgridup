@@ -10,6 +10,9 @@ RUN apt-get -y update && apt-get install -y python3 git sudo vim python3-pip pyt
 RUN git clone --depth 1 https://github.com/dpinney/omf.git
 RUN cd omf; sudo python3 install.py
 
+# Force Julia install and reopt_jl setup.
+RUN python3 -c "import omf; omf.solvers.reopt_jl.install_reopt_jl()"
+
 # Move files across.
 COPY . .
 

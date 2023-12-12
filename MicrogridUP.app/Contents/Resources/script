@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import os, time, signal, subprocess, webbrowser
+import os, time, signal, subprocess, sys, webbrowser
 
 # subprocess.run(['export', 'PATH="$PATH:/usr/local/bin"'])
 # subprocess.run(["source", "~/.bash_profile"])
@@ -32,7 +32,19 @@ def is_docker_running():
 def signal_handler():
     '''Stops Docker container in event of SIGINT, SIGTERM.'''
     subprocess.run(['docker', 'stop', 'mgucont'])
-    exit(0)
+    sys.exit()
+
+def is_docker_installed():
+    try:
+        subprocess.check_output(["which", "docker"], universal_newlines=True)
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+# Check to see if Docker is installed.
+if not is_docker_installed():
+    print('Docker is not installed. Please install Docker at https://docs.docker.com/get-docker/ and try again.')
+    sys.exit()
 
 # Check to see if Docker is running.
 if not is_docker_running():

@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 import os, time, signal, subprocess, sys, webbrowser
 
+os.environ["PATH"] = "/usr/local/bin:" + os.environ["PATH"]
+
 def is_docker_running():
     command = "docker stats --no-stream"
     process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -12,17 +14,17 @@ def is_docker_running():
     else:
         print(f'Unexpected error: {error.decode()}. Output: {output.decode()}')
 
+def signal_handler():
+    '''Stops Docker container in event of SIGINT, SIGTERM.'''
+    subprocess.run(['docker', 'stop', 'mgucont'])
+    sys.exit(0)
+
 def is_docker_installed():
     try:
         subprocess.check_output(["which", "docker"], universal_newlines=True)
         return True
     except subprocess.CalledProcessError:
         return False
-
-def signal_handler():
-    '''Stops Docker container in event of SIGINT, SIGTERM.'''
-    subprocess.run(['docker', 'stop', 'mgucont'])
-    sys.exit(0)
 
 # Check to see if Docker is installed.
 if not is_docker_installed():
@@ -65,7 +67,7 @@ services:
         volumes:
             - {os.path.join(TARGET_DIR, PROJ_DIR)}/data/projects:/data/projects
         ports:
-            - "5000:5000"
+            - "5001:5000"
 '''
 
 # Create a subprocess and feed the Compose file string to stdin.
@@ -79,9 +81,6 @@ signal.signal(signal.SIGTERM, signal_handler)
 time.sleep(10)
 
 # Open browser.
-webbrowser.open('http://localhost:5000')
+webbrowser.open('http://localhost:5001')
 
-# Stop container on user input. 
-subprocess.run(['read', '-n1', '-r', '-p', 'Server Running at http://localhost:5000. Press any key to stop...', 'key'])
-print('Gracefully stopping docker container...')
-subprocess.run(['docker', 'stop', 'mgucont'])
+print('Server Running at http://localhost:5001. You may stop the container using the stop button in Docker Desktop. Closing this window will not affect the behavior of the server.')

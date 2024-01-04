@@ -337,7 +337,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		loads = MICROGRIDS[mg]['loads']
 		critical_load_kws = MICROGRIDS[mg]['critical_load_kws']
 		for l, c in zip(loads, critical_load_kws):
-			if c != 0 or c != '0':
+			if not (c == 0 or c == '0' or c == 0.0 or c == '0.0'):
 				CRITICAL_LOADS.append(l)
 	# Run the full MicrogridUP analysis.
 	try:

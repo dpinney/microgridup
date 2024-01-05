@@ -379,10 +379,6 @@
                     <i class="fa fa-plus-square"></i>
                     <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
                     <div style="display:none;">
-						<div class="chunk">
-                            <label class="tooltip" for="DIESEL_SAFETY_FACTOR">Fossil Safety Margin (%)<span class="classic">TO DO: FILL TOOLTIP</span></label>
-                            <input type="text" name="DIESEL_SAFETY_FACTOR" value="{{in_data.DIESEL_SAFETY_FACTOR}}" />
-                        </div>
                     </div>
                 </div>
                 <h5>Financial</h5>
@@ -960,10 +956,10 @@
 		for (var i = 0; i < inputs.length; i++) {
 			var input = inputs[i];
 			if (!input.checkValidity()) {
-			valid = false;
-			input.style.border = "1px solid red";
+				valid = false;
+				input.style.border = "1px solid red";
 			} else {
-			input.style.border = "";
+				input.style.border = "";
 			}
 		}
 		return valid;
@@ -1219,13 +1215,19 @@
 
 		// Upload DSS circuit. Get loads.
 		$('#upload-file-btn').click(function() {
+			var model_dir = $('input[name="MODEL_DIR"]').val()
 			// Do not proceed if model has no name.
-			if ($('input[name="MODEL_DIR"]').val() === '') {
+			if (model_dir === '') {
 				alert('Please specify a model name.')
 				return 
 			}
+			// Do not proceed if input contains capital letters.
+			const pattern = new RegExp('[A-Z]');
+			if (pattern.test(model_dir)) {
+				alert('Model names must be entirely lowercase. Please return to Step 1 and provide Model Name with lowercase input.')
+				return
+			}
 			var form_data = new FormData($('#upload-file')[0]);
-			var model_dir = $('input[name="MODEL_DIR"]').val()
 			form_data.append('MODEL_DIR',model_dir)
 			$.ajax({
 				type: 'POST',
@@ -1294,6 +1296,7 @@
 			if (form1Valid && form2Valid) {
 				// Submit the forms
 				submitEverything();
+				// console.log('Submitting form.')
 			} else {
 				// Show alert and highlight incorrect fields
 				if (!form1Valid) {

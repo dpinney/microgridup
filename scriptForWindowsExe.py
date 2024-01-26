@@ -69,7 +69,7 @@ services:
         image: ghcr.io/dpinney/microgridup:main
         container_name: mgucont
         volumes:
-            - {os.path.join(TARGET_DIR, PROJ_DIR)}/data/projects:/data/projects
+            - {os.path.join(TARGET_DIR, PROJ_DIR, 'data', 'projects')}:/data/projects
         ports:
             - "5001:5000"
 '''

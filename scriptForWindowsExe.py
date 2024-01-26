@@ -46,7 +46,7 @@ if not is_docker_running():
 # Set directory variables for git clone and volume mount.
 HOME_DIR = os.environ['USERPROFILE']
 TARGET_DIR = os.path.join(HOME_DIR, 'Documents')
-PROJ_DIR = 'microgridup'
+PROJ_DIR = 'microgridup-main'
 
 # Check to see if PROJ_DIR exists in TARGET_DIR. If not, clone repository.
 if not os.path.isdir(os.path.join(TARGET_DIR, PROJ_DIR)):

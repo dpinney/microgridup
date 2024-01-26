@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 import os, time, signal, subprocess, sys, webbrowser
+from zipfile import ZipFile
+from urllib.request import urlopen
+from io import BytesIO
 
 os.environ["PATH"] = "/usr/local/bin:" + os.environ["PATH"]
 
@@ -44,13 +47,15 @@ if not is_docker_running():
 # Set directory variables for git clone and volume mount.
 HOME_DIR = os.path.expanduser('~')
 TARGET_DIR = os.path.join(HOME_DIR, 'Documents')
-PROJ_DIR = 'microgridup'
+PROJ_DIR = 'microgridup-main'
 
 # Check to see if PROJ_DIR exists in TARGET_DIR. If not, clone repository.
 if not os.path.isdir(os.path.join(TARGET_DIR, PROJ_DIR)):
-    print('Microgridup folder does not exist, cloning repo...')
-    os.chdir(TARGET_DIR)
-    subprocess.run(['git','clone','--depth=1','https://github.com/dpinney/microgridup.git'])
+    print('Microgridup folder does not exist, downloading zip...')
+    zip_url = 'https://codeload.github.com/dpinney/microgridup/zip/refs/heads/main'
+    with urlopen(zip_url) as zip_response:
+        with ZipFile(BytesIO(zip_response.read())) as zip_file:
+            zip_file.extractall(TARGET_DIR)
 else: 
     print('Microgridup folder exists, skipping git clone.')
 

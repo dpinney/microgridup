@@ -397,8 +397,6 @@ def run():
 		microgrids = json.loads(request.form['MICROGRIDS'])
 	# Form REOPT_INPUTS. 
 	REOPT_INPUTS = {
-		'latitude':request.form['latitude'],
-		'longitude':request.form['longitude'],
 		'energyCost':request.form['energyCost'],
 		'wholesaleCost':request.form['wholesaleCost'],
 		'demandCost':request.form['demandCost'],

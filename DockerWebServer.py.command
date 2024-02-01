@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import os, time, signal, subprocess, webbrowser
+import os, time, signal, subprocess, sys, webbrowser
 
 def is_docker_running():
     command = "docker stats --no-stream"
@@ -12,10 +12,22 @@ def is_docker_running():
     else:
         print(f'Unexpected error: {error.decode()}. Output: {output.decode()}')
 
+def is_docker_installed():
+    try:
+        subprocess.check_output(["which", "docker"], universal_newlines=True)
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
 def signal_handler():
     '''Stops Docker container in event of SIGINT, SIGTERM.'''
     subprocess.run(['docker', 'stop', 'mgucont'])
-    exit(0)
+    sys.exit(0)
+
+# Check to see if Docker is installed.
+if not is_docker_installed():
+    print('Docker is not installed. Please install Docker at https://docs.docker.com/get-docker/ and try again.')
+    sys.exit(0)
 
 # Check to see if Docker is running.
 if not is_docker_running():
@@ -39,6 +51,9 @@ if not os.path.isdir(os.path.join(TARGET_DIR, PROJ_DIR)):
     subprocess.run(['git','clone','--depth=1','https://github.com/dpinney/microgridup.git'])
 else: 
     print('Microgridup folder exists, skipping git clone.')
+
+# Remove previous container.
+subprocess.run(['docker','rm','mgucont'])
 
 # Create Docker Compose file as a variable. Must use spaces to indent.
 DOCKER_COMPOSE_FILE = f'''

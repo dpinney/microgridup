@@ -143,6 +143,13 @@ def duplicate():
 		return 'Duplication failed. Project does not exist or the new name is invalid.'
 	else:
 		shutil.copytree(f'{_projectDir}/{project}', f'{_projectDir}/{new_name}')
+		with open(f'data/projects/{new_name}/allInputData.json') as file:
+			inputs = json.load(file)
+		inputs['MODEL_DIR'] = inputs['MODEL_DIR'].replace(project, new_name)
+		inputs['BASE_DSS'] = inputs['BASE_DSS'].replace(project, new_name)
+		inputs['LOAD_CSV'] = inputs['LOAD_CSV'].replace(project, new_name)
+		with open(f'data/projects/{new_name}/allInputData.json', 'w') as file:
+			json.dump(inputs, file, indent=4)
 		return f'Successfully duplicated {project} as {new_name}.'
 
 @app.route('/jsonToDss', methods=['GET','POST'])
@@ -391,8 +398,6 @@ def run():
 		microgrids = json.loads(request.form['MICROGRIDS'])
 	# Form REOPT_INPUTS. 
 	REOPT_INPUTS = {
-		'latitude':request.form['latitude'],
-		'longitude':request.form['longitude'],
 		'energyCost':request.form['energyCost'],
 		'wholesaleCost':request.form['wholesaleCost'],
 		'demandCost':request.form['demandCost'],

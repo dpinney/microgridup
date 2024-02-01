@@ -371,22 +371,36 @@
         });
 
         function duplicate(project) {
-            var new_name = prompt('Name for the duplicate?', '');
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == XMLHttpRequest.DONE) {
-                    alert(xhr.responseText);
-                    location.reload();
+            let new_name;
+            do {
+                new_name = prompt('Name for the duplicate?');
+                if (new_name === null) {
+                    break
+                } else if (new_name !== new_name.toLowerCase()) {
+                    alert('Model names must be entirely lowercase.');
+                } else if (new_name === '') {
+                    alert('Model names may not be empty.');
+                } else {
+                    break;
+                }
+            } while (true);
+            if (new_name !== null) {
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState == XMLHttpRequest.DONE) {
+                        alert(xhr.responseText);
+                        location.reload();
+                    };
                 };
-            };
-            xhr.open('POST', '/duplicate', true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            var contents = JSON.stringify({
-                'project':project,
-                'new_name':new_name
-            });
-            xhr.send(contents);
-            alert(contents);
+                xhr.open('POST', '/duplicate', true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                var contents = JSON.stringify({
+                    'project':project,
+                    'new_name':new_name
+                });
+                xhr.send(contents);
+                // alert(contents);
+            }
         }
 
         function confirmDelete(event) {

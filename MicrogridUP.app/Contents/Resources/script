@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 import os, time, signal, subprocess, sys, webbrowser
-
-# subprocess.run(['export', 'PATH="$PATH:/usr/local/bin"'])
-# subprocess.run(["source", "~/.bash_profile"])
+from zipfile import ZipFile
+from urllib.request import urlopen
+from io import BytesIO
 
 os.environ["PATH"] = "/usr/local/bin:" + os.environ["PATH"]
 
@@ -17,22 +17,10 @@ def is_docker_running():
     else:
         print(f'Unexpected error: {error.decode()}. Output: {output.decode()}')
 
-# def is_docker_running():
-#     try:
-#         output = subprocess.run(["docker", "stats", "--no-stream"], capture_output=True, check=True)
-#     except subprocess.CalledProcessError as e:
-#         if "Cannot connect to the Docker daemon" in e.output.decode() or 'request returned Internal Server Error for API route and version' in e.output.decode():
-#             return False
-#         else:
-#             print(f'Unexpected error: {e.output.decode()}')
-#             return False
-#     else:
-#         return True
-
 def signal_handler():
     '''Stops Docker container in event of SIGINT, SIGTERM.'''
     subprocess.run(['docker', 'stop', 'mgucont'])
-    sys.exit()
+    sys.exit(0)
 
 def is_docker_installed():
     try:
@@ -44,7 +32,7 @@ def is_docker_installed():
 # Check to see if Docker is installed.
 if not is_docker_installed():
     print('Docker is not installed. Please install Docker at https://docs.docker.com/get-docker/ and try again.')
-    sys.exit()
+    sys.exit(0)
 
 # Check to see if Docker is running.
 if not is_docker_running():
@@ -59,15 +47,20 @@ if not is_docker_running():
 # Set directory variables for git clone and volume mount.
 HOME_DIR = os.path.expanduser('~')
 TARGET_DIR = os.path.join(HOME_DIR, 'Documents')
-PROJ_DIR = 'microgridup'
+PROJ_DIR = 'microgridup-main'
 
 # Check to see if PROJ_DIR exists in TARGET_DIR. If not, clone repository.
 if not os.path.isdir(os.path.join(TARGET_DIR, PROJ_DIR)):
-    print('Microgridup folder does not exist, cloning repo...')
-    os.chdir(TARGET_DIR)
-    subprocess.run(['git','clone','--depth=1','https://github.com/dpinney/microgridup.git'])
+    print('Microgridup folder does not exist, downloading zip...')
+    zip_url = 'https://codeload.github.com/dpinney/microgridup/zip/refs/heads/main'
+    with urlopen(zip_url) as zip_response:
+        with ZipFile(BytesIO(zip_response.read())) as zip_file:
+            zip_file.extractall(TARGET_DIR)
 else: 
     print('Microgridup folder exists, skipping git clone.')
+
+# Remove previous container.
+subprocess.run(['docker','rm','mgucont'])
 
 # Create Docker Compose file as a variable. Must use spaces to indent.
 DOCKER_COMPOSE_FILE = f'''
@@ -96,7 +89,3 @@ time.sleep(10)
 webbrowser.open('http://localhost:5001')
 
 print('Server Running at http://localhost:5001. You may stop the container using the stop button in Docker Desktop. Closing this window will not affect the behavior of the server.')
-# Stop container on user input. 
-# subprocess.run(['read', '-n1', '-r', '-p', 'Server Running at http://localhost:5000. Press any key to stop...', 'key'])
-# print('Gracefully stopping docker container...')
-# subprocess.run(['docker', 'stop', 'mgucont'])

@@ -269,14 +269,6 @@
                     <input type="text" name="MODEL_DIR" value="{{in_data.MODEL_DIR}}" pattern="[a-z0-9_\-]+" required/>
                 </div>
                 <div class="chunk">
-                    <label class="tooltip" for="latitude">Latitude<span class="classic">Specify the latitude of the load/grid as a decimal.</span></label>
-                    <input type="text" name="latitude" pattern="-?\d+\.?\d*" value="{{ in_data.REOPT_INPUTS.get('latitude','39.7817') }}"/>
-                </div>
-                <div class="chunk">
-                    <label class="tooltip" for="longitude">Longitude<span class="classic">Specify the longitude of the load/grid as a decimal.</span></label>
-                    <input type="text" name="longitude" pattern="-?\d+\.?\d*" value="{{ in_data.REOPT_INPUTS.get('longitude','-89.6501') }}"/>
-                </div>
-                <div class="chunk">
                     <label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">Defines the length of the interconnection analysis. Example – if time steps are 15 minutes, 480 would define a five day analysis.</span></label>
                     <input type="text" name="QSTS_STEPS" value="{{in_data.QSTS_STEPS}}" />
                 </div>
@@ -382,10 +374,6 @@
                     <i class="fa fa-plus-square"></i>
                     <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
                     <div style="display:none;">
-						<div class="chunk">
-                            <label class="tooltip" for="DIESEL_SAFETY_FACTOR">Fossil Safety Margin (%)<span class="classic">TO DO: FILL TOOLTIP</span></label>
-                            <input type="text" name="DIESEL_SAFETY_FACTOR" value="{{in_data.DIESEL_SAFETY_FACTOR}}" />
-                        </div>
                     </div>
                 </div>
                 <h5>Financial</h5>
@@ -450,7 +438,16 @@
                     </form>
                 </div>
             </div>
-            <div id="circuitCreator" class="desc"></div>
+            <div id="circuitCreator" class="desc">
+				<div class="chunk">
+                    <label class="tooltip" for="latitude">Latitude<span class="classic">Specify the latitude of the load/grid as a decimal.</span></label>
+                    <input type="text" name="latitude" pattern="-?\d+\.?\d*" min="-90" max="90" value="{{ in_data.REOPT_INPUTS.get('latitude','39.7817') }}"/>
+                </div>
+                <div class="chunk">
+                    <label class="tooltip" for="longitude">Longitude<span class="classic">Specify the longitude of the load/grid as a decimal.</span></label>
+                    <input type="text" name="longitude" pattern="-?\d+\.?\d*" min="-180" max="180" value="{{ in_data.REOPT_INPUTS.get('longitude','-89.6501') }}"/>
+                </div>
+			</div>
 
             <div id="critLoads">
             </div>
@@ -968,10 +965,21 @@
 		for (var i = 0; i < inputs.length; i++) {
 			var input = inputs[i];
 			if (!input.checkValidity()) {
-			valid = false;
-			input.style.border = "1px solid red";
+				valid = false;
+				input.style.border = "1px solid red";
+			} else if ( (input.hasAttribute('min') && !(Number(input.value) >= Number(input.min))) || (input.hasAttribute('max') && !(Number(input.value) <= Number(input.max))) ) {
+				valid = false;
+				input.style.border = "1px solid red";
+			} else if (input.hasAttribute('step')) {
+				const step = Number(input.step);
+				const val = Number(input.value);
+				const tolerance = 1e-15; // Need to justify close enough to 0 because of floating point division oddities.
+				if (step > 0 && val % step != 0 && Math.abs(val % step) > tolerance) {
+					valid = false;
+					input.style.border = "1px solid red";
+				}
 			} else {
-			input.style.border = "";
+				input.style.border = "";
 			}
 		}
 		return valid;
@@ -1232,13 +1240,19 @@
 
 		// Upload DSS circuit. Get loads.
 		$('#upload-file-btn').click(function() {
+			var model_dir = $('input[name="MODEL_DIR"]').val()
 			// Do not proceed if model has no name.
-			if ($('input[name="MODEL_DIR"]').val() === '') {
+			if (model_dir === '') {
 				alert('Please specify a model name.')
 				return 
 			}
+			// Do not proceed if input contains capital letters.
+			const pattern = new RegExp('[A-Z]');
+			if (pattern.test(model_dir)) {
+				alert('Model names must be entirely lowercase. Please return to Step 1 and provide Model Name with lowercase input.')
+				return
+			}
 			var form_data = new FormData($('#upload-file')[0]);
-			var model_dir = $('input[name="MODEL_DIR"]').val()
 			form_data.append('MODEL_DIR',model_dir)
 			$.ajax({
 				type: 'POST',
@@ -1307,6 +1321,7 @@
 			if (form1Valid && form2Valid) {
 				// Submit the forms
 				submitEverything();
+				// console.log('Submitting form.')
 			} else {
 				// Show alert and highlight incorrect fields
 				if (!form1Valid) {

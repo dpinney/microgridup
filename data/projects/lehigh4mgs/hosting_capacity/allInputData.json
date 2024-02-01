@@ -1,0 +1,11 @@
+{
+    "modelType": "hostingCapacity",
+    "feederName1": "circuit.dss",
+    "optionalCircuitFile": "on",
+    "traditionalHCMaxTestkw": 11348.18499404,
+    "runAmiAlgorithm": "off",
+    "created": "2024-02-01 02:08:19.516093",
+    "runStartTime": "2024-02-01T02:08:19.627322",
+    "runtimeEst_min": 1.0,
+    "runTime": "0:00:00"
+}

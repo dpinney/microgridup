@@ -91,7 +91,10 @@ def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, logg
 		total_generation = 0
 		for ob in all_generation:
 			total_generation += float(ob.get('kw'))
-		data['In-rush as % of total generation'].append(round(100*sum(expected_inrush.values())/total_generation, 3))
+		if total_generation == 0:
+			data['In-rush as % of total generation'].append(None)
+		else:
+			data['In-rush as % of total generation'].append(round(100*sum(expected_inrush.values())/total_generation, 3))
 
 		# Soft Start load (kW)
 		data['Soft Start load (kW)'].append(round(gradual_load_pickup(dssTree, loads, motor_perc), 3))
@@ -643,7 +646,8 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 	fig.add_vline(x=end_time, line=outage_line_style)
 	offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
-def play(pathToDss, workDir, microgrids, faultedLine, i, logger):
+def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_length, logger):
+	assert isinstance(faulted_lines, str)
 	actions = {}
 	print('CONTROLLING ON', microgrids)
 	logger.warning(f'CONTROLLING ON {microgrids}')
@@ -653,24 +657,26 @@ def play(pathToDss, workDir, microgrids, faultedLine, i, logger):
 	if curr_dir != workDir:
 		os.chdir(workDir)
 	# Read in inputs.
-	with open(f'reopt_final_{i}/allInputData.json') as file:
-		inputs = json.load(file)
-	outageStart = int(inputs['outage_start_hour'])
-	lengthOfOutage = int(inputs['outageDuration'])
-	outageEnd = outageStart + lengthOfOutage
+	outageEnd = outage_start + outage_length
 	# Read in the circuit information.
 	dssTree = opendss.dssConvert.dssToTree(pathToDss)
 	# Add the fault, modeled as a 3 phase open, to the actions.
-	actions[outageStart] = f'''
-		open object=line.{faultedLine} term=1
-		open object=line.{faultedLine} term=2
-		open object=line.{faultedLine} term=3
-	'''
-	actions[outageEnd] = f'''
-		close object=line.{faultedLine} term=1
-		close object=line.{faultedLine} term=2
-		close object=line.{faultedLine} term=3
-	'''
+	faulted_lines = faulted_lines.split(',')
+	open_line_actions = ''
+	close_line_actions = ''
+	for faulted_line in faulted_lines:
+		open_line_actions += f'''
+			open object=line.{faulted_line} term=1
+			open object=line.{faulted_line} term=2
+			open object=line.{faulted_line} term=3
+		'''
+		close_line_actions += f'''
+			close object=line.{faulted_line} term=1
+			close object=line.{faulted_line} term=2
+			close object=line.{faulted_line} term=3
+		'''
+	actions[outage_start] = open_line_actions
+	actions[outageEnd] = close_line_actions
 	actions[1] = ''
 	# Initialize dict of vsource ratings 
 	big_gen_ratings = {}
@@ -695,15 +701,17 @@ def play(pathToDss, workDir, microgrids, faultedLine, i, logger):
 				pass
 		# Have all microgrids switch out of the circuit during fault.
 		switch_name = mg_values['switch']
-		actions[outageStart] += f'''
-			open object=line.{switch_name} term=1
-			open object=line.{switch_name} term=2
-			open object=line.{switch_name} term=3
+		# HACK: we don't store whether the switch is a line or transformer in the microgrid dict, so make a best guess
+		switch_type = opendss._getByName(dssTree, switch_name)['object'].split('.')[0]
+		actions[outage_start] += f'''
+			open object={switch_type}.{switch_name} term=1
+			open object={switch_type}.{switch_name} term=2
+			open object={switch_type}.{switch_name} term=3
 		'''
 		actions[outageEnd] += f'''
-			close object=line.{switch_name} term=1
-			close object=line.{switch_name} term=2
-			close object=line.{switch_name} term=3
+			close object={switch_type}.{switch_name} term=1
+			close object={switch_type}.{switch_name} term=2
+			close object={switch_type}.{switch_name} term=3
 		'''
 		# Get all microgrid fossil units, sorted by size
 		gen_bus = mg_values['gen_bus']
@@ -749,7 +757,7 @@ def play(pathToDss, workDir, microgrids, faultedLine, i, logger):
 				calcv
 			'''
 			#Enable/disable the diesel vsources during the outage via actions.
-			actions[outageStart] += f'''
+			actions[outage_start] += f'''
 				close {line_name}
 				calcv
 			'''
@@ -760,23 +768,23 @@ def play(pathToDss, workDir, microgrids, faultedLine, i, logger):
 		else:
 			manual_balance_approach = True
 		# Manually construct battery loadshapes for outage.
-		dssTree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw = do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTree, logger)
+		dssTree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw = do_manual_balance_approach(outage_start, outageEnd, mg_key, mg_values, dssTree, logger)
 		# Manual Balance Approach plotting call.
 		if manual_balance_approach == True:
-			fname = plot_manual_balance_approach(mg_key, 2019, outageStart, outageEnd, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw)
+			fname = plot_manual_balance_approach(mg_key, 2019, outage_start, outageEnd, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw)
 			rengen_fnames.append(fname)
-			rengen_mgs[mg_key] = {"All loads loadshapes during outage (kw)":list(all_loads_shapes_kw[outageStart:outageEnd]),
-			"All rengen loadshapes during outage (kw)":list(all_rengen_shapes[outageStart:outageEnd]),
+			rengen_mgs[mg_key] = {"All loads loadshapes during outage (kw)":list(all_loads_shapes_kw[outage_start:outageEnd]),
+			"All rengen loadshapes during outage (kw)":list(all_rengen_shapes[outage_start:outageEnd]),
 			"Cumulative battery loadshape during outage (kw)":list(new_batt_loadshape),
 			"Surplus rengen":total_surplus}
 	# print("big_gen_ratings",big_gen_ratings)
 	# print("rengen_mgs",rengen_mgs)
 	# Additional calcv to make sure the simulation runs.
-	actions[outageStart] += f'calcv\n'
+	actions[outage_start] += f'calcv\n'
 	actions[outageEnd] += f'calcv\n'
 	# Write the adjusted opendss file with new kw, generators.
 	opendss.dssConvert.treeToDss(dssTree, 'circuit_control.dss')
-	# Run the simulation
+	# Run the simulation.  can hang, so wait at most 4 minutes for it to complete
 	FPREFIX = 'timezcontrol'
 	opendss.newQstsPlot(
 		'circuit_control.dss',
@@ -807,13 +815,13 @@ def play(pathToDss, workDir, microgrids, faultedLine, i, logger):
 				for line in reader:
 					writer.writerow(line)
 	# Generate the output charts.
-	make_chart(f'{FPREFIX}_source_and_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Generator Output", "Average Hourly kW", outageStart, lengthOfOutage, batt_cycle_chart=True, fossil_loading_chart=True, vsource_ratings=big_gen_ratings, rengen_mgs=rengen_mgs)
-	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, dssTree, "Load Voltage", "PU", outageStart, lengthOfOutage, ansi_bands=True, rengen_mgs=rengen_mgs)
+	make_chart(f'{FPREFIX}_source_and_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Generator Output", "Average Hourly kW", outage_start, outage_length, batt_cycle_chart=True, fossil_loading_chart=True, vsource_ratings=big_gen_ratings, rengen_mgs=rengen_mgs)
+	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, dssTree, "Load Voltage", "PU", outage_start, outage_length, ansi_bands=True, rengen_mgs=rengen_mgs)
 	try:
-		make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], 2019, microgrids, dssTree, "Tap Position", "PU", outageStart, lengthOfOutage)
+		make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], 2019, microgrids, dssTree, "Tap Position", "PU", outage_start, outage_length)
 	except:
 		pass #TODO: better detection of missing control data.
-	plot_inrush_data(pathToDss, microgrids, f'{FPREFIX}_inrush_plot.html', outageStart, outageEnd, logger, vsourceRatings=big_gen_ratings)
+	plot_inrush_data(pathToDss, microgrids, f'{FPREFIX}_inrush_plot.html', outage_start, outageEnd, logger, vsourceRatings=big_gen_ratings)
 	# Write final output file.
 	output_slug = '''	
 		<head>
@@ -822,19 +830,29 @@ def play(pathToDss, workDir, microgrids, faultedLine, i, logger):
 				iframe {width:100%; height:600px; border:0;}
 			</style>
 		</head>
-		<body style="margin:0px">
-			<iframe src="timezcontrol_source_and_gen.csv.plot.html"></iframe>
+		<body style="margin:0px">'''
+	if os.path.isfile('timezcontrol_source_and_gen.csv.plot.html'):
+		output_slug += '''
+			<iframe src="timezcontrol_source_and_gen.csv.plot.html"></iframe>'''
+	if os.path.isfile('timezcontrol_load.csv.plot.html'):
+		output_slug += '''
 			<iframe src="timezcontrol_load.csv.plot.html"></iframe>'''
 	if os.path.isfile('timezcontrol_control.csv.plot.html'):
-		output_slug +='''
+		output_slug += '''
 			<iframe src="timezcontrol_control.csv.plot.html"></iframe>'''
-	output_slug +='''
-			<iframe src="timezcontrol_source_and_gen.csv_battery_cycles.plot.html"></iframe>
+	if os.path.isfile('timezcontrol_source_and_gen.csv_battery_cycles.plot.html'):
+		output_slug += '''
+			<iframe src="timezcontrol_source_and_gen.csv_battery_cycles.plot.html"></iframe>'''
+	output_slug += '''
 		</body>'''
 	print(f'Control microgrids count {len(microgrids)} and renewable count {len(rengen_fnames)}')
 	logger.warning(f'Control microgrids count {len(microgrids)} and renewable count {len(rengen_fnames)}')
 	if len(microgrids) != len(rengen_fnames):
-		output_slug = output_slug + '''<iframe src="timezcontrol_source_and_gen.csv_fossil_loading.plot.html"></iframe>
+		if os.path.isfile('timezcontrol_source_and_gen.csv_fossil_loading.plot.html'):
+			output_slug += '''
+			<iframe src="timezcontrol_source_and_gen.csv_fossil_loading.plot.html"></iframe>'''
+		if os.path.isfile('timezcontrol_source_and_gen.csv_fuel_consumption.plot.html'):
+			output_slug += '''
 			<iframe src="timezcontrol_source_and_gen.csv_fuel_consumption.plot.html"></iframe>'''
 	for rengen_name in rengen_fnames:
 		# insert renewable manual balance plots.
@@ -846,22 +864,32 @@ def play(pathToDss, workDir, microgrids, faultedLine, i, logger):
 	os.chdir(curr_dir)
 
 def _tests():
-	_myDir = os.path.abspath(os.path.dirname(__file__))
 	# - This is needed because these files are in the root of the Docker container and paths like "//" are invalid
+	_myDir = os.path.abspath(os.path.dirname(__file__))
 	if _myDir == '/':
 		_myDir = ''
-	FAULTED_LINE = 670671
+	FAULTED_LINES = '670671'
 	with open('testfiles/test_params.json') as file:
 		test_params = json.load(file)
 	control_test_args = test_params['control_test_args']
 	# Testing microgridup_control.play() (End-to-end test of module).
 	logger = microgridup.setup_logging(f'{_myDir}/logs.txt')
 	for _dir in control_test_args:
+		model_dir = f'{_myDir}/data/projects/{_dir}'
+		curr_dir = os.getcwd()
+		workDir = os.path.abspath(model_dir)
+		if curr_dir != workDir:
+			os.chdir(workDir)
 		if 'lukes' in _dir:
 			continue # NOTE: Remove this statement if support for lukes (multiple points of connection) is added.
 		final_run_count = len(control_test_args[_dir]) - 1 # FULL_NAME is based on the count of the microgrid in the final run.
 		print(f'---------------------------------------------------------\nRunning test of microgridup_control.play() on {_dir}.\n---------------------------------------------------------')
-		play(f'circuit_plusmg_{final_run_count}.dss', f'{_myDir}/data/projects/{_dir}', control_test_args[_dir], FAULTED_LINE, final_run_count, logger)
+		with open(f'reopt_mg{final_run_count}/allInputData.json') as file:
+			allInputData = json.load(file)
+		outage_start = int(allInputData['outage_start_hour'])
+		outage_length = int(allInputData['outageDuration'])
+		play(f'circuit_plus_mgAll.dss', f'{_myDir}/data/projects/{_dir}', control_test_args[_dir], FAULTED_LINES, outage_start, outage_length, logger)
+		os.chdir(curr_dir)
 	return print('Ran all tests for microgridup_control.py.')
 
 if __name__ == '__main__':

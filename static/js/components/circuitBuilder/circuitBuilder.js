@@ -1,4 +1,4 @@
-export { CircuitElement, CircuitModel, CircuitController, CircuitTableView, CircuitUserControlsView, CsvLoadParser };
+export { CircuitElement, CircuitModel, CircuitController, CircuitTableView, CircuitUserControlsView, CsvLoadParser, OutageLocationInputView };
 import { Modal, getTrashCanSvg } from '../modal.js';
 
 class CircuitElement {
@@ -210,7 +210,6 @@ class CsvLoadParser {
     renderContent() {
         const modal = new Modal();
         modal.divElement.id = 'csvLoadParserView';
-        modal.divElement.classList.add('outermostModal');
         const label = document.createElement('label');
         label.classList.add('tooltip');
         label.htmlFor = 'LOAD_CSV';
@@ -221,6 +220,7 @@ class CsvLoadParser {
         label.append(span);
         modal.divElement.append(label);
         const input = document.createElement('input');
+        input.required = true;
         input.type = 'file';
         input.accept = '.csv';
         input.name = 'LOAD_CSV';
@@ -242,7 +242,7 @@ class CsvLoadParser {
         modal.divElement.append(button);
         if (this.modal === null) {
             this.modal = modal;
-        } 
+        }
         if (document.body.contains(this.modal.divElement)) {
             this.modal.divElement.replaceWith(modal.divElement);
             this.modal = modal;
@@ -342,10 +342,8 @@ class CsvLoadParser {
             throw Error('The load profile CSV must contain a number of rows that is a multiple of 8760 (not including the required heading row).');
         }
         this.#csvLoadsElements = csvLoadsElements;
-        for (const e of csvLoadsElements) {
-            for (const ob of this.#observers) {
-                ob.handleNewElement(e);
-            }
+        for (const ob of this.#observers) {
+            ob.handleParsedCsv();
         }
     }
 
@@ -354,6 +352,81 @@ class CsvLoadParser {
      */
     getLoads() {
         return this.#csvLoadsElements;
+    }
+}
+
+class OutageLocationInputView {
+
+    modal;
+    #controller;
+    #input;
+
+    constructor(circuitController) {
+        if (!(circuitController instanceof CircuitController)) {
+            throw TypeError('The "circuitController" argument must be instanceof CircuitController.');
+        }
+        this.modal = null;
+        this.#controller = circuitController;
+        this.renderContent();
+    }
+
+    renderContent() {
+        const modal = new Modal();
+        const label = document.createElement('label');
+        label.classList.add('tooltip');
+        label.htmlFor = 'FAULTED_LINES';
+        label.textContent = 'Outage Location(s)';
+        const span = document.createElement('span');
+        span.classList.add('classic');
+        span.textContent = 'Node number in distribution map where typical outage would take place.';
+        label.append(span);
+        modal.divElement.append(label);
+        const input = document.createElement('input');
+        this.#input = input;
+        input.id = 'FAULTED_LINES';
+        input.name = 'FAULTED_LINES';
+        input.pattern = '\\w+(?:,\\w+)?'
+        input.required = true;
+        this.updateInput();
+        modal.divElement.append(input);
+        if (this.modal === null) {
+            this.modal = modal;
+        }
+        if (document.body.contains(this.modal.divElement)) {
+            this.modal.divElement.replaceWith(modal.divElement);
+            this.modal = modal;
+        }
+    }
+
+    handleNewElement(element) {
+        if (element.getProperty('type') === 'feeder') {
+            this.#controller.model.addObserver(this, element.fullName);
+            this.renderContent();
+        }
+    }
+
+    handleRemovedElement(element) {
+        if (element.getProperty('type') === 'feeder') {
+            this.#controller.model.removeObserver(this, element.fullName);
+            this.renderContent();
+        }
+    }
+
+    handleChangedProperty(element, property, oldPropertyVal, namespace) {
+        if (element.getProperty('type') === 'feeder' && property === 'name' && namespace === 'props') {
+            this.renderContent();
+        }
+    }
+
+    setValue(value) {
+        if (typeof value !== 'string') {
+            throw TypeError('The "value" argument must be typeof "string".');
+        }
+        this.#input.value = value;
+    }
+
+    updateInput() {
+        this.#input.value = this.#controller.model.getElements(element => element.getProperty('type') === 'feeder').map(feeder => feeder.getProperty('name')).join(',');
     }
 }
 
@@ -510,21 +583,22 @@ class CircuitModel {
         const connectedElements = this.getConnectedElements(fullName);
         const allElements = [originalElement, ...connectedElements];
         for (const element of allElements) {
-            const key = this.#removeFromNameToKey(element.fullName);
+            const key = this.#getKey(element.fullName);
+            // - Remove the element (and its children) from the graph before updating any displays
             this.#graph.dropNode(key);
-            if (this.#elementObservers[key] instanceof Array) {
-                for (const ob of this.#elementObservers[key]) {
-                    // - Must notify each individual observer of an element about that element's removal
-                    ob.handleRemovedElement(element);
-                }
+            const copy = Array.from(this.#elementObservers[key]);
+            for (const ob of copy) {
+                // - Must notify each individual observer of an element about that element's removal. When an observer handles the removal, it also
+                //   updates its display. Therefore, the model must be updated (i.e. the element must be removed from the model) BEFORE
+                //   handleRemovedElement() is called in order for the display to remove the element. "Removed from the model" means removed from the
+                //   graph, not removed from this.#nameToKey. removeObserver() requires that the key of the element that's being deleted still exists
+                //   in this.#nameToKey, so don't call this.#removeFromNameToKey() until all of the observers have been removed
+                ob.handleRemovedElement(element);
             }
+            // - Now that the element and all of its children have been removed from the graph, and all the observers have been removed, I can remove
+            //   the element's key from this.#nameToKey
+            this.#removeFromNameToKey(element.fullName);
             delete this.#elementObservers[key];
-        }
-        // - Must notify all graph observers exactly one time that one or more deletions happened
-        //  - If an observer cares about individual nodes, it can listen to each one. If an observer only cares about the graph, then it's only
-        //    told that the original element was deleted
-        for (const ob of this.#graphObservers) {
-            ob.handleRemovedElement(originalElement);
         }
     }
 
@@ -708,24 +782,28 @@ class CircuitUserControlsView {
         this.#createSubmitButton(modal);
         if (this.modal === null) {
             this.modal = modal;
-        } 
+        }
         if (document.body.contains(this.modal.divElement)) {
             this.modal.divElement.replaceWith(modal.divElement);
             this.modal = modal;
         }
     }
 
-    handleNewElement(element) {
-        try { 
-            this.#controller.model.getElement(element.fullName);
-            this.#controller.model.addObserver(this, element.fullName);
-        } catch (e) {
+    /**
+     * - Instead of try-catching in handleNewElement(), I need a different event to listen for. handleNewElement assumes the element is already IN the
+     *   model. That's how it works. If I break that assumption I need a new event type
+     */
+    handleParsedCsv() {
+        this.refreshContent();
+    }
 
-        }
+    handleNewElement(element) {
+        this.#controller.model.addObserver(this, element.fullName);
         this.refreshContent();
     }
 
     handleRemovedElement(element) {
+        this.#controller.model.removeObserver(this, element.fullName);
         this.refreshContent();
     }
 
@@ -1096,7 +1174,6 @@ class CircuitTableView {
      */
     renderContent() {
         const modal = new Modal();
-        modal.divElement.classList.add('outermostModal');
         modal.divElement.id = 'circuitTableView';
         modal.setTitle('Circuit Builder');
         const substationElements = this.#controller.model.getElements(element => {
@@ -1134,7 +1211,7 @@ class CircuitTableView {
         }
         if (this.modal === null) {
             this.modal = modal;
-        } 
+        }
         if (document.body.contains(this.modal.divElement)) {
             this.modal.divElement.replaceWith(modal.divElement);
             this.modal = modal;
@@ -1147,6 +1224,7 @@ class CircuitTableView {
     }
 
     handleRemovedElement(element) {
+        this.#controller.model.removeObserver(this, element.fullName);
         this.renderContent();
     }
 
@@ -1315,5 +1393,3 @@ function test() {
     //document.querySelectorAll('select').forEach(e => e.disabled = true);
     //document.querySelectorAll('button').forEach(e => e.disabled = true);
 }
-
-//main();

@@ -3,7 +3,7 @@ from omf import distNetViz, geo
 from omf.runAllTests import _print_header
 import microgridup_control
 import microgridup_resilience
-from microgridup_design import run_reopt, create_economic_microgrid
+import microgridup_design
 import microgridup_hosting_cap
 import shutil
 import os
@@ -355,7 +355,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		# - Calculate hosting capacity for the initial circuit uploaded by the user or created via the GUI
 		microgridup_hosting_cap.run_hosting_capacity(MODEL_DSS)
 		# - For each microgrid, use REOPT to calculate the optimal amount of new generation assets and to calculate generation power output
-		run_reopt(MICROGRIDS, logger, REOPT_INPUTS, INVALIDATE_CACHE)
+		microgridup_design.run_reopt(MICROGRIDS, logger, REOPT_INPUTS, INVALIDATE_CACHE)
 		# - Go through the REOPT results and iteratively add each microgrid's new generation to the original circuit until all of the new generation
 		#   has been added
 		mg_names_sorted = sorted(MICROGRIDS.keys())
@@ -423,7 +423,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		if os.path.exists("user_warnings.txt"):
 			with open("user_warnings.txt") as myfile:
 				warnings = myfile.read()
-		create_economic_microgrid(MICROGRIDS, logger, REOPT_INPUTS, INVALIDATE_CACHE)
+		microgridup_design.create_economic_microgrid(MICROGRIDS, logger, REOPT_INPUTS, INVALIDATE_CACHE)
 		names_and_folders = {x.split('_')[1]: x for x in sorted([dir_ for dir_ in os.listdir('.') if dir_.startswith('reopt_')])}
 		# generate a decent chart of additional generation.
 		chart_html = summary_charts(stats)

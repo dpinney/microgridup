@@ -1,32 +1,202 @@
-import os, json, shutil, statistics
+import os, json, shutil, statistics, logging
+from pathlib import Path
+from copy import deepcopy
 import jinja2 as j2
 import plotly.graph_objects as go
 import pandas as pd
-from omf.solvers.opendss import dssConvert
 import microgridup
 import microgridup_hosting_cap
-from omf.solvers.REopt import REOPT_API_KEYS
+from omf.models import microgridDesign, __neoMetaModel__
+import concurrent.futures
+
 
 MGU_FOLDER = os.path.abspath(os.path.dirname(__file__))
 if MGU_FOLDER == '/':
 	MGU_FOLDER = '' #workaround for docker root installs
 PROJ_FOLDER = f'{MGU_FOLDER}/data/projects'
 
-def run(MODEL_DIR, REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, lon, existing_generation_dict, api_key, INVALIDATE_CACHE):
-	'''
-	Generate full microgrid design for given microgrid spec dictionary and circuit file (used to gather distribution assets) Generate the microgrid
-	specs for REOpt. SIDE-EFFECTS: generates REOPT_FOLDER
 
-	- MODEL_DIR: the outermost model directory
-	- REOPT_FOLDER: a inner directory within the outermost model directory for running REopt on a particular microgrid
-	- microgrid: a microgrid dict
-	- logger: a logger instance
-	- REOPT_INPUTS: arbitrarily set user input parameters
-	- mg_name: the name of the microgrid
-	- lat: latitude
-	- lon: longitude
-	- existing_generation_dict: a dict that contains generation information from the circuit
-	- INVALIDATE_CACHE: whether to reuse existing REopt results
+def run_reopt(microgrids, logger, reopt_inputs, invalidate_cache):
+	'''
+	:param microgrids: all of the microgrid definitions (as defined by microgrid_gen_mgs.py) for the given circuit
+	:type microgrids: dict
+	:param logger: a logger
+	:type logger: logger
+	:param reopt_inputs: REopt inputs that must be set by the user. All microgrids for a given circuit share these same REopt parameters.
+	:type reopt_inputs: dict
+	:param invalidate_cache: whether to ignore an existing directory of cached REopt results for all of the microgrids of a circuit
+	:return: don't return anything. Instead, just read the corresponding allInputData.json and allOutputData.json file for each microgrid to build a
+	    new DSS file in microgridup_hosting_cap.py
+	:rtype: None
+	'''
+	assert isinstance(microgrids, dict)
+	assert isinstance(logger, logging.Logger)
+	assert isinstance(reopt_inputs, dict)
+	assert isinstance(invalidate_cache, bool)
+	create_production_factor_series_csv(microgrids, logger, invalidate_cache)
+	# - Run REopt for each microgrid
+	process_argument_lists = []
+	for mg_name in microgrids.keys():
+		microgrid = microgrids[mg_name]
+		# - Apply microgrid parameter overrides
+		mg_specific_reopt_inputs = deepcopy(reopt_inputs)
+		for param, val in mg_specific_reopt_inputs['mgParameterOverrides'][mg_name].items():
+			mg_specific_reopt_inputs[param] = str(val)
+		del mg_specific_reopt_inputs['mgParameterOverrides']
+		# - Generate a set of arguments for a single process
+		existing_generation_dict = microgridup_hosting_cap.get_microgrid_existing_generation_dict('circuit.dss', microgrid)
+		lat, lon = microgridup_hosting_cap.get_microgrid_coordinates('circuit.dss', microgrid)
+		process_argument_lists.append([f'reopt_{mg_name}', microgrid, logger, mg_specific_reopt_inputs, mg_name, lat, lon, existing_generation_dict, invalidate_cache])
+		# - Uncomment to run in single-process mode
+		#run(f'reopt_{mg_name}', microgrid, logger, mg_specific_reopt_inputs, mg_name, lat, lon, existing_generation_dict, invalidate_cache)
+	# - Uncomment to run in multiprocessing mode
+	with concurrent.futures.ProcessPoolExecutor() as executor:
+		future_list = []
+		for process_argument_list in process_argument_lists:
+			future_list.append(executor.submit(run, *process_argument_list))
+		for f in concurrent.futures.as_completed(future_list):
+			if f.exception() is not None:
+				raise Exception(f'The REopt optimization for the microgrid {f.exception().filename.split("/")[0].split("_")[1]} failed because the optimizer determined there was no feasible solution for the given inputs.')
+
+
+def create_production_factor_series_csv(microgrids, logger, invalidate_cache):
+	# - Do an initial REopt run to get "production_factor_series" vectors for solar and wind generators. Basically, situtations can occur where solar
+	#   or wind generators are in a circuit, but are not included in a microgrid (or the microgrid that they are included in has no critical loads).
+	#   If either of these situations occur, our inputs to REopt are configured such that no "PV" or "Wind" data will be present in the REopt output
+	#   and as a result we won't be able to generate load shapes for those generators. To get around this issue, we just do an extra REopt run with
+	#   solar and wind enabled and then actual microgrids can read the "production_factor_series" data as needed
+	if not Path('production_factor_series.csv').exists() or invalidate_cache is True:
+		microgridDesign.new('reopt_loadshapes')
+        # - The load shape for production_factor_series.csv needs to be the same as for the microgrid(s) in order to use the same wind turbine size
+        #   class. This is tricky because technically different microgrids could have sufficiently different load shapes such that one microgrid could
+        #   use a smaller size class and another microgrid would use a larger size class, so which size class should production_factor_series.csv use?
+        #   For now, we just use whatever size class mg0 uses and assume all microgrids have similar load profiles (and thus, similar size classes)
+        # - Could make use multiprocessing if we had to for 4 simultaneous REopt runs
+		set_allinputdata_load_shape_parameters('reopt_loadshapes', f'loads.csv', list(microgrids.values())[0], logger)
+		with open('reopt_loadshapes/allInputData.json') as f:
+			allInputData = json.load(f)
+		lat, lon = microgridup_hosting_cap.get_microgrid_coordinates('circuit.dss', list(microgrids.values())[0])
+        # - The coordinates for production_factor_series.csv need to be the same as for the microgrid(s) in order to use the same historical REopt
+        #   wind data
+		allInputData['latitude'] = lat
+		allInputData['longitude'] = lon
+		# - We only care about the inputs to the model insofar as they 1) include solar and wind output and 2) the model completes as quickly as possible
+		allInputData['solar'] = 'on'
+		allInputData['wind'] = 'on'
+		allInputData['battery'] = 'off'
+		allInputData['fossil'] = 'off'
+		with open('reopt_loadshapes/allInputData.json', 'w') as f:
+			json.dump(allInputData, f, indent=4)
+		__neoMetaModel__.runForeground('reopt_loadshapes')
+		with open('reopt_loadshapes/results.json') as f:
+			results = json.load(f)
+		shutil.rmtree('reopt_loadshapes')
+		production_factor_series_df = pd.DataFrame()
+		production_factor_series_df['pv_production_factor_series'] = pd.Series(results['PV']['production_factor_series'])
+		production_factor_series_df['wind_production_factor_series'] = pd.Series(results['Wind']['production_factor_series'])
+		production_factor_series_df.to_csv('production_factor_series.csv', index=False)
+
+
+def create_economic_microgrid(microgrids, logger, reopt_inputs, invalidate_cache):
+	'''
+	- Same parameters as run_reopt
+    - Currently, we do NOT mutate the microgrids dict that contains the other real microgrids because we don't need to
+	'''
+	assert isinstance(microgrids, dict)
+	assert isinstance(logger, logging.Logger)
+	assert isinstance(reopt_inputs, dict)
+	assert isinstance(invalidate_cache, bool)
+	# - Add an extra "economic" microgrid to see if there's additional peak-shaving potential
+	economic_microgrid = {
+		'loads': [],
+		'gen_obs_existing': [],
+		'critical_load_kws': []
+	}
+	for mg in microgrids.values():
+		economic_microgrid['loads'].extend(mg['loads'])
+		economic_microgrid['switch'] = mg['switch']
+		economic_microgrid['gen_bus'] = mg['gen_bus']
+		economic_microgrid['gen_obs_existing'].extend(mg['gen_obs_existing'])
+		economic_microgrid['critical_load_kws'].extend(mg['critical_load_kws'])
+	if not Path('reopt_mgBonusGen').exists() or invalidate_cache is True:
+		microgridDesign.new('reopt_mgBonusGen')
+		with open('reopt_mgBonusGen/allInputData.json') as f:
+			allInputData = json.load(f)
+		lat, lon = microgridup_hosting_cap.get_microgrid_coordinates('circuit.dss', list(microgrids.values())[0])
+		allInputData['latitude'] = lat
+		allInputData['longitude'] = lon
+		# - Always set outage_start_hour to 0 because we don't want to run a REopt resilience analysis
+		allInputData['outage_start_hour'] = '0'
+		# - We do not apply the calculated maximum technology limits to the economic microgrid. That's the point. So set the limits to be the
+		#   user-inputted limits
+		allInputData['batteryCapacityMax'] = reopt_inputs['batteryCapacityMax']
+		allInputData['batteryPowerMax'] = reopt_inputs['batteryPowerMax']
+		allInputData['solarMax'] = reopt_inputs['solarMax']
+		allInputData['windMax'] = reopt_inputs['windMax']
+		allInputData['dieselMax'] = reopt_inputs['dieselMax']
+		# - The existing solar, wind, fossil, and batteries of the economic microgrid are calculated by including the existing generation and storage of
+		#   each actual microgrid AND the new generation and storage recommended by REopt for each microgrid. As a shortcut, these values can be
+		#   calculated simply by reading the "size_kw" and related properties from the results.json files of the reopt runs of the actual microgrids
+		# - Since dictionary insertion is (effectively) a given in Python 3.6, the other microgrids should have completed their REopt runs before the
+		#   economic microgrid parameters are set
+		allInputData['batteryKwhExisting'] = 0
+		allInputData['batteryKwExisting'] = 0
+		allInputData['solarExisting'] = 0
+		allInputData['windExisting'] = 0
+		allInputData['genExisting'] = 0
+		for mg_name in microgrids.keys():
+			with open(f'reopt_{mg_name}/results.json') as f:
+				results = json.load(f)
+			if 'ElectricStorage' in results:
+				allInputData['batteryKwhExisting'] += results['ElectricStorage']['size_kwh']
+				allInputData['batteryKwExisting'] += results['ElectricStorage']['size_kw']
+			else:
+				allInputData['batteryKwhExisting'] += 0
+				allInputData['batteryKwExisting'] += 0
+			if 'PV' in results:
+				allInputData['solarExisting'] += results['PV']['size_kw']
+			else:
+				allInputData['solarExisting'] += 0
+			if 'Wind' in results:
+				allInputData['windExisting'] += results['Wind']['size_kw']
+			else:
+				allInputData['windExisting'] += 0
+			if 'Generator' in results:
+				allInputData['genExisting'] += results['Generator']['size_kw']
+			else:
+				allInputData['genExisting'] += 0
+		with open('reopt_mgBonusGen/allInputData.json', 'w') as f:
+			json.dump(allInputData, f, indent=4)
+		# - Run REopt
+		__neoMetaModel__.runForeground('reopt_mgBonusGen')
+		# - Write output
+		microgrid_design_output('reopt_mgBonusGen/allOutputData.json', 'reopt_mgBonusGen/allInputData.json', 'reopt_mgBonusGen/cleanMicrogridDesign.html')
+
+
+def run(REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, lon, existing_generation_dict, INVALIDATE_CACHE):
+	'''
+	Generate full microgrid design for given microgrid spec dictionary and circuit file (used to gather distribution assets). Generate the microgrid
+	specs for REOpt.
+
+	:param REOPT_FOLDER: a directory within the outermost model directory for running REopt on a particular microgrid
+    :type REOPT_FOLDER: str
+    :param microgrid: a microgrid definition
+    :type microgrid: dict
+    :param logger: a logger instance
+	:type logger: Logger
+    :param REOPT_INPUTS: user-defined input parameters for REOPT
+    :type REOPT_INPUTS: dict
+    :param mg_name: the name of the microgrid
+    :type mg_name: str
+    :param lat: latitude
+    :type lat: float
+	:param lon: longitude
+	:type lon: float
+    :param existing_generation_dict: the existing generation in microgrid
+    :type existing_generation_dict: dict
+    :param INVALIDATE_CACHE: whether to reuse the existing REOPT results
+    :type INVALIDATE_CACHCE: float
+	:rtype: None
 	'''
 	assert isinstance(INVALIDATE_CACHE, bool)
 	if os.path.isdir(REOPT_FOLDER) and INVALIDATE_CACHE == False:
@@ -42,9 +212,8 @@ def run(MODEL_DIR, REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, 
 	shutil.rmtree(REOPT_FOLDER, ignore_errors=True)
 	omf.models.microgridDesign.new(REOPT_FOLDER)
 	set_allinputdata_load_shape_parameters(REOPT_FOLDER, f'loads.csv', microgrid, logger)
-	set_allinputdata_outage_parameters(REOPT_FOLDER, f'{REOPT_FOLDER}/loadShape.csv', REOPT_INPUTS["outageDuration"])
-	critical_load_percent = get_critical_load_percent(f'{REOPT_FOLDER}/loadShape.csv', microgrid, mg_name, logger)
-	set_allinputdata_user_parameters(REOPT_FOLDER, REOPT_INPUTS, critical_load_percent, lat, lon, api_key)
+	set_allinputdata_outage_parameters(REOPT_FOLDER, f'{REOPT_FOLDER}/loadShape.csv', REOPT_INPUTS['outageDuration'])
+	set_allinputdata_user_parameters(REOPT_FOLDER, REOPT_INPUTS, lat, lon)
 	set_allinputdata_battery_parameters(REOPT_FOLDER, existing_generation_dict['battery_kw_existing'], existing_generation_dict['battery_kwh_existing'])
 	set_allinputdata_solar_parameters(REOPT_FOLDER, existing_generation_dict['solar_kw_existing'])
 	set_allinputdata_wind_parameters(REOPT_FOLDER, existing_generation_dict['wind_kw_existing'])
@@ -54,38 +223,48 @@ def run(MODEL_DIR, REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, 
     # - Write output
 	microgrid_design_output(f'{REOPT_FOLDER}/allOutputData.json', f'{REOPT_FOLDER}/allInputData.json', f'{REOPT_FOLDER}/cleanMicrogridDesign.html')
 
+
 def set_allinputdata_load_shape_parameters(REOPT_FOLDER, load_csv_path, microgrid, logger):
 	'''
-	- Write loadShape.csv. loadShape.csv is different from loads.csv because loadShape.csv is the sum of load shapes of only the loads (both critical
-	  and non-critical) in the microgrid
-    - Set related parameters in allInputData.json
+	- Write loadShape.csv. loadShape.csv contains a single column that is the sum of every load that is in loads.csv (i.e. it is the sum of all the
+	  loads across entire installation)
+	    - Previously, loadShape.csv used to contain a single column that was only the sum of the loads (both critical and non-critical) in the given
+	      microgrid
+    - Set allInputData['loadShape'] equal to the contents of loadShape.csv
+    - Set allInputData['criticalLoadShape'] equal to the sum of the columns in loads.csv that correspond to critical loads in the given microgrid
+        - Previously, allInputData['criticalLoadFactor'] was used instead, but this parameter is no longer used
 	'''
-	# Get the microgrid total loads
-	load_df = pd.read_csv(load_csv_path)
-	mg_load_df = pd.DataFrame()
-	loads = microgrid['loads']
-	mg_load_df['load'] = [0 for x in range(8760)]
-	for load_name in loads:
-		try:
-			mg_load_df['load'] = mg_load_df['load'] + load_df[load_name]
-		except:
-			print('ERROR: loads in Load Data (.csv) do not match loads in circuit.')
-			logger.warning('ERROR: loads in Load Data (.csv) do not match loads in circuit.')
-	mg_load_df.to_csv(REOPT_FOLDER + '/loadShape.csv', header=False, index=False)
+	load_df = pd.read_csv(load_csv_path)[microgrid['loads']]
+	# - Write loadShape.csv
+	load_shape_series = load_df.apply(sum, axis=1)
+	load_shape_series.to_csv(REOPT_FOLDER + '/loadShape.csv', header=False, index=False)
 	with open(REOPT_FOLDER + '/allInputData.json') as f:
 		allInputData = json.load(f)
+	allInputData['fileName'] = 'loadShape.csv'
 	with open(REOPT_FOLDER + '/loadShape.csv') as f:
 		allInputData['loadShape'] = f.read()
-	allInputData['fileName'] = 'loadShape.csv'
+    # - Write criticalLoadshape.csv
+	if len(microgrid['loads']) != len(microgrid['critical_load_kws']):
+		raise Exception('The number of entries in microgrid["loads"] does not match the number of entries in microgrid["critical_load_kws"].')
+	column_selection = []
+	for tup in zip(microgrid['loads'], microgrid['critical_load_kws']):
+		if float(tup[1]) > 0:
+			column_selection.append(tup[0])
+	critical_load_shape_series = load_df[column_selection].apply(sum, axis=1)
+	critical_load_shape_series.to_csv(REOPT_FOLDER + '/criticalLoadShape.csv', header=False, index=False)
+	with open(REOPT_FOLDER + '/criticalLoadShape.csv') as f:
+		allInputData['criticalLoadShape'] = f.read()
+	allInputData['criticalFileName'] = 'criticalLoadShape.csv'
 	with open(REOPT_FOLDER + '/allInputData.json', 'w') as f:
 		json.dump(allInputData, f, indent=4)
+
 
 def set_allinputdata_outage_parameters(REOPT_FOLDER, loadshape_csv_path, outage_duration):
 	with open(REOPT_FOLDER + '/allInputData.json') as f:
 		allInputData = json.load(f)
 	# Set the REopt outage to be centered around the max load in the loadshape
-	mg_load_df = pd.read_csv(loadshape_csv_path)
-	max_load_index = int(mg_load_df.idxmax())
+	mg_load_series = pd.read_csv(loadshape_csv_path, header=None)[0]
+	max_load_index = int(mg_load_series.idxmax())
 	# reset the outage timing such that the length of REOPT_INPUTS falls half before and half after the hour of max load
 	outage_duration = int(outage_duration)
 	if max_load_index + outage_duration/2 > 8760:
@@ -99,111 +278,133 @@ def set_allinputdata_outage_parameters(REOPT_FOLDER, loadshape_csv_path, outage_
 	with open(REOPT_FOLDER + '/allInputData.json', 'w') as f:
 		json.dump(allInputData, f, indent=4)
 
-def get_critical_load_percent(loadshape_csv_path, microgrid, mg_name, logger):
-	''' Set the critical load percent input for REopt by finding the ratio of max critical load kws to the max kw of the loadshape of that mg'''
-	mg_load_df = pd.read_csv(loadshape_csv_path)
-	max_load = float(mg_load_df.max())
-	# add up all max kws from critical loads to support during an outage
-	max_crit_load = sum(microgrid['critical_load_kws'])
-	if max_crit_load > max_load:
-		warning_message = f'The critical loads specified for microgrid {mg_name} are larger than the max kw of the total loadshape.\n'
-		print(warning_message)
-		logger.warn(warning_message)
-		with open("user_warnings.txt", "a") as myfile:
-			myfile.write(warning_message)
-	critical_load_percent = max_crit_load/max_load
-	if critical_load_percent > 2:
-		print(f'This critical load percent of {critical_load_percent} is over 2.0, the maximum allowed. Setting critical load percent to 2.0.\n')
-		logger.warn(f'This critical load percent of {critical_load_percent} is over 2.0, the maximum allowed. Setting critical load percent to 2.0.\n')
-		critical_load_percent = 2.0
-	return critical_load_percent
 
-def set_allinputdata_user_parameters(REOPT_FOLDER, REOPT_INPUTS, critical_load_percent, lat, lon, api_key):
+def set_allinputdata_user_parameters(REOPT_FOLDER, REOPT_INPUTS, lat, lon):
+	'''
+	- Set all of the REopt input parameters specified by the user
+    - We used to use ["electric_load"]["critical_load_fraction"] to set ["electric_load"]["critical_loads_kw"], but we no longer do. Instead, we set
+      ["electric_load"]["critical_loads_kw"] directly
+        - ["electric_load"]["critical_load_fraction"] is still set in microgridDesign.py, but the REopt output shows it isn't used when
+          ["electric_load"["critical_loads_kw"] is set directly, so it's fine
+	'''
 	with open(REOPT_FOLDER + '/allInputData.json') as f:
 		allInputData = json.load(f)
 	# Pulling user defined inputs from REOPT_INPUTS.
 	for key in REOPT_INPUTS:
 		allInputData[key] = REOPT_INPUTS[key]
-	allInputData['criticalLoadFactor'] = str(critical_load_percent)
 	allInputData['latitude'] = float(lat)
 	allInputData['longitude'] = float(lon)
-	allInputData['api_key'] = api_key
 	with open(REOPT_FOLDER + '/allInputData.json', 'w') as f:
 		json.dump(allInputData, f, indent=4)
+
 
 def set_allinputdata_battery_parameters(REOPT_FOLDER, battery_kw_existing, battery_kwh_existing):
+	'''
+	- If new batteries are enabled, set ['ElectricStorage']['max_kwh'] equal to the lesser of (1) the total kWh consumed during the outage window or
+	  (2) the user-defined maximum kWh
+    - If new batteries are not enabled, and there are existing batteries, set ['ElectricStorage']['max_kwh'] equal to the amount of existing battery
+      capacity and set ['ElectricStorage']['max_kw'] equal to the amount of existing battery power. If there are not existing batteries, set
+      ['ElectricStorage']['max_kwh'] equal to 0 and ['ElectricStorage']['max_kw'] equal to 0
+
+	'''
+    # - How do we want to handle existing vs new batteries?
+    #   - There are existing batteries and new batteries are enabled
+	#       - Old approach: Pretend the existing batteries don't exist by setting existing kWh and kW to 0
+    #       - New approach: ???
+    #   - There are no existing batteries and new batteries are enabled
+    #       - No problem
+    #   - There are existing batteries are new batteries are not enabled
+	#       - Set the max kWh and kW REopt parameters to the existing kWh and kW values in the circuit
+    #   - There are no existing batteries and new batteries are not enabled
+    #       - No problem
 	with open(REOPT_FOLDER + '/allInputData.json') as f:
 		allInputData = json.load(f)
-	# do not analyze existing batteries if multiple existing batteries exist
-	if float(battery_kwh_existing) > 1:
-		allInputData['batteryKwExisting'] = 0
-		allInputData['batteryKwhExisting'] = 0
-		# multiple_existing_battery_message = f'More than one existing battery storage asset is specified on microgrid {mg_name}. Configuration of microgrid controller is not assumed to control multiple existing batteries, and thus all existing batteries will be removed from analysis of {mg_name}.\n'
-		# print(multiple_existing_battery_message)
-		# if path.exists("user_warnings.txt"):
-		# 	with open("user_warnings.txt", "r+") as myfile:
-		# 		if multiple_existing_battery_message not in myfile.read():
-		# 			myfile.write(multiple_existing_battery_message)
-		# else:
-		# 	with open("user_warnings.txt", "a") as myfile:
-		# 		myfile.write(multiple_existing_battery_message)
-	elif float(battery_kwh_existing) > 0:
-		allInputData['batteryKwExisting'] = str(battery_kw_existing)
-		allInputData['batteryPowerMin'] = str(battery_kw_existing)
-		allInputData['batteryKwhExisting'] = str(battery_kwh_existing)
-		allInputData['batteryCapacityMin'] = str(battery_kwh_existing)
-		allInputData['battery'] = 'on'
+	allInputData['batteryKwhExisting'] = str(battery_kwh_existing)
+	allInputData['batteryKwExisting'] = str(battery_kw_existing)
+	if allInputData['battery'] == 'on':
+		critical_load_series = pd.read_csv(REOPT_FOLDER + '/criticalLoadShape.csv', header=None)[0]
+		outage_start_hour = int(allInputData['outage_start_hour'])
+		outage_duration = int(allInputData['outageDuration'])
+		calculated_max_kwh = critical_load_series[outage_start_hour:outage_start_hour + outage_duration].sum()
+		if calculated_max_kwh < int(allInputData['batteryCapacityMax']):
+			allInputData['batteryCapacityMax'] = str(calculated_max_kwh)
+		# - allInputData['batteryPowerMax'] is set in set_allinputdata_user_parameters()
+	else:
+		allInputData['batteryCapacityMax'] = str(battery_kwh_existing)
+		allInputData['batteryPowerMax'] = str(battery_kw_existing)
+	# - allInputData['batteryCapacityMin'] is set in set_allinputdata_user_parameters()
+	# - allInputData['batteryPowerMin'] is set in set_allinputdata_user_parameters()
 	with open(REOPT_FOLDER + '/allInputData.json', 'w') as f:
 		json.dump(allInputData, f, indent=4)
+
 
 def set_allinputdata_solar_parameters(REOPT_FOLDER, solar_kw_existing):
+	'''
+	- If new solar is enabled, set ['PV']['max_kw'] equal to the lesser of (1) the maximum value in the critical load shape series multiplied by 4 or
+	  (2) the user-defined maximum value
+	- If new solar is not enabled, set ['PV']['max_kw'] equal to 0
+	- Always set ['PV']['existing_kw'] equal to the amount of existing solar that exists in the circuit. REopt will include existing solar generation
+	  in its calculation regardless of whether new solar generation is enabled
+	- ['PV']['min_kw'] is set by the user (defaults to 0)
+	'''
 	with open(REOPT_FOLDER + '/allInputData.json') as f:
 		allInputData = json.load(f)
-	# enable following 2 lines when using gen_existing_ref_shapes()
-	# force REopt to optimize on solar even if not recommended by REopt optimization
+	allInputData['solarExisting'] = str(solar_kw_existing)
 	if allInputData['solar'] == 'on':
-		allInputData['solarMin'] = '1'
-	if float(solar_kw_existing) > 0:
-		allInputData['solarExisting'] = str(solar_kw_existing)
-		allInputData['solar'] = 'on'
-	# enable following 4 lines when using gen_existing_ref_shapes()
-	# if not already turned on, set solar on to 1 kw to provide loadshapes for existing gen in make_full_dss()
-	if allInputData['solar'] == 'off':
-		allInputData['solar'] = 'on'
-		allInputData['solarMax'] = '1'
-		allInputData['solarMin'] = '1'
+		critical_load_series = pd.read_csv(REOPT_FOLDER + '/criticalLoadShape.csv', header=None)[0]
+		calculated_max_kw = critical_load_series.max() * 4
+		if calculated_max_kw < int(allInputData['solarMax']):
+			allInputData['solarMax'] = str(calculated_max_kw)
+	else:
+		allInputData['solarMax'] = '0'
 	with open(REOPT_FOLDER + '/allInputData.json', 'w') as f:
 		json.dump(allInputData, f, indent=4)
+
 
 def set_allinputdata_wind_parameters(REOPT_FOLDER, wind_kw_existing):
+	'''
+	- If new wind is enabled, set ['Wind']['max_kw'] equal to the lesser of (1) the maximum value in the critical load shape series multiplied by 2 or
+	  (2) the user-defined maximum value
+	- If new wind is not enabled, and there is existing wind, set ['Wind']['max_kw'] equal to the amount of existing wind
+	- ['Wind']['min_kw'] is set by the user (defaults to 0)
+	'''
 	with open(REOPT_FOLDER + '/allInputData.json') as f:
 		allInputData = json.load(f)
-	# enable following 2 lines when using gen_existing_ref_shapes()
-	# force REopt to optimize on wind even if not recommended by REopt optimization
+	# - allInputData['windExisting'] is only used by microgridUP, not REopt
+	allInputData['windExisting'] = str(wind_kw_existing)
+	critical_load_series = pd.read_csv(REOPT_FOLDER + '/criticalLoadShape.csv', header=None)[0]
+	calculated_max_kw = critical_load_series.max() * 2
 	if allInputData['wind'] == 'on':
-		allInputData['windMin'] = '1'
-	if float(wind_kw_existing) > 0:
-		allInputData['windExisting'] = str(wind_kw_existing)
-		allInputData['windMin'] = str(wind_kw_existing)
-		allInputData['wind'] = 'on' #failsafe to include wind if found in base_dss
-	# enable following 4 lines when using gen_existing_ref_shapes()
-	# if not already turned on, set wind on to 1 kw to provide loadshapes for existing gen in make_full_dss()
-	if allInputData['wind'] == 'off':
-		allInputData['wind'] = 'on'
-		allInputData['windMax'] = '1'
-		allInputData['windMin'] = '1'
+		if calculated_max_kw < int(allInputData['windMax']):
+			allInputData['windMax'] = str(calculated_max_kw)
+	else:
+		allInputData['windMax'] = str(wind_kw_existing)
 	with open(REOPT_FOLDER + '/allInputData.json', 'w') as f:
 		json.dump(allInputData, f, indent=4)
 
+
 def set_allinputdata_generator_parameters(REOPT_FOLDER, fossil_kw_existing):
+	'''
+	- If new fossil generators are enabled, set ['Generator']['max_kw'] equal to the lesser of (1) the maximum value in the critical load shape series
+	  or (2) the user-defined maximum value
+    - If new fossil generators are not enabled, set ['Generator']['max_kw'] to 0
+    - Always set ['Generator']['existing_kw'] equal to the amount of existing fossil generation that exists in the circuit. REopt will include
+      existing fossil generation in its calculation regardless of whether new fossil generation is enabled
+    - ['Generator']['min_kw'] is set by the user (defaults to 0)
+	'''
 	with open(REOPT_FOLDER + '/allInputData.json') as f:
 		allInputData = json.load(f)
 	allInputData['genExisting'] = str(fossil_kw_existing)
-	fossil_status = allInputData['fossil']
-	if fossil_status == 'off':
+	if allInputData['fossil'] == 'on':
+		critical_load_series = pd.read_csv(REOPT_FOLDER + '/criticalLoadShape.csv', header=None)[0]
+		calculated_max_kw = critical_load_series.max()
+		if calculated_max_kw < int(allInputData['dieselMax']):
+			allInputData['dieselMax'] = str(calculated_max_kw)
+	else:
 		allInputData['dieselMax'] = '0'
 	with open(REOPT_FOLDER + '/allInputData.json', 'w') as f:
 		json.dump(allInputData, f, indent=4)
+
 
 def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	''' Generate a clean microgridDesign output with edge-to-edge design. '''
@@ -266,14 +467,21 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 		fig_html = fig.to_html(default_height='600px')
 		all_html = all_html + fig_html
 	# Make generation overview chart
-	gen_data = {
-		"Average Load (kWh)": allOutData["avgLoad1"],
-		"Solar Total (kW)": allOutData["sizePVRounded1"],
-		"Wind Total (kW)": allOutData["sizeWindRounded1"],
-		"Storage Total (kW)": allOutData["powerBatteryRounded1"],
-		"Storage Total (kWh)": allOutData["capacityBatteryRounded1"],
-		"Fossil Total (kW)": allOutData["sizeDieselRounded1"],
-		"Fossil Fuel Used in Outage (kGal diesel equiv.)": allOutData["fuelUsedDieselRounded1"] / 1000.0}
+	gen_data = {}
+	if 'avgLoad1' in allOutData:
+		gen_data['Average Load (kWh)'] = allOutData['avgLoad1']
+	if 'sizePVRounded1' in allOutData:
+		gen_data['Solar Total (kW)'] = allOutData['sizePVRounded1']
+	if 'sizeWindRounded1' in allOutData:
+		gen_data['Wind Total (kW)'] = allOutData['sizeWindRounded1']
+	if 'powerBatteryRounded1' in allOutData:
+		gen_data['Storage Total (kW)'] = allOutData['powerBatteryRounded1']
+	if 'capacityBatteryRounded1' in allOutData:
+		gen_data['Storage Total (kWh)'] = allOutData['capacityBatteryRounded1']
+	if 'sizeDieselRounded1' in allOutData:
+		gen_data['Fossil Total (kW)'] = allOutData['sizeDieselRounded1']
+	if 'fuelUsedDieselRounded1' in allOutData:
+		gen_data['Fossil Fuel Used in Outage (kGal diesel equiv.)'] = allOutData['fuelUsedDieselRounded1'] / 1000.0
 	generation_fig = go.Figure(
 		data=[
 			go.Bar(
@@ -341,6 +549,7 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	with open(outputPath, 'w') as outFile:
 		outFile.write(mgd)
 
+
 def _tests():
 	# Load arguments from JSON.
 	with open('testfiles/test_params.json') as file:
@@ -359,10 +568,10 @@ def _tests():
 	logger = microgridup.setup_logging(f'{MGU_FOLDER}/logs.txt')
 	print(f'----------Testing {_dir}----------')
 	for run_count in range(len(microgrids)):
-		dss_filename = 'circuit.dss' if run_count == 0 else f'circuit_plusmg_{run_count-1}.dss'
-		existing_generation_dict = microgridup_hosting_cap.get_microgrid_existing_generation_dict(f'{MODEL_DIR}/{dss_filename}', microgrids[f'mg{run_count}'])
-		lat, lon = microgridup_hosting_cap.get_microgrid_coordinates(f'{MODEL_DIR}/{dss_filename}', microgrids[f'mg{run_count}'])
-		run(MODEL_DIR, f'reopt_final_{run_count}', microgrids[f'mg{run_count}'], logger, REOPT_INPUTS, f'mg{run_count}', lat, lon, existing_generation_dict, REOPT_API_KEYS[0], False)
+		microgrid = microgrids[f'mg{run_count}']
+		existing_generation_dict = microgridup_hosting_cap.get_microgrid_existing_generation_dict(f'{MODEL_DIR}/circuit.dss', microgrid)
+		lat, lon = microgridup_hosting_cap.get_microgrid_coordinates(f'{MODEL_DIR}/circuit.dss', microgrid)
+		run(f'reopt_mg{run_count}', microgrid, logger, REOPT_INPUTS, f'mg{run_count}', lat, lon, existing_generation_dict, False)
 	os.chdir(curr_dir)
 	print('Ran all tests for microgridup_design.py.')
 

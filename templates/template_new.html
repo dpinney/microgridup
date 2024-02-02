@@ -516,7 +516,7 @@
                     </div>
                     <div class="chunk">
                         <label class="tooltip" for="solarMax">Solar Power Max (kW-DC)<span class="classic">Specify the maximum desired generation in kW-DC. Leave at default for full optimization on solar power.</span></label>
-                        <input type="text" name="solarMax" value="{{ in_data.REOPT_INPUTS.get('solarMax','100000') }}"/>
+                        <input type="text" name="solarMax" value="{{ in_data.REOPT_INPUTS.get('solarMax','100000')}}" required/>
                     </div>
                     <div class="chunk">
                         <label class="tooltip" for="solarMin">Solar Power Min (kW-DC)<span class="classic">Specify the minimum desired generation in kW-DC.</span></label>

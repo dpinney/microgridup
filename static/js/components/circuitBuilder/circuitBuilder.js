@@ -375,7 +375,7 @@ class OutageLocationInputView {
         const label = document.createElement('label');
         label.classList.add('tooltip');
         label.htmlFor = 'FAULTED_LINES';
-        label.textContent = 'Outage Location(s)';
+        label.textContent = 'Outage Location(s) ';
         const span = document.createElement('span');
         span.classList.add('classic');
         span.textContent = 'Node number in distribution map where typical outage would take place.';

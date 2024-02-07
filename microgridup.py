@@ -270,6 +270,23 @@ def get_all_colorable_elements(dss_path, omd_path=None):
     colorable_elements = [x for x in tree if x['!CMD'] in ('new','edit','setbusxy') and 'loadshape' not in x.get('object','') and 'line' not in x.get('object','')]
     return colorable_elements
 
+def check_each_mg_for_reopt_error(number_of_microgrids, logger):
+	for number in range(number_of_microgrids):
+		path = f'reopt_mg{number}/results.json'
+		if os.path.isfile(path):
+			with open(path) as file:
+				results = json.load(file)
+			if results.get('Messages',{}).get('errors',{}):
+				error_message_list = results.get('Messages',{}).get('errors',{})
+				print(f'Error in REopt folder reopt_mg{number}: {error_message_list}')
+				logger.warning(f'Error in REopt folder reopt_mg{number}: {error_message_list}')
+			else:
+				logger.warning(f'No error messages returned in REopt folder reopt_mg{number}.')
+				print(f'No error messages returned in REopt folder reopt_mg{number}.')
+		else:
+			print(f'An Exception occured but REopt folder reopt_mg{number} does not exist.')
+			logger.warning(f'An Exception occured but REopt folder reopt_mg{number} does not exist.')
+
 def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINES, DESCRIPTION='', INVALIDATE_CACHE=True, OUTAGE_CSV=None, DELETE_FILES=False, open_results=False):
 	''' Generate a full microgrid plan for the given inputs. '''
 	# Constants
@@ -467,6 +484,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		print(traceback.format_exc())
 		logger.warning(traceback.format_exc())
 		os.system(f'touch "{MODEL_DIR}/0crashed.txt"')
+		check_each_mg_for_reopt_error(len(MICROGRIDS), logger)
 	finally:
 		os.chdir(curr_dir)
 		os.system(f'rm "{workDir}/0running.txt"')

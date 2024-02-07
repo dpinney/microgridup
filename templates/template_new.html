@@ -366,7 +366,7 @@
                         <button type="button" class="remove-btn">Remove File</button>
                     {% else %}
                         <label class="tooltip" for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)<span class="classic">Please upload a .csv file representing historical outages. See https://github.com/dpinney/<br>microgridup/blob/main/docs<br>/input_formats.md for formatting details.</span></label>
-                        <input type="file" name="HISTORICAL_OUTAGES" class="file-input">
+                        <input type="file" name="HISTORICAL_OUTAGES" class="file-input" accept=".csv">
                         <button type="button" class="remove-btn">Remove File</button>
                     {% endif %}
                 </div>
@@ -383,7 +383,7 @@
                 </div>
                 <div class="chunk">
                     <label class="tooltip" for="single_phase_relay_cost">Single-Phase Relay Cost ($)<span class="classic">Specify the cost of a single-phase relay in $.</span></label>
-                    <input type="text" name="single_phase_relay_cost" value="{{ in_data.REOPT_INPUTS.get('single_phase_relay_cost','300') }}" pattern="^\d+\.?\d*?$"/>
+                    <input type="text" name="single_phase_relay_cost" value="{{ in_data.REOPT_INPUTS.get('single_phase_relay_cost','300') }}" pattern="^\d+$"/>
                 </div>
                 <div class="chunk">
                     <label class="tooltip" for="three_phase_relay_cost">Three-Phase Relay Cost ($)<span class="classic">Specify the cost of a three-phase relay in $.</span></label>
@@ -428,7 +428,7 @@
                         {% else %}
                             <fieldset>
                                 <label for="BASE_DSS_NAME">Circuit Definition (.dss)</label>
-                                <input name="BASE_DSS_NAME" type="file" class="file-input">
+                                <input name="BASE_DSS_NAME" type="file" class="file-input" accept=".dss">
                             </fieldset>
                             <fieldset>
                                 <button id="upload-file-btn" type="button">Upload</button>
@@ -594,7 +594,7 @@
                     <h5>Fossil</h5>
                     <div class="chunk">
                         <label class="tooltip" for="dieselGenCost">Genset Cost ($/kW)<span class="classic">Specify the cost in $/kWh.</span></label>
-                        <input type="text" name="dieselGenCost" value="{{ in_data.REOPT_INPUTS.get('dieselGenCost','500') }}" pattern="^\d+\.?\d*?$"/>
+                        <input type="text" name="dieselGenCost" value="{{ in_data.REOPT_INPUTS.get('dieselGenCost','500') }}" pattern="^\d+\.?\d*?$" required/>
                     </div>
                     <div class="chunk">
                         <label class="tooltip" for="dieselMax">Genset Max (kW)<span class="classic">Specify max fossil generation in kW. Only specify if needed, as the optimization runs best if left unedited.</span></label>
@@ -636,11 +636,11 @@
                         </select>
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="dieselMacrsOptionYears">Fossil MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 5 and 7 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
+                        <label class="tooltip" for="dieselMacrsOptionYears">Fossil MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 15 and 20 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
                         <select id="dieselMacrsOptionYears" name="dieselMacrsOptionYears">
                             <option {% if 'dieselMacrsOptionYears' not in in_data.REOPT_INPUTS or in_data.REOPT_INPUTS.dieselMacrsOptionYears == "0" %}selected{% endif %} value="0">0</option>
-                            <option {% if in_data.REOPT_INPUTS.dieselMacrsOptionYears == "5" %}selected{% endif %} value="5">5</option>
-                            <option {% if in_data.REOPT_INPUTS.dieselMacrsOptionYears == "7" %}selected{% endif %} value="7">7</option>
+                            <option {% if in_data.REOPT_INPUTS.dieselMacrsOptionYears == "15" %}selected{% endif %} value="15">15</option>
+                            <option {% if in_data.REOPT_INPUTS.dieselMacrsOptionYears == "20" %}selected{% endif %} value="20">20</option>
                         </select>
                     </div>
                 </div>
@@ -705,8 +705,9 @@
 				} else {
 					const oldNameAttribute = $(fileInput).attr('name');
 					var nameAttribute = oldNameAttribute;
+					var fileType = oldNameAttribute == 'BASE_DSS_NAME' ? '.dss' : '.csv';
 					// Replace the read-only text input with a new file input.
-					const newFileInput = $('<input type="file" class="file-input">').attr('name', nameAttribute);
+					const newFileInput = $('<input type="file" class="file-input">').attr('name', nameAttribute).attr('accept', fileType);
 					fileInput.replaceWith(newFileInput);
 					// Set up the new file input for further functionality.
 					newFileInput.on('change', function () {
@@ -973,7 +974,7 @@
 			} else if (input.hasAttribute('step')) {
 				const step = Number(input.step);
 				const val = Number(input.value);
-				const tolerance = 1e-15; // Need to justify close enough to 0 because of floating point division oddities.
+				const tolerance = 1e-3; // Need to justify close enough to 0 because of floating point division oddities.
 				if (step > 0 && val % step != 0 && Math.abs(val % step) > tolerance) {
 					valid = false;
 					input.style.border = "1px solid red";

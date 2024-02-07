@@ -1,6 +1,5 @@
 from omf.solvers.opendss import dssConvert
-from omf import distNetViz
-from omf import geo
+from omf import distNetViz, geo
 from omf.runAllTests import _print_header
 import microgridup_control
 import microgridup_resilience
@@ -17,10 +16,6 @@ import datetime
 import traceback
 import sys
 import logging
-import random
-from copy import deepcopy
-import concurrent.futures
-from omf.solvers.REopt import REOPT_API_KEYS
 
 MGU_FOLDER = os.path.abspath(os.path.dirname(__file__))
 if MGU_FOLDER == '/':
@@ -275,13 +270,29 @@ def get_all_colorable_elements(dss_path, omd_path=None):
     colorable_elements = [x for x in tree if x['!CMD'] in ('new','edit','setbusxy') and 'loadshape' not in x.get('object','') and 'line' not in x.get('object','')]
     return colorable_elements
 
-def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINE, DESCRIPTION='', INVALIDATE_CACHE=True, OUTAGE_CSV=None, DELETE_FILES=False, open_results=False):
+def check_each_mg_for_reopt_error(number_of_microgrids, logger):
+	for number in range(number_of_microgrids):
+		path = f'reopt_mg{number}/results.json'
+		if os.path.isfile(path):
+			with open(path) as file:
+				results = json.load(file)
+			if results.get('Messages',{}).get('errors',{}):
+				error_message_list = results.get('Messages',{}).get('errors',{})
+				print(f'Error in REopt folder reopt_mg{number}: {error_message_list}')
+				logger.warning(f'Error in REopt folder reopt_mg{number}: {error_message_list}')
+			else:
+				logger.warning(f'No error messages returned in REopt folder reopt_mg{number}.')
+				print(f'No error messages returned in REopt folder reopt_mg{number}.')
+		else:
+			print(f'An Exception occured but REopt folder reopt_mg{number} does not exist.')
+			logger.warning(f'An Exception occured but REopt folder reopt_mg{number} does not exist.')
+
+def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINES, DESCRIPTION='', INVALIDATE_CACHE=True, OUTAGE_CSV=None, DELETE_FILES=False, open_results=False):
 	''' Generate a full microgrid plan for the given inputs. '''
 	# Constants
 	MODEL_DSS = 'circuit.dss'
 	MODEL_LOAD_CSV = 'loads.csv'
 	GEN_NAME = 'generation.csv'
-	REF_NAME = 'ref_gen_loads.csv'
 	OMD_NAME = 'circuit.dss.omd'
 	MAP_NAME = 'circuit_map'
 	ONELINE_NAME = 'circuit_oneline.html'
@@ -337,7 +348,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		loads = MICROGRIDS[mg]['loads']
 		critical_load_kws = MICROGRIDS[mg]['critical_load_kws']
 		for l, c in zip(loads, critical_load_kws):
-			if not (c == 0 or c == '0' or c == 0.0 or c == '0.0'):
+			if float(c) != 0:
 				CRITICAL_LOADS.append(l)
 	# Run the full MicrogridUP analysis.
 	try:
@@ -350,7 +361,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 				'QSTS_STEPS':QSTS_STEPS,
 				'REOPT_INPUTS':REOPT_INPUTS,
 				'MICROGRIDS':MICROGRIDS,
-				'FAULTED_LINE':FAULTED_LINE,
+				'FAULTED_LINES':FAULTED_LINES,
 				'OUTAGE_CSV':OUTAGE_CSV,
 				'CRITICAL_LOADS':CRITICAL_LOADS,
 				'CREATION_DATE':CREATION_DATE,
@@ -358,22 +369,35 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 				'INVALIDATE_CACHE':INVALIDATE_CACHE
 			}
 			json.dump(inputs, inputs_file, indent=4)
-		# Hosting capacity
+		# - Calculate hosting capacity for the initial circuit uploaded by the user or created via the GUI
 		microgridup_hosting_cap.run_hosting_capacity(MODEL_DSS)
-		# Generate the per-microgrid results and add each to the circuit iteratively.
-		# - Multi-threaded REopt execution
-		run_reopt_threads(MODEL_DIR, MICROGRIDS, logger, REOPT_INPUTS, INVALIDATE_CACHE)
-		mgs_name_sorted = sorted(MICROGRIDS.keys())
-		for i, mg_name in enumerate(mgs_name_sorted):
-			BASE_DSS = MODEL_DSS if i==0 else f'circuit_plusmg_{i-1}.dss'
-			max_crit_load = sum(MICROGRIDS[mg_name]['critical_load_kws'])
-			microgridup_hosting_cap.run(f'reopt_final_{i}', GEN_NAME, MICROGRIDS[mg_name], BASE_DSS, mg_name, REF_NAME, MODEL_LOAD_CSV, f'circuit_plusmg_{i}.dss', f'mg_add_cost_{i}.csv', max_crit_load, logger, REOPT_INPUTS)
+		# - For each microgrid, use REOPT to calculate the optimal amount of new generation assets and to calculate generation power output
+		microgridup_design.run_reopt(MICROGRIDS, logger, REOPT_INPUTS, INVALIDATE_CACHE)
+		# - Go through the REOPT results and iteratively add each microgrid's new generation to the original circuit until all of the new generation
+		#   has been added
+		mg_names_sorted = sorted(MICROGRIDS.keys())
+		for i in range(0, len(mg_names_sorted)):
+			# - Initially, BASE_DSS is the circuit file that was uploaded by the user to uploads/ or created via the GUI circuit creator. The model
+			#   directory gets a copy of this file and names the copy "circuit.dss". The first run of microgridup_hosting_cap.run() uses circuit.dss
+			#   with microgrid mg0 to create circuit_plus_mg0.dss. The next run of microgridup_hosting_cap.run() uses circuit_plus_mg0.dss with
+			#   microgrid mg1 to create circuit_plus_mg1.dss, etc. Eventually, a final circuit_plus_mgAll.dss is created and that is the final
+			#   circuit file we run control simulations on
+			mg_name = mg_names_sorted[i]
+			if i == 0:
+				BASE_DSS = MODEL_DSS
+			else:
+				BASE_DSS = f'circuit_plus_{mg_names_sorted[i-1]}.dss'
+			if i == len(mg_names_sorted) - 1:
+				output_dss_filename = 'circuit_plus_mgAll.dss'
+			else:
+				output_dss_filename = f'circuit_plus_{mg_name}.dss'
+			microgridup_hosting_cap.run(f'reopt_{mg_name}', GEN_NAME, MICROGRIDS[mg_name], BASE_DSS, mg_name, MODEL_LOAD_CSV, output_dss_filename, f'mg_add_cost_{mg_name}.csv', logger, REOPT_INPUTS)
 		# Make OMD of fully detailed system.
-		dssConvert.dssToOmd(f'circuit_plusmg_{i}.dss', OMD_NAME, RADIUS=0.0002)
+		dssConvert.dssToOmd('circuit_plus_mgAll.dss', OMD_NAME, RADIUS=0.0002)
 		# Draw the circuit oneline.
 		distNetViz.viz(OMD_NAME, forceLayout=False, outputPath='.', outputName=ONELINE_NAME, open_file=False)
 		# Powerflow outputs.
-		microgridup_hosting_cap.gen_powerflow_results(f'circuit_plusmg_{i}.dss', REOPT_INPUTS['year'], QSTS_STEPS, logger)
+		microgridup_hosting_cap.gen_powerflow_results('circuit_plus_mgAll.dss', REOPT_INPUTS['year'], QSTS_STEPS, logger)
 		# Draw the map.
 		out = colorby_mgs(OMD_NAME, MICROGRIDS, CRITICAL_LOADS)
 		new_path = './color_test.omd'
@@ -387,18 +411,20 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 			json.dump(omd, out_file, indent=4)
 		geo.map_omd(new_path, MAP_NAME, open_browser=False)
 		# Perform control sim.
-		new_mg_for_control = {name:MICROGRIDS[name] for name in mgs_name_sorted[0:i+1]}
-		microgridup_control.play(f'circuit_plusmg_{i}.dss', os.getcwd(), new_mg_for_control, FAULTED_LINE, i, logger)
+		new_mg_for_control = {name:MICROGRIDS[name] for name in mg_names_sorted[0:i+1]}
+		with open(f'reopt_{mg_names_sorted[0]}/allInputData.json') as file:
+			allInputData = json.load(file)
+		outage_start = int(allInputData['outage_start_hour'])
+		outage_length = int(allInputData['outageDuration'])
+		microgridup_control.play('circuit_plus_mgAll.dss', os.getcwd(), new_mg_for_control, FAULTED_LINES, outage_start, outage_length, logger)
 		# Resilience simulation with outages. Optional. Skipped if no OUTAGE_CSV
 		if OUTAGE_CSV:
 			all_microgrid_loads = [x.get('loads',[]) for x in MICROGRIDS.values()]
 			all_loads = [item for sublist in all_microgrid_loads for item in sublist]
-			microgridup_resilience.main('outages.csv', 'outages_ADJUSTED.csv', all_loads, f'circuit_plusmg_{i}.dss', 'output_resilience.html')
+			microgridup_resilience.main('outages.csv', 'outages_ADJUSTED.csv', all_loads, 'circuit_plus_mgAll.dss', 'output_resilience.html')
 		# Build Final report
 		reports = [x for x in os.listdir('.') if x.startswith('ultimate_rep_')]
 		reports.sort()
-		reopt_folders = [x for x in os.listdir('.') if x.startswith('reopt_final_')]
-		reopt_folders.sort()
 		reps = pd.concat([pd.read_csv(x) for x in reports]).to_dict(orient='list')
 		stats = summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV)
 		mg_add_cost_files = [x for x in os.listdir('.') if x.startswith('mg_add_cost_')]
@@ -406,19 +432,16 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		# create a row-based list of lists of mg_add_cost_files
 		add_cost_rows = []
 		for file in mg_add_cost_files:
-			with open(file, "r") as f:
-				reader = csv.reader(f, delimiter=',')
-				next(reader, None) #skip the header
-				for row in reader:
-					add_cost_rows.append([row[0],row[1],row[2],int(row[3])])
+			df = pd.read_csv(file)
+			for row in df.values.tolist():
+				add_cost_rows.append(row)
 		current_time = datetime.datetime.now() 
 		warnings = "None"
 		if os.path.exists("user_warnings.txt"):
 			with open("user_warnings.txt") as myfile:
 				warnings = myfile.read()
-		# generate file map
-		mg_names = list(MICROGRIDS.keys())
-		names_and_folders = {x[0]:x[1] for x in zip(mg_names, reopt_folders)}
+		microgridup_design.create_economic_microgrid(MICROGRIDS, logger, REOPT_INPUTS, INVALIDATE_CACHE)
+		names_and_folders = {x.split('_')[1]: x for x in sorted([dir_ for dir_ in os.listdir('.') if dir_.startswith('reopt_')])}
 		# generate a decent chart of additional generation.
 		chart_html = summary_charts(stats)
 		# Write out overview iframe
@@ -461,82 +484,11 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		print(traceback.format_exc())
 		logger.warning(traceback.format_exc())
 		os.system(f'touch "{MODEL_DIR}/0crashed.txt"')
+		check_each_mg_for_reopt_error(len(MICROGRIDS), logger)
 	finally:
 		os.chdir(curr_dir)
 		os.system(f'rm "{workDir}/0running.txt"')
 
-
-def run_reopt_threads(model_dir, microgrids, logger, reopt_inputs, invalidate_cache):
-	'''
-	:param model_dir: the path to the outermost model directory of the circuit shared by all of the microgrids
-	:type model_dir: string
-	:param microgrids: all of the microgrid definitions (as defined by microgrid_gen_mgs.py) for the given circuit
-	:type microgrids: dict
-	:param logger: a logger
-	:type logger: logger
-	:param reopt_inputs: REopt inputs that must be set by the user. All microgrids for a given circuit share these same REopt parameters. All threads
-	    should only read from this dict, so it's fine that they're sharing the same dict
-	:type reopt_inputs: dict
-	:param invalidate_cache: whether to ignore an existing directory of cached REopt results for all of the microgrids of a circuit
-	:return: don't return anything once all the threads have completed. Instead, just read the corresponding allInputData.json and allOutputData.json
-		file for each microgrid to build a new DSS file in microgridup_hosting_cap.py
-	:rtype: None
-
-	This function will not retry a REopt thread that returned an exception due to an optimization timeout. Instead, it will immediately raise the
-	optimization timeout exception. This function will retry a REopt thread that returned an exception due to something other than an optimization
-	timeout.
-	'''
-	assert isinstance(model_dir, str)
-	assert isinstance(microgrids, dict)
-	assert isinstance(logger, logging.Logger)
-	assert isinstance(reopt_inputs, dict)
-	assert isinstance(invalidate_cache, bool)
-	# - Shuffle the api keys so we don't use them in the same order every time
-	api_keys = random.sample(REOPT_API_KEYS, len(REOPT_API_KEYS))
-	# - Generate the correct arguments for each REopt thread to be run
-	thread_argument_lists = []
-	for i, mg_name in enumerate(sorted(microgrids.keys())):
-		# - Apply microgrid parameter overrides
-		mg_specific_reopt_inputs = deepcopy(reopt_inputs)
-		for param, val in mg_specific_reopt_inputs['mgParameterOverrides'][mg_name].items():
-			mg_specific_reopt_inputs[param] = str(val)
-		del mg_specific_reopt_inputs['mgParameterOverrides']
-		# - Generate a set of arguments for a single thread
-		thread_argument_lists.append([model_dir, microgrids[mg_name], i, logger, mg_specific_reopt_inputs, mg_name, api_keys[i % len(api_keys)], invalidate_cache])
-	# - Retry a thread that throws an exception
-	future_lists = ([], [])
-	argument_lists = (thread_argument_lists, [])
-	with concurrent.futures.ThreadPoolExecutor() as executor:
-		for args_list in argument_lists[0]:
-			future_lists[0].append(executor.submit(run_reopt_thread, *args_list))
-		for future_list_idx, future_list in enumerate(future_lists):
-			for f in concurrent.futures.as_completed(future_list):
-				if f.exception() is not None:
-					# - omf.__neoMetaModel__.py captures any exception thrown by a model's work() function and writes it to stderr.txt within the
-					#   model's working directory. Any exception detected here is caused by a side-effect of REopt failing, namely that
-					#   reopt_final_i/allOutputData.json does not exist. But that file could not exist for various reasons, and we only retry a thread
-					#   if it did not fail due to an optimization timeout. Therefore, we have to read stderr.txt to get the original exception
-					#   information
-					future_idx = future_list.index(f)
-					args_list = argument_lists[future_list_idx][future_idx]
-					stderr_filepath = f'reopt_final_{args_list[2]}/stderr.txt'
-					if os.path.isfile(stderr_filepath):
-						with open(stderr_filepath) as f:
-							string = f.read()
-							if string.find('Optimization exceeded timeout') > -1:
-								raise Exception(f'Thread for microgrid "{args_list[5]}" for circuit "{args_list[0]}" failed due to REopt reaching an optimization timeout of 420 seconds.')
-					# - If the thread failed due to some other reason, retry it once
-					if future_list_idx + 1 < len(future_lists):
-						# - Always invalidate the cache when retrying
-						args_list[-1] = True
-						future_lists[future_list_idx + 1].append(executor.submit(run_reopt_thread, *args_list))
-						argument_lists[future_list_idx + 1].append(args_list)
-
-def run_reopt_thread(model_dir, microgrid, microgrid_index, logger, reopt_inputs, mg_name, api_key, invalidate_cache):
-	print('THIS DIR FOR THREADS', os.getcwd())
-	existing_generation_dict = microgridup_hosting_cap.get_microgrid_existing_generation_dict('circuit.dss', microgrid)
-	lat, lon = microgridup_hosting_cap.get_microgrid_coordinates('circuit.dss', microgrid)
-	microgridup_design.run(model_dir, f'reopt_final_{microgrid_index}', microgrid, logger, reopt_inputs, mg_name, lat, lon, existing_generation_dict, api_key, invalidate_cache)
 
 def _tests():
 	''' Unit tests for this module. '''
@@ -545,7 +497,6 @@ def _tests():
 	MG_MINES = test_params['MG_MINES']
 	REOPT_INPUTS = test_params['REOPT_INPUTS']
 	QSTS_STEPS = 480.0
-	FAULTED_LINE = '670671'
 	# Test of full().
 	successful_tests = []
 	failed_tests = []
@@ -553,10 +504,12 @@ def _tests():
 	for _dir in MG_MINES:
 		try:
 			_dir.index('wizard')
+			FAULTED_LINES = 'reg1'
 			mgu_args = [f'{PROJ_FOLDER}/{_dir}', f'{MGU_FOLDER}/testfiles/wizard_base_3mg.dss']
 		except ValueError as e:
+			FAULTED_LINES = '670671'
 			mgu_args = [f'{PROJ_FOLDER}/{_dir}', f'{MGU_FOLDER}/testfiles/lehigh_base_3mg.dss']
-		mgu_args.extend([f'{MGU_FOLDER}/testfiles/lehigh_load.csv', QSTS_STEPS, REOPT_INPUTS, MG_MINES[_dir][0], FAULTED_LINE, '', False])
+		mgu_args.extend([f'{MGU_FOLDER}/testfiles/lehigh_load.csv', QSTS_STEPS, REOPT_INPUTS, MG_MINES[_dir][0], FAULTED_LINES, '', False])
 		print(f'---------------------------------------------------------\nBeginning end-to-end backend test of {_dir}.\n---------------------------------------------------------')
 		full(*mgu_args)
 		if untested.count(_dir) == 0 and os.path.isfile(f'{PROJ_FOLDER}/{_dir}/0crashed.txt'):

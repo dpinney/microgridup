@@ -269,14 +269,6 @@
                     <input type="text" name="MODEL_DIR" value="{{in_data.MODEL_DIR}}" pattern="[a-z0-9_\-]+" required/>
                 </div>
                 <div class="chunk">
-                    <label class="tooltip" for="latitude">Latitude<span class="classic">Specify the latitude of the load/grid as a decimal.</span></label>
-                    <input type="text" name="latitude" pattern="-?\d+\.?\d*" min="-90" max="90" value="{{ in_data.REOPT_INPUTS.get('latitude','39.7817') }}"/>
-                </div>
-                <div class="chunk">
-                    <label class="tooltip" for="longitude">Longitude<span class="classic">Specify the longitude of the load/grid as a decimal.</span></label>
-                    <input type="text" name="longitude" pattern="-?\d+\.?\d*" min="-180" max="180" value="{{ in_data.REOPT_INPUTS.get('longitude','-89.6501') }}"/>
-                </div>
-                <div class="chunk">
                     <label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">Defines the length of the interconnection analysis. Example – if time steps are 15 minutes, 480 would define a five day analysis.</span></label>
                     <input type="text" name="QSTS_STEPS" value="{{in_data.QSTS_STEPS}}" />
                 </div>
@@ -356,8 +348,11 @@
                 </div>
                 <h5>Resilience</h5>
                 <div class="chunk">
-                    <label class="tooltip" for="FAULTED_LINE">Outage Location(s)<span class="classic">Node number in distribution map where typical outage would take place.</span></label>
-                    <input type="text" name="FAULTED_LINE" value="{{in_data.FAULTED_LINE}}" />
+                    <div id='outageLocationInputInsert'></div>
+                    <!--
+                    <label class="tooltip" for="FAULTED_LINES">Outage Location(s)<span class="classic">Node number in distribution map where typical outage would take place.</span></label>
+                    <input type="text" name="FAULTED_LINES" value="{{in_data.FAULTED_LINES}}" pattern="\w+(?:,\w+)?" required/>
+                    -->
                 </div>
                 <div class="chunk">
                     <label class="tooltip" for="outageDuration">Outage Duration (hours)<span class="classic">The added major outage is given this duration.</span></label>
@@ -371,7 +366,7 @@
                         <button type="button" class="remove-btn">Remove File</button>
                     {% else %}
                         <label class="tooltip" for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)<span class="classic">Please upload a .csv file representing historical outages. See https://github.com/dpinney/<br>microgridup/blob/main/docs<br>/input_formats.md for formatting details.</span></label>
-                        <input type="file" name="HISTORICAL_OUTAGES" class="file-input">
+                        <input type="file" name="HISTORICAL_OUTAGES" class="file-input" accept=".csv">
                         <button type="button" class="remove-btn">Remove File</button>
                     {% endif %}
                 </div>
@@ -388,7 +383,7 @@
                 </div>
                 <div class="chunk">
                     <label class="tooltip" for="single_phase_relay_cost">Single-Phase Relay Cost ($)<span class="classic">Specify the cost of a single-phase relay in $.</span></label>
-                    <input type="text" name="single_phase_relay_cost" value="{{ in_data.REOPT_INPUTS.get('single_phase_relay_cost','300') }}" pattern="^\d+\.?\d*?$"/>
+                    <input type="text" name="single_phase_relay_cost" value="{{ in_data.REOPT_INPUTS.get('single_phase_relay_cost','300') }}" pattern="^\d+$"/>
                 </div>
                 <div class="chunk">
                     <label class="tooltip" for="three_phase_relay_cost">Three-Phase Relay Cost ($)<span class="classic">Specify the cost of a three-phase relay in $.</span></label>
@@ -433,7 +428,7 @@
                         {% else %}
                             <fieldset>
                                 <label for="BASE_DSS_NAME">Circuit Definition (.dss)</label>
-                                <input name="BASE_DSS_NAME" type="file" class="file-input">
+                                <input name="BASE_DSS_NAME" type="file" class="file-input" accept=".dss">
                             </fieldset>
                             <fieldset>
                                 <button id="upload-file-btn" type="button">Upload</button>
@@ -443,7 +438,16 @@
                     </form>
                 </div>
             </div>
-            <div id="circuitCreator" class="desc"></div>
+            <div id="circuitCreator" class="desc">
+				<div class="chunk">
+                    <label class="tooltip" for="latitude">Latitude<span class="classic">Specify the latitude of the load/grid as a decimal.</span></label>
+                    <input type="text" name="latitude" pattern="-?\d+\.?\d*" min="-90" max="90" value="{{ in_data.REOPT_INPUTS.get('latitude','39.7817') }}"/>
+                </div>
+                <div class="chunk">
+                    <label class="tooltip" for="longitude">Longitude<span class="classic">Specify the longitude of the load/grid as a decimal.</span></label>
+                    <input type="text" name="longitude" pattern="-?\d+\.?\d*" min="-180" max="180" value="{{ in_data.REOPT_INPUTS.get('longitude','-89.6501') }}"/>
+                </div>
+			</div>
 
             <div id="critLoads">
             </div>
@@ -512,7 +516,7 @@
                     </div>
                     <div class="chunk">
                         <label class="tooltip" for="solarMax">Solar Power Max (kW-DC)<span class="classic">Specify the maximum desired generation in kW-DC. Leave at default for full optimization on solar power.</span></label>
-                        <input type="text" name="solarMax" value="{{ in_data.REOPT_INPUTS.get('solarMax','100000') }}"/>
+                        <input type="text" name="solarMax" value="{{ in_data.REOPT_INPUTS.get('solarMax','100000')}}" required/>
                     </div>
                     <div class="chunk">
                         <label class="tooltip" for="solarMin">Solar Power Min (kW-DC)<span class="classic">Specify the minimum desired generation in kW-DC.</span></label>
@@ -590,7 +594,7 @@
                     <h5>Fossil</h5>
                     <div class="chunk">
                         <label class="tooltip" for="dieselGenCost">Genset Cost ($/kW)<span class="classic">Specify the cost in $/kWh.</span></label>
-                        <input type="text" name="dieselGenCost" value="{{ in_data.REOPT_INPUTS.get('dieselGenCost','500') }}" pattern="^\d+\.?\d*?$"/>
+                        <input type="text" name="dieselGenCost" value="{{ in_data.REOPT_INPUTS.get('dieselGenCost','500') }}" pattern="^\d+\.?\d*?$" required/>
                     </div>
                     <div class="chunk">
                         <label class="tooltip" for="dieselMax">Genset Max (kW)<span class="classic">Specify max fossil generation in kW. Only specify if needed, as the optimization runs best if left unedited.</span></label>
@@ -627,16 +631,16 @@
                     <div class="chunk">
                         <label class="tooltip" for="dieselOnlyRunsDuringOutage">Genset only runs during outage?<span class="classic">"No" signifies that fossil generator is enabled to run at any point in the year.</span></label>
                         <select id="dieselOnlyRunsDuringOutage" name="dieselOnlyRunsDuringOutage">
-                            <option {% if in_data.REOPT_INPUTS.dieselOnlyRunsDuringOutage == "true" %}selected{% endif %} value="true">Yes</option>
-                            <option {% if 'dieselOnlyRunsDuringOutage' not in in_data.REOPT_INPUTS or in_data.REOPT_INPUTS.dieselOnlyRunsDuringOutage == "false" %}selected{% endif %} value="false">No</option>
+                            <option {% if in_data.REOPT_INPUTS.dieselOnlyRunsDuringOutage == True %}selected{% endif %} value="true">Yes</option>
+                            <option {% if 'dieselOnlyRunsDuringOutage' not in in_data.REOPT_INPUTS or in_data.REOPT_INPUTS.dieselOnlyRunsDuringOutage == False %}selected{% endif %} value="false">No</option>
                         </select>
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="dieselMacrsOptionYears">Fossil MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 5 and 7 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
+                        <label class="tooltip" for="dieselMacrsOptionYears">Fossil MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 15 and 20 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
                         <select id="dieselMacrsOptionYears" name="dieselMacrsOptionYears">
                             <option {% if 'dieselMacrsOptionYears' not in in_data.REOPT_INPUTS or in_data.REOPT_INPUTS.dieselMacrsOptionYears == "0" %}selected{% endif %} value="0">0</option>
-                            <option {% if in_data.REOPT_INPUTS.dieselMacrsOptionYears == "5" %}selected{% endif %} value="5">5</option>
-                            <option {% if in_data.REOPT_INPUTS.dieselMacrsOptionYears == "7" %}selected{% endif %} value="7">7</option>
+                            <option {% if in_data.REOPT_INPUTS.dieselMacrsOptionYears == "15" %}selected{% endif %} value="15">15</option>
+                            <option {% if in_data.REOPT_INPUTS.dieselMacrsOptionYears == "20" %}selected{% endif %} value="20">20</option>
                         </select>
                     </div>
                 </div>
@@ -701,8 +705,9 @@
 				} else {
 					const oldNameAttribute = $(fileInput).attr('name');
 					var nameAttribute = oldNameAttribute;
+					var fileType = oldNameAttribute == 'BASE_DSS_NAME' ? '.dss' : '.csv';
 					// Replace the read-only text input with a new file input.
-					const newFileInput = $('<input type="file" class="file-input">').attr('name', nameAttribute);
+					const newFileInput = $('<input type="file" class="file-input">').attr('name', nameAttribute).attr('accept', fileType);
 					fileInput.replaceWith(newFileInput);
 					// Set up the new file input for further functionality.
 					newFileInput.on('change', function () {
@@ -832,6 +837,11 @@
 			}
 			// Manual grouping GUI includes inputs for gen_bus and switch.
 			var numMgs = $('#mgQuantity').val();
+			const mgs = {};
+			for (let i = 0; i < numMgs; i++) {
+				mgs[`mg${i}`] = {};
+			}
+			createMicrogridParameterMVC(mgs);
 			if ($('#partitionMethod').val() == 'manual') {
 				// Clear existing #switchGenbus if it exists already. 
 				$('#switchGenbus').remove();
@@ -964,7 +974,7 @@
 			} else if (input.hasAttribute('step')) {
 				const step = Number(input.step);
 				const val = Number(input.value);
-				const tolerance = 1e-15; // Need to justify close enough to 0 because of floating point division oddities.
+				const tolerance = 1e-3; // Need to justify close enough to 0 because of floating point division oddities.
 				if (step > 0 && val % step != 0 && Math.abs(val % step) > tolerance) {
 					valid = false;
 					input.style.border = "1px solid red";
@@ -1204,6 +1214,11 @@
 			var test = $(this).val();
 			$("div.desc").hide();
 			$("#circuit" + test).show();
+            if (test === 'Creator') {
+                window.outageLocationInputView.updateInput();
+            } else {
+                window.outageLocationInputView.setValue("{{in_data.FAULTED_LINES}}");
+            }
 		});
 		
 		// If user clicked edit, show used circuit.
@@ -1322,7 +1337,7 @@
 	});
 	</script>
 	<script type='module'>
-	import { CircuitElement, CircuitModel, CircuitController, CircuitTableView, CircuitUserControlsView, CsvLoadParser } from '/static/js/components/circuitBuilder/circuitBuilder.js';
+	import { CircuitElement, CircuitModel, CircuitController, CircuitTableView, CircuitUserControlsView, CsvLoadParser, OutageLocationInputView } from '/static/js/components/circuitBuilder/circuitBuilder.js';
 	import { MicrogridParameterModel, MicrogridParameterController, MicrogridParameterView } from '/static/js/components/microgridParameterMVC/microgridParameterMVC.js'
 	// - CircuitBuilder
 	const circuitElements = [
@@ -1367,21 +1382,28 @@
 			kw: 79
 		},
 	].map(element => new CircuitElement(element));
-	let model = new CircuitModel();
-	circuitElements.forEach(e => model.addElement(e));
-	let controller = new CircuitController(model);
-	let view = new CircuitTableView(controller);
+	const model = new CircuitModel();
+	const controller = new CircuitController(model);
+	const outageLocationInputView = new OutageLocationInputView(controller);
+    window.outageLocationInputView = outageLocationInputView;
+	model.addObserver(outageLocationInputView);
+	const view = new CircuitTableView(controller);
 	model.addObserver(view);
 	const csvLoadParser = new CsvLoadParser();
 	const controls = new CircuitUserControlsView(controller, csvLoadParser);
-	model.addObserver(controls);
 	csvLoadParser.addObserver(controls);
-	circuitElements.forEach(e => {
-		model.addObserver(view, e.fullName);
-		model.addObserver(controls, e.fullName);
-	});
+	model.addObserver(controls);
+	// - The modal div elements must be appended to the DOM before elements are added to the model in order for the modals to update propertly
+	document.getElementById('outageLocationInputInsert').append(outageLocationInputView.modal.divElement);
 	document.getElementById('circuitCreator').append(view.modal.divElement);
 	document.getElementById('circuitCreator').append(controls.modal.divElement);
+	for (const e of circuitElements) {
+		model.addElement(e);
+		// - The CircuitTableView is already a graph observer, so it will become an observer of every new element that is added
+		// - The CircuitUserControlsView is already a graph observer, so it will become an observer of every new element that is added
+		// - The OutageLocationInputview is already a graph observer, so it will become an observer of every new element that is added
+	}
+	outageLocationInputView.setValue("{{in_data.FAULTED_LINES}}");
 	const csvLoadParserInsert = document.getElementById('csvLoadParserInsert');
 	if (csvLoadParserInsert !== null) {
 		csvLoadParserInsert.replaceWith(csvLoadParser.modal.divElement);
@@ -1390,9 +1412,9 @@
 	}
 	// - MicrogridParameterMVC
 	window.createMicrogridParameterMVC = function createMicrogridParameterMVC(MG_MINES) {
-		model = new MicrogridParameterModel(Object.keys(MG_MINES));
-		controller = new MicrogridParameterController(model);
-		view = new MicrogridParameterView(controller);
+		const model = new MicrogridParameterModel(Object.keys(MG_MINES));
+		const controller = new MicrogridParameterController(model);
+		const view = new MicrogridParameterView(controller);
 		document.getElementById('microgridParameterMVC').replaceChildren(view.modal.divElement);
 		window.microgridParameterModel = model;
 	};

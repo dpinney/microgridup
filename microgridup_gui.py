@@ -170,6 +170,7 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 	for ob in elements:
 		obType = ob['type']
 		obName = ob['name']
+		suffix = '' if obName.endswith('_existing') else '_existing'
 		if obType == 'substation': 
 			dssString += f'new object=vsource.{obName} basekv=2.4 bus1={obName}_bus.1.2.3 pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001 \n'
 			busList.append(f'{obName}_bus')
@@ -180,16 +181,16 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 			dssString += f'new object=load.{obName} bus1={ob["parent"]}_end.1.2.3 phases=3 conn=wye model=1 kv=2.4 kw={ob["kw"]} kvar=660 \n'
 		elif obType == 'solar':
 			prefix = '' if obName.startswith('solar_') else 'solar_'
-			dssString += f'new object=generator.{prefix}{obName} bus1={ob["parent"]}_end.1.2.3 phases=3 kv=2.4 kw={ob["kw"]} pf=1 \n'
+			dssString += f'new object=generator.{prefix}{obName}{suffix} bus1={ob["parent"]}_end.1.2.3 phases=3 kv=2.4 kw={ob["kw"]} pf=1 \n'
 		elif obType == 'wind':
 			prefix = '' if obName.startswith('wind_') else 'wind_'
-			dssString += f'new object=generator.{prefix}{obName} bus1={ob["parent"]}_end.1.2.3 phases=3 kv=2.4 kw={ob["kw"]} pf=1 \n'
+			dssString += f'new object=generator.{prefix}{obName}{suffix} bus1={ob["parent"]}_end.1.2.3 phases=3 kv=2.4 kw={ob["kw"]} pf=1 \n'
 		elif obType == 'battery':
 			prefix = '' if obName.startswith('battery_') else 'battery_'
-			dssString += f'new object=storage.{prefix}{obName} bus1={ob["parent"]}_end.1.2.3 phases=3 kv=2.4 kwrated={ob["kw"]} kwhstored={ob["kwh"]} kwhrated={ob["kwh"]} dispmode=follow %charge=100 %discharge=100 %effcharge=96 %effdischarge=96 \n'
+			dssString += f'new object=storage.{prefix}{obName}{suffix} bus1={ob["parent"]}_end.1.2.3 phases=3 kv=2.4 kwrated={ob["kw"]} kwhstored={ob["kwh"]} kwhrated={ob["kwh"]} dispmode=follow %charge=100 %discharge=100 %effcharge=96 %effdischarge=96 \n'
 		elif obType == 'fossil':
 			prefix = '' if obName.startswith('fossil_') else 'fossil_'
-			dssString += f'new object=generator.{prefix}{obName} bus1={ob["parent"]}_end.1.2.3 phases=3 kw={ob["kw"]} pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 \n'
+			dssString += f'new object=generator.{prefix}{obName}{suffix} bus1={ob["parent"]}_end.1.2.3 phases=3 kw={ob["kw"]} pf=1 kv=2.4 xdp=0.27 xdpp=0.2 h=2 \n'
 		else:
 			raise Exception(f'Unknown object type "{obType}"')
 	# Convert dssString to a networkx graph.
@@ -397,8 +398,6 @@ def run():
 		microgrids = json.loads(request.form['MICROGRIDS'])
 	# Form REOPT_INPUTS. 
 	REOPT_INPUTS = {
-		'latitude':request.form['latitude'],
-		'longitude':request.form['longitude'],
 		'energyCost':request.form['energyCost'],
 		'wholesaleCost':request.form['wholesaleCost'],
 		'demandCost':request.form['demandCost'],
@@ -444,7 +443,7 @@ def run():
 		'dieselCO2Factor':request.form['dieselCO2Factor'],
 		'dieselOMCostKw':request.form['dieselOMCostKw'],
 		'dieselOMCostKwh':request.form['dieselOMCostKwh'],
-		'dieselOnlyRunsDuringOutage':request.form['dieselOnlyRunsDuringOutage'],
+		'dieselOnlyRunsDuringOutage':(request.form['dieselOnlyRunsDuringOutage'] == 'true'),
 		'dieselMacrsOptionYears':request.form['dieselMacrsOptionYears'],
 		'windCost':request.form['windCost'],
 		'windMax':request.form['windMax'],
@@ -460,7 +459,7 @@ def run():
 		float(request.form['QSTS_STEPS']),
 		REOPT_INPUTS,
 		microgrids,
-		request.form['FAULTED_LINE'],
+		request.form['FAULTED_LINES'],
 		request.form['DESCRIPTION'],
 		True,
 		outages_path if have_outages else None

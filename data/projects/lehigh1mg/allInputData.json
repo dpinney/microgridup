@@ -25,7 +25,7 @@
         "solarMax": "10000",
         "solarMin": 0,
         "batteryCapacityCost": "420",
-        "batteryCapacityMax": "10000",
+        "batteryCapacityMax": "100000",
         "batteryCapacityMin": 0,
         "batteryPowerCost": "840",
         "batteryPowerMax": "10000",

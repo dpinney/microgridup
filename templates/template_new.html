@@ -1140,6 +1140,7 @@
 
 	window.circuitIsSpecified = false;
 	window.filename = '';
+	window.on_edit_flow = false;
 
 	$(document).ready(function() {
 		// Clone partitioning div for resetting.
@@ -1149,6 +1150,7 @@
 		attachDropdownsEventHandler();
 		attachPartitionButtonEventHandler();
 
+		// Add Remove File buttons for previously uploaded inputs.
 		$('.chunk').each(function () {
 			toggleRemoveButton(this);
 		});
@@ -1229,6 +1231,7 @@
 			window.circuitIsSpecified = true;
 			window.filename = $('#circuitPostCreation').val();
 			const MODEL_DIR = document.getElementsByName('MODEL_DIR')[0].value;
+			window.on_edit_flow = true;
 			// Get allDataInputs.json params from Jinja as variables in the script.
 			var in_data = JSON.parse('{{ in_data | tojson | safe }}');
 			var criticalLoads = in_data['CRITICAL_LOADS'];
@@ -1255,6 +1258,8 @@
 			}
 			var form_data = new FormData($('#upload-file')[0]);
 			form_data.append('MODEL_DIR',model_dir)
+			// Recognize if we're on the edit flow. If we are not, backend should search data/projects for model_dir and return error if it already exists.
+			form_data.append('on_edit_flow',window.on_edit_flow);
 			$.ajax({
 				type: 'POST',
 				url: '/uploadDss',
@@ -1288,6 +1293,9 @@
 					window.filename = data.filename;
 					// Make directory uneditable. 
 					$('input[name="MODEL_DIR"]').prop("readonly", true);
+				},
+				error: function(data) {
+					alert(data.responseJSON.error);
 				}
 			});
 		});

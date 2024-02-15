@@ -162,7 +162,6 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 		lon = float(request.form['longitude'])
 	if not elements:
 		elements = json.loads(request.form['json'])
-
 	# Convert to DSS and return loads.
 	dssString = f'clear \nset defaultbasefrequency=60 \nnew object=circuit.{model_dir} \n'
 	busList = []
@@ -172,7 +171,7 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 		obName = ob['name']
 		suffix = '' if obName.endswith('_existing') else '_existing'
 		if obType == 'substation': 
-			dssString += f'new object=vsource.{obName} basekv=2.4 bus1={obName}_bus.1.2.3 pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001 \n'
+			dssString += f'new object=vsource.{obName} basekv={ob["basekv"]} bus1={obName}_bus.1.2.3 pu=1.00 r1=0 x1=0.0001 r0=0 x0=0.0001 \n'
 			busList.append(f'{obName}_bus')
 		elif obType == 'feeder':
 			dssString += f'new object=line.{obName} phases=3 bus1={ob["parent"]}_bus.1.2.3 bus2={obName}_end.1.2.3 length=1333 units=ft \n'

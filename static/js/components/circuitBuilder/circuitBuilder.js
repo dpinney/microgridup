@@ -135,7 +135,7 @@ class CircuitElement {
 
     static validateProperty(property, propertyVal, namespace) {
         //const onlyLetters = /^[A-Za-z\-_]+$/;
-        const onlyNumbers = /^\d*.?\d+$/;
+        const onlyNumbers = /^\d*\.?\d+$/;
         const lettersOrNumbers = /^[\w\-]+$/;
         if (namespace === 'props') {
             if (['name', 'namespace', 'type'].includes(property)) {
@@ -169,9 +169,9 @@ class CircuitElement {
                     throw Error('The name component of the "parent" property can only include the following: (1) alphanumeric characters, (2) "-", and (3) "_". ')
                 }
             }
-            if (['kw', 'kwh'].includes(property)) {
+            if (['kw', 'kwh', 'basekv'].includes(property)) {
                 if (!onlyNumbers.test(propertyVal)) {
-                    throw Error(`The value of the "${property}" property can only include numbers.`)
+                    throw Error(`The value of the "${property}" property can only include positive numbers.`)
                 }
             }
             if (['loadProfile'].includes(property)) {
@@ -714,7 +714,6 @@ class CircuitUserControlsView {
         this.#circuitElementParentNameSelect = null;
         this.#userInputDiv = null;
         this.renderContent();
-
         this.controller = this.#controller;
     }
 
@@ -915,7 +914,8 @@ class CircuitUserControlsView {
                     this.#controller.model.addElement(new CircuitElement({
                         name: substationName,
                         namespace: 'element',
-                        type: 'substation'
+                        type: 'substation',
+                        basekv: 2.4
                     }));
                     this.modal.setBanner('', ['hidden']);
                 } catch (e) {
@@ -1164,8 +1164,7 @@ class CircuitTableView {
             const row = this.#getElementRow(substationElement);
             substationModal.insertTBodyRow(row);
             modal.divElement.append(substationModal.divElement);
-            // - No substation properties may be set by users
-            //this.#insertPropertiesModal(modal, substationElement, ['indent-level-3']);
+            this.#insertPropertiesModal(modal, substationElement, ['indent-level-3']);
             // - For now, only feeders should be children of substations
             for (const feederElement of this.#controller.model.getChildElements(substationElement.fullName)) {
                 const feederModal = new Modal();

@@ -50,6 +50,7 @@ def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
 			mg_load_names.append(load_name)
 	# add up all of the loads in MICROGRIDS into one loadshape
 	loads = pd.read_csv(MODEL_LOAD_CSV)
+	loads.columns = [str(x).lower() for x in loads.columns]
 	loads['full_load']= loads[mg_load_names].sum(axis=1)
 	#print('loads.head()', loads.head())
 	max_load = int(loads['full_load'].max())

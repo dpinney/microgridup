@@ -349,10 +349,6 @@
                 <h5>Resilience</h5>
                 <div class="chunk">
                     <div id='outageLocationInputInsert'></div>
-                    <!--
-                    <label class="tooltip" for="FAULTED_LINES">Outage Location(s)<span class="classic">Node number in distribution map where typical outage would take place.</span></label>
-                    <input type="text" name="FAULTED_LINES" value="{{in_data.FAULTED_LINES}}" pattern="\w+(?:,\w+)?" required/>
-                    -->
                 </div>
                 <div class="chunk">
                     <label class="tooltip" for="outageDuration">Outage Duration (hours)<span class="classic">The added major outage is given this duration.</span></label>
@@ -374,6 +370,10 @@
                     <i class="fa fa-plus-square"></i>
                     <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
                     <div style="display:none;">
+                        <div class="chunk">
+                            <label class="tooltip" for="maxRuntimeSeconds">Maximum REopt Run-time (seconds)<span class="classic">A greater maximum REopt run-time could result in more precise REopt results.</span></label>
+                            <input type="text" name="maxRuntimeSeconds" value="{{ in_data.REOPT_INPUTS.get('maxRuntimeSeconds', '240') }}" min="1" max="1200"/>
+                        </div>
                     </div>
                 </div>
                 <h5>Financial</h5>

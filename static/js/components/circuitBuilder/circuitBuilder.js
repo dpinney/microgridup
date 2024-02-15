@@ -283,34 +283,13 @@ class CsvLoadParser {
         if (data.data.length < 8760) {
             throw Error('CSV parsing failed. A CSV must have at least 8760 rows, not including the required heading row.');
         }
+        const lowercaseHeadings = data.data[0].map(heading => heading.toLowerCase());
+        if (new Set(lowercaseHeadings).size !== lowercaseHeadings.length) {
+            throw Error('Please ensure that load profile CSV headings are case-insensitive unique.');
+        }
         // - Use triangular number formula instead of comparing array contents
         const timeseriesSignature1 = ((8760 ** 2 ) + 8760) / 2;
         const timeseriesSignature2 = ((8759 ** 2 ) + 8759) / 2;
-        // - No header row (we choose not to allow this)
-        //if (data.data.length % 8760 === 0) {
-        //    for (let i = 0; i < data.data[0].length; i++) {
-        //        const loadProfile = [];
-        //        for (let j = 0; j < data.data.length; j++) {
-        //            const kw = data.data[j][i];
-        //            const numKw = +kw;
-        //            if (isNaN(numKw) || kw === null) {
-        //                throw Error(`CSV parsing failed. Could not parse the value "${kw}" in row "${j + 1}" of column "${i + 1}" in file "${file.name}" into a number.`); 
-        //            }
-        //            loadProfile.push(numKw);
-        //        }
-        //        const sum = loadProfile.reduce((acc, cur) => acc + cur);
-        //        if (sum !== timeseriesSignature1 && sum !== timeseriesSignature2) {
-        //            const element = new CircuitElement({
-        //                name: `load_${i}`,
-        //                namespace: 'element',
-        //                type: 'load'
-        //            });
-        //            element.setProperty('loadProfile', loadProfile);
-        //            element.setProperty('kw', Math.max(...loadProfile));
-        //            csvLoadsElements.push(element);
-        //        }
-        //    }
-        // - Header row
         if ((data.data.length - 1) % 8760 === 0) {
             if (new Set(data.data[0]).size !== data.data[0].length) {
                 throw Error('Please ensure the load profile CSV headings are all unique.');

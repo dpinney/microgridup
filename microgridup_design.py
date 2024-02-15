@@ -100,7 +100,7 @@ def create_production_factor_series_csv(microgrids, logger, invalidate_cache):
 def create_economic_microgrid(microgrids, logger, reopt_inputs, invalidate_cache):
 	'''
 	- Same parameters as run_reopt
-    - Currently, we do NOT mutate the microgrids dict that contains the other real microgrids because we don't need to
+	- Currently, we do NOT mutate the microgrids dict that contains the other real microgrids because we don't need to
 	'''
 	assert isinstance(microgrids, dict)
 	assert isinstance(logger, logging.Logger)
@@ -120,6 +120,7 @@ def create_economic_microgrid(microgrids, logger, reopt_inputs, invalidate_cache
 		economic_microgrid['critical_load_kws'].extend(mg['critical_load_kws'])
 	if not Path('reopt_mgBonusGen').exists() or invalidate_cache is True:
 		microgridDesign.new('reopt_mgBonusGen')
+		set_allinputdata_load_shape_parameters('reopt_mgBonusGen', f'loads.csv', economic_microgrid, logger)
 		with open('reopt_mgBonusGen/allInputData.json') as f:
 			allInputData = json.load(f)
 		lat, lon = microgridup_hosting_cap.get_microgrid_coordinates('circuit.dss', list(microgrids.values())[0])
@@ -167,9 +168,22 @@ def create_economic_microgrid(microgrids, logger, reopt_inputs, invalidate_cache
 				allInputData['genExisting'] += 0
 		with open('reopt_mgBonusGen/allInputData.json', 'w') as f:
 			json.dump(allInputData, f, indent=4)
-		# - Run REopt
 		__neoMetaModel__.runForeground('reopt_mgBonusGen')
-		# - Write output
+		# - Need to make several adjustments to the economic microgrid
+		with open('reopt_mgBonusGen/allOutputData.json') as f:
+			outData = json.load(f)
+		# - If the existing amount of storage power across all microgrids is greater than the recommended storage power for the economic microgrid,
+		#   don't build any new storage power. Do the same for storage capacity. This is quite common because the economic microgrid never experiences
+		#   an outage, so it doesn't need as much storage as the microgrids. The existing storage across all microgrids is enough to survive an outage
+		#   and maximize peak shaving potential
+		# - If, for some reason, the storage power for the economic microgrid is greater than the storage power across all microgrids and the storage
+		#   capacity for the economic microgrid is less than the storage capacity across all microgrids, we run into a weird situation where we
+		#   estimate the cost for additional power but not additional capacity (or vice versa). Could you build storage power without also building
+		#   storage capacity (or vice versa)? Hopefully this doesn't happen
+		if outData['powerBattery1'] < outData['batteryKwExisting1']:
+			outData['powerBattery1'] = 0
+		if outData['capacityBattery1'] < outData['batteryKwhExisting1']:
+			outData['capacityBattery1'] = 0
 		microgrid_design_output('reopt_mgBonusGen/allOutputData.json', 'reopt_mgBonusGen/allInputData.json', 'reopt_mgBonusGen/cleanMicrogridDesign.html')
 
 
@@ -228,13 +242,16 @@ def set_allinputdata_load_shape_parameters(REOPT_FOLDER, load_csv_path, microgri
 	'''
 	- Write loadShape.csv. loadShape.csv contains a single column that is the sum of every load that is in loads.csv (i.e. it is the sum of all the
 	  loads across entire installation)
-	    - Previously, loadShape.csv used to contain a single column that was only the sum of the loads (both critical and non-critical) in the given
-	      microgrid
-    - Set allInputData['loadShape'] equal to the contents of loadShape.csv
-    - Set allInputData['criticalLoadShape'] equal to the sum of the columns in loads.csv that correspond to critical loads in the given microgrid
-        - Previously, allInputData['criticalLoadFactor'] was used instead, but this parameter is no longer used
+		- Previously, loadShape.csv used to contain a single column that was only the sum of the loads (both critical and non-critical) in the given
+		  microgrid
+	- Set allInputData['loadShape'] equal to the contents of loadShape.csv
+	- Set allInputData['criticalLoadShape'] equal to the sum of the columns in loads.csv that correspond to critical loads in the given microgrid
+		- Previously, allInputData['criticalLoadFactor'] was used instead, but this parameter is no longer used
 	'''
-	load_df = pd.read_csv(load_csv_path)[microgrid['loads']]
+	load_df = pd.read_csv(load_csv_path)
+	# - Make all column headings lowercase because OpenDSS is case-insensitive
+	load_df.columns = [str(x).lower() for x in load_df.columns]
+	load_df = load_df[microgrid['loads']]
 	# - Write loadShape.csv
 	load_shape_series = load_df.apply(sum, axis=1)
 	load_shape_series.to_csv(REOPT_FOLDER + '/loadShape.csv', header=False, index=False)
@@ -282,10 +299,10 @@ def set_allinputdata_outage_parameters(REOPT_FOLDER, loadshape_csv_path, outage_
 def set_allinputdata_user_parameters(REOPT_FOLDER, REOPT_INPUTS, lat, lon):
 	'''
 	- Set all of the REopt input parameters specified by the user
-    - We used to use ["electric_load"]["critical_load_fraction"] to set ["electric_load"]["critical_loads_kw"], but we no longer do. Instead, we set
-      ["electric_load"]["critical_loads_kw"] directly
-        - ["electric_load"]["critical_load_fraction"] is still set in microgridDesign.py, but the REopt output shows it isn't used when
-          ["electric_load"["critical_loads_kw"] is set directly, so it's fine
+	- We used to use ["electric_load"]["critical_load_fraction"] to set ["electric_load"]["critical_loads_kw"], but we no longer do. Instead, we set
+	  ["electric_load"]["critical_loads_kw"] directly
+	- ["electric_load"]["critical_load_fraction"] is still set in microgridDesign.py, but the REopt output shows it isn't used when
+	  ["electric_load"["critical_loads_kw"] is set directly, so it's fine
 	'''
 	with open(REOPT_FOLDER + '/allInputData.json') as f:
 		allInputData = json.load(f)

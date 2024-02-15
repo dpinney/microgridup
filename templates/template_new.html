@@ -333,7 +333,7 @@
                     {% endif %}
                 </div>
 				<div class="chunk">
-					<label class="tooltip" for="analysisYears">Analysis Period (years)<span class="classic">Specify the length of financial analysis in years.</span></label>
+					<label class="tooltip" for="analysisYears">Analysis Period (years)<span class="classic">Please enter a number 2-75 to specify the length of financial analysis in years.</span></label>
 					<input type="text" name="analysisYears" value="{{ in_data.REOPT_INPUTS.get('analysisYears','25') }}" step="1" min="2" max="75"/>
 				</div>
                 <div>
@@ -351,7 +351,7 @@
                     <div id='outageLocationInputInsert'></div>
                 </div>
                 <div class="chunk">
-                    <label class="tooltip" for="outageDuration">Outage Duration (hours)<span class="classic">The added major outage is given this duration.</span></label>
+                    <label class="tooltip" for="outageDuration">Outage Duration (hours)<span class="classic">Please enter a number 1-8760 to specify the duration of the added major outage in hours.</span></label>
                     <input type="text" name="outageDuration" value="{{ in_data.REOPT_INPUTS.get('outageDuration','48') }}" min="1" max="8760"/>
                 </div>
 				<div class="chunk">
@@ -371,7 +371,7 @@
                     <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
                     <div style="display:none;">
                         <div class="chunk">
-                            <label class="tooltip" for="maxRuntimeSeconds">Maximum REopt Run-time (seconds)<span class="classic">A greater maximum REopt run-time could result in more precise REopt results.</span></label>
+                            <label class="tooltip" for="maxRuntimeSeconds">Maximum REopt Run-time (seconds)<span class="classic">Please enter a number 1-1200. A greater maximum REopt run-time could result in more precise REopt results.</span></label>
                             <input type="text" name="maxRuntimeSeconds" value="{{ in_data.REOPT_INPUTS.get('maxRuntimeSeconds', '240') }}" min="1" max="1200"/>
                         </div>
                     </div>

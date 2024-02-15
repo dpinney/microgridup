@@ -7,6 +7,7 @@ from omf.solvers import opendss
 from omf.solvers.opendss import dssConvert
 from omf.solvers import opendss
 import plotly
+import plotly.graph_objects as go
 import datetime
 import microgridup
 import omf.models
@@ -427,6 +428,7 @@ def make_full_dss(input_dss_filename, GEN_NAME, LOAD_NAME, output_dss_filename, 
 		#   "generation.csv" is empty
 		gen_df = pd.DataFrame()
 	load_df = pd.read_csv(LOAD_NAME)
+	load_df.columns = [str(x).lower() for x in load_df.columns]
 	# get 1kw reference loadshapes for solar and wind existing gens that are outside of 'microgrid'
 	ref_df = pd.read_csv('production_factor_series.csv')
 	shape_insert_list = {}
@@ -776,14 +778,14 @@ def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_st
 
 		for y_name in csv_column_headers:
 			this_series = gen_data[gen_data[category_name] == ob_name]
-			trace = plotly.graph_objs.Scatter(
+			trace = go.Scatter(
 				x = pd.to_datetime(this_series[x], unit = 'h', origin = pd.Timestamp(f'{year}-01-01')), #TODO: make this datetime convert arrays other than hourly or with a different startdate than Jan 1 if needed
 				y = this_series[y_name], # ToDo: rounding to 3 decimals here would be ideal, but doing so does not accept Inf values 
 				name = ob_name + '_' + y_name,
 				hoverlabel = dict(namelength = -1)
 			)
 			data.append(trace)
-	layout = plotly.graph_objs.Layout(
+	layout = go.Layout(
 		#title = f'{csvName} Output',
 		title = chart_name,
 		xaxis = dict(title="Date"),
@@ -794,7 +796,7 @@ def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_st
 		)
 		#yaxis = dict(title = str(y_list))
 	)
-	fig = plotly.graph_objs.Figure(data, layout)
+	fig = go.Figure(data, layout)
 
 	if ansi_bands == True:
 		date = pd.Timestamp(f'{year}-01-01')
@@ -875,7 +877,7 @@ def get_microgrid_existing_generation_dict(dss_path, microgrid):
 
 def run_hosting_capacity(dss_filename):
 	'''
-	Run the traditional algorithm in omf.models.hostingCapacity() on the final dss file
+	Run the traditional algorithm in omf.models.hostingCapacity() on the initial dss file
 
 	:type dss_filename: str
 	:param dss_filename: the filename of the dss file (e.g. circuit_plusmg_{i}.dss)
@@ -892,7 +894,7 @@ def run_hosting_capacity(dss_filename):
 	# - Create and set the new omd file
 	dssConvert.dssToOmd(dss_filename, f'hosting_capacity/{dss_filename}.omd')
 	all_input_data['feederName1'] = dss_filename
-	# - New approach to finding hosting capacity bounds
+	# - Ignore the timeseries column if it exists in loads.csv
 	timeseries_signature1 = ((8760 ** 2 ) + 8760) / 2
 	timeseries_signature2 = ((8759 ** 2 ) + 8759) / 2
 	load_df = pd.read_csv('loads.csv')
@@ -909,14 +911,41 @@ def run_hosting_capacity(dss_filename):
 	omf.models.__neoMetaModel__.runForeground('hosting_capacity')
 	with open('hosting_capacity/allOutputData.json') as f:
 		data = json.load(f)
+	# - Organize graph data
+	kw_capacity_per_bus = data['traditionalHCResults']
+	tree = dssConvert.dssToTree(dss_filename)
+	kw_load_and_gen_per_bus = {}
+	for d in tree:
+		if d.get('object', '').startswith('load.'):
+			bus_name = d['bus1'].split('.')[0]
+			if kw_load_and_gen_per_bus.get(bus_name) is None:
+				kw_load_and_gen_per_bus[bus_name] = {'load': float(d['kw']), 'generation': 0}
+			else:
+				kw_load_and_gen_per_bus[bus_name]['load'] += float(d['kw'])
+		if d.get('object', '').startswith('generator'):
+			bus_name = d['bus1'].split('.')[0]
+			if kw_load_and_gen_per_bus.get(bus_name) is None:
+				kw_load_and_gen_per_bus[bus_name] = {'generation': float(d['kw']), 'load': 0}
+			else:
+				kw_load_and_gen_per_bus[bus_name]['generation'] += float(d['kw'])
 	# - Create graph
-	fig = plotly.io.from_json(data['traditionalGraphData'])
-	fig.update_traces(width=.1)
-	fig.update_layout(title='Traditional Hosting Capacity By Bus', font=dict(family="sans-serif", color="black"))
+	df = pd.DataFrame(kw_capacity_per_bus)
+	df['load_kw'] = df.apply(lambda row: kw_load_and_gen_per_bus[row['bus']].get('load', 0), axis=1)
+	df['generation_kw'] = df.apply(lambda row: kw_load_and_gen_per_bus[row['bus']].get('generation', 0), axis=1)
+	non_violation_rows = df[(df['thermal_violation'] == False) & (df['voltage_violation'] == False)]
+	voltage_violation_rows = df[(df['thermal_violation'] == False) & (df['voltage_violation'] == True)]
+	thermal_violation_rows = df[(df['thermal_violation'] == True) & (df['voltage_violation'] == False)]
+	duel_violation_rows = df[(df['thermal_violation'] == True) & (df['voltage_violation'] == True)]
+	fig = go.Figure(data=[
+		go.Bar(name='Bus Existing kW Load', x=df['bus'], y=df['load_kw'], marker_color='purple', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Existing kW Load: %{y}'])),
+		go.Bar(name='Bus Existing kW Generation', x=df['bus'], y=df['generation_kw'], marker_color='blue', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Existing kW Generation: %{y}'])),
+		go.Bar(name='Bus Max kW Capacity', x=non_violation_rows['bus'], y=non_violation_rows['max_kw'], marker_color='green', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Max kW Capacity: %{y}'])),
+		go.Bar(name='Bus Voltage Violation kW', x=voltage_violation_rows['bus'], y=voltage_violation_rows['max_kw'], marker_color='yellow', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Voltage Violation kW: %{y}'])),
+		go.Bar(name='Bus Thermal Violation kW', x=thermal_violation_rows['bus'], y=thermal_violation_rows['max_kw'], marker_color='orange', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Thermal Violation kW: %{y}'])),
+		go.Bar(name='Bus Voltage and Thermal Violation kW', x=duel_violation_rows['bus'], y=duel_violation_rows['max_kw'], marker_color='red', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Voltage and Thermal Violation kW: %{y}']))])
+	fig.update_layout(title='Traditional Hosting Capacity By Bus', font=dict(family="sans-serif", color="black"), xaxis_title='Bus Name', yaxis_title='kW')
 	fig.write_html('hosting_capacity/traditionalGraphData.html')
 	# - Create table
-	headings =  f"<tr>{''.join([f'<th>{th}</th>' for th in data['traditionalHCTableHeadings']])}</tr>"
-	values = ''.join([f"<tr>{''.join(row_)}</tr>" for row_ in [[f'<td>{val}</td>' for val in row] for row in data['traditionalHCTableValues']]])
 	html = (
         '<html>'
             '<head>'
@@ -924,13 +953,9 @@ def run_hosting_capacity(dss_filename):
             '</head>'
             '<body>'
                 '<div class="tableDiv">'
-                    '<table>'
-                        f'{headings}'
-                        f'{values}'
-                    '</table>'
+                f'{df.to_html(index=False, border=0)}'
                 '</div>'
-            '</body>'
-		'</html>')
+    )
 	with open('hosting_capacity/traditionalGraphTable.html', 'w') as f:
 		f.write(html)
 

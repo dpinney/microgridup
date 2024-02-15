@@ -33,7 +33,7 @@ def run_reopt(microgrids, logger, reopt_inputs, invalidate_cache):
 	assert isinstance(logger, logging.Logger)
 	assert isinstance(reopt_inputs, dict)
 	assert isinstance(invalidate_cache, bool)
-	create_production_factor_series_csv(microgrids, logger, invalidate_cache)
+	create_production_factor_series_csv(microgrids, logger, reopt_inputs, invalidate_cache)
 	# - Run REopt for each microgrid
 	process_argument_lists = []
 	for mg_name in microgrids.keys():
@@ -59,7 +59,7 @@ def run_reopt(microgrids, logger, reopt_inputs, invalidate_cache):
 	#			raise Exception(f'The REopt optimization for the microgrid {f.exception().filename.split("/")[0].split("_")[1]} failed because the optimizer determined there was no feasible solution for the given inputs.')
 
 
-def create_production_factor_series_csv(microgrids, logger, invalidate_cache):
+def create_production_factor_series_csv(microgrids, logger, reopt_inputs, invalidate_cache):
 	# - Do an initial REopt run to get "production_factor_series" vectors for solar and wind generators. Basically, situtations can occur where solar
 	#   or wind generators are in a circuit, but are not included in a microgrid (or the microgrid that they are included in has no critical loads).
 	#   If either of these situations occur, our inputs to REopt are configured such that no "PV" or "Wind" data will be present in the REopt output
@@ -67,17 +67,18 @@ def create_production_factor_series_csv(microgrids, logger, invalidate_cache):
 	#   solar and wind enabled and then actual microgrids can read the "production_factor_series" data as needed
 	if not Path('production_factor_series.csv').exists() or invalidate_cache is True:
 		microgridDesign.new('reopt_loadshapes')
-        # - The load shape for production_factor_series.csv needs to be the same as for the microgrid(s) in order to use the same wind turbine size
-        #   class. This is tricky because technically different microgrids could have sufficiently different load shapes such that one microgrid could
-        #   use a smaller size class and another microgrid would use a larger size class, so which size class should production_factor_series.csv use?
-        #   For now, we just use whatever size class mg0 uses and assume all microgrids have similar load profiles (and thus, similar size classes)
-        # - Could make use multiprocessing if we had to for 4 simultaneous REopt runs
+		# - The load shape for production_factor_series.csv needs to be the same as for the microgrid(s) in order to use the same wind turbine size
+		#   class. This is tricky because technically different microgrids could have sufficiently different load shapes such that one microgrid could
+		#   use a smaller size class and another microgrid would use a larger size class, so which size class should production_factor_series.csv use?
+		#   For now, we just use whatever size class mg0 uses and assume all microgrids have similar load profiles (and thus, similar size classes)
+		# - Could make use multiprocessing if we had to for 4 simultaneous REopt runs
 		set_allinputdata_load_shape_parameters('reopt_loadshapes', f'loads.csv', list(microgrids.values())[0], logger)
 		with open('reopt_loadshapes/allInputData.json') as f:
 			allInputData = json.load(f)
+		allInputData['maxRuntimeSeconds'] = reopt_inputs['maxRuntimeSeconds']
 		lat, lon = microgridup_hosting_cap.get_microgrid_coordinates('circuit.dss', list(microgrids.values())[0])
-        # - The coordinates for production_factor_series.csv need to be the same as for the microgrid(s) in order to use the same historical REopt
-        #   wind data
+		# - The coordinates for production_factor_series.csv need to be the same as for the microgrid(s) in order to use the same historical REopt
+		#   wind data
 		allInputData['latitude'] = lat
 		allInputData['longitude'] = lon
 		# - We only care about the inputs to the model insofar as they 1) include solar and wind output and 2) the model completes as quickly as possible
@@ -123,6 +124,7 @@ def create_economic_microgrid(microgrids, logger, reopt_inputs, invalidate_cache
 		set_allinputdata_load_shape_parameters('reopt_mgBonusGen', f'loads.csv', economic_microgrid, logger)
 		with open('reopt_mgBonusGen/allInputData.json') as f:
 			allInputData = json.load(f)
+		allInputData['maxRuntimeSeconds'] = reopt_inputs['maxRuntimeSeconds']
 		lat, lon = microgridup_hosting_cap.get_microgrid_coordinates('circuit.dss', list(microgrids.values())[0])
 		allInputData['latitude'] = lat
 		allInputData['longitude'] = lon

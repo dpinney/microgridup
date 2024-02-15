@@ -450,7 +450,8 @@ def run():
 		'windMin':request.form['windMin'],
 		'windMacrsOptionYears':request.form['windMacrsOptionYears'],
 		'windItcPercent':request.form['windItcPercent'],
-		'mgParameterOverrides': json.loads(request.form['mgParameterOverrides'])
+		'mgParameterOverrides': json.loads(request.form['mgParameterOverrides']),
+		'maxRuntimeSeconds': request.form['maxRuntimeSeconds']
 	}
 	mgu_args = [
 		f'{_projectDir}/{request.form["MODEL_DIR"]}',

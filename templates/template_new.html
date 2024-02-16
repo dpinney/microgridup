@@ -371,8 +371,8 @@
                     <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
                     <div style="display:none;">
                         <div class="chunk">
-                            <label class="tooltip" for="maxRuntimeSeconds">Maximum REopt Run-time (seconds)<span class="classic">Please enter a number 1-1200. A greater maximum REopt run-time could result in more precise REopt results.</span></label>
-                            <input type="text" name="maxRuntimeSeconds" value="{{ in_data.REOPT_INPUTS.get('maxRuntimeSeconds', '240') }}" min="1" max="1200"/>
+                            <label class="tooltip" for="maxRuntimeSeconds">Maximum REopt Run-time (seconds)<span class="classic">Please enter a number 30-86400. A greater maximum REopt run-time could result in more precise REopt results. A maximum REopt run-time that is too short could result in an error.</span></label>
+                            <input type="text" name="maxRuntimeSeconds" value="{{ in_data.REOPT_INPUTS.get('maxRuntimeSeconds', '240') }}" min="30" max="86400"/>
                         </div>
                     </div>
                 </div>

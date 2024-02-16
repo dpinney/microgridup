@@ -153,7 +153,7 @@ def duplicate():
 		return f'Successfully duplicated {project} as {new_name}.'
 
 @app.route('/jsonToDss', methods=['GET','POST'])
-def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False):
+def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False, on_edit_flow=None):
 	if not model_dir:
 		model_dir = request.form['MODEL_DIR']
 	if not lat:
@@ -162,6 +162,12 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 		lon = float(request.form['longitude'])
 	if not elements:
 		elements = json.loads(request.form['json'])
+	if not on_edit_flow:
+		on_edit_flow = request.form['on_edit_flow']
+	if on_edit_flow == 'false':
+		if os.path.isdir(f'{_mguDir}/data/projects/{model_dir}'):
+			print('Invalid Model Name.')
+			return jsonify(error=f'A model named "{model_dir}" already exists. Please choose a different Model Name.'), 400 # Name was already taken.
 	# Convert to DSS and return loads.
 	dssString = f'clear \nset defaultbasefrequency=60 \nnew object=circuit.{model_dir} \n'
 	busList = []
@@ -222,26 +228,27 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False)
 		print(f'Test run of jsonToDss() for {model_dir} complete.')
 		return dssFilePath
 
-@app.route('/uploadDss', methods = ['GET','POST'])
+@app.route('/uploadDss', methods = ['POST'])
 def uploadDss():
-	if request.method == 'POST':
-		# Check if the post request has the file part.
-		model_dir = request.form['MODEL_DIR']
-		if 'BASE_DSS_NAME' not in request.files:
-			print('No file part.')
-			return jsonify(error='No file part'), 400  # Return a JSON response with 400 Bad Request status.
-		file = request.files['BASE_DSS_NAME']
-		# If the user does not select a file, the browser submits an empty file without a filename.
-		if file.filename == '':
-			print('No selected file.')
-			return jsonify(error='No selected file'), 400  # Return a JSON response with 400 Bad Request status.
-		if file and allowed_file(file.filename):
-			if not os.path.isdir(f'{_mguDir}/uploads'):
-				os.mkdir(f'{_mguDir}/uploads')
-			file.save(f'{_mguDir}/uploads/BASE_DSS_{model_dir}')
-			loads = getLoads(f'{_mguDir}/uploads/BASE_DSS_{model_dir}')
-			return jsonify(loads=loads, filename=f'{_mguDir}/uploads/BASE_DSS_{model_dir}')
-	print('Invalid file.')
+	model_dir = request.form['MODEL_DIR']
+	# Check to see if user is on edit flow. If user is not on edit flow, ensure that model_dir is not already in data/projects.
+	on_edit_flow = request.form['on_edit_flow']
+	if on_edit_flow == 'false':
+		if os.path.isdir(f'{_mguDir}/data/projects/{model_dir}'):
+			return jsonify(error=f'A model named "{model_dir}" already exists. Please choose a different Model Name.'), 400 # Name was already taken.
+	# Check if the post request has the file part.
+	if 'BASE_DSS_NAME' not in request.files:
+		return jsonify(error='No file part'), 400  # Return a JSON response with 400 Bad Request status.
+	file = request.files['BASE_DSS_NAME']
+	# If the user does not select a file, the browser submits an empty file without a filename.
+	if file.filename == '':
+		return jsonify(error='No selected file'), 400  # Return a JSON response with 400 Bad Request status.
+	if file and allowed_file(file.filename):
+		if not os.path.isdir(f'{_mguDir}/uploads'):
+			os.mkdir(f'{_mguDir}/uploads')
+		file.save(f'{_mguDir}/uploads/BASE_DSS_{model_dir}')
+		loads = getLoads(f'{_mguDir}/uploads/BASE_DSS_{model_dir}')
+		return jsonify(loads=loads, filename=f'{_mguDir}/uploads/BASE_DSS_{model_dir}')
 	return jsonify(error='Invalid file'), 400  # Return a JSON response with 400 Bad Request status for invalid files.
 
 @app.route('/getLoadsFromExistingFile', methods=['POST'])
@@ -514,7 +521,7 @@ def _tests():
 	templateDssTree = [OrderedDict(item) for item in test_params['templateDssTree']]
 	# Testing jsonToDss().
 	for _dir in wizard_dir:
-		dssFilePath = jsonToDss(_dir, lat, lon, elements, True)
+		dssFilePath = jsonToDss(_dir, lat, lon, elements, True, 'true')
 		dssTree = dssConvert.dssToTree(dssFilePath)
 		expectedDssTree = templateDssTree
 		expectedDssTree[2] = OrderedDict([('!CMD', 'new'), ('object', f'circuit.{_dir.lower()}')])

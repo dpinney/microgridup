@@ -1050,6 +1050,8 @@ class CircuitUserControlsView {
                 ary.push(element);
             }
             formData.append('json', JSON.stringify(ary));
+            // Recognize if we're on the edit flow. If we are not, backend should search data/projects for model_dir and return error if it already exists.
+            formData.append('on_edit_flow',window.on_edit_flow);
             const that = this;
             $.ajax({
                 url: '/jsonToDss',
@@ -1087,8 +1089,8 @@ class CircuitUserControlsView {
                     $('#partitionMethod').prop('disabled', false);
                     that.modal.setBanner('', ['hidden']);
                 },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    that.modal.setBanner(`${textStatus}: ${errorThrown}`, ['caution']);
+                error: function(data) {
+                    that.modal.setBanner(data.responseJSON.error, ['caution']);
                 }
             });
         });

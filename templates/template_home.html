@@ -303,7 +303,7 @@
                 <select id="sort-by">
                     <option value="" disabled selected>Select method</option>
                     <option value="name">Project Name</option>
-                    <option value="date">Creation Date</option>
+                    <option value="date">Last Updated</option>
                 </select>
             </div>
             <div id="box-container">
@@ -359,16 +359,6 @@
             });
             boxes.forEach((box) => boxContainer.appendChild(box));
         }
-
-        // Event listener to handle sorting when the selection changes.
-        document.getElementById('sort-by').addEventListener('change', function () {
-            const sortBy = this.value;
-            if (sortBy === 'name') {
-                sortByProjectName();
-            } else if (sortBy === 'date') {
-                sortByCreationDate();
-            }
-        });
 
         function duplicate(project) {
             let new_name;
@@ -442,6 +432,31 @@
             }
         }
         window.onload = function () {
+            // Sort by previously selected method if page reloads.
+            var storedValue = localStorage.getItem('selectedProject');
+            console.log(storedValue);
+            if (storedValue != null) {
+                const method_selector = document.querySelector('#sort-by');
+                method_selector.value = storedValue;
+                if (storedValue === 'name') {
+                    sortByProjectName()
+                } else if (storedValue === 'date') {
+                    sortByCreationDate()
+                }
+            }
+
+            // Event listener to handle sorting when the selection changes.
+            document.getElementById('sort-by').addEventListener('change', function () {
+                const sortBy = this.value;
+                if (sortBy === 'name') {
+                    sortByProjectName();
+                    localStorage.setItem('selectedProject', this.value);
+                } else if (sortBy === 'date') {
+                    sortByCreationDate();
+                    localStorage.setItem('selectedProject', this.value);
+                }
+            });
+
             const projects_json = '{{ projects | tojson }}';
             const projects = JSON.parse(projects_json);
             setInterval(checkStatus(projects), 8000); // Check status each 8 seconds.

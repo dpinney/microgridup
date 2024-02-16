@@ -3,6 +3,7 @@ from pathlib import Path
 from copy import deepcopy
 import jinja2 as j2
 import plotly.graph_objects as go
+import numpy as np
 import pandas as pd
 import microgridup
 import microgridup_hosting_cap
@@ -56,7 +57,7 @@ def run_reopt(microgrids, logger, reopt_inputs, invalidate_cache):
 	#		future_list.append(executor.submit(run, *process_argument_list))
 	#	for f in concurrent.futures.as_completed(future_list):
 	#		if f.exception() is not None:
-	#			raise Exception(f'The REopt optimization for the microgrid {f.exception().filename.split("/")[0].split("_")[1]} failed because the optimizer determined there was no feasible solution for the given inputs.')
+	#           raise Exception(f'The REopt optimization for the microgrid {f.exception().filename.split("/")[0].split("_")[1]} failed because (1) the optimizer determined there was no feasible solution for the given inputs or (2) the solver could not complete within the user-defined maximum rum-time.')
 
 
 def create_production_factor_series_csv(microgrids, logger, reopt_inputs, invalidate_cache):
@@ -195,23 +196,23 @@ def run(REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, lon, existi
 	specs for REOpt.
 
 	:param REOPT_FOLDER: a directory within the outermost model directory for running REopt on a particular microgrid
-    :type REOPT_FOLDER: str
-    :param microgrid: a microgrid definition
-    :type microgrid: dict
-    :param logger: a logger instance
+	:type REOPT_FOLDER: str
+	:param microgrid: a microgrid definition
+	:type microgrid: dict
+	:param logger: a logger instance
 	:type logger: Logger
-    :param REOPT_INPUTS: user-defined input parameters for REOPT
-    :type REOPT_INPUTS: dict
-    :param mg_name: the name of the microgrid
-    :type mg_name: str
-    :param lat: latitude
-    :type lat: float
+	:param REOPT_INPUTS: user-defined input parameters for REOPT
+	:type REOPT_INPUTS: dict
+	:param mg_name: the name of the microgrid
+	:type mg_name: str
+	:param lat: latitude
+	:type lat: float
 	:param lon: longitude
 	:type lon: float
-    :param existing_generation_dict: the existing generation in microgrid
-    :type existing_generation_dict: dict
-    :param INVALIDATE_CACHE: whether to reuse the existing REOPT results
-    :type INVALIDATE_CACHCE: float
+	:param existing_generation_dict: the existing generation in microgrid
+	:type existing_generation_dict: dict
+	:param INVALIDATE_CACHE: whether to reuse the existing REOPT results
+	:type INVALIDATE_CACHCE: float
 	:rtype: None
 	'''
 	assert isinstance(INVALIDATE_CACHE, bool)
@@ -234,9 +235,9 @@ def run(REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, lon, existi
 	set_allinputdata_solar_parameters(REOPT_FOLDER, existing_generation_dict['solar_kw_existing'])
 	set_allinputdata_wind_parameters(REOPT_FOLDER, existing_generation_dict['wind_kw_existing'])
 	set_allinputdata_generator_parameters(REOPT_FOLDER, existing_generation_dict['fossil_kw_existing'])
-    # - Run REopt
+	# - Run REopt
 	omf.models.__neoMetaModel__.runForeground(REOPT_FOLDER)
-    # - Write output
+	# - Write output
 	microgrid_design_output(f'{REOPT_FOLDER}/allOutputData.json', f'{REOPT_FOLDER}/allInputData.json', f'{REOPT_FOLDER}/cleanMicrogridDesign.html')
 
 
@@ -486,38 +487,41 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 		fig_html = fig.to_html(default_height='600px')
 		all_html = all_html + fig_html
 	# Make generation overview chart
-	gen_data = {}
+	with open(allInputDataPath) as f:
+		all_input_data = json.load(f)
+	df = pd.DataFrame({
+		'Solar kW': [all_input_data['solarExisting'], 0, all_input_data['solarExisting']],
+		'Wind kW': [all_input_data['windExisting'], 0, all_input_data['windExisting']],
+		'Storage kW': [all_input_data['batteryKwExisting'], 0, all_input_data['batteryKwExisting']],
+		'Storage kWh': [all_input_data['batteryKwhExisting'], 0, all_input_data['batteryKwhExisting']],
+		'Fossil kW': [all_input_data['genExisting'], 0, all_input_data['genExisting']]
+	}, index=['Existing', 'New', 'Total'], dtype=np.float64)
+	if 'sizePV1' in allOutData:
+		df.loc['Total', 'Solar kW'] = allOutData['sizePV1']
+		df.loc['New', 'Solar kW'] = allOutData['sizePV1'] - float(all_input_data['solarExisting'])
+	if 'sizeWind1' in allOutData:
+		df.loc['Total', 'Wind kW'] = allOutData['sizeWind1']
+		df.loc['New', 'Wind kW'] = allOutData['sizeWind1'] - float(all_input_data['windExisting'])
+	if 'powerBattery1' in allOutData:
+		df.loc['Total', 'Storage kW'] = allOutData['powerBattery1']
+		df.loc['New', 'Storage kW'] = allOutData['powerBattery1'] - float(all_input_data['batteryKwExisting'])
+	if 'capacityBattery1' in allOutData:
+		df.loc['Total', 'Storage kWh'] = allOutData['capacityBattery1']
+		df.loc['New', 'Storage kWh'] = allOutData['capacityBattery1'] - float(all_input_data['batteryKwhExisting'])
+	if 'sizeDiesel1' in allOutData:
+		df.loc['Total', 'Fossil kW'] = allOutData['sizeDiesel1']
+		df.loc['New', 'Fossil kW'] = allOutData['sizeDiesel1'] - float(all_input_data['genExisting'])
+	generation_fig = go.Figure(data=[
+		go.Bar(name='Existing Generation (kW)', x=df.columns.to_series(), y=df.loc['Existing']),
+		go.Bar(name='New Generation (kW)', x=df.columns.to_series(), y=df.loc['New']),
+		go.Bar(name='Total Generation (kW)', x=df.columns.to_series(), y=df.loc['Total'])
+	])
+	generation_fig.update_layout(title='Generation Overview', font=dict(family="sans-serif", color="black"), xaxis_title='Generation Type', yaxis_title='kW')
+	max_ = df.max().max()
 	if 'avgLoad1' in allOutData:
-		gen_data['Average Load (kWh)'] = allOutData['avgLoad1']
-	if 'sizePVRounded1' in allOutData:
-		gen_data['Solar Total (kW)'] = allOutData['sizePVRounded1']
-	if 'sizeWindRounded1' in allOutData:
-		gen_data['Wind Total (kW)'] = allOutData['sizeWindRounded1']
-	if 'powerBatteryRounded1' in allOutData:
-		gen_data['Storage Total (kW)'] = allOutData['powerBatteryRounded1']
-	if 'capacityBatteryRounded1' in allOutData:
-		gen_data['Storage Total (kWh)'] = allOutData['capacityBatteryRounded1']
-	if 'sizeDieselRounded1' in allOutData:
-		gen_data['Fossil Total (kW)'] = allOutData['sizeDieselRounded1']
+		generation_fig.add_annotation(x=4, y=(max_ * 1.25), text=f'Average load: {allOutData["avgLoad1"]} kW', showarrow=False, xanchor="left")
 	if 'fuelUsedDieselRounded1' in allOutData:
-		gen_data['Fossil Fuel Used in Outage (kGal diesel equiv.)'] = allOutData['fuelUsedDieselRounded1'] / 1000.0
-	generation_fig = go.Figure(
-		data=[
-			go.Bar(
-				name = 'Without Microgrid',
-				x=list(gen_data.keys()),
-				y=list(gen_data.values()),
-			)
-		]
-	)
-	generation_fig.update_layout(
-		title = 'Generation Overview',
-		legend = legend_spec,
-		font = dict(
-			family="sans-serif",
-			color="black"
-		)
-	)
+		generation_fig.add_annotation(x=4, y=(max_ * 1.2), text=f'Fossil Fuel Used in Outage (kGal Diesel Equiv.): {allOutData["fuelUsedDieselRounded1"] / 1000.0}', showarrow=False, xanchor="left")
 	generation_fig_html = generation_fig.to_html(default_height='600px')
 	all_html = generation_fig_html + all_html
 	# Make financial overview chart

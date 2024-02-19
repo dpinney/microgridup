@@ -55,7 +55,8 @@
     "elements": [
         {
             "class": "substation",
-            "text": "sub"
+            "text": "sub",
+            "basekv": 2.4
         },
         {
             "class": "feeder",

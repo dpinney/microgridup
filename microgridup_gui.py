@@ -78,7 +78,11 @@ def home():
 
 @app.route('/rfile/<project>/<filename>')
 def rfile(project, filename):
-	return send_from_directory(f'{_projectDir}/{project}', filename)
+	return send_from_directory(os.path.join(_projectDir, project), filename)
+	
+@app.route('/rfile/<project>/<subfolder>/<filename>')
+def rnested_file(project, subfolder, filename):
+	return send_from_directory(os.path.join(_projectDir, project, subfolder), filename)
 
 @app.route('/load/<project>')
 def load(project):

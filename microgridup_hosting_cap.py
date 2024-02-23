@@ -943,7 +943,13 @@ def run_hosting_capacity(dss_filename):
 		go.Bar(name='Bus Voltage Violation kW', x=voltage_violation_rows['bus'], y=voltage_violation_rows['max_kw'], marker_color='yellow', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Voltage Violation kW: %{y}'])),
 		go.Bar(name='Bus Thermal Violation kW', x=thermal_violation_rows['bus'], y=thermal_violation_rows['max_kw'], marker_color='orange', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Thermal Violation kW: %{y}'])),
 		go.Bar(name='Bus Voltage and Thermal Violation kW', x=duel_violation_rows['bus'], y=duel_violation_rows['max_kw'], marker_color='red', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Voltage and Thermal Violation kW: %{y}']))])
-	fig.update_layout(title='Traditional Hosting Capacity By Bus', font=dict(family="sans-serif", color="black"), xaxis_title='Bus Name', yaxis_title='kW')
+	fig.update_layout(
+		title='Traditional Hosting Capacity By Bus',
+		font=dict(family="sans-serif",
+		color="black"),
+		xaxis_title='Bus Name',
+		yaxis_title='kW',
+		legend=dict(orientation='h'))
 	fig.write_html('hosting_capacity/traditionalGraphData.html')
 	# - Create table
 	html = (

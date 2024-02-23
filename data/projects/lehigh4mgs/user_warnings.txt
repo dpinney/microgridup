@@ -2,5 +2,3 @@ Supporting critical loads across microgrids assumes an AMI metering system. If n
 Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 Pre-existing battery battery_684_existing will not be utilized to support loads in microgrid mg2.
 Pre-existing battery battery_646_existing will not be utilized to support loads in microgrid mg3.
-Pre-existing battery battery_684_existing will not be utilized to support loads in microgrid mg2.
-Pre-existing battery battery_646_existing will not be utilized to support loads in microgrid mg3.

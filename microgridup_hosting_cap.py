@@ -790,12 +790,9 @@ def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_st
 		title = chart_name,
 		xaxis = dict(title="Date"),
 		yaxis = dict(title=y_axis_name),
-		font = dict(
-			family="sans-serif",
-			color="black"
-		)
 		#yaxis = dict(title = str(y_list))
-	)
+		font = dict(family="sans-serif", color="black"),
+		legend = dict(orientation='h'))
 	fig = go.Figure(data, layout)
 
 	if ansi_bands == True:

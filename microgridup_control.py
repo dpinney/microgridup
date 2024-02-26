@@ -504,8 +504,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 					legendgrouptitle_text=legend_group,
 					showlegend=True,
 					name=ob_name + '_' + y_name,
-					hoverlabel = dict(namelength = -1)
-					)
+					hoverlabel = dict(namelength = -1))
 				fossil_traces.append(fossil_trace)
 
 			# If battery_ and not null values, count battery cycles.
@@ -572,11 +571,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 			title = f"Fossil Genset Loading Percentage ({csvName})",
 			xaxis = dict(title = 'Date'),
 			yaxis = dict(title = 'Fossil Percent Loading'),
-			font = dict(
-				family="sans-serif",
-				color="black"
-			)
-		)
+			font = dict(family="sans-serif", color="black"))
 		fossil_fig = graph_objects.Figure(fossil_traces, new_layout)
 		offline.plot(fossil_fig, filename=f'{csvName}_fossil_loading.plot.html', auto_open=False)
 
@@ -592,12 +587,9 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 		fig.add_trace(graph_objects.Bar(x = list(diesel_dict.keys()), y = list(diesel_dict.values()), name="Diesel"), secondary_y=False)
 		fig.add_trace(graph_objects.Bar(x = list(mmbtu_dict.keys()), y = list(mmbtu_dict.values()), name="Gas"), secondary_y=True)
 		fig.update_layout(
-		    title_text = f"Diesel and Natural Gas Equivalent Consumption During Outage By Microgrid<br><sup>Total Consumption in Gallons of Diesel = {total_gal_diesel} || Total Consumption in MMBTU Natural Gas = {total_mmbtu_gas}|| Total Ouput in kWh = {fossil_kwh_output}</sup>",
-			font = dict(
-				family="sans-serif",
-				color="black"
-			)
-		)
+			title_text = f"Diesel and Natural Gas Equivalent Consumption During Outage By Microgrid<br><sup>Total Consumption in Gallons of Diesel = {total_gal_diesel} || Total Consumption in MMBTU Natural Gas = {total_mmbtu_gas}|| Total Ouput in kWh = {fossil_kwh_output}</sup>",
+			font = dict(family="sans-serif", color="black"),
+			legend=dict(orientation='h'))
 		fig.update_xaxes(title_text="Microgrid")
 		fig.update_yaxes(title_text="Gallons of Diesel Equivalent Consumed During Outage", secondary_y=False)
 		fig.update_yaxes(title_text="MMBTU of Natural Gas Equivalent Consumed During Outage", secondary_y=True)
@@ -609,17 +601,12 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 		batt_cycles = dict(sorted(batt_cycles.items()))
 		new_trace = graph_objects.Bar(
 			x = list(batt_cycles.keys()), 
-			y = list(batt_cycles.values()) 
-		)
+			y = list(batt_cycles.values()))
 		new_layout = graph_objects.Layout(
 			title = "Battery Cycles During Analysis Period",
 			xaxis = dict(title = 'Battery'),
 			yaxis = dict(title = 'Cycles'),
-			font = dict(
-				family="sans-serif",
-				color="black"
-			)
-			)
+			font = dict(family="sans-serif", color="black"))
 		new_fig = graph_objects.Figure(new_trace, new_layout)
 		offline.plot(new_fig, filename=f'{csvName}_battery_cycles.plot.html', auto_open=False)
 
@@ -628,11 +615,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 		title = f'{chart_name} <br><sup>Dotted black lines indicate outage start and end times</sup>',
 		xaxis = dict(title = 'Date'),
 		yaxis = dict(title = y_axis_name),
-		font = dict(
-			family="sans-serif",
-			color="black"
-		)
-	)
+		font = dict(family="sans-serif", color="black"))
 	fig = graph_objects.Figure(data, layout)
 	if ansi_bands == True:
 		line_style = {'color':'Red', 'width':3, 'dash':'dashdot'}

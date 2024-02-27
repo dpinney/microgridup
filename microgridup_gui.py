@@ -4,7 +4,7 @@ from collections import OrderedDict
 from matplotlib import pyplot as plt
 from flask import Flask, request, redirect, render_template, jsonify, url_for
 from omf.solvers.opendss import dssConvert
-from microgridup_gen_mgs import mg_group, nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch
+from microgridup_gen_mgs import mg_group, nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, topological_sort
 from microgridup import full
 from subprocess import Popen
 from flask import send_from_directory
@@ -305,18 +305,26 @@ def previewPartitions():
 	MGQUANT = int(json.loads(request.form['mgQuantity']))
 	G = dssConvert.dss_to_networkx(CIRC_FILE)
 	algo_params={}
-	if METHOD == 'lukes':
-		default_size = int(len(G.nodes())/3)
-		MG_GROUPS = nx_group_lukes(G, algo_params.get('size',default_size))
-	elif METHOD == 'branch':
-		MG_GROUPS = nx_group_branch(G, i_branch=algo_params.get('i_branch',0))
-	elif METHOD == 'bottomUp':
-		MG_GROUPS = nx_bottom_up_branch(G, num_mgs=MGQUANT, large_or_small='large')
-	elif METHOD == 'criticalLoads':
-		MG_GROUPS = nx_critical_load_branch(G, CRITICAL_LOADS, num_mgs=MGQUANT, large_or_small='large')
-	else:
-		print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", or "criticalLoads". No mgs generated.')
-		return {}
+	all_trees = get_all_trees(G)
+	all_trees_pruned = [tree for tree in all_trees if len(tree.nodes()) > 1]
+	num_trees_pruned = len(all_trees_pruned)
+	MG_GROUPS = []
+	try:
+		for tree in all_trees_pruned:
+			if METHOD == 'lukes':
+				default_size = int(len(tree.nodes())/3)
+				MG_GROUPS.extend(nx_group_lukes(tree, algo_params.get('size',default_size)))
+			elif METHOD == 'branch':
+				MG_GROUPS.extend(nx_group_branch(tree, i_branch=algo_params.get('i_branch',0)))
+			elif METHOD == 'bottomUp':
+				MG_GROUPS.extend(nx_bottom_up_branch(tree, num_mgs=MGQUANT/num_trees_pruned, large_or_small='large'))
+			elif METHOD == 'criticalLoads':
+				MG_GROUPS.extend(nx_critical_load_branch(tree, CRITICAL_LOADS, num_mgs=MGQUANT/num_trees_pruned, large_or_small='large'))
+			else:
+				print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", or "criticalLoads". No mgs generated.')
+				return {}
+	except:
+		return jsonify('Invalid partitioning method')
 	MG_MINES = mg_group(CIRC_FILE, CRITICAL_LOADS, METHOD, algo_params={'num_mgs':MGQUANT})
 	for mg in MG_MINES:
 		if not MG_MINES[mg]['switch']:

@@ -4,8 +4,8 @@
     "optionalCircuitFile": "on",
     "traditionalHCMaxTestkw": 11348.18499404,
     "runAmiAlgorithm": "off",
-    "created": "2024-02-01 01:55:25.972743",
-    "runStartTime": "2024-02-01T01:55:26.080325",
+    "created": "2024-02-23 17:04:25.165386",
+    "runStartTime": "2024-02-23T17:04:25.295623",
     "runtimeEst_min": 1.0,
     "runTime": "0:00:00"
 }

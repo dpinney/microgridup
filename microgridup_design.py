@@ -49,15 +49,15 @@ def run_reopt(microgrids, logger, reopt_inputs, invalidate_cache):
 		lat, lon = microgridup_hosting_cap.get_microgrid_coordinates('circuit.dss', microgrid)
 		process_argument_lists.append([f'reopt_{mg_name}', microgrid, logger, mg_specific_reopt_inputs, mg_name, lat, lon, existing_generation_dict, invalidate_cache])
 		# - Uncomment to run in single-process mode
-		run(f'reopt_{mg_name}', microgrid, logger, mg_specific_reopt_inputs, mg_name, lat, lon, existing_generation_dict, invalidate_cache)
+		#run(f'reopt_{mg_name}', microgrid, logger, mg_specific_reopt_inputs, mg_name, lat, lon, existing_generation_dict, invalidate_cache)
 	# - Uncomment to run in multiprocessing mode
-	#with concurrent.futures.ProcessPoolExecutor() as executor:
-	#	future_list = []
-	#	for process_argument_list in process_argument_lists:
-	#		future_list.append(executor.submit(run, *process_argument_list))
-	#	for f in concurrent.futures.as_completed(future_list):
-	#		if f.exception() is not None:
-	#           raise Exception(f'The REopt optimization for the microgrid {f.exception().filename.split("/")[0].split("_")[1]} failed because (1) the optimizer determined there was no feasible solution for the given inputs or (2) the solver could not complete within the user-defined maximum rum-time.')
+	with concurrent.futures.ProcessPoolExecutor() as executor:
+		future_list = []
+		for process_argument_list in process_argument_lists:
+			future_list.append(executor.submit(run, *process_argument_list))
+		for f in concurrent.futures.as_completed(future_list):
+			if f.exception() is not None:
+				raise Exception(f'The REopt optimization for the microgrid {f.exception().filename.split("/")[0].split("_")[1]} failed because (1) the optimizer determined there was no feasible solution for the given inputs or (2) the solver could not complete within the user-defined maximum rum-time.')
 
 
 def create_production_factor_series_csv(microgrids, logger, reopt_inputs, invalidate_cache):
@@ -490,12 +490,13 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	with open(allInputDataPath) as f:
 		all_input_data = json.load(f)
 	df = pd.DataFrame({
-		'Solar kW': [all_input_data['solarExisting'], 0, all_input_data['solarExisting']],
-		'Wind kW': [all_input_data['windExisting'], 0, all_input_data['windExisting']],
-		'Storage kW': [all_input_data['batteryKwExisting'], 0, all_input_data['batteryKwExisting']],
-		'Storage kWh': [all_input_data['batteryKwhExisting'], 0, all_input_data['batteryKwhExisting']],
-		'Fossil kW': [all_input_data['genExisting'], 0, all_input_data['genExisting']]
-	}, index=['Existing', 'New', 'Total'], dtype=np.float64)
+		'Solar kW': [all_input_data['solarExisting'], 0, all_input_data['solarExisting'], 0, 0],
+		'Wind kW': [all_input_data['windExisting'], 0, all_input_data['windExisting'], 0, 0],
+		'Storage kW': [all_input_data['batteryKwExisting'], 0, all_input_data['batteryKwExisting'], 0, 0],
+		'Storage kWh': [all_input_data['batteryKwhExisting'], 0, all_input_data['batteryKwhExisting'], 0, 0],
+		'Fossil kW': [all_input_data['genExisting'], 0, all_input_data['genExisting'], 0, 0],
+		'Load kW': [0, 0, 0, allOutData['avgLoad1'], max(allOutData['load1'])]
+	}, index=['Existing', 'New', 'Total', 'Average', 'Peak'], dtype=np.float64)
 	if 'sizePV1' in allOutData:
 		df.loc['Total', 'Solar kW'] = allOutData['sizePV1']
 		df.loc['New', 'Solar kW'] = allOutData['sizePV1'] - float(all_input_data['solarExisting'])
@@ -514,12 +515,18 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	generation_fig = go.Figure(data=[
 		go.Bar(name='Existing Generation (kW)', x=df.columns.to_series(), y=df.loc['Existing']),
 		go.Bar(name='New Generation (kW)', x=df.columns.to_series(), y=df.loc['New']),
-		go.Bar(name='Total Generation (kW)', x=df.columns.to_series(), y=df.loc['Total'])
+		go.Bar(name='Total Generation (kW)', x=df.columns.to_series(), y=df.loc['Total']),
+		go.Bar(name='Average Load (kW)', x=df.columns.to_series(), y=df.loc['Average']),
+		go.Bar(name='Peak Load (kW)', x=df.columns.to_series(), y=df.loc['Peak']),
 	])
-	generation_fig.update_layout(title='Generation Overview', font=dict(family="sans-serif", color="black"), xaxis_title='Generation Type', yaxis_title='kW')
+	generation_fig.update_layout(
+		title='Generation Overview',
+		font=dict(family="sans-serif",
+		color="black"),
+		xaxis_title='Generation Type',
+		yaxis_title='kW',
+		legend=dict(orientation='h'))
 	max_ = df.max().max()
-	if 'avgLoad1' in allOutData:
-		generation_fig.add_annotation(x=4, y=(max_ * 1.25), text=f'Average load: {allOutData["avgLoad1"]} kW', showarrow=False, xanchor="left")
 	if 'fuelUsedDieselRounded1' in allOutData:
 		generation_fig.add_annotation(x=4, y=(max_ * 1.2), text=f'Fossil Fuel Used in Outage (kGal Diesel Equiv.): {allOutData["fuelUsedDieselRounded1"] / 1000.0}', showarrow=False, xanchor="left")
 	generation_fig_html = generation_fig.to_html(default_height='600px')

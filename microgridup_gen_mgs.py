@@ -293,10 +293,15 @@ def manual_groups(G, pairings):
 		for idx in range(2,len(pairs)):
 			cur_lca = lcas.get((cur_lca,pairs[idx]),lcas.get((pairs[idx],cur_lca)))
 		mgs[mg] = list(nx.nodes(nx.dfs_tree(G, cur_lca)))
-	# Only return the contents of each MG but do so in order specified by the user. 2/27/24 multiple substation edit: we are no longer guaranteed to have every microgrid definition with each call of this function, so order cannot be guaranteed. 
+	# Only return the contents of each MG but do so in order specified by the user.
 	parts = []
-	for mg in mgs:
-		parts.append(mgs[mg])
+	counter = 1
+	while mgs:
+		key = f'Mg{counter}'
+		if mgs.get(key):
+			parts.append(mgs[key])
+			del mgs[key]
+		counter += 1
 	return parts
 
 def nx_get_parent(G, n):

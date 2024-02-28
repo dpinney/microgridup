@@ -407,11 +407,21 @@
 
             <h3>Step 2: Specify existing circuit</h3>
             <p>Please select your circuit creation method:</p>
+			<input type="radio" id="wizard" name="circuit" value="Creator" />
+            <label for="wizard">Build circuit manually</label><br>
             <input type="radio" id="upload" name="circuit" value="Upload" />
             <label for="upload">Upload circuit from file</label><br>
-            <input type="radio" id="wizard" name="circuit" value="Creator" />
-            <label for="wizard">Build circuit manually</label><br>
 
+			<div id="circuitCreator" class="desc">
+				<div class="chunk">
+                    <label class="tooltip" for="latitude">Latitude<span class="classic">Specify the latitude of the load/grid as a decimal.</span></label>
+                    <input type="text" name="latitude" pattern="-?\d+\.?\d*" min="-90" max="90" value="{{ in_data.REOPT_INPUTS.get('latitude','39.7817') }}"/>
+                </div>
+                <div class="chunk">
+                    <label class="tooltip" for="longitude">Longitude<span class="classic">Specify the longitude of the load/grid as a decimal.</span></label>
+                    <input type="text" name="longitude" pattern="-?\d+\.?\d*" min="-180" max="180" value="{{ in_data.REOPT_INPUTS.get('longitude','-89.6501') }}"/>
+                </div>
+			</div>
             <div id="circuitUpload" class="desc" style="margin-top:10px">
                 <div class="chunk">
                     <form id="upload-file" method="post" enctype="multipart/form-data">
@@ -438,16 +448,6 @@
                     </form>
                 </div>
             </div>
-            <div id="circuitCreator" class="desc">
-				<div class="chunk">
-                    <label class="tooltip" for="latitude">Latitude<span class="classic">Specify the latitude of the load/grid as a decimal.</span></label>
-                    <input type="text" name="latitude" pattern="-?\d+\.?\d*" min="-90" max="90" value="{{ in_data.REOPT_INPUTS.get('latitude','39.7817') }}"/>
-                </div>
-                <div class="chunk">
-                    <label class="tooltip" for="longitude">Longitude<span class="classic">Specify the longitude of the load/grid as a decimal.</span></label>
-                    <input type="text" name="longitude" pattern="-?\d+\.?\d*" min="-180" max="180" value="{{ in_data.REOPT_INPUTS.get('longitude','-89.6501') }}"/>
-                </div>
-			</div>
 
             <div id="critLoads">
             </div>
@@ -1018,7 +1018,7 @@
 		for (var pair of form2.entries()) {
 				form1.append(pair[0], pair[1]);
 			}
-		// Specificy circuit location.
+		// Specify circuit location.
 		const dss_path = $('#circuitPostCreation').val();
 		if (dss_path == undefined) {
 			form1.append('DSS_PATH','Direct to uploads folder.');

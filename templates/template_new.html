@@ -460,12 +460,12 @@
                 <label class="tooltip" for="MG_DEF_METHOD">Microgrid Definition Method<span class="classic">Select a method by which the circuit should be partitioned into microgrids.</span></label>
                 <select id="partitionMethod" name="MG_DEF_METHOD" style="margin-right:6px" disabled>
                     <option value="" disabled selected>Select method</option>
-                    <option value="manual" {% if in_data.MG_DEF_METHOD == 'manual' %}selected{% endif %}>Manual</option>
-                    <option value="loadGrouping" {% if in_data.MG_DEF_METHOD == 'load_grouping' %}selected{% endif %}>Load Grouping</option>
-                    <option value="lukes" {% if in_data.MG_DEF_METHOD == 'lukes' %}selected{% endif %}>Lukes</option>
-                    <option value="branch" {% if in_data.MG_DEF_METHOD == 'branch' %}selected{% endif %}>Branch</option>
-                    <option value="bottomUp" {% if in_data.MG_DEF_METHOD == 'bottom-up' %}selected{% endif %}>Bottom-Up</option>
-                    <option value="criticalLoads" {% if in_data.MG_DEF_METHOD == 'critical_loads' %}selected{% endif %}>Critical Loads</option>
+                    <option value="manual" {% if in_data.MG_DEF_METHOD == 'manual' %}selected{% endif %} title="Assign each load to a specific microgrid and input the generation bus and switch for each microgrid.">Manual</option>
+                    <option value="loadGrouping" {% if in_data.MG_DEF_METHOD == 'load_grouping' %}selected{% endif %} title="Assign each load to a specific microgrid. Generation buses and switches will be selected automatically.">Load Grouping</option>
+                    <option value="lukes" {% if in_data.MG_DEF_METHOD == 'lukes' %}selected{% endif %} title="Use Lukes' 'Efficient Algorithm for the Partitioning of Trees' (1974) to divide circuit into microgrids.">Lukes</option>
+                    <option value="branch" {% if in_data.MG_DEF_METHOD == 'branch' %}selected{% endif %} title="Divide circuit into microgrids at the first bus from which there are multiple feeders.">Branch</option>
+                    <option value="bottomUp" {% if in_data.MG_DEF_METHOD == 'bottom-up' %}selected{% endif %} title="Form microgrids at the ends of each feeder and add elements upstream of each element to the same microgrid, merging with neighboring microgrids, until there are the desired number of microgrids.">Bottom-Up</option>
+                    <option value="criticalLoads" {% if in_data.MG_DEF_METHOD == 'critical_loads' %}selected{% endif %} title="Form a microgrid for each critical load and add elements upstream of each critical load to the same microgrid, merging with neighboring microgrids, until there are the desired number of microgrids.">Critical Loads</option>
                 </select></br>
                 <form id="partitionManuallyForm" style="display: none;">
                     <label for="mgQuantity">How many microgrids?</label>
@@ -1241,6 +1241,14 @@
 			// Also populate partitioning preview div from original run.
 			showOldPartitions(MODEL_DIR, MG_MINES);
 		}
+
+		// Add tooltip handler to partitioning dropdown.
+		$("#partitionMethod").change(function(event) {
+			$.each($(this).find('option'), function(key, value) {
+				$(value).removeClass('active');
+			})
+			$('option:selected').addClass('active');
+		});
 
 		// Upload DSS circuit. Get loads.
 		$('#upload-file-btn').click(function() {

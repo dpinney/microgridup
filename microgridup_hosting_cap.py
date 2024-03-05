@@ -899,10 +899,6 @@ def run_hosting_capacity(dss_filename):
 		load_df = load_df.iloc[:, 1:]
 	# - Instead of testing each bus up to 50000 kW, just test up to 4x the peak load across all meters to speed up the calculation
 	all_input_data['traditionalHCMaxTestkw'] = load_df.apply(np.max).sum() * 4
-	# - To be explicit, delete keys that aren't relevant for traditional hosting capacity algorithm
-	del all_input_data['algorithm']
-	del all_input_data['inputDataFileName']
-	del all_input_data['inputDataFileContent']
 	with open('hosting_capacity/allInputData.json', 'w') as f:
 		json.dump(all_input_data, f, indent=4)
 	omf.models.__neoMetaModel__.runForeground('hosting_capacity')

@@ -8,6 +8,7 @@ import pandas as pd
 import microgridup
 import microgridup_hosting_cap
 from omf.models import microgridDesign, __neoMetaModel__
+import omf.solvers.reopt_jl as reopt_jl
 import concurrent.futures
 
 
@@ -72,7 +73,7 @@ def create_production_factor_series_csv(microgrids, logger, reopt_inputs, invali
 		#   class. This is tricky because technically different microgrids could have sufficiently different load shapes such that one microgrid could
 		#   use a smaller size class and another microgrid would use a larger size class, so which size class should production_factor_series.csv use?
 		#   For now, we just use whatever size class mg0 uses and assume all microgrids have similar load profiles (and thus, similar size classes)
-		# - Could make use multiprocessing if we had to for 4 simultaneous REopt runs
+		#   - We could make use of multiprocessing if we had to for 4 simultaneous REopt runs
 		set_allinputdata_load_shape_parameters('reopt_loadshapes', f'loads.csv', list(microgrids.values())[0], logger)
 		with open('reopt_loadshapes/allInputData.json') as f:
 			allInputData = json.load(f)
@@ -82,7 +83,8 @@ def create_production_factor_series_csv(microgrids, logger, reopt_inputs, invali
 		#   wind data
 		allInputData['latitude'] = lat
 		allInputData['longitude'] = lon
-		# - We only care about the inputs to the model insofar as they 1) include solar and wind output and 2) the model completes as quickly as possible
+		# - We only care about the inputs to the model insofar as they (1) include solar and wind output and (2) the model completes as quickly as
+		#   possible
 		allInputData['solar'] = 'on'
 		allInputData['wind'] = 'on'
 		allInputData['battery'] = 'off'
@@ -581,27 +583,44 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 
 
 def _tests():
-	# Load arguments from JSON.
+	# - Asssert that REopt's own tests pass
+	reopt_jl._test()
+	# - Load lehigh1mg to use as test input
 	with open('testfiles/test_params.json') as file:
 		test_params = json.load(file)
-	control_test_args = test_params['control_test_args']
 	REOPT_INPUTS = test_params['REOPT_INPUTS']
-	# Testing directory.
-	_dir = 'lehigh4mgs' # Change to test on different directory.
+	control_test_args = test_params['control_test_args']
+	_dir = 'lehigh1mg'
+	microgrids = control_test_args[_dir]
 	MODEL_DIR = f'{PROJ_FOLDER}/{_dir}'
 	# HACK: work in directory because we're very picky about the current dir.
 	curr_dir = os.getcwd()
 	workDir = os.path.abspath(MODEL_DIR)
 	if curr_dir != workDir:
 		os.chdir(workDir)
-	microgrids = control_test_args[_dir]
 	logger = microgridup.setup_logging(f'{MGU_FOLDER}/logs.txt')
 	print(f'----------Testing {_dir}----------')
 	for run_count in range(len(microgrids)):
 		microgrid = microgrids[f'mg{run_count}']
 		existing_generation_dict = microgridup_hosting_cap.get_microgrid_existing_generation_dict(f'{MODEL_DIR}/circuit.dss', microgrid)
 		lat, lon = microgridup_hosting_cap.get_microgrid_coordinates(f'{MODEL_DIR}/circuit.dss', microgrid)
-		run(f'reopt_mg{run_count}', microgrid, logger, REOPT_INPUTS, f'mg{run_count}', lat, lon, existing_generation_dict, False)
+		run(f'reopt_mg{run_count}', microgrid, logger, REOPT_INPUTS, f'mg{run_count}', lat, lon, existing_generation_dict, True)
+		# - Assert that we got valid output from REopt
+		with open(f'reopt_mg{run_count}/REoptInputs.json') as f:
+			inputs = json.load(f)
+		with open(f'reopt_mg{run_count}/results.json') as f:
+			results = json.load(f)
+		# - Assert that the input load shape matches the output load shape
+		assert inputs['s']['electric_load']['loads_kw'] == results['ElectricLoad']['load_series_kw']
+		# - Assert that the optimal solar size is within 50 kW of an expected value
+		assert abs(4297.2752 - results['PV']['size_kw']) < 50
+		# - Assert that the optimal generator size is within 50 kW of an expected value
+		assert abs(1351.04 - results['Generator']['size_kw']) < 50
+		# - Assert that the optimal storage size is within 50 kW of an expected value
+		assert abs(527.31 - results['ElectricStorage']['size_kw']) < 50
+		assert abs(1227.04 - results['ElectricStorage']['size_kwh']) < 50
+		# - Assert that the optimal lifecycle cost is within $100,000 of an expected value
+		assert abs(1.64328751854e7 - results['Financial']['lcc']) < 100000
 	os.chdir(curr_dir)
 	print('Ran all tests for microgridup_design.py.')
 

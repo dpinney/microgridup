@@ -95,7 +95,10 @@ def create_production_factor_series_csv(microgrids, logger, reopt_inputs, invali
 		shutil.rmtree('reopt_loadshapes')
 		production_factor_series_df = pd.DataFrame()
 		production_factor_series_df['pv_production_factor_series'] = pd.Series(results['PV']['production_factor_series'])
-		production_factor_series_df['wind_production_factor_series'] = pd.Series(results['Wind']['production_factor_series'])
+		try:
+			production_factor_series_df['wind_production_factor_series'] = pd.Series(results['Wind']['production_factor_series'])
+		except:
+			pass #on some platforms reopt_jl can't handle wind, and it's safe to skip this output.
 		production_factor_series_df.to_csv('production_factor_series.csv', index=False)
 
 

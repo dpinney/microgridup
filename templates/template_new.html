@@ -269,7 +269,7 @@
                     <input type="text" name="MODEL_DIR" value="{{in_data.MODEL_DIR}}" pattern="[a-z0-9_\-]+" required/>
                 </div>
                 <div class="chunk">
-                    <label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">Defines the length of the interconnection analysis. Example – if time steps are 15 minutes, 480 would define a five day analysis.</span></label>
+                    <label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">Defines the length of the interconnection analysis in hours.</span></label>
                     <input type="text" name="QSTS_STEPS" value="{{in_data.QSTS_STEPS}}" />
                 </div>
                 <br>
@@ -309,14 +309,14 @@
                             </select>
                         </div>
                         <div class="chunk">
-                            <label class="tooltip" for="urdbLabelSwitch">Use URDB Rate?<span class="classic">Utilizing a rate from the Utility Rate Database overrides Cost of Energy and Cost of Demand rates above. See https://openei.org/services/<br>doc/rest/util_rates/</span></label>
+                            <label class="tooltip" for="urdbLabelSwitch">Use URDB Rate?<span class="classic">Utilizing a rate from the Utility Rate Database overrides Cost of Energy and Cost of Demand rates above. See <a href="https://openei.org/services/doc/rest/util_rates/">OpenEI</a> for more information.</span></label>
                             <select id="urdbLabelSwitch" name="urdbLabelSwitch">
                                 <option {% if in_data.REOPT_INPUTS.urdbLabelSwitch == "on" %}selected{% endif %} value="on">Yes</option>
                                 <option {% if 'urdbLabelSwitch' not in in_data.REOPT_INPUTS or in_data.REOPT_INPUTS.urdbLabelSwitch == "off" %}selected{% endif %} value="off">No</option>
                             </select>
                         </div>
                         <div class="chunk">
-                            <label class="tooltip" for="urdbLabel">URDB Label<span class="classic">Input the string found at the end of the URDB Rate URL, For example https://openei.org/apps/<br>IURDB/rate/view/<br> 5b75cfe95457a3454faf0aea <br> would yield "5b75cfe95457a3454faf0aea"</span></label>
+                            <label class="tooltip" for="urdbLabel">URDB Label<span class="classic">Input the string found at the end of the URDB Rate URL, For example <a href="https://openei.org/apps/IURDB/rate/view/5b75cfe95457a3454faf0aea">this rate data entry</a> would be "5b75cfe95457a3454faf0aea"</span></label>
                             <input type="text" name="urdbLabel" value="{{ in_data.REOPT_INPUTS.get('urdbLabel','5b75cfe95457a3454faf0aea') }}"/>
                         </div>
                     </div>
@@ -324,7 +324,7 @@
                 <h5>Load Profile</h5>
                 <div class="chunk">
                     {% if in_data.get('LOAD_CSV') %}
-                        <label class="tooltip" for="LOAD_CSV_NAME">Load Data (.csv)<span class="classic">Please upload a .csv file representing the hourly load shape. See https://github.com/dpinney/<br>microgridup/blob/main/docs<br>/input_formats.md for formatting details.</span></label>
+                        <label class="tooltip" for="LOAD_CSV_NAME">Load Data (.csv)<span class="classic">Please upload a .csv file representing the hourly load shape. See <a href="https://github.com/dpinney/microgridup/blob/main/docs/input_formats.md">input_formats.md</a> for formatting details.</span></label>
 						{% set load_path_as_list = in_data.get('LOAD_CSV').split('/') %}
                         <input type="text" name="LOAD_CSV_NAME" value="{{ load_path_as_list[-1] }}" class="file-input" readonly>
                         <button type="button" class="remove-btn">Remove File</button>
@@ -356,12 +356,12 @@
                 </div>
 				<div class="chunk">
                     {% if in_data.get('OUTAGE_CSV') %}
-                        <label class="tooltip" for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)<span class="classic">Please upload a .csv file representing historical outages. See https://github.com/dpinney/<br>microgridup/blob/main/docs<br>/input_formats.md for formatting details.</span></label>
+                        <label class="tooltip" for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)<span class="classic">Please upload a .csv file representing historical outages. See <a href="https://github.com/dpinney/microgridup/blob/main/docs/input_formats.md">input_formats.md</a> for formatting details.</span></label>
 						{% set outages_path_as_list = in_data.get('OUTAGE_CSV').split('/') %}
                         <input type="text" name="HISTORICAL_OUTAGES" value="{{ outages_path_as_list[-1] }}" class="file-input" readonly>
                         <button type="button" class="remove-btn">Remove File</button>
                     {% else %}
-                        <label class="tooltip" for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)<span class="classic">Please upload a .csv file representing historical outages. See https://github.com/dpinney/<br>microgridup/blob/main/docs<br>/input_formats.md for formatting details.</span></label>
+                        <label class="tooltip" for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)<span class="classic">Please upload a .csv file representing historical outages. See <a href="https://github.com/dpinney/microgridup/blob/main/docs/input_formats.md">input_formats.md</a> for formatting details.</span></label>
                         <input type="file" name="HISTORICAL_OUTAGES" class="file-input" accept=".csv">
                         <button type="button" class="remove-btn">Remove File</button>
                     {% endif %}

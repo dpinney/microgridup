@@ -18,6 +18,11 @@ def nx_get_branches(G):
 	'All branchy boys'
 	return [(n,G.out_degree(n)) for n in G.nodes() if G.out_degree(n) > 1]
 
+# A function to get all trees in a forest
+def get_all_trees(F):
+	list_of_trees = list(nx.weakly_connected_components(F))
+	return [F.subgraph(tree) for tree in list_of_trees]
+
 # Helper function to remove cycles and loops from a graph using hacky topological sort because nx_topological_sort breaks on cycles.
 def remove_loops(G):
 	# Delete edges to all parents except the first in topological order.
@@ -252,6 +257,17 @@ def nx_critical_load_branch(G, criticalLoads, num_mgs=3, large_or_small='large')
 			break
 	return parts[len(parts)-1]
 
+def check_if_loads_in_tree(G, pairs):
+	nodes_list = list(G.nodes())
+	loads_in_tree = []
+	nodes_not_in_tree = []
+	for node in pairs:
+		if node in nodes_list:
+			loads_in_tree.append(node)
+		else:
+			nodes_not_in_tree.append(node)
+	return loads_in_tree, nodes_not_in_tree
+
 def manual_groups(G, pairings):
 	# Create reference dict of lcas for each pair of two nodes.
 	tree_root = list(topological_sort(G))[0]
@@ -262,6 +278,12 @@ def manual_groups(G, pairings):
 	pairings.pop('None', None)
 	for mg in pairings:
 		pairs = pairings[mg]
+		loads_in_tree, nodes_not_in_tree = check_if_loads_in_tree(G, pairs)
+		if not loads_in_tree:
+			print(f'None of the pairs are in the current tree. Skipping.')
+			continue
+		if nodes_not_in_tree:
+			print(f'Error: the following nodes are not in current tree: {nodes_not_in_tree}.')
 		if len(pairs) > 1:
 			cur_lca = lcas.get((pairs[0],pairs[1]),lcas.get((pairs[1],pairs[0])))
 		elif len(pairs) == 1: # If there is only one load in a mg, use its parent as LCA. TO DO: Verify this assumption.
@@ -273,8 +295,13 @@ def manual_groups(G, pairings):
 		mgs[mg] = list(nx.nodes(nx.dfs_tree(G, cur_lca)))
 	# Only return the contents of each MG but do so in order specified by the user.
 	parts = []
-	for idx in range(len(mgs)):
-		parts.append(mgs[f'Mg{idx+1}'])
+	counter = 1
+	while mgs:
+		key = f'Mg{counter}'
+		if mgs.get(key):
+			parts.append(mgs[key])
+			del mgs[key]
+		counter += 1
 	return parts
 
 def nx_get_parent(G, n):
@@ -350,24 +377,29 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 	omd_list = list(omd.values())
 	# Generate microgrids
 	switch, gen_bus = None, None
-	if algo == 'lukes':
-		default_size = int(len(G.nodes())/3)
-		MG_GROUPS = nx_group_lukes(G, algo_params.get('size',default_size))
-	elif algo == 'branch':
-		MG_GROUPS = nx_group_branch(G, i_branch=algo_params.get('i_branch',0))
-	elif algo == 'bottomUp':
-		MG_GROUPS = nx_bottom_up_branch(G, num_mgs=algo_params.get('num_mgs',3), large_or_small='large')
-	elif algo == 'criticalLoads':
-		MG_GROUPS = nx_critical_load_branch(G, CRITICAL_LOADS, num_mgs=algo_params.get('num_mgs',3), large_or_small='large')
-	elif algo == 'loadGrouping':
-		MG_GROUPS = manual_groups(G, algo_params)
-	elif algo == 'manual':
-		MG_GROUPS = manual_groups(G, algo_params['pairings'])
-		switch = algo_params['switch']
-		gen_bus = algo_params['gen_bus']
-	else:
-		print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", or "criticalLoads". No mgs generated.')
-		return {}
+	all_trees = get_all_trees(G)
+	all_trees_pruned = [tree for tree in all_trees if len(tree.nodes()) > 1]
+	num_trees_pruned = len(all_trees_pruned)
+	MG_GROUPS = []
+	for tree in all_trees_pruned:
+		if algo == 'lukes':
+			default_size = int(len(tree.nodes())/3)
+			MG_GROUPS.extend(nx_group_lukes(tree, algo_params.get('size',default_size)))
+		elif algo == 'branch':
+			MG_GROUPS.extend(nx_group_branch(tree, i_branch=algo_params.get('i_branch',0)))
+		elif algo == 'bottomUp':
+			MG_GROUPS.extend(nx_bottom_up_branch(tree, num_mgs=algo_params.get('num_mgs',3)/num_trees_pruned, large_or_small='large'))
+		elif algo == 'criticalLoads':
+			MG_GROUPS.extend(nx_critical_load_branch(tree, CRITICAL_LOADS, num_mgs=algo_params.get('num_mgs',3)/num_trees_pruned, large_or_small='large'))
+		elif algo == 'loadGrouping':
+			MG_GROUPS.extend(manual_groups(tree, algo_params))
+		elif algo == 'manual':
+			MG_GROUPS.extend(manual_groups(tree, algo_params['pairings']))
+			switch = algo_params['switch']
+			gen_bus = algo_params['gen_bus']
+		else:
+			print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", or "criticalLoads". No mgs generated.')
+			return {}
 	MG_MINES = helper(MG_GROUPS, switch, gen_bus)
 	return MG_MINES
 

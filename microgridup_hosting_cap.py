@@ -790,12 +790,9 @@ def make_chart(csvName, circuitFilePath, category_name, x, y_list, year, qsts_st
 		title = chart_name,
 		xaxis = dict(title="Date"),
 		yaxis = dict(title=y_axis_name),
-		font = dict(
-			family="sans-serif",
-			color="black"
-		)
 		#yaxis = dict(title = str(y_list))
-	)
+		font = dict(family="sans-serif", color="black"),
+		legend = dict(orientation='h'))
 	fig = go.Figure(data, layout)
 
 	if ansi_bands == True:
@@ -902,10 +899,6 @@ def run_hosting_capacity(dss_filename):
 		load_df = load_df.iloc[:, 1:]
 	# - Instead of testing each bus up to 50000 kW, just test up to 4x the peak load across all meters to speed up the calculation
 	all_input_data['traditionalHCMaxTestkw'] = load_df.apply(np.max).sum() * 4
-	# - To be explicit, delete keys that aren't relevant for traditional hosting capacity algorithm
-	del all_input_data['algorithm']
-	del all_input_data['inputDataFileName']
-	del all_input_data['inputDataFileContent']
 	with open('hosting_capacity/allInputData.json', 'w') as f:
 		json.dump(all_input_data, f, indent=4)
 	omf.models.__neoMetaModel__.runForeground('hosting_capacity')
@@ -943,7 +936,13 @@ def run_hosting_capacity(dss_filename):
 		go.Bar(name='Bus Voltage Violation kW', x=voltage_violation_rows['bus'], y=voltage_violation_rows['max_kw'], marker_color='yellow', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Voltage Violation kW: %{y}'])),
 		go.Bar(name='Bus Thermal Violation kW', x=thermal_violation_rows['bus'], y=thermal_violation_rows['max_kw'], marker_color='orange', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Thermal Violation kW: %{y}'])),
 		go.Bar(name='Bus Voltage and Thermal Violation kW', x=duel_violation_rows['bus'], y=duel_violation_rows['max_kw'], marker_color='red', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Voltage and Thermal Violation kW: %{y}']))])
-	fig.update_layout(title='Traditional Hosting Capacity By Bus', font=dict(family="sans-serif", color="black"), xaxis_title='Bus Name', yaxis_title='kW')
+	fig.update_layout(
+		title='Traditional Hosting Capacity By Bus',
+		font=dict(family="sans-serif",
+		color="black"),
+		xaxis_title='Bus Name',
+		yaxis_title='kW',
+		legend=dict(orientation='h'))
 	fig.write_html('hosting_capacity/traditionalGraphData.html')
 	# - Create table
 	html = (

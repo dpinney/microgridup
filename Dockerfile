@@ -1,5 +1,5 @@
 # A Dockerfile for running MicrogridUP.
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 MAINTAINER <david.pinney@nreca.coop>
 
 # Install OS prereqs.

@@ -257,16 +257,8 @@
                     <input type="text" name="MODEL_DIR" value="lehigh1mg" pattern="[a-z0-9_\-]+" required/>
                 </div>
                 <div class="chunk">
-                    <label class="tooltip" for="latitude">Latitude<span class="classic">Specify the latitude of the load/grid as a decimal.</span></label>
-                    <input type="text" name="latitude" pattern="-?\d+\.?\d*" value="39.7817"/>
-                </div>
-                <div class="chunk">
-                    <label class="tooltip" for="longitude">Longitude<span class="classic">Specify the longitude of the load/grid as a decimal.</span></label>
-                    <input type="text" name="longitude" pattern="-?\d+\.?\d*" value="-89.6501"/>
-                </div>
-                <div class="chunk">
                     <label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">Defines the length of the interconnection analysis. Example – if time steps are 15 minutes, 480 would define a five day analysis.</span></label>
-                    <input type="text" name="QSTS_STEPS" value="480" />
+                    <input type="text" name="QSTS_STEPS" value="480.0" />
                 </div>
                 <br>
                 <div class="chunk">
@@ -327,7 +319,7 @@
                     
                 </div>
 				<div class="chunk">
-					<label class="tooltip" for="analysisYears">Analysis Period (years)<span class="classic">Specify the length of financial analysis in years.</span></label>
+					<label class="tooltip" for="analysisYears">Analysis Period (years)<span class="classic">Please enter a number 2-75 to specify the length of financial analysis in years.</span></label>
 					<input type="text" name="analysisYears" value="25" step="1" min="2" max="75"/>
 				</div>
                 <div>
@@ -343,20 +335,16 @@
                 <h5>Resilience</h5>
                 <div class="chunk">
                     <div id='outageLocationInputInsert'></div>
-                    <!--
-                    <label class="tooltip" for="FAULTED_LINES">Outage Location(s)<span class="classic">Node number in distribution map where typical outage would take place.</span></label>
-                    <input type="text" name="FAULTED_LINES" value="650632" pattern="\w+(?:,\w+)?" required/>
-                    -->
                 </div>
                 <div class="chunk">
-                    <label class="tooltip" for="outageDuration">Outage Duration (hours)<span class="classic">The added major outage is given this duration.</span></label>
+                    <label class="tooltip" for="outageDuration">Outage Duration (hours)<span class="classic">Please enter a number 1-8760 to specify the duration of the added major outage in hours.</span></label>
                     <input type="text" name="outageDuration" value="48" min="1" max="8760"/>
                 </div>
 				<div class="chunk">
                     
                         <label class="tooltip" for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)<span class="classic">Please upload a .csv file representing historical outages. See https://github.com/dpinney/<br>microgridup/blob/main/docs<br>/input_formats.md for formatting details.</span></label>
 						
-                        <input type="text" name="HISTORICAL_OUTAGES" value="lehigh_random_outages.csv" class="file-input" readonly>
+                        <input type="text" name="HISTORICAL_OUTAGES" value="outages.csv" class="file-input" readonly>
                         <button type="button" class="remove-btn">Remove File</button>
                     
                 </div>
@@ -364,9 +352,9 @@
                     <i class="fa fa-plus-square"></i>
                     <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
                     <div style="display:none;">
-						<div class="chunk">
-                            <label class="tooltip" for="DIESEL_SAFETY_FACTOR">Fossil Safety Margin (%)<span class="classic">TO DO: FILL TOOLTIP</span></label>
-                            <input type="text" name="DIESEL_SAFETY_FACTOR" value="" />
+                        <div class="chunk">
+                            <label class="tooltip" for="maxRuntimeSeconds">Maximum REopt Run-time (seconds)<span class="classic">Please enter a number 30-86400. A greater maximum REopt run-time could result in more precise REopt results. A maximum REopt run-time that is too short could result in an error.</span></label>
+                            <input type="text" name="maxRuntimeSeconds" value="240" min="30" max="86400"/>
                         </div>
                     </div>
                 </div>
@@ -377,7 +365,7 @@
                 </div>
                 <div class="chunk">
                     <label class="tooltip" for="single_phase_relay_cost">Single-Phase Relay Cost ($)<span class="classic">Specify the cost of a single-phase relay in $.</span></label>
-                    <input type="text" name="single_phase_relay_cost" value="300" pattern="^\d+\.?\d*?$"/>
+                    <input type="text" name="single_phase_relay_cost" value="300" pattern="^\d+$"/>
                 </div>
                 <div class="chunk">
                     <label class="tooltip" for="three_phase_relay_cost">Three-Phase Relay Cost ($)<span class="classic">Specify the cost of a three-phase relay in $.</span></label>
@@ -401,11 +389,21 @@
 
             <h3>Step 2: Specify existing circuit</h3>
             <p>Please select your circuit creation method:</p>
+			<input type="radio" id="wizard" name="circuit" value="Creator" />
+            <label for="wizard">Build circuit manually</label><br>
             <input type="radio" id="upload" name="circuit" value="Upload" />
             <label for="upload">Upload circuit from file</label><br>
-            <input type="radio" id="wizard" name="circuit" value="Creator" />
-            <label for="wizard">Build circuit manually</label><br>
 
+			<div id="circuitCreator" class="desc">
+				<div class="chunk">
+                    <label class="tooltip" for="latitude">Latitude<span class="classic">Specify the latitude of the load/grid as a decimal.</span></label>
+                    <input type="text" name="latitude" pattern="-?\d+\.?\d*" min="-90" max="90" value="39.7817"/>
+                </div>
+                <div class="chunk">
+                    <label class="tooltip" for="longitude">Longitude<span class="classic">Specify the longitude of the load/grid as a decimal.</span></label>
+                    <input type="text" name="longitude" pattern="-?\d+\.?\d*" min="-180" max="180" value="-89.6501"/>
+                </div>
+			</div>
             <div id="circuitUpload" class="desc" style="margin-top:10px">
                 <div class="chunk">
                     <form id="upload-file" method="post" enctype="multipart/form-data">
@@ -423,7 +421,6 @@
                     </form>
                 </div>
             </div>
-            <div id="circuitCreator" class="desc"></div>
 
             <div id="critLoads">
             </div>
@@ -436,12 +433,12 @@
                 <label class="tooltip" for="MG_DEF_METHOD">Microgrid Definition Method<span class="classic">Select a method by which the circuit should be partitioned into microgrids.</span></label>
                 <select id="partitionMethod" name="MG_DEF_METHOD" style="margin-right:6px" disabled>
                     <option value="" disabled selected>Select method</option>
-                    <option value="manual" >Manual</option>
-                    <option value="loadGrouping" >Load Grouping</option>
-                    <option value="lukes" >Lukes</option>
-                    <option value="branch" >Branch</option>
-                    <option value="bottomUp" >Bottom-Up</option>
-                    <option value="criticalLoads" >Critical Loads</option>
+                    <option value="manual"  title="Assign each load to a specific microgrid and input the generation bus and switch for each microgrid.">Manual</option>
+                    <option value="loadGrouping"  title="Assign each load to a specific microgrid. Generation buses and switches will be selected automatically.">Load Grouping</option>
+                    <option value="lukes"  title="Use Lukes' 'Efficient Algorithm for the Partitioning of Trees' (1974) to divide circuit into microgrids.">Lukes</option>
+                    <option value="branch"  title="Divide circuit into microgrids at the first bus from which there are multiple feeders.">Branch</option>
+                    <option value="bottomUp"  title="Form microgrids at the ends of each feeder and add elements upstream of each element to the same microgrid, merging with neighboring microgrids, until there are the desired number of microgrids.">Bottom-Up</option>
+                    <option value="criticalLoads"  title="Form a microgrid for each critical load and add elements upstream of each critical load to the same microgrid, merging with neighboring microgrids, until there are the desired number of microgrids.">Critical Loads</option>
                 </select></br>
                 <form id="partitionManuallyForm" style="display: none;">
                     <label for="mgQuantity">How many microgrids?</label>
@@ -492,7 +489,7 @@
                     </div>
                     <div class="chunk">
                         <label class="tooltip" for="solarMax">Solar Power Max (kW-DC)<span class="classic">Specify the maximum desired generation in kW-DC. Leave at default for full optimization on solar power.</span></label>
-                        <input type="text" name="solarMax" value="10000"/>
+                        <input type="text" name="solarMax" value="10000" required/>
                     </div>
                     <div class="chunk">
                         <label class="tooltip" for="solarMin">Solar Power Min (kW-DC)<span class="classic">Specify the minimum desired generation in kW-DC.</span></label>
@@ -519,7 +516,7 @@
                     </div>
                     <div class="chunk">
                         <label class="tooltip" for="batteryCapacityMax">Battery Capacity Max (kWh-AC)<span class="classic">Specify the maximum desired battery capacity in kWh.</span></label>
-                        <input type="text" name="batteryCapacityMax" value="10000"/>
+                        <input type="text" name="batteryCapacityMax" value="100000"/>
                     </div>
                     <div class="chunk">
                         <label class="tooltip" for="batteryCapacityMin">Battery Capacity Min (kWh-AC)<span class="classic">Specify the minimum desired battery capacity in kWh.</span></label>
@@ -570,7 +567,7 @@
                     <h5>Fossil</h5>
                     <div class="chunk">
                         <label class="tooltip" for="dieselGenCost">Genset Cost ($/kW)<span class="classic">Specify the cost in $/kWh.</span></label>
-                        <input type="text" name="dieselGenCost" value="1000" pattern="^\d+\.?\d*?$"/>
+                        <input type="text" name="dieselGenCost" value="1000" pattern="^\d+\.?\d*?$" required/>
                     </div>
                     <div class="chunk">
                         <label class="tooltip" for="dieselMax">Genset Max (kW)<span class="classic">Specify max fossil generation in kW. Only specify if needed, as the optimization runs best if left unedited.</span></label>
@@ -612,11 +609,11 @@
                         </select>
                     </div>
                     <div class="chunk">
-                        <label class="tooltip" for="dieselMacrsOptionYears">Fossil MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 5 and 7 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
+                        <label class="tooltip" for="dieselMacrsOptionYears">Fossil MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 15 and 20 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
                         <select id="dieselMacrsOptionYears" name="dieselMacrsOptionYears">
                             <option selected value="0">0</option>
-                            <option  value="5">5</option>
-                            <option  value="7">7</option>
+                            <option  value="15">15</option>
+                            <option  value="20">20</option>
                         </select>
                     </div>
                 </div>
@@ -681,8 +678,9 @@
 				} else {
 					const oldNameAttribute = $(fileInput).attr('name');
 					var nameAttribute = oldNameAttribute;
+					var fileType = oldNameAttribute == 'BASE_DSS_NAME' ? '.dss' : '.csv';
 					// Replace the read-only text input with a new file input.
-					const newFileInput = $('<input type="file" class="file-input">').attr('name', nameAttribute);
+					const newFileInput = $('<input type="file" class="file-input">').attr('name', nameAttribute).attr('accept', fileType);
 					fileInput.replaceWith(newFileInput);
 					// Set up the new file input for further functionality.
 					newFileInput.on('change', function () {
@@ -941,10 +939,21 @@
 		for (var i = 0; i < inputs.length; i++) {
 			var input = inputs[i];
 			if (!input.checkValidity()) {
-			valid = false;
-			input.style.border = "1px solid red";
+				valid = false;
+				input.style.border = "1px solid red";
+			} else if ( (input.hasAttribute('min') && !(Number(input.value) >= Number(input.min))) || (input.hasAttribute('max') && !(Number(input.value) <= Number(input.max))) ) {
+				valid = false;
+				input.style.border = "1px solid red";
+			} else if (input.hasAttribute('step')) {
+				const step = Number(input.step);
+				const val = Number(input.value);
+				const tolerance = 1e-3; // Need to justify close enough to 0 because of floating point division oddities.
+				if (step > 0 && val % step != 0 && Math.abs(val % step) > tolerance) {
+					valid = false;
+					input.style.border = "1px solid red";
+				}
 			} else {
-			input.style.border = "";
+				input.style.border = "";
 			}
 		}
 		return valid;
@@ -982,7 +991,7 @@
 		for (var pair of form2.entries()) {
 				form1.append(pair[0], pair[1]);
 			}
-		// Specificy circuit location.
+		// Specify circuit location.
 		const dss_path = $('#circuitPostCreation').val();
 		if (dss_path == undefined) {
 			form1.append('DSS_PATH','Direct to uploads folder.');
@@ -1104,6 +1113,7 @@
 
 	window.circuitIsSpecified = false;
 	window.filename = '';
+	window.on_edit_flow = false;
 
 	$(document).ready(function() {
 		// Clone partitioning div for resetting.
@@ -1113,6 +1123,7 @@
 		attachDropdownsEventHandler();
 		attachPartitionButtonEventHandler();
 
+		// Add Remove File buttons for previously uploaded inputs.
 		$('.chunk').each(function () {
 			toggleRemoveButton(this);
 		});
@@ -1193,8 +1204,9 @@
 			window.circuitIsSpecified = true;
 			window.filename = $('#circuitPostCreation').val();
 			const MODEL_DIR = document.getElementsByName('MODEL_DIR')[0].value;
+			window.on_edit_flow = true;
 			// Get allDataInputs.json params from Jinja as variables in the script.
-			var in_data = JSON.parse('{"BASE_DSS": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh1mg/circuit.dss", "CREATION_DATE": "2024-02-01 01:48:40", "CRITICAL_LOADS": ["634a_data_center", "634b_radar", "634c_atc_tower", "675a_hospital", "675b_residential1", "675c_residential1", "692_warehouse2", "684_command_center", "652_residential", "611_runway"], "DESCRIPTION": "", "FAULTED_LINES": "650632", "INVALIDATE_CACHE": false, "LOAD_CSV": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh1mg/loads.csv", "MICROGRIDS": {"mg0": {"critical_load_kws": [70, 90, 10, 150, 200, 200, 400, 20, 30, 70, 0, 0], "gen_bus": "670", "gen_obs_existing": ["solar_634_existing", "solar_675_existing", "fossil_684_existing", "fossil_646_existing", "battery_634_existing", "battery_684_existing"], "loads": ["634a_data_center", "634b_radar", "634c_atc_tower", "675a_hospital", "675b_residential1", "675c_residential1", "692_warehouse2", "684_command_center", "652_residential", "611_runway", "645_hangar", "646_office"], "switch": "650632"}}, "MODEL_DIR": "lehigh1mg", "OUTAGE_CSV": "/Users/austinchang/programming/repositories/microgridup/microgridup/testfiles/lehigh_random_outages.csv", "QSTS_STEPS": 480, "REOPT_INPUTS": {"analysisYears": "25", "battery": "on", "batteryCapacityCost": "420", "batteryCapacityCostReplace": "200", "batteryCapacityMax": "10000", "batteryCapacityMin": 0, "batteryCapacityReplaceYear": "10", "batteryPowerCost": "840", "batteryPowerCostReplace": "410", "batteryPowerMax": "10000", "batteryPowerMin": 0, "batteryPowerReplaceYear": "10", "demandCost": "20", "dieselCO2Factor": 24.1, "dieselFuelCostGal": 1.5, "dieselGenCost": "1000", "dieselMax": "10000", "dieselOMCostKw": 35, "dieselOMCostKwh": 0.02, "dieselOnlyRunsDuringOutage": false, "discountRate": "0.083", "energyCost": "0.12", "fossil": "on", "fuelAvailable": "150000", "mgParameterOverrides": {"mg0": {}}, "minGenLoading": 0, "outageDuration": "48", "single_phase_relay_cost": 300, "solar": "on", "solarCanCurtail": true, "solarCanExport": true, "solarCost": "1600", "solarMax": "10000", "solarMin": 0, "three_phase_relay_cost": 20000, "urdbLabelSwitch": "off", "value_of_lost_load": "100", "wholesaleCost": "0.034", "wind": "off", "windCost": "4989", "windMax": "1000", "windMin": 0, "year": "2017"}}');
+			var in_data = JSON.parse('{"BASE_DSS": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh1mg/circuit.dss", "CREATION_DATE": "2024-03-04 19:10:47", "CRITICAL_LOADS": ["634a_data_center", "634b_radar", "634c_atc_tower", "675a_hospital", "675b_residential1", "675c_residential1", "692_warehouse2", "684_command_center", "652_residential", "611_runway"], "DESCRIPTION": "", "FAULTED_LINES": "650632", "INVALIDATE_CACHE": true, "LOAD_CSV": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh1mg/loads.csv", "MICROGRIDS": {"mg0": {"critical_load_kws": [70, 90, 10, 150, 200, 200, 400, 20, 30, 70, 0, 0], "gen_bus": "670", "gen_obs_existing": ["solar_634_existing", "solar_675_existing", "fossil_684_existing", "fossil_646_existing", "battery_634_existing", "battery_684_existing"], "loads": ["634a_data_center", "634b_radar", "634c_atc_tower", "675a_hospital", "675b_residential1", "675c_residential1", "692_warehouse2", "684_command_center", "652_residential", "611_runway", "645_hangar", "646_office"], "switch": "650632"}}, "MODEL_DIR": "lehigh1mg", "OUTAGE_CSV": "/Users/austinchang/programming/repositories/microgridup/microgridup/lehigh1mg/outages.csv", "QSTS_STEPS": 480.0, "REOPT_INPUTS": {"analysisYears": "25", "battery": "on", "batteryCapacityCost": "420", "batteryCapacityCostReplace": "200", "batteryCapacityMax": "100000", "batteryCapacityMin": "0", "batteryCapacityReplaceYear": "10", "batteryItcPercent": "0", "batteryMacrsOptionYears": "7", "batteryPowerCost": "840", "batteryPowerCostReplace": "410", "batteryPowerMax": "10000", "batteryPowerMin": "0", "batteryPowerReplaceYear": "10", "demandCost": "20", "dieselCO2Factor": "24.1", "dieselFuelCostGal": "1.5", "dieselGenCost": "1000", "dieselMacrsOptionYears": "0", "dieselMax": "10000", "dieselMin": "0", "dieselOMCostKw": "35", "dieselOMCostKwh": "0.02", "dieselOnlyRunsDuringOutage": false, "discountRate": "0.083", "energyCost": "0.12", "fossil": "on", "fuelAvailable": "150000", "maxRuntimeSeconds": "240", "mgParameterOverrides": {"mg0": {}}, "minGenLoading": "0", "omCostEscalator": "0.025", "outageDuration": "48", "single_phase_relay_cost": "300", "solar": "on", "solarCanCurtail": true, "solarCanExport": true, "solarCost": "1600", "solarItcPercent": "0.26", "solarMacrsOptionYears": "5", "solarMax": "10000", "solarMin": "0", "three_phase_relay_cost": "20000", "urdbLabel": "5b75cfe95457a3454faf0aea", "urdbLabelSwitch": "off", "value_of_lost_load": "100", "wholesaleCost": "0.034", "wind": "off", "windCost": "4989", "windItcPercent": "0.26", "windMacrsOptionYears": "5", "windMax": "1000", "windMin": "0", "year": "2017"}}');
 			var criticalLoads = in_data['CRITICAL_LOADS'];
 			var MG_MINES = in_data['MICROGRIDS'];
 			// Also populate critical load selection div.
@@ -1203,16 +1215,32 @@
 			showOldPartitions(MODEL_DIR, MG_MINES);
 		}
 
+		// Add tooltip handler to partitioning dropdown.
+		$("#partitionMethod").change(function(event) {
+			$.each($(this).find('option'), function(key, value) {
+				$(value).removeClass('active');
+			})
+			$('option:selected').addClass('active');
+		});
+
 		// Upload DSS circuit. Get loads.
 		$('#upload-file-btn').click(function() {
+			var model_dir = $('input[name="MODEL_DIR"]').val()
 			// Do not proceed if model has no name.
-			if ($('input[name="MODEL_DIR"]').val() === '') {
+			if (model_dir === '') {
 				alert('Please specify a model name.')
 				return 
 			}
+			// Do not proceed if input contains capital letters.
+			const pattern = new RegExp('[A-Z]');
+			if (pattern.test(model_dir)) {
+				alert('Model names must be entirely lowercase. Please return to Step 1 and provide Model Name with lowercase input.')
+				return
+			}
 			var form_data = new FormData($('#upload-file')[0]);
-			var model_dir = $('input[name="MODEL_DIR"]').val()
 			form_data.append('MODEL_DIR',model_dir)
+			// Recognize if we're on the edit flow. If we are not, backend should search data/projects for model_dir and return error if it already exists.
+			form_data.append('on_edit_flow',window.on_edit_flow);
 			$.ajax({
 				type: 'POST',
 				url: '/uploadDss',
@@ -1246,6 +1274,9 @@
 					window.filename = data.filename;
 					// Make directory uneditable. 
 					$('input[name="MODEL_DIR"]').prop("readonly", true);
+				},
+				error: function(data) {
+					alert(data.responseJSON.error);
 				}
 			});
 		});
@@ -1280,6 +1311,7 @@
 			if (form1Valid && form2Valid) {
 				// Submit the forms
 				submitEverything();
+				// console.log('Submitting form.')
 			} else {
 				// Show alert and highlight incorrect fields
 				if (!form1Valid) {
@@ -1302,6 +1334,7 @@
 			name: 'substation_1',
 			namespace: 'element',
 			type: 'substation',
+			basekv: 2.4
 		},
 		{
 			name: 'feeder_1',

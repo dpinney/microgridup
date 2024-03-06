@@ -1,73 +1,76 @@
-2024-02-01 02:15:02,226 - Logging status updates for /Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehighauto_3mg.
-2024-02-01 02:19:15,453 - load_phases on bus_name: phases ['1'] on bus 634.1
-2024-02-01 02:19:15,454 - load_phases on bus_name: phases ['1'] on bus 634.1
-2024-02-01 02:19:15,454 - load_phases on bus_name: phases ['1'] on bus 634.1
-2024-02-01 02:19:15,459 - mg_phase_and_kv out_dict:
-2024-02-01 02:19:15,467 - Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
+2024-03-04 19:11:03,460 - Logging status updates for /Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehighauto_3mg.
+2024-03-04 19:11:03,460 - Rerunning existing project. DSS file not moved.
+2024-03-04 19:11:03,461 - Rerunning existing project. Load CSV file not moved.
+2024-03-04 19:11:03,461 - Rerunning existing project. Outages CSV file not moved.
+2024-03-04 19:18:27,932 - load_phases on bus_name: phases ['1'] on bus 634.1
+2024-03-04 19:18:27,934 - load_phases on bus_name: phases ['1'] on bus 634.1
+2024-03-04 19:18:27,935 - load_phases on bus_name: phases ['1'] on bus 634.1
+2024-03-04 19:18:27,955 - mg_phase_and_kv out_dict:
+2024-03-04 19:18:27,969 - Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
 
-2024-02-01 02:19:15,558 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+2024-03-04 19:18:28,107 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-02-01 02:19:15,558 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+2024-03-04 19:18:28,107 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-02-01 02:19:15,559 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+2024-03-04 19:18:28,108 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-02-01 02:19:15,610 - microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 604.0465, 'solar_size_existing': 440.0, 'solar_size_new': 164.04650000000004, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 116.64, 'fossil_size_existing': 0.0, 'fossil_size_new': 116.64, 'battery_cap_total': 466.62, 'battery_cap_existing': 307.0, 'battery_cap_new': 159.62, 'battery_pow_total': 133.25, 'battery_pow_existing': 79.0, 'battery_pow_new': 54.25}
-2024-02-01 02:19:15,678 - load_phases on bus_name: phases ['2'] on bus 645.2
-2024-02-01 02:19:15,678 - load_phases on bus_name: phases ['2'] on bus 646.2
-2024-02-01 02:19:15,731 - mg_phase_and_kv out_dict:
-2024-02-01 02:19:15,780 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+2024-03-04 19:18:28,176 - microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 601.1979, 'solar_size_existing': 440.0, 'solar_size_new': 161.1979, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 118.61, 'fossil_size_existing': 0.0, 'fossil_size_new': 118.61, 'battery_cap_total': 457.24, 'battery_cap_existing': 307.0, 'battery_cap_new': 150.24, 'battery_pow_total': 131.27, 'battery_pow_existing': 79.0, 'battery_pow_new': 52.27000000000001}
+2024-03-04 19:18:28,252 - load_phases on bus_name: phases ['2'] on bus 645.2
+2024-03-04 19:18:28,254 - load_phases on bus_name: phases ['2'] on bus 646.2
+2024-03-04 19:18:28,323 - mg_phase_and_kv out_dict:
+2024-03-04 19:18:28,383 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-02-01 02:19:15,780 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+2024-03-04 19:18:28,384 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-02-01 02:19:15,831 - microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 509.2012, 'solar_size_existing': 0.0, 'solar_size_new': 509.2012, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 37.34, 'fossil_size_existing': 0.0, 'fossil_size_new': 37.34, 'battery_cap_total': 218.69, 'battery_cap_existing': 0.0, 'battery_cap_new': 218.69, 'battery_pow_total': 94.81, 'battery_pow_existing': 0.0, 'battery_pow_new': 94.81}
-2024-02-01 02:19:15,896 - load_phases on bus_name: phases ['3'] on bus 684.3
-2024-02-01 02:19:15,896 - load_phases on bus_name: phases ['1', '2', '3'] on bus 692.1.2.3
-2024-02-01 02:19:15,896 - load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-02-01 02:19:15,896 - load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-02-01 02:19:15,896 - load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-02-01 02:19:15,897 - load_phases on bus_name: phases ['3'] on bus 611.3
-2024-02-01 02:19:15,897 - load_phases on bus_name: phases ['3'] on bus 652.3
-2024-02-01 02:19:15,897 - load_phases on bus_name: phases ['1'] on bus 670.1
-2024-02-01 02:19:15,897 - load_phases on bus_name: phases ['2'] on bus 670.2
-2024-02-01 02:19:15,897 - load_phases on bus_name: phases ['3'] on bus 670.3
-2024-02-01 02:19:15,954 - mg_phase_and_kv out_dict:
-2024-02-01 02:19:16,009 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+2024-03-04 19:18:28,442 - microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 509.0774, 'solar_size_existing': 0.0, 'solar_size_new': 509.0774, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 37.35, 'fossil_size_existing': 0.0, 'fossil_size_new': 37.35, 'battery_cap_total': 218.7, 'battery_cap_existing': 0.0, 'battery_cap_new': 218.7, 'battery_pow_total': 94.81, 'battery_pow_existing': 0.0, 'battery_pow_new': 94.81}
+2024-03-04 19:18:28,527 - load_phases on bus_name: phases ['3'] on bus 684.3
+2024-03-04 19:18:28,528 - load_phases on bus_name: phases ['1', '2', '3'] on bus 692.1.2.3
+2024-03-04 19:18:28,528 - load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-03-04 19:18:28,528 - load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-03-04 19:18:28,529 - load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-03-04 19:18:28,529 - load_phases on bus_name: phases ['3'] on bus 611.3
+2024-03-04 19:18:28,529 - load_phases on bus_name: phases ['3'] on bus 652.3
+2024-03-04 19:18:28,530 - load_phases on bus_name: phases ['1'] on bus 670.1
+2024-03-04 19:18:28,534 - load_phases on bus_name: phases ['2'] on bus 670.2
+2024-03-04 19:18:28,534 - load_phases on bus_name: phases ['3'] on bus 670.3
+2024-03-04 19:18:28,602 - mg_phase_and_kv out_dict:
+2024-03-04 19:18:28,680 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-02-01 02:19:16,010 - Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-03-04 19:18:28,682 - Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 
-2024-02-01 02:19:16,010 - Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-03-04 19:18:28,683 - Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 
-2024-02-01 02:19:16,010 - Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-03-04 19:18:28,684 - Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 
-2024-02-01 02:19:16,010 - Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-03-04 19:18:28,685 - Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 
-2024-02-01 02:19:16,010 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+2024-03-04 19:18:28,686 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-02-01 02:19:16,010 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+2024-03-04 19:18:28,687 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-02-01 02:19:16,010 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+2024-03-04 19:18:28,687 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-02-01 02:19:16,010 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+2024-03-04 19:18:28,687 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-02-01 02:19:16,010 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+2024-03-04 19:18:28,687 - Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-02-01 02:19:16,063 - microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 3059.643, 'solar_size_existing': 0.0, 'solar_size_new': 3059.643, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 835.93, 'fossil_size_existing': 265.0, 'fossil_size_new': 570.93, 'battery_cap_total': 1162.24, 'battery_cap_existing': 0.0, 'battery_cap_new': 1162.24, 'battery_pow_total': 381.58, 'battery_pow_existing': 0.0, 'battery_pow_new': 381.58}
-2024-02-01 02:19:16,182 - QSTS with circuit_plus_mgAll.dss AND CWD IS /Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehighauto_3mg
-2024-02-01 02:19:16,897 - CONTROLLING ON {'mg0': {'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'switch': '632633', 'gen_bus': '633', 'gen_obs_existing': ['solar_634_existing', 'battery_634_existing'], 'critical_load_kws': [160.0, 120.0, 120.0], 'max_potential': '700', 'max_potential_diesel': '1000000', 'battery_capacity': '10000'}, 'mg1': {'loads': ['645_hangar', '646_office'], 'switch': '632645', 'gen_bus': '645', 'gen_obs_existing': [], 'critical_load_kws': [170.0, 0.0], 'max_potential': '700', 'max_potential_diesel': '1000000', 'battery_capacity': '10000'}, 'mg2': {'loads': ['684_command_center', '692_warehouse2', '675a_hospital', '675b_residential1', '675c_residential1', '611_runway', '652_residential', '670a_residential2', '670b_residential2', '670c_residential2'], 'switch': '632670', 'gen_bus': '670', 'gen_obs_existing': ['fossil_675_existing'], 'critical_load_kws': [1155.0, 0.0, 485.0, 0.0, 0.0, 170.0, 0.0, 0.0, 0.0, 0.0], 'max_potential': '700', 'max_potential_diesel': '1000000', 'battery_capacity': '10000'}}
-2024-02-01 02:19:16,902 - reduced 634a_data_center from 160 to 160.0
-2024-02-01 02:19:16,902 - reduced 634b_radar from 120 to 120.0
-2024-02-01 02:19:16,902 - reduced 634c_atc_tower from 120 to 120.0
-2024-02-01 02:19:16,913 - reduced 645_hangar from 170 to 170.0
-2024-02-01 02:19:16,913 - reduced 646_office from 230 to 0.0
-2024-02-01 02:19:16,921 - reduced 684_command_center from 1155 to 1155.0
-2024-02-01 02:19:16,922 - reduced 692_warehouse2 from 170 to 0.0
-2024-02-01 02:19:16,922 - reduced 675a_hospital from 485 to 485.0
-2024-02-01 02:19:16,922 - reduced 675b_residential1 from 68 to 0.0
-2024-02-01 02:19:16,922 - reduced 675c_residential1 from 290 to 0.0
-2024-02-01 02:19:16,922 - reduced 611_runway from 170 to 170.0
-2024-02-01 02:19:16,922 - reduced 652_residential from 128 to 0.0
-2024-02-01 02:19:16,922 - reduced 670a_residential2 from 17 to 0.0
-2024-02-01 02:19:16,922 - reduced 670b_residential2 from 66 to 0.0
-2024-02-01 02:19:16,922 - reduced 670c_residential2 from 117 to 0.0
-2024-02-01 02:19:21,677 - JSON compatible representation of all_mg_elements (for jinja-ing into the circuit map): {'mg0': ['solar_633', '633', 'xfm1', '634', 'solar_634_existing', 'battery_633', '634b_radar', 'fossil_633', '634c_atc_tower', '634a_data_center'], 'mg1': ['645_hangar', 'solar_645', '646', 'battery_645', '645', 'fossil_645', '646_office'], 'mg2': ['652', 'fossil_670', 'cap2', '684', '670', '670c_residential2', '670a_residential2', '680', '692', 'battery_670', '675', '670b_residential2', 'cap1', '675c_residential1', '675a_hospital', '671', '675b_residential1', '611_runway', '611', '692_warehouse2', '684_command_center', 'solar_670', 'fossil_675_existing', '652_residential']}
-2024-02-01 02:19:21,724 - Control microgrids count 3 and renewable count 0
+2024-03-04 19:18:28,745 - microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 3049.4476, 'solar_size_existing': 0.0, 'solar_size_new': 3049.4476, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 836.19, 'fossil_size_existing': 265.0, 'fossil_size_new': 571.19, 'battery_cap_total': 1161.63, 'battery_cap_existing': 0.0, 'battery_cap_new': 1161.63, 'battery_pow_total': 374.72, 'battery_pow_existing': 0.0, 'battery_pow_new': 374.72}
+2024-03-04 19:18:28,910 - QSTS with circuit_plus_mgAll.dss AND CWD IS /Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehighauto_3mg
+2024-03-04 19:18:31,069 - CONTROLLING ON {'mg0': {'battery_capacity': '10000', 'critical_load_kws': [160, 120, 120], 'gen_bus': '633', 'gen_obs_existing': ['solar_634_existing', 'battery_634_existing'], 'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'max_potential': '700', 'max_potential_diesel': '1000000', 'switch': '632633'}, 'mg1': {'battery_capacity': '10000', 'critical_load_kws': [170, 0], 'gen_bus': '645', 'gen_obs_existing': [], 'loads': ['645_hangar', '646_office'], 'max_potential': '700', 'max_potential_diesel': '1000000', 'switch': '632645'}, 'mg2': {'battery_capacity': '10000', 'critical_load_kws': [1155, 0, 485, 0, 0, 170, 0, 0, 0, 0], 'gen_bus': '670', 'gen_obs_existing': ['fossil_675_existing'], 'loads': ['684_command_center', '692_warehouse2', '675a_hospital', '675b_residential1', '675c_residential1', '611_runway', '652_residential', '670a_residential2', '670b_residential2', '670c_residential2'], 'max_potential': '700', 'max_potential_diesel': '1000000', 'switch': '632670'}}
+2024-03-04 19:18:31,075 - reduced 634a_data_center from 160 to 160
+2024-03-04 19:18:31,075 - reduced 634b_radar from 120 to 120
+2024-03-04 19:18:31,075 - reduced 634c_atc_tower from 120 to 120
+2024-03-04 19:18:31,091 - reduced 645_hangar from 170 to 170
+2024-03-04 19:18:31,092 - reduced 646_office from 230 to 0
+2024-03-04 19:18:31,102 - reduced 684_command_center from 1155 to 1155
+2024-03-04 19:18:31,103 - reduced 692_warehouse2 from 170 to 0
+2024-03-04 19:18:31,103 - reduced 675a_hospital from 485 to 485
+2024-03-04 19:18:31,103 - reduced 675b_residential1 from 68 to 0
+2024-03-04 19:18:31,103 - reduced 675c_residential1 from 290 to 0
+2024-03-04 19:18:31,103 - reduced 611_runway from 170 to 170
+2024-03-04 19:18:31,104 - reduced 652_residential from 128 to 0
+2024-03-04 19:18:31,104 - reduced 670a_residential2 from 17 to 0
+2024-03-04 19:18:31,104 - reduced 670b_residential2 from 66 to 0
+2024-03-04 19:18:31,104 - reduced 670c_residential2 from 117 to 0
+2024-03-04 19:18:40,525 - JSON compatible representation of all_mg_elements (for jinja-ing into the circuit map): {'mg0': ['634a_data_center', 'fossil_633', '634b_radar', '634c_atc_tower', 'xfm1', '633', 'battery_633', '634', 'solar_633', 'solar_634_existing'], 'mg1': ['solar_645', 'fossil_645', '645', '645_hangar', '646_office', '646', 'battery_645'], 'mg2': ['684_command_center', '670c_residential2', '670b_residential2', '670a_residential2', '652_residential', 'solar_670', '675c_residential1', 'fossil_670', 'cap1', '680', '652', '675', '684', '611', 'fossil_675_existing', '675a_hospital', '611_runway', '692_warehouse2', '671', 'cap2', 'battery_670', '675b_residential1', '692', '670']}
+2024-03-04 19:18:40,585 - Control microgrids count 3 and renewable count 0

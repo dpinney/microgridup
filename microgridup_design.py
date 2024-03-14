@@ -351,7 +351,7 @@ def set_allinputdata_battery_parameters(REOPT_FOLDER, battery_kw_existing, batte
 		outage_start_hour = int(allInputData['outage_start_hour'])
 		outage_duration = int(allInputData['outageDuration'])
 		calculated_max_kwh = critical_load_series[outage_start_hour:outage_start_hour + outage_duration].sum()
-		if calculated_max_kwh < int(allInputData['batteryCapacityMax']):
+		if calculated_max_kwh < float(allInputData['batteryCapacityMax']):
 			allInputData['batteryCapacityMax'] = str(calculated_max_kwh)
 		# - allInputData['batteryPowerMax'] is set in set_allinputdata_user_parameters()
 	else:
@@ -378,7 +378,7 @@ def set_allinputdata_solar_parameters(REOPT_FOLDER, solar_kw_existing):
 	if allInputData['solar'] == 'on':
 		critical_load_series = pd.read_csv(REOPT_FOLDER + '/criticalLoadShape.csv', header=None)[0]
 		calculated_max_kw = critical_load_series.max() * 4
-		if calculated_max_kw < int(allInputData['solarMax']):
+		if calculated_max_kw < float(allInputData['solarMax']):
 			allInputData['solarMax'] = str(calculated_max_kw)
 	else:
 		allInputData['solarMax'] = '0'
@@ -400,7 +400,7 @@ def set_allinputdata_wind_parameters(REOPT_FOLDER, wind_kw_existing):
 	critical_load_series = pd.read_csv(REOPT_FOLDER + '/criticalLoadShape.csv', header=None)[0]
 	calculated_max_kw = critical_load_series.max() * 2
 	if allInputData['wind'] == 'on':
-		if calculated_max_kw < int(allInputData['windMax']):
+		if calculated_max_kw < float(allInputData['windMax']):
 			allInputData['windMax'] = str(calculated_max_kw)
 	else:
 		allInputData['windMax'] = str(wind_kw_existing)
@@ -423,7 +423,7 @@ def set_allinputdata_generator_parameters(REOPT_FOLDER, fossil_kw_existing):
 	if allInputData['fossil'] == 'on':
 		critical_load_series = pd.read_csv(REOPT_FOLDER + '/criticalLoadShape.csv', header=None)[0]
 		calculated_max_kw = critical_load_series.max()
-		if calculated_max_kw < int(allInputData['dieselMax']):
+		if calculated_max_kw < float(allInputData['dieselMax']):
 			allInputData['dieselMax'] = str(calculated_max_kw)
 	else:
 		allInputData['dieselMax'] = '0'

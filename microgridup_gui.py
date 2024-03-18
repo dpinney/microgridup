@@ -283,7 +283,7 @@ def previewOldPartitions():
 
 	# Make and save plot, convert to base64 hash, send to frontend.
 	plt.switch_backend('Agg')
-	plt.figure(figsize=(15,9))
+	plt.figure(figsize=(14,12), dpi=350)
 	pos_G = nice_pos(G)
 	# Add here later: function to convert MG_MINES to algo_params[pairings] for passing to manual_groups(). Would be more accurate when passed to node_group_map() than parts.
 	n_color_map = node_group_map(G, parts)
@@ -294,6 +294,41 @@ def previewOldPartitions():
 	pic_hash = base64.b64encode(pic_IObytes.getvalue()).decode('utf-8')
 	return jsonify({'pic_hash': pic_hash, 'MG_MINES': MG_MINES})
 
+def build_pos_from_omd(omd):
+	'''
+	pos = {n: (n, n) for n in G}
+	return type: {obj_name: (x, y), etc.}
+	'''
+	pos = {}
+	for key in omd:
+		ob = omd[key]
+		if 'latitude' in ob and 'longitude' in ob:
+			name = ob.get('name')
+			lat = float(ob.get('latitude'))
+			lon = float(ob.get('longitude'))
+			pos[name] = (lat,lon)
+	return pos
+
+def has_full_coords(omd):
+	has_coords = True
+	should_have_coords = set(['circuit','vsource','load','generator','storage','capacitor','bus'])
+	for key in omd:
+		ob = omd[key]
+		if ob.get('object') in should_have_coords:
+			if not (ob.get('latitude') and ob.get('longitude')):
+				has_coords = False
+	return has_coords
+
+def remove_nodes_without_coords(G, omd):
+	all_nodes_with_coords = set()
+	for key in omd:
+		ob = omd[key]
+		if 'latitude' in ob and 'longitude' in ob:
+			all_nodes_with_coords.add(ob.get('name'))
+	for node in list(G.nodes()):
+		if node not in all_nodes_with_coords:
+			G.remove_node(node)
+
 @app.route('/previewPartitions', methods = ['GET','POST'])
 @app.route('/edit/previewPartitions', methods = ['GET','POST'])
 def previewPartitions():
@@ -303,7 +338,17 @@ def previewPartitions():
 	CRITICAL_LOADS = json.loads(request.form['critLoads'])
 	METHOD = json.loads(request.form['method'])
 	MGQUANT = int(json.loads(request.form['mgQuantity']))
-	G = dssConvert.dss_to_networkx(CIRC_FILE)
+	# Convert to omd to give coordinates to important grid items.
+	omd = dssConvert.dssToOmd(CIRC_FILE, '', RADIUS=0.0004, write_out=False)
+	# Convert omd to NetworkX graph because omd has full coordinates.
+	G = dssConvert.dss_to_networkx(CIRC_FILE, omd=omd)
+	# Check to see if omd contains coordinates for each important node.
+	if has_full_coords(omd):
+		pos = build_pos_from_omd(omd)
+	else:
+		pos = nice_pos(G)
+	# Delete non-grid-element nodes from NetworkX graph.
+	remove_nodes_without_coords(G, omd)
 	algo_params={}
 	all_trees = get_all_trees(G)
 	all_trees_pruned = [tree for tree in all_trees if len(tree.nodes()) > 1]
@@ -331,10 +376,9 @@ def previewPartitions():
 			print(f'Selected partitioning method produced invalid results. Please choose a different partitioning method.')
 			return jsonify('Invalid partitioning method')
 	plt.switch_backend('Agg')
-	plt.figure(figsize=(15,9))
-	pos_G = nice_pos(G)
+	plt.figure(figsize=(14,12), dpi=350)
 	n_color_map = node_group_map(G, MG_GROUPS)
-	nx.draw(G, with_labels=True, pos=pos_G, node_color=n_color_map)
+	nx.draw(G, with_labels=True, pos=pos, node_color=n_color_map)
 	pic_IObytes = io.BytesIO()
 	plt.savefig(pic_IObytes,  format='png')
 	pic_IObytes.seek(0)

@@ -553,9 +553,9 @@ def node_group_map(graph, parts, color_list=['red','orange','yellow','green','bl
 
 def nice_pos(G):
 	''' return nice positions for charting G. '''
-	return nx.drawing.nx_agraph.graphviz_layout(G)
-	# return nx.kamada_kawai_layout(G)
+	# return nx.drawing.nx_agraph.graphviz_layout(G)
 	# return nx.spring_layout(G, iterations=500)
+	return nx.kamada_kawai_layout(G)
 
 def getLoads(path):
 	print(f'Working on {path}')

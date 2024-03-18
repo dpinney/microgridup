@@ -16,9 +16,9 @@ RUN python3 -c "import omf; omf.solvers.reopt_jl.install_reopt_jl()"
 # Move files across.
 COPY . .
 
-# Special requirements for graph layout
-RUN sudo apt-get -y install graphviz graphviz-dev
-RUN pip install pygraphviz
+# Special requirements for graph layout (DEPRECATED)
+# RUN sudo apt-get -y install graphviz graphviz-dev
+# RUN pip install pygraphviz
 
 # Also need a package for auth
 RUN pip install flask_httpauth

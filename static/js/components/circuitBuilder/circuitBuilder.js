@@ -364,7 +364,7 @@ class OutageLocationInputView {
         this.#input = input;
         input.id = 'FAULTED_LINES';
         input.name = 'FAULTED_LINES';
-        input.pattern = '\\w+(?:,\\w+)?'
+        input.pattern = '\\w+(?:,\\w+)*'
         input.required = true;
         this.updateInput();
         modal.divElement.append(input);

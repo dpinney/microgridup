@@ -114,26 +114,41 @@ def create_economic_microgrid(microgrids, logger, reopt_inputs, invalidate_cache
 	assert isinstance(reopt_inputs, dict)
 	assert isinstance(invalidate_cache, bool)
 	# - Add an extra "economic" microgrid to see if there's additional peak-shaving potential
-	economic_microgrid = {
-		'loads': [],
-		'gen_obs_existing': [],
-		'critical_load_kws': []
-	}
-	for mg in microgrids.values():
-		economic_microgrid['loads'].extend(mg['loads'])
-		economic_microgrid['switch'] = mg['switch']
-		economic_microgrid['gen_bus'] = mg['gen_bus']
-		economic_microgrid['gen_obs_existing'].extend(mg['gen_obs_existing'])
-		economic_microgrid['critical_load_kws'].extend(mg['critical_load_kws'])
-	if not Path('reopt_mgBonusGen').exists() or invalidate_cache is True:
-		microgridDesign.new('reopt_mgBonusGen')
-		set_allinputdata_load_shape_parameters('reopt_mgBonusGen', f'loads.csv', economic_microgrid, logger)
-		with open('reopt_mgBonusGen/allInputData.json') as f:
-			allInputData = json.load(f)
-		allInputData['maxRuntimeSeconds'] = reopt_inputs['maxRuntimeSeconds']
+	if not Path('reopt_mgEconomic').exists() or invalidate_cache is True:
+		economic_microgrid = {
+			'loads': [],
+			'gen_obs_existing': [],
+			'critical_load_kws': []
+		}
+		for mg in microgrids.values():
+			economic_microgrid['loads'].extend(mg['loads'])
+			economic_microgrid['switch'] = mg['switch']
+			economic_microgrid['gen_bus'] = mg['gen_bus']
+			economic_microgrid['gen_obs_existing'].extend(mg['gen_obs_existing'])
+			economic_microgrid['critical_load_kws'].extend(mg['critical_load_kws'])
+		microgridDesign.new('reopt_mgEconomic')
+		load_df = pd.read_csv('loads.csv')
+		load_df = load_df.iloc[:, load_df.apply(is_not_timeseries_column).to_list()]
+		load_shape_series = load_df.apply(sum, axis=1)
+		load_shape_series.to_csv('reopt_mgEconomic/loadShape.csv', header=False, index=False)
+		# - Set user parameters
 		lat, lon = microgridup_hosting_cap.get_microgrid_coordinates('circuit.dss', list(microgrids.values())[0])
-		allInputData['latitude'] = lat
-		allInputData['longitude'] = lon
+		set_allinputdata_user_parameters('reopt_mgEconomic', reopt_inputs, lat, lon)
+		# - Override certain user parameters
+		with open('reopt_mgEconomic/allInputData.json') as f:
+			allInputData = json.load(f)
+		allInputData['battery'] = 'on'
+		allInputData['solar'] = 'on'
+		allInputData['wind'] = 'on'
+		allInputData['fossil'] = 'on'
+		# - The load shape and critical load shape are the same for the economic microgrid. Also, there's no outage
+		allInputData['fileName'] = 'loadShape.csv'
+		with open('reopt_mgEconomic/loadShape.csv') as f:
+			load_shape_data = f.read()
+		allInputData['loadShape'] = load_shape_data
+		allInputData['criticalFileName'] = 'criticalLoadShape.csv'
+		allInputData['criticalLoadShape'] = load_shape_data
+		allInputData['maxRuntimeSeconds'] = reopt_inputs['maxRuntimeSeconds']
 		# - Always set outage_start_hour to 0 because we don't want to run a REopt resilience analysis
 		allInputData['outage_start_hour'] = '0'
 		# - We do not apply the calculated maximum technology limits to the economic microgrid. That's the point. So set the limits to be the
@@ -143,56 +158,25 @@ def create_economic_microgrid(microgrids, logger, reopt_inputs, invalidate_cache
 		allInputData['solarMax'] = reopt_inputs['solarMax']
 		allInputData['windMax'] = reopt_inputs['windMax']
 		allInputData['dieselMax'] = reopt_inputs['dieselMax']
-		# - The existing solar, wind, fossil, and batteries of the economic microgrid are calculated by including the existing generation and storage of
-		#   each actual microgrid AND the new generation and storage recommended by REopt for each microgrid. As a shortcut, these values can be
-		#   calculated simply by reading the "size_kw" and related properties from the results.json files of the reopt runs of the actual microgrids
-		# - Since dictionary insertion is (effectively) a given in Python 3.6, the other microgrids should have completed their REopt runs before the
-		#   economic microgrid parameters are set
+		# - The existing solar, wind, fossil, and battery amounts of the economic microgrid are calculated by including the existing generation and
+		#   storage of each actual microgrid, but not new recommended generation for any of the actual microgrids
 		allInputData['batteryKwhExisting'] = 0
 		allInputData['batteryKwExisting'] = 0
 		allInputData['solarExisting'] = 0
 		allInputData['windExisting'] = 0
 		allInputData['genExisting'] = 0
 		for mg_name in microgrids.keys():
-			with open(f'reopt_{mg_name}/results.json') as f:
-				results = json.load(f)
-			if 'ElectricStorage' in results:
-				allInputData['batteryKwhExisting'] += results['ElectricStorage']['size_kwh']
-				allInputData['batteryKwExisting'] += results['ElectricStorage']['size_kw']
-			else:
-				allInputData['batteryKwhExisting'] += 0
-				allInputData['batteryKwExisting'] += 0
-			if 'PV' in results:
-				allInputData['solarExisting'] += results['PV']['size_kw']
-			else:
-				allInputData['solarExisting'] += 0
-			if 'Wind' in results:
-				allInputData['windExisting'] += results['Wind']['size_kw']
-			else:
-				allInputData['windExisting'] += 0
-			if 'Generator' in results:
-				allInputData['genExisting'] += results['Generator']['size_kw']
-			else:
-				allInputData['genExisting'] += 0
-		with open('reopt_mgBonusGen/allInputData.json', 'w') as f:
+			with open(f'reopt_{mg_name}/allInputData.json') as f:
+				in_data = json.load(f)
+			allInputData['batteryKwhExisting'] += float(in_data['batteryKwhExisting'])
+			allInputData['batteryKwExisting'] += float(in_data['batteryKwExisting'])
+			allInputData['solarExisting'] += float(in_data['solarExisting'])
+			allInputData['windExisting'] += float(in_data['windExisting'])
+			allInputData['genExisting'] += float(in_data['genExisting'])
+		with open('reopt_mgEconomic/allInputData.json', 'w') as f:
 			json.dump(allInputData, f, indent=4)
-		__neoMetaModel__.runForeground('reopt_mgBonusGen')
-		# - Need to make several adjustments to the economic microgrid
-		with open('reopt_mgBonusGen/allOutputData.json') as f:
-			outData = json.load(f)
-		# - If the existing amount of storage power across all microgrids is greater than the recommended storage power for the economic microgrid,
-		#   don't build any new storage power. Do the same for storage capacity. This is quite common because the economic microgrid never experiences
-		#   an outage, so it doesn't need as much storage as the microgrids. The existing storage across all microgrids is enough to survive an outage
-		#   and maximize peak shaving potential
-		# - If, for some reason, the storage power for the economic microgrid is greater than the storage power across all microgrids and the storage
-		#   capacity for the economic microgrid is less than the storage capacity across all microgrids, we run into a weird situation where we
-		#   estimate the cost for additional power but not additional capacity (or vice versa). Could you build storage power without also building
-		#   storage capacity (or vice versa)? Hopefully this doesn't happen
-		if outData['powerBattery1'] < outData['batteryKwExisting1']:
-			outData['powerBattery1'] = 0
-		if outData['capacityBattery1'] < outData['batteryKwhExisting1']:
-			outData['capacityBattery1'] = 0
-		microgrid_design_output('reopt_mgBonusGen/allOutputData.json', 'reopt_mgBonusGen/allInputData.json', 'reopt_mgBonusGen/cleanMicrogridDesign.html')
+		__neoMetaModel__.runForeground('reopt_mgEconomic')
+		microgrid_design_output('reopt_mgEconomic')
 
 
 def run(REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, lon, existing_generation_dict, INVALIDATE_CACHE):
@@ -243,7 +227,7 @@ def run(REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, lon, existi
 	# - Run REopt
 	omf.models.__neoMetaModel__.runForeground(REOPT_FOLDER)
 	# - Write output
-	microgrid_design_output(f'{REOPT_FOLDER}/allOutputData.json', f'{REOPT_FOLDER}/allInputData.json', f'{REOPT_FOLDER}/cleanMicrogridDesign.html')
+	microgrid_design_output(REOPT_FOLDER)
 
 
 def set_allinputdata_load_shape_parameters(REOPT_FOLDER, load_csv_path, microgrid, logger):
@@ -445,11 +429,11 @@ def set_allinputdata_generator_parameters(REOPT_FOLDER, fossil_kw_existing):
 		json.dump(allInputData, f, indent=4)
 
 
-def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
+def microgrid_design_output(reopt_folder):
 	''' Generate a clean microgridDesign output with edge-to-edge design. '''
 	all_html = ''
 	legend_spec = {'orientation':'h', 'xanchor':'left'}#, 'x':0, 'y':-0.2}
-	with open(allOutDataPath) as file:
+	with open(f'{reopt_folder}/allOutputData.json') as file:
 		allOutData = json.load(file)
 	# Make timeseries charts
 	plotlyData = {
@@ -503,40 +487,43 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 			fig.update_yaxes(title_text='kW')
 		if k == 'Storage Charge Source':
 			fig.update_yaxes(title_text='kW')
+		fig.update_yaxes(rangemode="tozero")
 		fig_html = fig.to_html(default_height='600px')
 		all_html = all_html + fig_html
 	# Make generation overview chart
-	with open(allInputDataPath) as f:
+	with open(f'{reopt_folder}/allInputData.json') as f:
 		all_input_data = json.load(f)
+	with open(f'{reopt_folder}/results.json') as f:
+		results = json.load(f)
 	df = pd.DataFrame({
 		'Solar kW': [all_input_data['solarExisting'], 0, all_input_data['solarExisting'], 0, 0],
 		'Wind kW': [all_input_data['windExisting'], 0, all_input_data['windExisting'], 0, 0],
 		'Storage kW': [all_input_data['batteryKwExisting'], 0, all_input_data['batteryKwExisting'], 0, 0],
 		'Storage kWh': [all_input_data['batteryKwhExisting'], 0, all_input_data['batteryKwhExisting'], 0, 0],
 		'Fossil kW': [all_input_data['genExisting'], 0, all_input_data['genExisting'], 0, 0],
-		'Load kW': [0, 0, 0, allOutData['avgLoad1'], max(allOutData['load1'])]
+		'Critical Load kW': [0, 0, 0, int(statistics.mean(results['ElectricLoad']['critical_load_series_kw'])), int(max(results['ElectricLoad']['critical_load_series_kw']))]
 	}, index=['Existing', 'New', 'Total', 'Average', 'Peak'], dtype=np.float64)
 	if 'sizePV1' in allOutData:
-		df.loc['Total', 'Solar kW'] = allOutData['sizePV1']
-		df.loc['New', 'Solar kW'] = allOutData['sizePV1'] - float(all_input_data['solarExisting'])
+		df.loc['Total', 'Solar kW'] = int(allOutData['sizePV1'])
+		df.loc['New', 'Solar kW'] = int(allOutData['sizePV1'] - float(all_input_data['solarExisting']))
 	if 'sizeWind1' in allOutData:
-		df.loc['Total', 'Wind kW'] = allOutData['sizeWind1']
-		df.loc['New', 'Wind kW'] = allOutData['sizeWind1'] - float(all_input_data['windExisting'])
+		df.loc['Total', 'Wind kW'] = int(allOutData['sizeWind1'])
+		df.loc['New', 'Wind kW'] = int(allOutData['sizeWind1'] - float(all_input_data['windExisting']))
 	if 'powerBattery1' in allOutData:
-		df.loc['Total', 'Storage kW'] = allOutData['powerBattery1']
-		df.loc['New', 'Storage kW'] = allOutData['powerBattery1'] - float(all_input_data['batteryKwExisting'])
+		df.loc['Total', 'Storage kW'] = int(allOutData['powerBattery1'])
+		df.loc['New', 'Storage kW'] = int(allOutData['powerBattery1'] - float(all_input_data['batteryKwExisting']))
 	if 'capacityBattery1' in allOutData:
-		df.loc['Total', 'Storage kWh'] = allOutData['capacityBattery1']
-		df.loc['New', 'Storage kWh'] = allOutData['capacityBattery1'] - float(all_input_data['batteryKwhExisting'])
+		df.loc['Total', 'Storage kWh'] = int(allOutData['capacityBattery1'])
+		df.loc['New', 'Storage kWh'] = int(allOutData['capacityBattery1'] - float(all_input_data['batteryKwhExisting']))
 	if 'sizeDiesel1' in allOutData:
-		df.loc['Total', 'Fossil kW'] = allOutData['sizeDiesel1']
-		df.loc['New', 'Fossil kW'] = allOutData['sizeDiesel1'] - float(all_input_data['genExisting'])
+		df.loc['Total', 'Fossil kW'] = int(allOutData['sizeDiesel1'])
+		df.loc['New', 'Fossil kW'] = int(allOutData['sizeDiesel1'] - float(all_input_data['genExisting']))
 	generation_fig = go.Figure(data=[
 		go.Bar(name='Existing Generation (kW)', x=df.columns.to_series(), y=df.loc['Existing']),
 		go.Bar(name='New Generation (kW)', x=df.columns.to_series(), y=df.loc['New']),
 		go.Bar(name='Total Generation (kW)', x=df.columns.to_series(), y=df.loc['Total']),
-		go.Bar(name='Average Load (kW)', x=df.columns.to_series(), y=df.loc['Average']),
-		go.Bar(name='Peak Load (kW)', x=df.columns.to_series(), y=df.loc['Peak']),
+		go.Bar(name='Average Critical Load (kW)', x=df.columns.to_series(), y=df.loc['Average']),
+		go.Bar(name='Peak Critical Load (kW)', x=df.columns.to_series(), y=df.loc['Peak']),
 	])
 	generation_fig.update_layout(
 		title='Generation Overview',
@@ -584,7 +571,7 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 	fin_fig_html = fin_fig.to_html(default_height='600px')
 	all_html = fin_fig_html + all_html
 	# Nice input display
-	with open(allInputDataPath) as inFile:
+	with open(f'{reopt_folder}/allInputData.json') as inFile:
 		allInputData = json.load(inFile)
 	allInputData['loadShape'] = 'From File'
 	allInputData['criticalLoadShape'] = 'From File'
@@ -595,7 +582,7 @@ def microgrid_design_output(allOutDataPath, allInputDataPath, outputPath):
 		chart_html=all_html,
 		allInputData=allInputData
 	)
-	with open(outputPath, 'w') as outFile:
+	with open(f'{reopt_folder}/cleanMicrogridDesign.html', 'w') as outFile:
 		outFile.write(mgd)
 
 

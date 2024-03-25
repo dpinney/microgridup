@@ -166,7 +166,6 @@ class MicrogridParameterModel {
         if (new Set(microgridNames).size !== microgridNames.length) {
             throw Error('The "microgridNames" argument must contain unique values.');
         }
-        microgridNames = microgridNames.map(name => `mg${+name.substring(2) + 1}`);
         this.#microgrids = {};
         microgridNames.forEach(name => {
             this.#microgrids[name] = new Microgrid();
@@ -176,7 +175,6 @@ class MicrogridParameterModel {
     getExportData() {
         const data = {};
         for (let [name, mg] of Object.entries(this.#microgrids)) {
-            name = `mg${+name.substring(2) - 1}`;
             data[name] = {};
             for (const [key, param] of Object.entries(mg.getProperties())) {
                 data[name][key] = param.value;

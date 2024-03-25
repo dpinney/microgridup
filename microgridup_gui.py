@@ -270,8 +270,8 @@ def previewOldPartitions():
 	model_dir = data['MODEL_DIR']
 	filename = f'{_mguDir}/data/projects/{model_dir}/circuit.dss'
 	MG_MINES = data['MG_MINES']
-	G = dssConvert.dss_to_networkx(filename)
-
+	omd = dssConvert.dssToOmd(filename, '', RADIUS=0.0004, write_out=False)
+	G = dssConvert.dss_to_networkx(filename, omd=omd)
 	parts = []
 	for mg in MG_MINES:
 		cur_mg = []
@@ -280,14 +280,19 @@ def previewOldPartitions():
 		cur_mg.append(MG_MINES[mg].get('gen_bus'))
 		cur_mg.extend([load for load in MG_MINES[mg].get('gen_obs_existing')])
 		parts.append(cur_mg)
-
+	# Check to see if omd contains coordinates for each important node.
+	if has_full_coords(omd):
+		pos = build_pos_from_omd(omd)
+	else:
+		pos = nice_pos(G)
+	# Delete non-grid-element nodes from NetworkX graph.
+	remove_nodes_without_coords(G, omd)
 	# Make and save plot, convert to base64 hash, send to frontend.
 	plt.switch_backend('Agg')
 	plt.figure(figsize=(14,12), dpi=350)
-	pos_G = nice_pos(G)
 	# Add here later: function to convert MG_MINES to algo_params[pairings] for passing to manual_groups(). Would be more accurate when passed to node_group_map() than parts.
 	n_color_map = node_group_map(G, parts)
-	nx.draw(G, with_labels=True, pos=pos_G, node_color=n_color_map)
+	nx.draw(G, with_labels=True, pos=pos, node_color=n_color_map)
 	pic_IObytes = io.BytesIO()
 	plt.savefig(pic_IObytes,  format='png')
 	pic_IObytes.seek(0)

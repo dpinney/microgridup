@@ -40,22 +40,14 @@ def _walkTree(dirName):
 def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
 	'''Helper function within full() to take in a dict of lists of the microgrid
 	attributes and append a summary value for each attribute'''
-	# print("reps['Maximum 1 hr Load (kW)']",reps['Maximum 1 hr Load (kW)'])
-	# add up all of the loads in MICROGRIDS into one loadshape
-	# used previously to call items out of mg_name: gen_bus_name = mg_ob['gen_bus']
-	# grab all the load names from all of the microgrids analyzed
-	mg_load_names = []
-	for mg in MICROGRIDS:
-		for load_name in MICROGRIDS[mg]['loads']:
-			mg_load_names.append(load_name)
-	# add up all of the loads in MICROGRIDS into one loadshape
-	loads = pd.read_csv(MODEL_LOAD_CSV)
-	loads.columns = [str(x).lower() for x in loads.columns]
-	loads['full_load']= loads[mg_load_names].sum(axis=1)
+	load_df = pd.read_csv(MODEL_LOAD_CSV)
+	# - Remove any columns that contain hourly indicies instead of kW values
+	load_df = load_df.iloc[:, load_df.apply(microgridup_design.is_not_timeseries_column).to_list()]
+	load_shape_series = load_df.apply(sum, axis=1)
 	#print('loads.head()', loads.head())
-	max_load = int(loads['full_load'].max())
-	min_load = int(loads['full_load'].min())
-	avg_load = int(loads['full_load'].mean())
+	max_load = int(load_shape_series.max())
+	min_load = int(load_shape_series.min())
+	avg_load = int(load_shape_series.mean())
 	reps['Microgrid Name'].append('Summary')
 	reps['Generation Bus'].append('None')
 	# minimum coincident load across all mgs

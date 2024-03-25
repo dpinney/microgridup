@@ -234,7 +234,7 @@ def run(REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, lon, existi
 	shutil.rmtree(REOPT_FOLDER, ignore_errors=True)
 	omf.models.microgridDesign.new(REOPT_FOLDER)
 	set_allinputdata_load_shape_parameters(REOPT_FOLDER, f'loads.csv', microgrid, logger)
-	set_allinputdata_outage_parameters(REOPT_FOLDER, f'{REOPT_FOLDER}/loadShape.csv', REOPT_INPUTS['outageDuration'])
+	set_allinputdata_outage_parameters(REOPT_FOLDER, f'{REOPT_FOLDER}/criticalLoadShape.csv', REOPT_INPUTS['outageDuration'])
 	set_allinputdata_user_parameters(REOPT_FOLDER, REOPT_INPUTS, lat, lon)
 	set_allinputdata_battery_parameters(REOPT_FOLDER, existing_generation_dict['battery_kw_existing'], existing_generation_dict['battery_kwh_existing'])
 	set_allinputdata_solar_parameters(REOPT_FOLDER, existing_generation_dict['solar_kw_existing'])
@@ -257,9 +257,8 @@ def set_allinputdata_load_shape_parameters(REOPT_FOLDER, load_csv_path, microgri
 		- Previously, allInputData['criticalLoadFactor'] was used instead, but this parameter is no longer used
 	'''
 	load_df = pd.read_csv(load_csv_path)
-	# - Make all column headings lowercase because OpenDSS is case-insensitive
-	load_df.columns = [str(x).lower() for x in load_df.columns]
-	load_df = load_df[microgrid['loads']]
+	# - Remove any columns that contain hourly indicies instead of kW values
+	load_df = load_df.iloc[:, load_df.apply(is_not_timeseries_column).to_list()]
 	# - Write loadShape.csv
 	load_shape_series = load_df.apply(sum, axis=1)
 	load_shape_series.to_csv(REOPT_FOLDER + '/loadShape.csv', header=False, index=False)
@@ -275,6 +274,10 @@ def set_allinputdata_load_shape_parameters(REOPT_FOLDER, load_csv_path, microgri
 	for tup in zip(microgrid['loads'], microgrid['critical_load_kws']):
 		if float(tup[1]) > 0:
 			column_selection.append(tup[0])
+	# - /jsonToDss writes load names as they are to the DSS file, which is fine since OpenDSS is case-insensitive. However, our microgrid generation
+	#   code always outputs microgrid load names in lowercase, so I have to convert the DataFrame column names to lowercase if I want to access data
+	#   in the microgrid object without crashing due to a key error
+	load_df.columns = [str(x).lower() for x in load_df.columns]
 	critical_load_shape_series = load_df[column_selection].apply(sum, axis=1)
 	critical_load_shape_series.to_csv(REOPT_FOLDER + '/criticalLoadShape.csv', header=False, index=False)
 	with open(REOPT_FOLDER + '/criticalLoadShape.csv') as f:
@@ -284,11 +287,22 @@ def set_allinputdata_load_shape_parameters(REOPT_FOLDER, load_csv_path, microgri
 		json.dump(allInputData, f, indent=4)
 
 
-def set_allinputdata_outage_parameters(REOPT_FOLDER, loadshape_csv_path, outage_duration):
+def is_not_timeseries_column(series):
+       '''
+       - Given a series, return True if the sum of the series is not the sum of numbers 1 through 8760 or 0 through 8759, else False
+       '''
+       # - Triangular number formula
+       timeseries_signature_1 = ((8760 ** 2 ) + 8760) / 2
+       timeseries_signature_2 = ((8759 ** 2 ) + 8759) / 2
+       s = np.sum(series)
+       return s != timeseries_signature_1 and s != timeseries_signature_2
+
+
+def set_allinputdata_outage_parameters(REOPT_FOLDER, critical_loadshape_csv_path, outage_duration):
 	with open(REOPT_FOLDER + '/allInputData.json') as f:
 		allInputData = json.load(f)
 	# Set the REopt outage to be centered around the max load in the loadshape
-	mg_load_series = pd.read_csv(loadshape_csv_path, header=None)[0]
+	mg_load_series = pd.read_csv(critical_loadshape_csv_path, header=None)[0]
 	max_load_index = int(mg_load_series.idxmax())
 	# reset the outage timing such that the length of REOPT_INPUTS falls half before and half after the hour of max load
 	outage_duration = int(outage_duration)

@@ -283,10 +283,12 @@ def previewOldPartitions():
 	# Check to see if omd contains coordinates for each important node.
 	if has_full_coords(omd):
 		pos = build_pos_from_omd(omd)
+		# If dss had coords, dssToOmd gave all important elements coords. Can remove all elements without coords.
+		remove_nodes_without_coords(G, omd)
 	else:
 		pos = nice_pos(G)
-	# Delete non-grid-element nodes from NetworkX graph.
-	remove_nodes_without_coords(G, omd)
+		# Remove elements like 'clear' and 'set' which have no edges to other nodes.
+		remove_nodes_without_edges(G)
 	# Make and save plot, convert to base64 hash, send to frontend.
 	plt.switch_backend('Agg')
 	plt.figure(figsize=(14,12), dpi=350)
@@ -334,6 +336,10 @@ def remove_nodes_without_coords(G, omd):
 		if node not in all_nodes_with_coords:
 			G.remove_node(node)
 
+def remove_nodes_without_edges(G):
+	isolated_nodes = [node for node, degree in G.degree() if degree == 0]
+	G.remove_nodes_from(isolated_nodes)
+
 @app.route('/previewPartitions', methods = ['GET','POST'])
 @app.route('/edit/previewPartitions', methods = ['GET','POST'])
 def previewPartitions():
@@ -350,10 +356,12 @@ def previewPartitions():
 	# Check to see if omd contains coordinates for each important node.
 	if has_full_coords(omd):
 		pos = build_pos_from_omd(omd)
+		# If dss had coords, dssToOmd gave all important elements coords. Can remove all elements without coords.
+		remove_nodes_without_coords(G, omd)
 	else:
 		pos = nice_pos(G)
-	# Delete non-grid-element nodes from NetworkX graph.
-	remove_nodes_without_coords(G, omd)
+		# Remove elements like 'clear' and 'set' which have no edges to other nodes.
+		remove_nodes_without_edges(G)
 	algo_params={}
 	all_trees = get_all_trees(G)
 	all_trees_pruned = [tree for tree in all_trees if len(tree.nodes()) > 1]

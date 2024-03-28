@@ -285,8 +285,8 @@ def check_each_mg_for_reopt_error(number_of_microgrids, logger):
 				logger.warning(f'No error messages returned in REopt folder reopt_mg{number}.')
 				print(f'No error messages returned in REopt folder reopt_mg{number}.')
 		else:
-			print(f'An Exception occured but REopt folder reopt_mg{number} does not exist.')
-			logger.warning(f'An Exception occured but REopt folder reopt_mg{number} does not exist.')
+			print(f'An Exception occured but results.json in REopt folder reopt_mg{number} does not exist.')
+			logger.warning(f'An Exception occured but results.json in REopt folder reopt_mg{number} does not exist.')
 
 def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINES, DESCRIPTION='', INVALIDATE_CACHE=True, OUTAGE_CSV=None, DELETE_FILES=False, open_results=False):
 	''' Generate a full microgrid plan for the given inputs. '''

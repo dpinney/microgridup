@@ -501,29 +501,30 @@ def microgrid_design_output(reopt_folder):
 		'Storage kW': [all_input_data['batteryKwExisting'], 0, all_input_data['batteryKwExisting'], 0, 0],
 		'Storage kWh': [all_input_data['batteryKwhExisting'], 0, all_input_data['batteryKwhExisting'], 0, 0],
 		'Fossil kW': [all_input_data['genExisting'], 0, all_input_data['genExisting'], 0, 0],
-		'Critical Load kW': [0, 0, 0, int(statistics.mean(results['ElectricLoad']['critical_load_series_kw'])), int(max(results['ElectricLoad']['critical_load_series_kw']))]
+		'Load kW': [0, 0, 0, round(statistics.mean(results['ElectricLoad']['load_series_kw'])), round(max(results['ElectricLoad']['load_series_kw']))],
+		'Critical Load kW': [0, 0, 0, round(statistics.mean(results['ElectricLoad']['critical_load_series_kw'])), round(max(results['ElectricLoad']['critical_load_series_kw']))]
 	}, index=['Existing', 'New', 'Total', 'Average', 'Peak'], dtype=np.float64)
 	if 'sizePV1' in allOutData:
-		df.loc['Total', 'Solar kW'] = int(allOutData['sizePV1'])
-		df.loc['New', 'Solar kW'] = int(allOutData['sizePV1'] - float(all_input_data['solarExisting']))
+		df.loc['Total', 'Solar kW'] = round(allOutData['sizePV1'])
+		df.loc['New', 'Solar kW'] = round(allOutData['sizePV1'] - float(all_input_data['solarExisting']))
 	if 'sizeWind1' in allOutData:
-		df.loc['Total', 'Wind kW'] = int(allOutData['sizeWind1'])
-		df.loc['New', 'Wind kW'] = int(allOutData['sizeWind1'] - float(all_input_data['windExisting']))
+		df.loc['Total', 'Wind kW'] = round(allOutData['sizeWind1'])
+		df.loc['New', 'Wind kW'] = round(allOutData['sizeWind1'] - float(all_input_data['windExisting']))
 	if 'powerBattery1' in allOutData:
-		df.loc['Total', 'Storage kW'] = int(allOutData['powerBattery1'])
-		df.loc['New', 'Storage kW'] = int(allOutData['powerBattery1'] - float(all_input_data['batteryKwExisting']))
+		df.loc['Total', 'Storage kW'] = round(allOutData['powerBattery1'])
+		df.loc['New', 'Storage kW'] = round(allOutData['powerBattery1'] - float(all_input_data['batteryKwExisting']))
 	if 'capacityBattery1' in allOutData:
-		df.loc['Total', 'Storage kWh'] = int(allOutData['capacityBattery1'])
-		df.loc['New', 'Storage kWh'] = int(allOutData['capacityBattery1'] - float(all_input_data['batteryKwhExisting']))
+		df.loc['Total', 'Storage kWh'] = round(allOutData['capacityBattery1'])
+		df.loc['New', 'Storage kWh'] = round(allOutData['capacityBattery1'] - float(all_input_data['batteryKwhExisting']))
 	if 'sizeDiesel1' in allOutData:
-		df.loc['Total', 'Fossil kW'] = int(allOutData['sizeDiesel1'])
-		df.loc['New', 'Fossil kW'] = int(allOutData['sizeDiesel1'] - float(all_input_data['genExisting']))
+		df.loc['Total', 'Fossil kW'] = round(allOutData['sizeDiesel1'])
+		df.loc['New', 'Fossil kW'] = round(allOutData['sizeDiesel1'] - float(all_input_data['genExisting']))
 	generation_fig = go.Figure(data=[
 		go.Bar(name='Existing Generation (kW)', x=df.columns.to_series(), y=df.loc['Existing']),
 		go.Bar(name='New Generation (kW)', x=df.columns.to_series(), y=df.loc['New']),
 		go.Bar(name='Total Generation (kW)', x=df.columns.to_series(), y=df.loc['Total']),
-		go.Bar(name='Average Critical Load (kW)', x=df.columns.to_series(), y=df.loc['Average']),
-		go.Bar(name='Peak Critical Load (kW)', x=df.columns.to_series(), y=df.loc['Peak']),
+		go.Bar(name='Average Load (kW)', x=df.columns.to_series(), y=df.loc['Average']),
+		go.Bar(name='Peak Load (kW)', x=df.columns.to_series(), y=df.loc['Peak']),
 	])
 	generation_fig.update_layout(
 		title='Generation Overview',

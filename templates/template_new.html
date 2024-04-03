@@ -794,12 +794,14 @@
 			MODEL_DIR: MODEL_DIR,
 			MG_MINES: MG_MINES
 		};
+		document.body.style.cursor = 'progress';
 		$.ajax({
 			type: 'POST',
 			url: '/previewOldPartitions',
 			data: JSON.stringify(data),
 			contentType: 'application/json',
 			success: function(data, status) {
+				document.body.style.cursor = 'default';
 				var img = $('<img id="oldPartitionPreview">');
 				img.attr('src', 'data:image/gif;base64,' + data.pic_hash);
 				oldPartitionsDiv.prepend('<br>')
@@ -810,6 +812,7 @@
 				{% endif %}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
+				document.body.style.cursor = 'default';
 				console.log(textStatus + ' : ' + errorThrown);
 			}
 		})
@@ -924,6 +927,7 @@
 			}
 			// Get mgQuantity, if applicable. 
 			var mgQuantity = $('#minQuantMgs').val() ? $('#minQuantMgs').val() : 0;
+			document.body.style.cursor = 'progress';
 			$.ajax({
 				url: 'previewPartitions',
 				type: 'POST',
@@ -935,6 +939,7 @@
 					modelDir: JSON.stringify("{{in_data['MODEL_DIR']}}")
 				},
 				success: function(data, status) {
+					document.body.style.cursor = 'default';
 					if (data === 'Invalid partitioning method') {
 						alert('Selected partitioning method produced invalid results. Please choose a different partitioning method.');
 					} else {
@@ -947,6 +952,7 @@
 					}
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
+					document.body.style.cursor = 'default';
 					console.log(textStatus + ' : ' + errorThrown)
 				}
 			});

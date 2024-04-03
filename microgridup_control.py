@@ -463,8 +463,8 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 		for key in microgrids:
 			if microgrids[key]['gen_bus'] in ob_name or ob_name.split("-")[1] in microgrids[key]["loads"]:
 				legend_group = key
-				break
-			legend_group = "Not_in_MG"
+			else:
+				legend_group = "Not_in_MG"
 
 		# Loop through phases.
 		for y_name in y_list: 
@@ -499,7 +499,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 				graph_start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outageStart-24)
 				fossil_trace = graph_objects.Scatter(
 					x = pd.to_datetime(range(lengthOfOutage+48), unit = 'h', origin = graph_start_time),
-					y = fossil_percent_loading[outageStart-24: outageStart+lengthOfOutage+48],
+					y = fossil_percent_loading,
 					legendgroup=legend_group,
 					legendgrouptitle_text=legend_group,
 					showlegend=True,
@@ -557,7 +557,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 				graph_start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outageStart-24)
 				trace = graph_objects.Scatter(
 					x = pd.to_datetime(range(lengthOfOutage+48), unit = 'h', origin = graph_start_time),
-					y = y_axis[outageStart-24: outageStart+lengthOfOutage+48],
+					y = y_axis,
 					legendgroup=plot_legend_group,
 					legendgrouptitle_text=plot_legend_group,
 					showlegend = True,
@@ -630,6 +630,9 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 	offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
 def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_length, logger):
+	# It seems like the only way to send fewer steps to newQstsPlot (outage_length + 48 steps) is to revise the timestamps fed to actions. Rather than giving actions the hours of year that represent outage start and outage end, feed actions 25 for the outage start and 25 + outage_length for the outage end.
+	actions_outage_start = 25
+	actions_outage_end = actions_outage_start + outage_length
 	assert isinstance(faulted_lines, str)
 	actions = {}
 	print('CONTROLLING ON', microgrids)
@@ -658,8 +661,8 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 			close object=line.{faulted_line} term=2
 			close object=line.{faulted_line} term=3
 		'''
-	actions[outage_start] = open_line_actions
-	actions[outageEnd] = close_line_actions
+	actions[actions_outage_start] = open_line_actions
+	actions[actions_outage_end] = close_line_actions
 	actions[1] = ''
 	# Initialize dict of vsource ratings 
 	big_gen_ratings = {}
@@ -686,12 +689,12 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 		switch_name = mg_values['switch']
 		# HACK: we don't store whether the switch is a line or transformer in the microgrid dict, so make a best guess
 		switch_type = opendss._getByName(dssTree, switch_name)['object'].split('.')[0]
-		actions[outage_start] += f'''
+		actions[actions_outage_start] += f'''
 			open object={switch_type}.{switch_name} term=1
 			open object={switch_type}.{switch_name} term=2
 			open object={switch_type}.{switch_name} term=3
 		'''
-		actions[outageEnd] += f'''
+		actions[actions_outage_end] += f'''
 			close object={switch_type}.{switch_name} term=1
 			close object={switch_type}.{switch_name} term=2
 			close object={switch_type}.{switch_name} term=3
@@ -701,7 +704,7 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 		all_mg_fossil = [
 			ob for ob in dssTree
 			if ob.get('bus1','x.x').split('.')[0] == gen_bus
-			and 'fossil' in ob.get('object')
+			and 'generator.' in ob.get('object')
 		]
 		all_mg_fossil.sort(key=lambda x:float(x.get('kw')))
 		# Insert a vsource for the largest fossil unit in each microgrid.
@@ -740,11 +743,11 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 				calcv
 			'''
 			#Enable/disable the diesel vsources during the outage via actions.
-			actions[outage_start] += f'''
+			actions[actions_outage_start] += f'''
 				close {line_name}
 				calcv
 			'''
-			actions[outageEnd] += f'''
+			actions[actions_outage_end] += f'''
 				open {line_name}
 				calcv
 			'''
@@ -763,8 +766,8 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 	# print("big_gen_ratings",big_gen_ratings)
 	# print("rengen_mgs",rengen_mgs)
 	# Additional calcv to make sure the simulation runs.
-	actions[outage_start] += f'calcv\n'
-	actions[outageEnd] += f'calcv\n'
+	actions[actions_outage_start] += f'calcv\n'
+	actions[actions_outage_end] += f'calcv\n'
 	# Write the adjusted opendss file with new kw, generators.
 	opendss.dssConvert.treeToDss(dssTree, 'circuit_control.dss')
 	# Run the simulation.  can hang, so wait at most 4 minutes for it to complete
@@ -772,7 +775,7 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 	opendss.newQstsPlot(
 		'circuit_control.dss',
 		stepSizeInMinutes=60, 
-		numberOfSteps=8760,
+		numberOfSteps=outage_length+48,
 		keepAllFiles=False,
 		actions=actions,
 		filePrefix=FPREFIX

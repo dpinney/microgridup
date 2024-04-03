@@ -48,9 +48,9 @@ def run_reopt(microgrids, logger, reopt_inputs, invalidate_cache):
 		# - Generate a set of arguments for a single process
 		existing_generation_dict = microgridup_hosting_cap.get_microgrid_existing_generation_dict('circuit.dss', microgrid)
 		lat, lon = microgridup_hosting_cap.get_microgrid_coordinates('circuit.dss', microgrid)
-		process_argument_lists.append([f'reopt_{mg_name}', microgrid, logger, mg_specific_reopt_inputs, mg_name, lat, lon, existing_generation_dict, invalidate_cache])
+		process_argument_lists.append([f'reopt_{mg_name}', microgrid, mg_specific_reopt_inputs, mg_name, lat, lon, existing_generation_dict, invalidate_cache])
 		# - Uncomment to run in single-process mode
-		#run(f'reopt_{mg_name}', microgrid, logger, mg_specific_reopt_inputs, mg_name, lat, lon, existing_generation_dict, invalidate_cache)
+		#run(f'reopt_{mg_name}', microgrid, mg_specific_reopt_inputs, mg_name, lat, lon, existing_generation_dict, invalidate_cache)
 	# - Uncomment to run in multiprocessing mode
 	with concurrent.futures.ProcessPoolExecutor() as executor:
 		future_list = []
@@ -58,7 +58,11 @@ def run_reopt(microgrids, logger, reopt_inputs, invalidate_cache):
 			future_list.append(executor.submit(run, *process_argument_list))
 		for f in concurrent.futures.as_completed(future_list):
 			if f.exception() is not None:
-				raise Exception(f'The REopt optimization for the microgrid {f.exception().filename.split("/")[0].split("_")[1]} failed because (1) the optimizer determined there was no feasible solution for the given inputs or (2) the solver could not complete within the user-defined maximum rum-time.')
+				try:
+					microgrid_name = f.exception().filename.split("/")[0].split("_")[1]
+				except AttributeError:
+					microgrid_name = 'Unknown'					
+				raise Exception(f'The REopt optimization for the microgrid {microgrid_name} failed because (1) the optimizer determined there was no feasible solution for the given inputs or (2) the solver could not complete within the user-defined maximum run-time.')
 
 
 def create_production_factor_series_csv(microgrids, logger, reopt_inputs, invalidate_cache):
@@ -179,7 +183,8 @@ def create_economic_microgrid(microgrids, logger, reopt_inputs, invalidate_cache
 		microgrid_design_output('reopt_mgEconomic')
 
 
-def run(REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, lon, existing_generation_dict, INVALIDATE_CACHE):
+# def run(REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, lon, existing_generation_dict, INVALIDATE_CACHE):
+def run(REOPT_FOLDER, microgrid, REOPT_INPUTS, mg_name, lat, lon, existing_generation_dict, INVALIDATE_CACHE):
 	'''
 	Generate full microgrid design for given microgrid spec dictionary and circuit file (used to gather distribution assets). Generate the microgrid
 	specs for REOpt.
@@ -188,8 +193,6 @@ def run(REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, lon, existi
 	:type REOPT_FOLDER: str
 	:param microgrid: a microgrid definition
 	:type microgrid: dict
-	:param logger: a logger instance
-	:type logger: Logger
 	:param REOPT_INPUTS: user-defined input parameters for REOPT
 	:type REOPT_INPUTS: dict
 	:param mg_name: the name of the microgrid
@@ -204,6 +207,7 @@ def run(REOPT_FOLDER, microgrid, logger, REOPT_INPUTS, mg_name, lat, lon, existi
 	:type INVALIDATE_CACHCE: float
 	:rtype: None
 	'''
+	logger = microgridup.setup_logging('logs.log', mg_name)
 	assert isinstance(INVALIDATE_CACHE, bool)
 	if os.path.isdir(REOPT_FOLDER) and INVALIDATE_CACHE == False:
 		# - The cache is only for testing purposes
@@ -603,13 +607,12 @@ def _tests():
 	workDir = os.path.abspath(MODEL_DIR)
 	if curr_dir != workDir:
 		os.chdir(workDir)
-	logger = microgridup.setup_logging(f'{MGU_FOLDER}/logs.txt')
 	print(f'----------Testing {_dir}----------')
 	for run_count in range(len(microgrids)):
 		microgrid = microgrids[f'mg{run_count}']
 		existing_generation_dict = microgridup_hosting_cap.get_microgrid_existing_generation_dict(f'{MODEL_DIR}/circuit.dss', microgrid)
 		lat, lon = microgridup_hosting_cap.get_microgrid_coordinates(f'{MODEL_DIR}/circuit.dss', microgrid)
-		run(f'reopt_mg{run_count}', microgrid, logger, REOPT_INPUTS, f'mg{run_count}', lat, lon, existing_generation_dict, True)
+		run(f'reopt_mg{run_count}', microgrid, REOPT_INPUTS, f'mg{run_count}', lat, lon, existing_generation_dict, True)
 		# - Assert that we got valid output from REopt
 		with open(f'reopt_mg{run_count}/REoptInputs.json') as f:
 			inputs = json.load(f)

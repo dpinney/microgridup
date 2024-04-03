@@ -23,14 +23,14 @@ if MGU_FOLDER == '/':
 	MGU_FOLDER = '' #workaround for docker root installs
 PROJ_FOLDER = f'{MGU_FOLDER}/data/projects'
 
-def setup_logging(log_file):
-    logger = logging.getLogger('custom_logger')
-    logger.setLevel(logging.WARNING)
-    formatter = logging.Formatter('%(asctime)s - %(message)s')
-    file_handler = logging.FileHandler(log_file)
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-    return logger
+def setup_logging(log_file, mg_name=None):
+	logger = logging.getLogger(f'reopt_{mg_name}') if mg_name else logging.getLogger()
+	logger.setLevel(logging.WARNING)
+	formatter = logging.Formatter('%(asctime)s %(processName)-10s %(name)s %(message)s')
+	file_handler = logging.FileHandler(log_file)
+	file_handler.setFormatter(formatter)
+	logger.addHandler(file_handler)
+	return logger
 
 def _walkTree(dirName):
 	listOfFiles = []
@@ -292,7 +292,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 	if not os.path.isdir(MODEL_DIR):
 		os.mkdir(MODEL_DIR)
 	# Setup logging.
-	log_file = f'{MODEL_DIR}/logs.txt'
+	log_file = f'{MODEL_DIR}/logs.log'
 	if os.path.exists(log_file):
 		open(log_file, 'w').close()
 	logger = setup_logging(log_file)

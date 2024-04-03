@@ -46,7 +46,7 @@ def verify_password(username, password):
 @app.route('/get_logs/<model_name>')
 def get_logs(model_name):
     # Read the logs from the corresponding log file.
-    log_file = os.path.join('data/projects', model_name, 'logs.txt')
+    log_file = os.path.join('data/projects', model_name, 'logs.log')
     if os.path.exists(log_file):
         with open(log_file, 'r') as file:
             logs = file.readlines()

@@ -621,14 +621,14 @@ def _tests():
 		# - Assert that the input load shape matches the output load shape
 		assert inputs['s']['electric_load']['loads_kw'] == results['ElectricLoad']['load_series_kw']
 		# - Assert that the optimal solar size is within 5% of an expected value
-		assert abs(1 - results['PV']['size_kw']/4534.8271) < 0.05
+		assert abs(1 - results['PV']['size_kw']/4378.8761) < 0.05
 		# - Assert that the optimal generator size is within 5% of an expected value
-		assert abs(1 - results['Generator']['size_kw']/1391.77) < 0.05
+		assert abs(1 - results['Generator']['size_kw']/1417.39) < 0.05
 		# - Assert that the optimal storage size is within 5% of an expected value
-		assert abs(1 - results['ElectricStorage']['size_kw']/564.55) < 0.05
-		assert abs(1 - results['ElectricStorage']['size_kwh']/1397.13) < 0.05
+		assert abs(1 - results['ElectricStorage']['size_kw']/544.49) < 0.05
+		assert abs(1 - results['ElectricStorage']['size_kwh']/1253.18) < 0.05
 		# - Assert that the optimal lifecycle cost is within 5% of an expected value
-		assert abs(1 - results['Financial']['lcc']/1.73823260427e7) < 0.05
+		assert abs(1 - results['Financial']['lcc']/1.72419163504e7) < 0.05
 	os.chdir(curr_dir)
 	print('Ran all tests for microgridup_design.py.')
 

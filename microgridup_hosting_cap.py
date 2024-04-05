@@ -855,7 +855,7 @@ def run_hosting_capacity(dss_filename):
 	all_input_data['traditionalHCMaxTestkw'] = load_df.apply(np.max).sum() * 4
 	with open('hosting_capacity/allInputData.json', 'w') as f:
 		json.dump(all_input_data, f, indent=4)
-	omf.models.__neoMetaModel__.runForeground('hosting_capacity')
+	omf.models.__neoMetaModel__.runForeground(f'{os.getcwd()}/hosting_capacity')
 	with open('hosting_capacity/allOutputData.json') as f:
 		data = json.load(f)
 	# - Organize graph data

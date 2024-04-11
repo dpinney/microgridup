@@ -838,8 +838,9 @@ def run_hosting_capacity(dss_filename):
 	omf.models.hostingCapacity.new('hosting_capacity')
 	with open('hosting_capacity/allInputData.json') as f:
 		all_input_data = json.load(f)
-	# - Disable AMI algorithm
+	# - Disable AMI algorithm and downline algorithm
 	all_input_data['runAmiAlgorithm'] = 'off'
+	all_input_data['runDownlineAlgorithm'] = 'off'
 	# - Remove omd file that was copied by default into the hosting_capacity/ directory because we replace it with a different omd
 	os.remove(f"hosting_capacity/{all_input_data['feederName1']}.omd")
 	# - Create and set the new omd file
@@ -855,7 +856,10 @@ def run_hosting_capacity(dss_filename):
 	all_input_data['traditionalHCMaxTestkw'] = load_df.apply(np.max).sum() * 4
 	with open('hosting_capacity/allInputData.json', 'w') as f:
 		json.dump(all_input_data, f, indent=4)
+	cwd = os.getcwd()
 	omf.models.__neoMetaModel__.runForeground(f'{os.getcwd()}/hosting_capacity')
+	# - IDK why running hostingCapacity.py changes working directories, but change it back
+	os.chdir(cwd)
 	with open('hosting_capacity/allOutputData.json') as f:
 		data = json.load(f)
 	# - Organize graph data

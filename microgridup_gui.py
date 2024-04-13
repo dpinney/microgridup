@@ -4,7 +4,7 @@ from collections import OrderedDict
 from matplotlib import pyplot as plt
 from flask import Flask, request, redirect, render_template, jsonify, url_for
 from omf.solvers.opendss import dssConvert
-from microgridup_gen_mgs import mg_group, nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, topological_sort
+from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_mg_mines, form_mg_groups
 from microgridup import full
 from subprocess import Popen
 from flask import send_from_directory
@@ -383,7 +383,7 @@ def previewPartitions():
 				return {}
 	except:
 		return jsonify('Invalid partitioning method')
-	MG_MINES = mg_group(CIRC_FILE, CRITICAL_LOADS, METHOD, algo_params={'num_mgs':MGQUANT})
+	MG_MINES = form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd)
 	for mg in MG_MINES:
 		if not MG_MINES[mg]['switch']:
 			print(f'Selected partitioning method produced invalid results. Please choose a different partitioning method.')
@@ -455,20 +455,28 @@ def run():
 	crit_loads = json.loads(request.form['CRITICAL_LOADS'])
 	mg_method = request.form['MG_DEF_METHOD']
 	MGQUANT = int(json.loads(request.form['mgQuantity']))
+	G = dssConvert.dss_to_networkx(dss_path)
+	omd = dssConvert.dssToOmd(dss_path, '', RADIUS=0.0004, write_out=False)
 	if mg_method == 'loadGrouping':
 		pairings = json.loads(request.form['MICROGRIDS'])
-		microgrids = mg_group(dss_path, crit_loads, 'loadGrouping', pairings)	
+		mg_groups = form_mg_groups(G, crit_loads, 'loadGrouping', pairings)
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
 	elif mg_method == 'manual':
 		algo_params = json.loads(request.form['MICROGRIDS'])
-		microgrids = mg_group(dss_path, crit_loads, 'manual', algo_params)
+		mg_groups = form_mg_groups(G, crit_loads, 'manual', algo_params)
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd, switch=algo_params['switch'], gen_bus=algo_params['gen_bus'])
 	elif mg_method == 'lukes':
-		microgrids = mg_group(dss_path, crit_loads, 'lukes')
+		mg_groups = form_mg_groups(G, crit_loads, 'lukes', algo_params)
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
 	elif mg_method == 'branch':
-		microgrids = mg_group(dss_path, crit_loads, 'branch')
+		mg_groups = form_mg_groups(G, crit_loads, 'branch')
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
 	elif mg_method == 'bottomUp':
-		microgrids = mg_group(dss_path, crit_loads, 'bottomUp', algo_params={'num_mgs':MGQUANT})
+		mg_groups = form_mg_groups(G, crit_loads, 'bottomUp', algo_params={'num_mgs':MGQUANT})
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
 	elif mg_method == 'criticalLoads':
-		microgrids = mg_group(dss_path, crit_loads, 'criticalLoads', algo_params={'num_mgs':MGQUANT})
+		mg_groups = form_mg_groups(G, crit_loads, 'criticalLoads', algo_params={'num_mgs':MGQUANT})
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
 	elif mg_method == '': 
 		microgrids = json.loads(request.form['MICROGRIDS'])
 	# Form REOPT_INPUTS. 

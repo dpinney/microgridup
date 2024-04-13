@@ -3,6 +3,7 @@ in microgrid_test_4mg.py for economic comparison'''
 
 from microgridup import *
 import microgridup_gen_mgs as gmg
+from omf.solvers.opendss import dssConvert
 
 def test_1mg():
 	# Input data.
@@ -426,7 +427,10 @@ def test_auto3mg():
 		"mgParameterOverrides": {"mg0":{}, "mg1": {}, "mg2":{}}
 	}
 	ALGO = 'branch' #'lukes'
-	MICROGRIDS = gmg.mg_group(CIRC_FILE, CRITICAL_LOADS, ALGO)
+	G = dssConvert.dss_to_networkx(CIRC_FILE)
+	omd = dssConvert.dssToOmd(CIRC_FILE, '', RADIUS=0.0004, write_out=False)
+	MG_GROUPS = gmg.form_mg_groups(CIRC_FILE, CRITICAL_LOADS, ALGO)
+	MICROGRIDS = gmg.form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd)
 	# MICROGRIDS = {
 	# 	'mg0': {
 	# 		'loads': ['634a_data_center','634b_radar','634c_atc_tower'],

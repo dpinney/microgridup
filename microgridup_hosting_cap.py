@@ -977,7 +977,7 @@ def _tests():
 	if curr_dir != workDir:
 		os.chdir(workDir)
 	microgrids = control_test_args[_dir]
-	logger = microgridup.setup_logging(f'{MGU_FOLDER}/logs.txt')
+	logger = microgridup.setup_logging(f'{MGU_FOLDER}/logs.log')
 	# As many tests per directory as there are microgrids/REopt API calls per directory.
 	mg_names_sorted = sorted(microgrids.keys())
 	REOPT_INPUTS = {

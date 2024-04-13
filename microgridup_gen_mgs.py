@@ -296,7 +296,7 @@ def manual_groups(G, pairings):
 		mgs[mg] = list(nx.nodes(nx.dfs_tree(G, cur_lca)))
 	# Only return the contents of each MG but do so in order specified by the user.
 	parts = []
-	counter = 1
+	counter = 0
 	while mgs:
 		key = f'Mg{counter}'
 		if mgs.get(key):

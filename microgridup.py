@@ -9,6 +9,7 @@ import shutil
 import os
 import json
 import pandas as pd
+import numpy as np
 import plotly.graph_objects as go
 import csv
 import jinja2 as j2
@@ -37,33 +38,22 @@ def _walkTree(dirName):
 		listOfFiles += [os.path.join(dirpath, file) for file in filenames]
 	return listOfFiles
 
-def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
+def summary_stats(reps, MICROGRIDS):
 	'''Helper function within full() to take in a dict of lists of the microgrid
 	attributes and append a summary value for each attribute'''
-	# print("reps['Maximum 1 hr Load (kW)']",reps['Maximum 1 hr Load (kW)'])
-	# add up all of the loads in MICROGRIDS into one loadshape
-	# used previously to call items out of mg_name: gen_bus_name = mg_ob['gen_bus']
-	# grab all the load names from all of the microgrids analyzed
-	mg_load_names = []
-	for mg in MICROGRIDS:
-		for load_name in MICROGRIDS[mg]['loads']:
-			mg_load_names.append(load_name)
-	# add up all of the loads in MICROGRIDS into one loadshape
-	loads = pd.read_csv(MODEL_LOAD_CSV)
-	loads.columns = [str(x).lower() for x in loads.columns]
-	loads['full_load']= loads[mg_load_names].sum(axis=1)
-	#print('loads.head()', loads.head())
-	max_load = int(loads['full_load'].max())
-	min_load = int(loads['full_load'].min())
-	avg_load = int(loads['full_load'].mean())
+	load_df = pd.read_csv('loads.csv')
+	# - Remove any columns that contain hourly indicies instead of kW values
+	load_df = load_df.iloc[:, load_df.apply(microgridup_design.is_not_timeseries_column).to_list()]
+	load_series = load_df.apply(sum, axis=1)
 	reps['Microgrid Name'].append('Summary')
 	reps['Generation Bus'].append('None')
-	# minimum coincident load across all mgs
-	reps['Minimum 1 hr Load (kW)'].append(round(min_load))
-	reps['Average 1 hr Load (kW)'].append(round(avg_load))
-	reps['Average Daytime 1 hr Load (kW)'].append(round(sum(reps['Average Daytime 1 hr Load (kW)'])))
-	# maximum coincident load acorss all mgs
-	reps['Maximum 1 hr Load (kW)'].append(round(max_load))
+	reps['Minimum 1 hr Load (kW)'].append(round(load_series.min()))
+	reps['Average 1 hr Load (kW)'].append(round(load_series.mean()))
+	reps['Average Daytime 1 hr Load (kW)'].append(round(np.average(np.average(np.array(np.split(load_series.to_numpy(), 365))[:, 9:17], axis=1))))
+	reps['Maximum 1 hr Load (kW)'].append(round(load_series.max()))
+	reps['Minimum 1 hr Critical Load (kW)'].append(round(sum(reps['Minimum 1 hr Critical Load (kW)'])))
+	reps['Average 1 hr Critical Load (kW)'].append(round(sum(reps['Average 1 hr Critical Load (kW)'])))
+	reps['Average Daytime 1 hr Critical Load (kW)'].append(round(sum(reps['Average Daytime 1 hr Critical Load (kW)'])))
 	reps['Maximum 1 hr Critical Load (kW)'].append(round(sum(reps['Maximum 1 hr Critical Load (kW)'])))
 	reps['Existing Fossil Generation (kW)'].append(round(sum(reps['Existing Fossil Generation (kW)'])))
 	reps['New Fossil Generation (kW)'].append(round(sum(reps['New Fossil Generation (kW)'])))
@@ -84,10 +74,10 @@ def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
 	# print("wgtd_avg_renewables_perc:", wgtd_avg_renewables_perc)
 	reps['Renewable Generation (% of Annual kWh)'].append(round(wgtd_avg_renewables_perc))
 	# using yr 1 emissions and percent reductions, calculate a weighted average of % reduction in emissions for yr 1
-	yr1_emis = reps['Emissions (Yr 1 Tons CO2)']
 	reps['Emissions (Yr 1 Tons CO2)'].append(round(sum(reps['Emissions (Yr 1 Tons CO2)'])))
 	# print("yr1_emis:", yr1_emis)
 	emis_reduc_perc = reps['Emissions Reduction (Yr 1 % CO2)']
+	yr1_emis = reps['Emissions (Yr 1 Tons CO2)']
 	total_tons_list = [yr1_emis[i]/(1-emis_reduc_perc[i]/100) for i in range(len(emis_reduc_perc))]
 	reduc_tons_list = [a*b/100 for a,b in zip(total_tons_list,emis_reduc_perc)]
 	reduc_percent_yr1 = sum(reduc_tons_list)/sum(total_tons_list)*100
@@ -101,7 +91,7 @@ def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
 	# else:
 	# 	reps['Minimum Outage Survived (h)'].append(None)
 	if all([h != None for h in reps['Average Outage Survived (h)']]):
-		reps['Average Outage Survived (h)'].append(round(min(reps['Average Outage Survived (h)']),0))
+		reps['Average Outage Survived (h)'].append(round(min(reps['Average Outage Survived (h)']), 0))
 	else:
 		reps['Average Outage Survived (h)'].append(None)
 	# print(reps)
@@ -427,7 +417,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		reports = [x for x in os.listdir('.') if x.startswith('ultimate_rep_')]
 		reports.sort()
 		reps = pd.concat([pd.read_csv(x) for x in reports]).to_dict(orient='list')
-		stats = summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV)
+		stats = summary_stats(reps, MICROGRIDS)
 		mg_add_cost_files = [x for x in os.listdir('.') if x.startswith('mg_add_cost_')]
 		mg_add_cost_files.sort()
 		# create a row-based list of lists of mg_add_cost_files
@@ -441,7 +431,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		if os.path.exists("user_warnings.txt"):
 			with open("user_warnings.txt") as myfile:
 				warnings = myfile.read()
-		#microgridup_design.create_economic_microgrid(MICROGRIDS, logger, REOPT_INPUTS, INVALIDATE_CACHE)
+		microgridup_design.create_economic_microgrid(MICROGRIDS, logger, REOPT_INPUTS, INVALIDATE_CACHE)
 		names_and_folders = {x.split('_')[1]: x for x in sorted([dir_ for dir_ in os.listdir('.') if dir_.startswith('reopt_')])}
 		# generate a decent chart of additional generation.
 		chart_html = summary_charts(stats)
@@ -481,7 +471,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 			outFile.write(out)
 		if open_results:
 			os.system(f'open {FINAL_REPORT}')
-	except Exception:
+	except Exception as e:
 		print(traceback.format_exc())
 		logger.warning(traceback.format_exc())
 		os.system(f'touch "{MODEL_DIR}/0crashed.txt"')

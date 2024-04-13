@@ -257,7 +257,7 @@
                     <input type="text" name="MODEL_DIR" value="lehigh1mg" pattern="[a-z0-9_\-]+" required/>
                 </div>
                 <div class="chunk">
-                    <label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">Defines the length of the interconnection analysis. Example – if time steps are 15 minutes, 480 would define a five day analysis.</span></label>
+                    <label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">Defines the length of the interconnection analysis in hours.</span></label>
                     <input type="text" name="QSTS_STEPS" value="480.0" />
                 </div>
                 <br>
@@ -297,14 +297,14 @@
                             </select>
                         </div>
                         <div class="chunk">
-                            <label class="tooltip" for="urdbLabelSwitch">Use URDB Rate?<span class="classic">Utilizing a rate from the Utility Rate Database overrides Cost of Energy and Cost of Demand rates above. See https://openei.org/services/<br>doc/rest/util_rates/</span></label>
+                            <label class="tooltip" for="urdbLabelSwitch">Use URDB Rate?<span class="classic">Utilizing a rate from the Utility Rate Database overrides Cost of Energy and Cost of Demand rates above. See <a href="https://openei.org/services/doc/rest/util_rates/">OpenEI</a> for more information.</span></label>
                             <select id="urdbLabelSwitch" name="urdbLabelSwitch">
                                 <option  value="on">Yes</option>
                                 <option selected value="off">No</option>
                             </select>
                         </div>
                         <div class="chunk">
-                            <label class="tooltip" for="urdbLabel">URDB Label<span class="classic">Input the string found at the end of the URDB Rate URL, For example https://openei.org/apps/<br>IURDB/rate/view/<br> 5b75cfe95457a3454faf0aea <br> would yield "5b75cfe95457a3454faf0aea"</span></label>
+                            <label class="tooltip" for="urdbLabel">URDB Label<span class="classic">Input the string found at the end of the URDB Rate URL, For example <a href="https://openei.org/apps/IURDB/rate/view/5b75cfe95457a3454faf0aea">this rate data entry</a> would be "5b75cfe95457a3454faf0aea"</span></label>
                             <input type="text" name="urdbLabel" value="5b75cfe95457a3454faf0aea"/>
                         </div>
                     </div>
@@ -312,7 +312,7 @@
                 <h5>Load Profile</h5>
                 <div class="chunk">
                     
-                        <label class="tooltip" for="LOAD_CSV_NAME">Load Data (.csv)<span class="classic">Please upload a .csv file representing the hourly load shape. See https://github.com/dpinney/<br>microgridup/blob/main/docs<br>/input_formats.md for formatting details.</span></label>
+                        <label class="tooltip" for="LOAD_CSV_NAME">Load Data (.csv)<span class="classic">Please upload a .csv file representing the hourly load shape. See <a href="https://github.com/dpinney/microgridup/blob/main/docs/input_formats.md">input_formats.md</a> for formatting details.</span></label>
 						
                         <input type="text" name="LOAD_CSV_NAME" value="loads.csv" class="file-input" readonly>
                         <button type="button" class="remove-btn">Remove File</button>
@@ -342,7 +342,7 @@
                 </div>
 				<div class="chunk">
                     
-                        <label class="tooltip" for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)<span class="classic">Please upload a .csv file representing historical outages. See https://github.com/dpinney/<br>microgridup/blob/main/docs<br>/input_formats.md for formatting details.</span></label>
+                        <label class="tooltip" for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)<span class="classic">Please upload a .csv file representing historical outages. See <a href="https://github.com/dpinney/microgridup/blob/main/docs/input_formats.md">input_formats.md</a> for formatting details.</span></label>
 						
                         <input type="text" name="HISTORICAL_OUTAGES" value="outages.csv" class="file-input" readonly>
                         <button type="button" class="remove-btn">Remove File</button>
@@ -767,12 +767,14 @@
 			MODEL_DIR: MODEL_DIR,
 			MG_MINES: MG_MINES
 		};
+		document.body.style.cursor = 'progress';
 		$.ajax({
 			type: 'POST',
 			url: '/previewOldPartitions',
 			data: JSON.stringify(data),
 			contentType: 'application/json',
 			success: function(data, status) {
+				document.body.style.cursor = 'default';
 				var img = $('<img id="oldPartitionPreview">');
 				img.attr('src', 'data:image/gif;base64,' + data.pic_hash);
 				oldPartitionsDiv.prepend('<br>')
@@ -783,6 +785,7 @@
 				
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
+				document.body.style.cursor = 'default';
 				console.log(textStatus + ' : ' + errorThrown);
 			}
 		})
@@ -832,7 +835,7 @@
 				$(this).empty();
 				$(this).append('<option value="">None</option>')
 				for (let i = 0; i < numMgs; i++) {
-					var count = i + 1;
+					var count = i;
 					$(this).append('<option value="Mg' + count + '">Mg' + count + '</option>');
 				}
 			});
@@ -897,6 +900,7 @@
 			}
 			// Get mgQuantity, if applicable. 
 			var mgQuantity = $('#minQuantMgs').val() ? $('#minQuantMgs').val() : 0;
+			document.body.style.cursor = 'progress';
 			$.ajax({
 				url: 'previewPartitions',
 				type: 'POST',
@@ -908,6 +912,7 @@
 					modelDir: JSON.stringify("lehigh1mg")
 				},
 				success: function(data, status) {
+					document.body.style.cursor = 'default';
 					if (data === 'Invalid partitioning method') {
 						alert('Selected partitioning method produced invalid results. Please choose a different partitioning method.');
 					} else {
@@ -920,6 +925,7 @@
 					}
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
+					document.body.style.cursor = 'default';
 					console.log(textStatus + ' : ' + errorThrown)
 				}
 			});
@@ -1206,7 +1212,7 @@
 			const MODEL_DIR = document.getElementsByName('MODEL_DIR')[0].value;
 			window.on_edit_flow = true;
 			// Get allDataInputs.json params from Jinja as variables in the script.
-			var in_data = JSON.parse('{"BASE_DSS": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh1mg/circuit.dss", "CREATION_DATE": "2024-03-04 19:10:47", "CRITICAL_LOADS": ["634a_data_center", "634b_radar", "634c_atc_tower", "675a_hospital", "675b_residential1", "675c_residential1", "692_warehouse2", "684_command_center", "652_residential", "611_runway"], "DESCRIPTION": "", "FAULTED_LINES": "650632", "INVALIDATE_CACHE": true, "LOAD_CSV": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh1mg/loads.csv", "MICROGRIDS": {"mg0": {"critical_load_kws": [70, 90, 10, 150, 200, 200, 400, 20, 30, 70, 0, 0], "gen_bus": "670", "gen_obs_existing": ["solar_634_existing", "solar_675_existing", "fossil_684_existing", "fossil_646_existing", "battery_634_existing", "battery_684_existing"], "loads": ["634a_data_center", "634b_radar", "634c_atc_tower", "675a_hospital", "675b_residential1", "675c_residential1", "692_warehouse2", "684_command_center", "652_residential", "611_runway", "645_hangar", "646_office"], "switch": "650632"}}, "MODEL_DIR": "lehigh1mg", "OUTAGE_CSV": "/Users/austinchang/programming/repositories/microgridup/microgridup/lehigh1mg/outages.csv", "QSTS_STEPS": 480.0, "REOPT_INPUTS": {"analysisYears": "25", "battery": "on", "batteryCapacityCost": "420", "batteryCapacityCostReplace": "200", "batteryCapacityMax": "100000", "batteryCapacityMin": "0", "batteryCapacityReplaceYear": "10", "batteryItcPercent": "0", "batteryMacrsOptionYears": "7", "batteryPowerCost": "840", "batteryPowerCostReplace": "410", "batteryPowerMax": "10000", "batteryPowerMin": "0", "batteryPowerReplaceYear": "10", "demandCost": "20", "dieselCO2Factor": "24.1", "dieselFuelCostGal": "1.5", "dieselGenCost": "1000", "dieselMacrsOptionYears": "0", "dieselMax": "10000", "dieselMin": "0", "dieselOMCostKw": "35", "dieselOMCostKwh": "0.02", "dieselOnlyRunsDuringOutage": false, "discountRate": "0.083", "energyCost": "0.12", "fossil": "on", "fuelAvailable": "150000", "maxRuntimeSeconds": "240", "mgParameterOverrides": {"mg0": {}}, "minGenLoading": "0", "omCostEscalator": "0.025", "outageDuration": "48", "single_phase_relay_cost": "300", "solar": "on", "solarCanCurtail": true, "solarCanExport": true, "solarCost": "1600", "solarItcPercent": "0.26", "solarMacrsOptionYears": "5", "solarMax": "10000", "solarMin": "0", "three_phase_relay_cost": "20000", "urdbLabel": "5b75cfe95457a3454faf0aea", "urdbLabelSwitch": "off", "value_of_lost_load": "100", "wholesaleCost": "0.034", "wind": "off", "windCost": "4989", "windItcPercent": "0.26", "windMacrsOptionYears": "5", "windMax": "1000", "windMin": "0", "year": "2017"}}');
+			var in_data = JSON.parse('{"BASE_DSS": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh1mg/circuit.dss", "CREATION_DATE": "2024-04-03 19:46:31", "CRITICAL_LOADS": ["634a_data_center", "634b_radar", "634c_atc_tower", "675a_hospital", "675b_residential1", "675c_residential1", "692_warehouse2", "684_command_center", "652_residential", "611_runway"], "DESCRIPTION": "", "FAULTED_LINES": "650632", "INVALIDATE_CACHE": true, "LOAD_CSV": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh1mg/loads.csv", "MICROGRIDS": {"mg0": {"critical_load_kws": [70, 90, 10, 150, 200, 200, 400, 20, 30, 70, 0, 0], "gen_bus": "670", "gen_obs_existing": ["solar_634_existing", "solar_675_existing", "fossil_684_existing", "fossil_646_existing", "battery_634_existing", "battery_684_existing"], "loads": ["634a_data_center", "634b_radar", "634c_atc_tower", "675a_hospital", "675b_residential1", "675c_residential1", "692_warehouse2", "684_command_center", "652_residential", "611_runway", "645_hangar", "646_office"], "switch": "650632"}}, "MODEL_DIR": "lehigh1mg", "OUTAGE_CSV": "/Users/austinchang/programming/repositories/microgridup/microgridup/lehigh1mg/outages.csv", "QSTS_STEPS": 480.0, "REOPT_INPUTS": {"analysisYears": "25", "battery": "on", "batteryCapacityCost": "420", "batteryCapacityCostReplace": "200", "batteryCapacityMax": "100000", "batteryCapacityMin": "0", "batteryCapacityReplaceYear": "10", "batteryItcPercent": "0", "batteryMacrsOptionYears": "7", "batteryPowerCost": "840", "batteryPowerCostReplace": "410", "batteryPowerMax": "10000", "batteryPowerMin": "0", "batteryPowerReplaceYear": "10", "demandCost": "20", "dieselCO2Factor": "24.1", "dieselFuelCostGal": "1.5", "dieselGenCost": "1000", "dieselMacrsOptionYears": "0", "dieselMax": "10000", "dieselMin": "0", "dieselOMCostKw": "35", "dieselOMCostKwh": "0.02", "dieselOnlyRunsDuringOutage": false, "discountRate": "0.083", "energyCost": "0.12", "fossil": "on", "fuelAvailable": "150000", "maxRuntimeSeconds": "240", "mgParameterOverrides": {"mg0": {}}, "minGenLoading": "0", "omCostEscalator": "0.025", "outageDuration": "48", "single_phase_relay_cost": "300", "solar": "on", "solarCanCurtail": true, "solarCanExport": true, "solarCost": "1600", "solarItcPercent": "0.26", "solarMacrsOptionYears": "5", "solarMax": "10000", "solarMin": "0", "three_phase_relay_cost": "20000", "urdbLabel": "5b75cfe95457a3454faf0aea", "urdbLabelSwitch": "off", "value_of_lost_load": "100", "wholesaleCost": "0.034", "wind": "off", "windCost": "4989", "windItcPercent": "0.26", "windMacrsOptionYears": "5", "windMax": "1000", "windMin": "0", "year": "2017"}}');
 			var criticalLoads = in_data['CRITICAL_LOADS'];
 			var MG_MINES = in_data['MICROGRIDS'];
 			// Also populate critical load selection div.

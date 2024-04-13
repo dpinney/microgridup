@@ -1,0 +1,76 @@
+2024-04-03 20:04:34,543 Process-5  root Logging status updates for /Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehighauto_3mg.
+2024-04-03 20:04:34,543 Process-5  root Rerunning existing project. DSS file not moved.
+2024-04-03 20:04:34,543 Process-5  root Rerunning existing project. Load CSV file not moved.
+2024-04-03 20:04:34,543 Process-5  root Rerunning existing project. Outages CSV file not moved.
+2024-04-03 20:08:48,103 Process-5  root load_phases on bus_name: phases ['1'] on bus 634.1
+2024-04-03 20:08:48,103 Process-5  root load_phases on bus_name: phases ['1'] on bus 634.1
+2024-04-03 20:08:48,103 Process-5  root load_phases on bus_name: phases ['1'] on bus 634.1
+2024-04-03 20:08:48,113 Process-5  root mg_phase_and_kv out_dict:
+2024-04-03 20:08:48,125 Process-5  root Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
+
+2024-04-03 20:08:48,212 Process-5  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 20:08:48,213 Process-5  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 20:08:48,213 Process-5  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 20:08:48,241 Process-5  root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 1663.3458, 'solar_size_existing': 440.0, 'solar_size_new': 1223.3458, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 107.44, 'fossil_size_existing': 0.0, 'fossil_size_new': 107.44, 'battery_cap_total': 410.27, 'battery_cap_existing': 307.0, 'battery_cap_new': 103.26999999999998, 'battery_pow_total': 185.3, 'battery_pow_existing': 79.0, 'battery_pow_new': 106.30000000000001}
+2024-04-03 20:08:48,334 Process-5  root load_phases on bus_name: phases ['2'] on bus 645.2
+2024-04-03 20:08:48,335 Process-5  root load_phases on bus_name: phases ['2'] on bus 646.2
+2024-04-03 20:08:48,391 Process-5  root mg_phase_and_kv out_dict:
+2024-04-03 20:08:48,445 Process-5  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 20:08:48,445 Process-5  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 20:08:48,473 Process-5  root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 639.6613, 'solar_size_existing': 0.0, 'solar_size_new': 639.6613, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 29.58, 'fossil_size_existing': 0.0, 'fossil_size_new': 29.58, 'battery_cap_total': 230.71, 'battery_cap_existing': 0.0, 'battery_cap_new': 230.71, 'battery_pow_total': 120.33, 'battery_pow_existing': 0.0, 'battery_pow_new': 120.33}
+2024-04-03 20:08:48,565 Process-5  root load_phases on bus_name: phases ['3'] on bus 684.3
+2024-04-03 20:08:48,566 Process-5  root load_phases on bus_name: phases ['1', '2', '3'] on bus 692.1.2.3
+2024-04-03 20:08:48,566 Process-5  root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-04-03 20:08:48,567 Process-5  root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-04-03 20:08:48,568 Process-5  root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-04-03 20:08:48,568 Process-5  root load_phases on bus_name: phases ['3'] on bus 611.3
+2024-04-03 20:08:48,568 Process-5  root load_phases on bus_name: phases ['3'] on bus 652.3
+2024-04-03 20:08:48,569 Process-5  root load_phases on bus_name: phases ['1'] on bus 670.1
+2024-04-03 20:08:48,569 Process-5  root load_phases on bus_name: phases ['2'] on bus 670.2
+2024-04-03 20:08:48,570 Process-5  root load_phases on bus_name: phases ['3'] on bus 670.3
+2024-04-03 20:08:48,631 Process-5  root mg_phase_and_kv out_dict:
+2024-04-03 20:08:48,691 Process-5  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 20:08:48,692 Process-5  root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+
+2024-04-03 20:08:48,692 Process-5  root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+
+2024-04-03 20:08:48,692 Process-5  root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+
+2024-04-03 20:08:48,693 Process-5  root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+
+2024-04-03 20:08:48,693 Process-5  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 20:08:48,693 Process-5  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 20:08:48,694 Process-5  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 20:08:48,694 Process-5  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 20:08:48,694 Process-5  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 20:08:48,722 Process-5  root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 3960.9983, 'solar_size_existing': 0.0, 'solar_size_new': 3960.9983, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 822.28, 'fossil_size_existing': 265.0, 'fossil_size_new': 557.28, 'battery_cap_total': 1179.49, 'battery_cap_existing': 0.0, 'battery_cap_new': 1179.49, 'battery_pow_total': 455.62, 'battery_pow_existing': 0.0, 'battery_pow_new': 455.62}
+2024-04-03 20:08:48,968 Process-5  root QSTS with circuit_plus_mgAll.dss AND CWD IS /Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehighauto_3mg
+2024-04-03 20:08:51,295 Process-5  root CONTROLLING ON {'mg0': {'battery_capacity': '10000', 'critical_load_kws': [160, 120, 120], 'gen_bus': '633', 'gen_obs_existing': ['solar_634_existing', 'battery_634_existing'], 'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'max_potential': '700', 'max_potential_diesel': '1000000', 'switch': '632633'}, 'mg1': {'battery_capacity': '10000', 'critical_load_kws': [170, 0], 'gen_bus': '645', 'gen_obs_existing': [], 'loads': ['645_hangar', '646_office'], 'max_potential': '700', 'max_potential_diesel': '1000000', 'switch': '632645'}, 'mg2': {'battery_capacity': '10000', 'critical_load_kws': [1155, 0, 485, 0, 0, 170, 0, 0, 0, 0], 'gen_bus': '670', 'gen_obs_existing': ['fossil_675_existing'], 'loads': ['684_command_center', '692_warehouse2', '675a_hospital', '675b_residential1', '675c_residential1', '611_runway', '652_residential', '670a_residential2', '670b_residential2', '670c_residential2'], 'max_potential': '700', 'max_potential_diesel': '1000000', 'switch': '632670'}}
+2024-04-03 20:08:51,300 Process-5  root reduced 634a_data_center from 160 to 160
+2024-04-03 20:08:51,300 Process-5  root reduced 634b_radar from 120 to 120
+2024-04-03 20:08:51,301 Process-5  root reduced 634c_atc_tower from 120 to 120
+2024-04-03 20:08:51,310 Process-5  root reduced 645_hangar from 170 to 170
+2024-04-03 20:08:51,311 Process-5  root reduced 646_office from 230 to 0
+2024-04-03 20:08:51,318 Process-5  root reduced 684_command_center from 1155 to 1155
+2024-04-03 20:08:51,318 Process-5  root reduced 692_warehouse2 from 170 to 0
+2024-04-03 20:08:51,319 Process-5  root reduced 675a_hospital from 485 to 485
+2024-04-03 20:08:51,319 Process-5  root reduced 675b_residential1 from 68 to 0
+2024-04-03 20:08:51,319 Process-5  root reduced 675c_residential1 from 290 to 0
+2024-04-03 20:08:51,319 Process-5  root reduced 611_runway from 170 to 170
+2024-04-03 20:08:51,319 Process-5  root reduced 652_residential from 128 to 0
+2024-04-03 20:08:51,320 Process-5  root reduced 670a_residential2 from 17 to 0
+2024-04-03 20:08:51,320 Process-5  root reduced 670b_residential2 from 66 to 0
+2024-04-03 20:08:51,320 Process-5  root reduced 670c_residential2 from 117 to 0
+2024-04-03 20:08:53,070 Process-5  root JSON compatible representation of all_mg_elements (for jinja-ing into the circuit map): {'mg0': ['xfm1', '633', 'solar_633', '634b_radar', 'fossil_633', '634', '634c_atc_tower', 'battery_633', '634a_data_center', 'solar_634_existing'], 'mg1': ['645_hangar', 'fossil_645', 'solar_645', '645', 'battery_645', '646', '646_office'], 'mg2': ['cap2', '680', '684', '675b_residential1', '675c_residential1', '611_runway', '611', 'battery_670', '670', '692', '671', 'fossil_675_existing', '684_command_center', '675', 'fossil_670', 'cap1', 'solar_670', '652', '652_residential', '670c_residential2', '675a_hospital', '670a_residential2', '692_warehouse2', '670b_residential2']}
+2024-04-03 20:08:53,125 Process-5  root Control microgrids count 3 and renewable count 0

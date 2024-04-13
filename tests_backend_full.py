@@ -429,7 +429,7 @@ def test_auto3mg():
 	ALGO = 'branch' #'lukes'
 	G = dssConvert.dss_to_networkx(CIRC_FILE)
 	omd = dssConvert.dssToOmd(CIRC_FILE, '', RADIUS=0.0004, write_out=False)
-	MG_GROUPS = gmg.form_mg_groups(CIRC_FILE, CRITICAL_LOADS, ALGO)
+	MG_GROUPS = gmg.form_mg_groups(G, CRITICAL_LOADS, ALGO)
 	MICROGRIDS = gmg.form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd)
 	# MICROGRIDS = {
 	# 	'mg0': {

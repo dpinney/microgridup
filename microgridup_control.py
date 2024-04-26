@@ -61,9 +61,9 @@ def plot_inrush_data(dssPath, microgrids, out_html, outage_start, outage_end, ou
 	dssTree = dssConvert.dssToTree(dssPath)
 
 	# Divide up transformers and loads by microgrid.
-	data = defaultdict(list)
+	table_data = defaultdict(list)
 	for key in microgrids:
-		data['Microgrid ID'].append(key)
+		table_data['Microgrid ID'].append(key)
 
 		# # of Interruptions --> Number of times gen drops to zero during sim.
 		new_dss_tree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw = do_manual_balance_approach(outage_start, outage_end, microgrids[key], dssTree, logger)
@@ -71,19 +71,19 @@ def plot_inrush_data(dssPath, microgrids, out_html, outage_start, outage_end, ou
 		new_batt_loadshape = list(new_batt_loadshape)
 		cumulative_existing_batt_shapes = list(cumulative_existing_batt_shapes)
 		gen_and_storage_shape = [x-y for x,y in zip(all_rengen_shapes[outage_start:outage_end],new_batt_loadshape)]
-		data['# of Interruptions'].append(len(count_interruptions_rengenmg(outage_start, outage_end, outage_length, all_loads_shapes_kw, gen_and_storage_shape)))
+		table_data['# of Interruptions'].append(len(count_interruptions_rengenmg(outage_start, outage_end, outage_length, all_loads_shapes_kw, gen_and_storage_shape)))
 		
 		# Expected In-rush (kW)
 		loads = [obj for obj in new_dss_tree if 'load.' in obj.get('object','') and obj.get('object','').split('.')[1] in microgrids[key]['loads']]
 		transformers = [obj for obj in new_dss_tree if 'transformer.' in obj.get('object','') and obj.get('object','').split('.')[1] in all_mg_elements[key]]
 		expected_inrush = estimate_inrush(loads + transformers, motor_perc)
-		data['Expected In-rush (kW)'].append(round(sum(expected_inrush.values()), 3))
+		table_data['Expected In-rush (kW)'].append(round(sum(expected_inrush.values()), 3))
 
 		# Expected In-rush (kW) from transformers
-		data['In-rush (kW) from transformers'].append(round(sum([expected_inrush[ob] for ob in expected_inrush if 'transformer' in ob]), 3))
+		table_data['In-rush (kW) from transformers'].append(round(sum([expected_inrush[ob] for ob in expected_inrush if 'transformer' in ob]), 3))
 
 		# Expected In-rush (kW) from loads
-		data['Expected In-rush (kW) from loads'].append(round(sum([expected_inrush[ob] for ob in expected_inrush if 'load' in ob]), 3))
+		table_data['Expected In-rush (kW) from loads'].append(round(sum([expected_inrush[ob] for ob in expected_inrush if 'load' in ob]), 3))
 
 		# In-rush as % of total generation
 		gen_bus = microgrids[key]['gen_bus']
@@ -92,21 +92,21 @@ def plot_inrush_data(dssPath, microgrids, out_html, outage_start, outage_end, ou
 		for ob in all_generation:
 			total_generation += float(ob.get('kw'))
 		if total_generation == 0:
-			data['In-rush as % of total generation'].append(None)
+			table_data['In-rush as % of total generation'].append(None)
 		else:
-			data['In-rush as % of total generation'].append(round(100*sum(expected_inrush.values())/total_generation, 3))
+			table_data['In-rush as % of total generation'].append(round(100*sum(expected_inrush.values())/total_generation, 3))
 
 		# Soft Start load (kW)
-		data['Soft Start load (kW)'].append(round(gradual_load_pickup(new_dss_tree, loads, motor_perc), 3))
+		table_data['Soft Start load (kW)'].append(round(gradual_load_pickup(new_dss_tree, loads, motor_perc), 3))
 
 		# Super-cap Sizing
-		data['Super-cap Sizing ($)'].append(round(super_cap_size(sum(expected_inrush.values())), 3))
+		table_data['Super-cap Sizing ($)'].append(round(super_cap_size(sum(expected_inrush.values())), 3))
 
 		# Total fossil surge. Send total fossil kW power per mg to function, return product after multiplication by surge factor. 
 		fossilGens = [ob for ob in new_dss_tree if ob.get('bus1','x.x').split('.')[0] == gen_bus and 'generator.fossil' in ob.get('object','')]
-		data['Total fossil surge (kW)'].append(round(calculate_fossil_surge_power(fossilGens, vsourceRatings, gen_bus), 3))
+		table_data['Total fossil surge (kW)'].append(round(calculate_fossil_surge_power(fossilGens, vsourceRatings, gen_bus), 3))
 	
-	df = pd.DataFrame(data)
+	df = pd.DataFrame(table_data)
 	
 	table_html = '<h1>In-rush Current Report</h1>' + df.to_html(justify='left').replace('border="1"','border="0"')
 	with open(out_html,'w') as outFile:
@@ -339,7 +339,7 @@ def do_manual_balance_approach(outage_start, outage_end, mg_values, dssTree, log
 
 def plot_manual_balance_approach(mg_key, year, outage_start, outage_end, outage_length, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw):
 	# Creates plot of manually constructed battery activity, load, and renewable generation (all cumulative).
-	data = []
+	traces = []
 	new_batt_loadshape = list(new_batt_loadshape)
 	cumulative_existing_batt_shapes = list(cumulative_existing_batt_shapes)
 	# Both gen and storage shapes after running battery algorithm.
@@ -361,7 +361,7 @@ def plot_manual_balance_approach(mg_key, year, outage_start, outage_end, outage_
 			name = y_axis_names[idx],
 			hoverlabel = dict(namelength = -1)
 		)
-		data.append(trace)
+		traces.append(trace)
 
 	# Plots load traces, gen traces, storage traces.
 	layout = graph_objects.Layout(
@@ -373,7 +373,7 @@ def plot_manual_balance_approach(mg_key, year, outage_start, outage_end, outage_
 			color="black"
 		)
 	)
-	fig = graph_objects.Figure(data, layout)
+	fig = graph_objects.Figure(traces, layout)
 	out_name = f'{mg_key}_gen_load_storage.plot.html'
 	offline.plot(fig, filename=out_name, auto_open=False)
 	return out_name
@@ -412,12 +412,12 @@ def make_chart(csvName, y_list, year, microgrids, chart_name, y_axis_name, outag
 	'''
 	rengen_proportional_loadshapes = form_rengen_proportional_loadshapes(rengen_mgs, rengen_kw_ratings, microgrids)
 	storage_proportional_loadshapes = form_storage_proportional_loadshapes(rengen_mgs, batt_kwh_ratings, microgrids) # Divide batteries into microgrids, find mg total kwh capacities for storage, and form element specific loadshapes.
-	fossil_kwh_output, diesel_dict, mmbtu_dict, fossil_traces, batt_cycles, data = process_circuit_objects(csvName, microgrids, y_list, outage_start, outage_end, outage_length, fossil_kw_ratings, vsource_ratings, year, rengen_mgs, storage_proportional_loadshapes, batt_kwh_ratings, rengen_proportional_loadshapes)
+	fossil_kwh_output, diesel_dict, mmbtu_dict, fossil_traces, batt_cycles, glc_traces = extract_charting_data(csvName, microgrids, y_list, outage_start, outage_end, outage_length, fossil_kw_ratings, vsource_ratings, year, rengen_mgs, storage_proportional_loadshapes, batt_kwh_ratings, rengen_proportional_loadshapes)
 	if chart_name == 'Generator Output':
 		make_fossil_loading_chart(csvName, fossil_traces, fossil_kwh_output, diesel_dict, mmbtu_dict)
 		make_batt_cycle_chart(csvName, batt_cycles)
 	ansi_bands = True if chart_name == 'Load Voltage' else False
-	make_glc_plots(csvName, chart_name, y_axis_name, data, outage_start, outage_length, year, ansi_bands)
+	make_glc_plots(csvName, chart_name, y_axis_name, glc_traces, outage_start, outage_length, year, ansi_bands)
 
 def form_rengen_proportional_loadshapes(rengen_mgs, rengen_kw_ratings, microgrids):
 	'''
@@ -484,7 +484,7 @@ def form_storage_proportional_loadshapes(rengen_mgs, batt_kwh_ratings, microgrid
 		storage_proportional_loadshapes[mg_key] = mg_proportional_storage_shapes
 	return storage_proportional_loadshapes
 
-def process_circuit_objects(csvName, microgrids, y_list, outage_start, outage_end, outage_length, fossil_kw_ratings, vsource_ratings, year, rengen_mgs, storage_proportional_loadshapes, batt_kwh_ratings, rengen_proportional_loadshapes):
+def extract_charting_data(csvName, microgrids, y_list, outage_start, outage_end, outage_length, fossil_kw_ratings, vsource_ratings, year, rengen_mgs, storage_proportional_loadshapes, batt_kwh_ratings, rengen_proportional_loadshapes):
 	'''
 	:param csvName: CSV name generated by newQstsPlot. Prefix is timezcontrol.
 	:type csvName: str

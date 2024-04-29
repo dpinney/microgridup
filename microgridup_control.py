@@ -530,7 +530,7 @@ def extract_charting_data(csvName, microgrids, y_list, outage_start, outage_end,
 		
 		# Set appropriate legend group based on microgrid.
 		for key in microgrids:
-			if microgrids[key]['gen_bus'] in ob_name or ob_name.split("-")[1] in microgrids[key]["loads"]:
+			if microgrids[key]['gen_bus'] in ob_name or ob_name.split("-")[1] in microgrids[key]["loads"] or ob_name.split("-")[1] in microgrids[key]['gen_obs_existing']:
 				legend_group = key
 			else:
 				legend_group = "Not_in_MG"

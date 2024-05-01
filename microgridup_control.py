@@ -887,26 +887,27 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 		actions=actions,
 		filePrefix=FPREFIX
 	)
-	# Merge gen and source csvs for plotting fossil loading percentages
-	inputs = [f'{FPREFIX}_gen.csv', f'{FPREFIX}_source.csv']
-	# First determine the field names from the top line of each input file
-	fieldnames = []
-	for filename in inputs:
-		with open(filename, "r", newline="") as f_in:
-			reader = csv.reader(f_in)
-			headers = next(reader)
-			for h in headers:
-				if h not in fieldnames:
-					fieldnames.append(h)
-	# Then copy the data
-	with open(f"{FPREFIX}_source_and_gen.csv", "w", newline="") as f_out:
-		writer = csv.DictWriter(f_out, fieldnames=fieldnames)
-		writer.writeheader()
+	if os.path.exists(f'{FPREFIX}_gen.csv') and os.path.exists(f'{FPREFIX}_source.csv'):
+		# Merge gen and source csvs for plotting fossil loading percentages
+		inputs = [f'{FPREFIX}_gen.csv', f'{FPREFIX}_source.csv']
+		# First determine the field names from the top line of each input file
+		fieldnames = []
 		for filename in inputs:
 			with open(filename, "r", newline="") as f_in:
-				reader = csv.DictReader(f_in)  # Uses the field names in this file
-				for line in reader:
-					writer.writerow(line)
+				reader = csv.reader(f_in)
+				headers = next(reader)
+				for h in headers:
+					if h not in fieldnames:
+						fieldnames.append(h)
+		# Then copy the data
+		with open(f"{FPREFIX}_source_and_gen.csv", "w", newline="") as f_out:
+			writer = csv.DictWriter(f_out, fieldnames=fieldnames)
+			writer.writeheader()
+			for filename in inputs:
+				with open(filename, "r", newline="") as f_in:
+					reader = csv.DictReader(f_in)  # Uses the field names in this file
+					for line in reader:
+						writer.writerow(line)
 	# Collect fossil_kw_ratings, batt_kwh_ratings, and rengen_kw_ratings.
 	batt_kwh_ratings, fossil_kw_ratings, rengen_kw_ratings = {}, {}, {}
 	# Info we need from tree: every battery by name with corresponding kwhrated, every fossil gen by name with corresponding kw, every rengen by name with corresponding kw rated.
@@ -918,8 +919,10 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 		if "generator.solar" in item.get("object","x.x") or "generator.wind" in item.get("object","x.x"):
 				rengen_kw_ratings[item.get("object").split(".")[1]] = item.get("kw")
 	# Generate the output charts.
-	make_chart(f'{FPREFIX}_source_and_gen.csv', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, "Generator Output", "Average Hourly kW", outage_start, outage_end, outage_length, batt_kwh_ratings, fossil_kw_ratings, vsource_ratings=big_gen_ratings, rengen_kw_ratings=rengen_kw_ratings, rengen_mgs=rengen_mgs)
-	make_chart(f'{FPREFIX}_load.csv', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, "Load Voltage", "PU", outage_start, outage_end, outage_length, batt_kwh_ratings, fossil_kw_ratings, rengen_kw_ratings=rengen_kw_ratings, rengen_mgs=rengen_mgs)
+	if os.path.exists(f'{FPREFIX}_source_and_gen.csv'):
+		make_chart(f'{FPREFIX}_source_and_gen.csv', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, "Generator Output", "Average Hourly kW", outage_start, outage_end, outage_length, batt_kwh_ratings, fossil_kw_ratings, vsource_ratings=big_gen_ratings, rengen_kw_ratings=rengen_kw_ratings, rengen_mgs=rengen_mgs)
+	if os.path.exists(f'{FPREFIX}_load.csv'):
+		make_chart(f'{FPREFIX}_load.csv', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, "Load Voltage", "PU", outage_start, outage_end, outage_length, batt_kwh_ratings, fossil_kw_ratings, rengen_kw_ratings=rengen_kw_ratings, rengen_mgs=rengen_mgs)
 	if os.path.exists(f'{workDir}/{FPREFIX}_control.csv'):
 		make_chart(f'{FPREFIX}_control.csv', ['Tap(pu)'], 2019, microgrids, "Tap Position", "PU", outage_start, outage_end, outage_length, batt_kwh_ratings, fossil_kw_ratings)
 	plot_inrush_data(pathToDss, microgrids, f'{FPREFIX}_inrush_plot.html', outage_start, outage_end, outage_length, logger, vsourceRatings=big_gen_ratings)

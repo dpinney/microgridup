@@ -318,7 +318,7 @@ def build_pos_from_omd(omd):
 
 def has_full_coords(omd):
 	has_coords = True
-	should_have_coords = set(['circuit','vsource','load','generator','storage','capacitor','bus'])
+	should_have_coords = set(['vsource','load','generator','storage','capacitor','bus'])
 	for key in omd:
 		ob = omd[key]
 		if ob.get('object') in should_have_coords:

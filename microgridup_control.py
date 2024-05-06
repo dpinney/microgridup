@@ -739,7 +739,17 @@ def make_glc_plots(csvName, chart_name, y_axis_name, glc_traces, outage_start, o
 	fig.add_vline(x=end_time, line=outage_line_style)
 	offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
-def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_length, logger):
+def faulted_lines_in_graph(path_to_dss, faulted_lines):
+	omd = dssConvert.dssToOmd(path_to_dss, '', write_out=False)
+	for key in omd:
+		if omd[key].get('name','') == faulted_lines:
+			return True
+	return False
+
+def play(path_to_dss, work_dir, microgrids, faulted_lines, outage_start, outage_length, logger):
+	# First run a check to ensure faulted_lines is in graph.
+	if not faulted_lines_in_graph(path_to_dss, faulted_lines):
+		raise ValueError("The provided outage location is not in the provided circuit. Control simulation skipped.")
 	# It seems like the only way to send fewer steps to newQstsPlot (outage_length + 48 steps) is to revise the timestamps fed to actions. Rather than giving actions the hours of year that represent outage start and outage end, feed actions 25 for the outage start and 25 + outage_length for the outage end.
 	actions_outage_start = 25
 	actions_outage_end = actions_outage_start + outage_length
@@ -747,15 +757,15 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 	actions = {}
 	print('CONTROLLING ON', microgrids)
 	logger.warning(f'CONTROLLING ON {microgrids}')
-	# microgridup.py changes our directory to the one containing the currently running analysis. This is to help opendss run. If we're running this function by itself, we need to chdir into the workDir argument.
+	# microgridup.py changes our directory to the one containing the currently running analysis. This is to help opendss run. If we're running this function by itself, we need to chdir into the work_dir argument.
 	curr_dir = os.getcwd()
-	workDir = os.path.abspath(workDir)
-	if curr_dir != workDir:
-		os.chdir(workDir)
+	work_dir = os.path.abspath(work_dir)
+	if curr_dir != work_dir:
+		os.chdir(work_dir)
 	# Read in inputs.
 	outage_end = outage_start + outage_length
 	# Read in the circuit information.
-	dssTree = dssConvert.dssToTree(pathToDss)
+	dssTree = dssConvert.dssToTree(path_to_dss)
 	# Add the fault, modeled as a 3 phase open, to the actions.
 	faulted_lines = faulted_lines.split(',')
 	open_line_actions = ''
@@ -923,9 +933,9 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 		make_chart(f'{FPREFIX}_source_and_gen.csv', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, "Generator Output", "Average Hourly kW", outage_start, outage_end, outage_length, batt_kwh_ratings, fossil_kw_ratings, vsource_ratings=big_gen_ratings, rengen_kw_ratings=rengen_kw_ratings, rengen_mgs=rengen_mgs)
 	if os.path.exists(f'{FPREFIX}_load.csv'):
 		make_chart(f'{FPREFIX}_load.csv', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, "Load Voltage", "PU", outage_start, outage_end, outage_length, batt_kwh_ratings, fossil_kw_ratings, rengen_kw_ratings=rengen_kw_ratings, rengen_mgs=rengen_mgs)
-	if os.path.exists(f'{workDir}/{FPREFIX}_control.csv'):
+	if os.path.exists(f'{work_dir}/{FPREFIX}_control.csv'):
 		make_chart(f'{FPREFIX}_control.csv', ['Tap(pu)'], 2019, microgrids, "Tap Position", "PU", outage_start, outage_end, outage_length, batt_kwh_ratings, fossil_kw_ratings)
-	plot_inrush_data(pathToDss, microgrids, f'{FPREFIX}_inrush_plot.html', outage_start, outage_end, outage_length, logger, vsourceRatings=big_gen_ratings)
+	plot_inrush_data(path_to_dss, microgrids, f'{FPREFIX}_inrush_plot.html', outage_start, outage_end, outage_length, logger, vsourceRatings=big_gen_ratings)
 	# Write final output file.
 	output_slug = '''	
 		<head>
@@ -981,9 +991,9 @@ def _tests():
 	for _dir in control_test_args:
 		model_dir = f'{_myDir}/data/projects/{_dir}'
 		curr_dir = os.getcwd()
-		workDir = os.path.abspath(model_dir)
-		if curr_dir != workDir:
-			os.chdir(workDir)
+		work_dir = os.path.abspath(model_dir)
+		if curr_dir != work_dir:
+			os.chdir(work_dir)
 		if 'lukes' in _dir:
 			continue # NOTE: Remove this statement if support for lukes (multiple points of connection) is added.
 		final_run_count = len(control_test_args[_dir]) - 1 # FULL_NAME is based on the count of the microgrid in the final run.

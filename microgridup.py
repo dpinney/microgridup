@@ -407,7 +407,12 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 			allInputData = json.load(file)
 		outage_start = int(allInputData['outage_start_hour'])
 		outage_length = int(allInputData['outageDuration'])
-		microgridup_control.play('circuit_plus_mgAll.dss', os.getcwd(), new_mg_for_control, FAULTED_LINES, outage_start, outage_length, logger)
+		try:
+			microgridup_control.play('circuit_plus_mgAll.dss', os.getcwd(), new_mg_for_control, FAULTED_LINES, outage_start, outage_length, logger)
+		except ValueError as e:
+			error_message = str(e)
+			print(error_message)
+			logger.warning(error_message)
 		# Resilience simulation with outages. Optional. Skipped if no OUTAGE_CSV
 		if OUTAGE_CSV:
 			all_microgrid_loads = [x.get('loads',[]) for x in MICROGRIDS.values()]

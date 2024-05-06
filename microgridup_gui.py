@@ -266,7 +266,6 @@ def getLoadsFromExistingFile():
 @app.route('/previewOldPartitions', methods=['POST'])
 def previewOldPartitions():
 	data = request.get_json()
-	# filename = data['filename']
 	model_dir = data['MODEL_DIR']
 	filename = f'{_mguDir}/data/projects/{model_dir}/circuit.dss'
 	MG_MINES = data['MG_MINES']
@@ -275,10 +274,15 @@ def previewOldPartitions():
 	parts = []
 	for mg in MG_MINES:
 		cur_mg = []
-		cur_mg.extend([load for load in MG_MINES[mg].get('loads')])
-		# cur_mg.append(MG_MINES[mg].get('switch'))
 		cur_mg.append(MG_MINES[mg].get('gen_bus'))
-		cur_mg.extend([load for load in MG_MINES[mg].get('gen_obs_existing')])
+		try:
+			# Try to extend mg by all elements topographically downstream from gen_bus.
+			all_descendants = list(nx.descendants(G, MG_MINES[mg].get('gen_bus')))
+			cur_mg.extend(all_descendants)
+		except:
+			# If that didn't work, use old method.
+			cur_mg.extend([load for load in MG_MINES[mg].get('gen_obs_existing')])
+			cur_mg.extend([load for load in MG_MINES[mg].get('loads')])
 		parts.append(cur_mg)
 	# Check to see if omd contains coordinates for each important node.
 	if has_full_coords(omd):

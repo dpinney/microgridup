@@ -351,8 +351,10 @@
             const boxContainer = document.getElementById('box-container');
             const boxes = Array.from(boxContainer.getElementsByClassName('box'));
             boxes.sort((a, b) => {
-                const timestampA = a.querySelector('.timestamp').textContent;
-                const timestampB = b.querySelector('.timestamp').textContent;
+                const timestampElementA = a.querySelector('.timestamp');
+                const timestampA = timestampElementA ? timestampElementA.textContent : 0; // If no timestamp is found, set to 0.
+                const timestampElementB = a.querySelector('.timestamp');
+                const timestampB = timestampElementB ? timestampElementB.textContent : 0;
                 const dateA = new Date(timestampA);
                 const dateB = new Date(timestampB);
                 return dateB - dateA;
@@ -434,7 +436,6 @@
         window.onload = function () {
             // Sort by previously selected method if page reloads.
             var storedValue = localStorage.getItem('selectedProject');
-            console.log(storedValue);
             if (storedValue != null) {
                 const method_selector = document.querySelector('#sort-by');
                 method_selector.value = storedValue;

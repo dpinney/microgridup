@@ -104,7 +104,7 @@ def load(project):
 	
 @app.route('/check_status/<project>')
 def check_status(project):
-	'''Used by template_in_progress.html to redirect to output_final.html once it exists.'''
+	'''Used by template_in_progress.html to redirect to output_final.html once it exists. Used by template_home.html to update status in boxes.'''
 	files = os.listdir(f'{_projectDir}/{project}')
 	if 'output_final.html' in files and '0running.txt' not in files and '0crashed.txt' not in files:
 		return jsonify(status='complete', url=f'/data/projects/{project}/output_final.html')

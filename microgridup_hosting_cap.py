@@ -341,7 +341,7 @@ def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, dss_filename, 
 	return gen_obs
 
 
-def mg_add_cost(outputCsvName, microgrid, mg_name, dss_filename, logger, SINGLE_PHASE_RELAY_COST, THREE_PHASE_RELAY_COST):
+def mg_add_cost(outputCsvName, microgrid, mg_name, dss_filename, logger, REOPT_INPUTS):
 	'''Returns a costed csv of all switches and other upgrades needed to allow the microgrid 
 	to operate in islanded mode to support critical loads
 	TO DO: When critical load list references actual load buses instead of kw ratings,
@@ -353,47 +353,60 @@ def mg_add_cost(outputCsvName, microgrid, mg_name, dss_filename, logger, SINGLE_
 	switch_name = microgrid['switch']
 	tree = dssConvert.dssToTree(dss_filename)
 	load_map = {x.get('object',''):i for i, x in enumerate(tree)}
+	# - The js_circuit_model is always optional, but should exist for circuits that were built with the manual circuit editor
+	if 'js_circuit_model' in REOPT_INPUTS:
+		js_circuit_model = {json.loads(s)['name'].lower(): json.loads(s) for s in json.loads(REOPT_INPUTS['js_circuit_model'])}
+	else:
+		js_circuit_model = None
 	# print out a csv of the 
 	with open(outputCsvName, 'w', newline='') as outcsv:
 		writer = csv.writer(outcsv)
-		writer.writerow(["Microgrid","Location", "Recommended Upgrade", "Cost Estimate ($)"])
-		writer.writerow([mg_name, mg_name, "Microgrid Design", MG_DESIGN_COST])
-		writer.writerow([mg_name, mg_name, "Microgrid Controls", MG_CONTROL_COST])
+		writer.writerow(['Microgrid','Location', 'Recommended Upgrade', 'Component Count', 'Cost Estimate ($)'])
+		writer.writerow([mg_name, mg_name, 'Microgrid Design', '1', MG_DESIGN_COST])
+		writer.writerow([mg_name, mg_name, 'Microgrid Controls', '1', MG_CONTROL_COST])
 		# for switch in switch_name: # TO DO: iterate through all disconnect points for the mg by going through the DSS file
-		writer.writerow([mg_name, switch_name, "SCADA disconnect switch", SCADA_COST])
-		if len(mg_loads) > 1: # if the entire microgrid is a single load (100% critical load), there is no need for metering past SCADA
-			for load in mg_loads:
-				ob = tree[load_map[f'load.{load}']]
-				# print("mg_add_cost() ob:", ob)
-				bus_name = ob.get('bus1','')
-				bus_name_list = bus_name.split('.')
-				load_phases = []
-				load_phases = bus_name_list[-(len(bus_name_list)-1):]
-				# print("mg_add_cost() load_phases on bus_name: phases", load_phases, "on bus", bus_name)
-				if len(load_phases) > 1:
-					writer.writerow([mg_name, load, "3-phase relay", THREE_PHASE_RELAY_COST])
-					three_phase_message = 'Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.\n'
-					print(three_phase_message)
-					logger.warning(three_phase_message)
-					if path.exists("user_warnings.txt"):
-						with open("user_warnings.txt", "r+") as myfile:
-							if three_phase_message not in myfile.read():
-								myfile.write(three_phase_message)
-					else:
-						with open("user_warnings.txt", "a") as myfile:
-							myfile.write(three_phase_message)		
+		writer.writerow([mg_name, switch_name, 'SCADA disconnect switch', '1', SCADA_COST])
+		# - If the entire microgrid is a single load (100% critical load), there is no need for metering past SCADA
+		#   - 05/06/2024: one load can be a composite of multiple loads, so we don't assume the above statement anymore. Disabled the if-statement
+		#if len(mg_loads) > 1:
+		for load in mg_loads:
+			ob = tree[load_map[f'load.{load}']]
+			# print("mg_add_cost() ob:", ob)
+			bus_name = ob.get('bus1','')
+			bus_name_list = bus_name.split('.')
+			load_phases = []
+			load_phases = bus_name_list[-(len(bus_name_list)-1):]
+			# print("mg_add_cost() load_phases on bus_name: phases", load_phases, "on bus", bus_name)
+			if len(load_phases) > 1:
+				if js_circuit_model is None:
+					writer.writerow([mg_name, load, "3-phase relay(s)", '1', REOPT_INPUTS['three_phase_relay_cost']])
 				else:
-					writer.writerow([mg_name, load, "AMI disconnect meter", SINGLE_PHASE_RELAY_COST])
-					ami_message = 'Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.\n'
-					print(ami_message)
-					logger.warning(ami_message)
-					if path.exists("user_warnings.txt"):
-						with open("user_warnings.txt", "r+") as myfile:
-							if ami_message not in myfile.read():
-								myfile.write(ami_message)
-					else:
-						with open("user_warnings.txt", "a") as myfile:
+					writer.writerow([mg_name, load, "3-phase relay(s)", js_circuit_model[load]['threePhaseLoadCount'], int(REOPT_INPUTS['three_phase_relay_cost']) * int(js_circuit_model[load]['threePhaseLoadCount'])])
+				three_phase_message = 'Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.\n'
+				print(three_phase_message)
+				logger.warning(three_phase_message)
+				if path.exists("user_warnings.txt"):
+					with open("user_warnings.txt", "r+") as myfile:
+						if three_phase_message not in myfile.read():
+							myfile.write(three_phase_message)
+				else:
+					with open("user_warnings.txt", "a") as myfile:
+						myfile.write(three_phase_message)
+			else:
+				if js_circuit_model is None:
+					writer.writerow([mg_name, load, "AMI disconnect meter(s)", 1, REOPT_INPUTS['single_phase_relay_cost']])
+				else:
+					writer.writerow([mg_name, load, "AMI disconnect meter(s)", js_circuit_model[load]['singlePhaseLoadCount'], int(REOPT_INPUTS['single_phase_relay_cost']) * int(js_circuit_model[load]['singlePhaseLoadCount'])])
+				ami_message = 'Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.\n'
+				print(ami_message)
+				logger.warning(ami_message)
+				if path.exists("user_warnings.txt"):
+					with open("user_warnings.txt", "r+") as myfile:
+						if ami_message not in myfile.read():
 							myfile.write(ami_message)
+				else:
+					with open("user_warnings.txt", "a") as myfile:
+						myfile.write(ami_message)
 
 def make_full_dss(input_dss_filename, GEN_NAME, LOAD_NAME, output_dss_filename, gen_obs, microgrid):
 	''' insert generation objects into dss.
@@ -783,7 +796,7 @@ def run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, input_dss_filename, mg_name, LO
 	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, input_dss_filename, mg_name, logger)
 	make_full_dss(input_dss_filename, GEN_NAME, LOAD_NAME, output_dss_filename, gen_obs, microgrid)
 	# Generate microgrid control hardware costs.
-	mg_add_cost(ADD_COST_NAME, microgrid, mg_name, input_dss_filename, logger, int(REOPT_INPUTS['single_phase_relay_cost']), int(REOPT_INPUTS['three_phase_relay_cost']))
+	mg_add_cost(ADD_COST_NAME, microgrid, mg_name, input_dss_filename, logger, REOPT_INPUTS)
 	microgrid_report_csv(f'ultimate_rep_{output_dss_filename}.csv', REOPT_FOLDER_FINAL, microgrid, mg_name, ADD_COST_NAME, logger)
 
 def get_microgrid_coordinates(dss_path, microgrid):

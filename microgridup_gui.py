@@ -121,6 +121,12 @@ def edit(project):
 			in_data['MODEL_DIR'] = in_data['MODEL_DIR'].split('/')[-1]
 	except:
 		in_data = None
+	# - Encode the circuit model properly
+	if 'js_circuit_model' in in_data['REOPT_INPUTS']:
+		js_circuit_model = []
+		for s in json.loads(in_data['REOPT_INPUTS']['js_circuit_model']):
+			js_circuit_model.append(json.loads(s))
+		in_data['REOPT_INPUTS']['js_circuit_model'] = js_circuit_model
 	return render_template('template_new.html', in_data=in_data, iframe_mode=False, editing=True)
 
 @app.route('/delete/<project>')
@@ -484,8 +490,8 @@ def run():
 		'analysisYears':request.form['analysisYears'],
 		'outageDuration':request.form['outageDuration'],
 		'value_of_lost_load':request.form['value_of_lost_load'],
-		'single_phase_relay_cost':request.form['single_phase_relay_cost'],
-		'three_phase_relay_cost':request.form['three_phase_relay_cost'],
+		'single_phase_relay_cost':request.form['singlePhaseRelayCost'],
+		'three_phase_relay_cost':request.form['threePhaseRelayCost'],
 		'omCostEscalator':request.form['omCostEscalator'],
 		'discountRate':request.form['discountRate'],
 		'solar':request.form['solar'],
@@ -528,6 +534,9 @@ def run():
 		'mgParameterOverrides': json.loads(request.form['mgParameterOverrides']),
 		'maxRuntimeSeconds': request.form['maxRuntimeSeconds']
 	}
+	# - The js_circuit_model is always optional, but should exist for circuits that were built with the manual circuit editor
+	if 'jsCircuitModel' in request.form:
+		REOPT_INPUTS['js_circuit_model'] = request.form['jsCircuitModel']
 	mgu_args = [
 		f'{_projectDir}/{request.form["MODEL_DIR"]}',
 		dss_path,

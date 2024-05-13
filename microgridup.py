@@ -454,6 +454,12 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 			in_data['MODEL_DIR'] = in_data['MODEL_DIR'].split('/')[-1]
 		with open(f'{MGU_FOLDER}/templates/template_new.html') as f:
 			view_inputs_template = j2.Template(f.read())
+		# - Encode the circuit model properly
+		if 'js_circuit_model' in in_data['REOPT_INPUTS']:
+			js_circuit_model = []
+			for s in json.loads(in_data['REOPT_INPUTS']['js_circuit_model']):
+				js_circuit_model.append(json.loads(s))
+			in_data['REOPT_INPUTS']['js_circuit_model'] = js_circuit_model
 		view_inputs_html = view_inputs_template.render(in_data=in_data, iframe_mode=True)
 		with open('view_inputs.html', 'w') as f:
 			f.write(view_inputs_html)

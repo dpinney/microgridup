@@ -156,8 +156,8 @@ class MicrogridParameterModel {
         },
         'financial': {
             // - Technially, there's no max for single_phase_relay_cost or three_phase_relay_cost
-            'single_phase_relay_cost': () => new MicrogridParameter('Single-Phase Relay Cost ($)', 1.0e9, 0, 'single_phase_relay_cost', 'int'),
-            'three_phase_relay_cost': () => new MicrogridParameter('Three-Phase Relay Cost ($)', 1.0e9, 0, 'three_phase_relay_cost', 'int')
+            'singlePhaseRelayCost': () => new MicrogridParameter('Single-Phase Relay Cost ($)', 1.0e9, 0, 'singlePhaseRelayCost', 'int'),
+            'threePhaseRelayCost': () => new MicrogridParameter('Three-Phase Relay Cost ($)', 1.0e9, 0, 'threePhaseRelayCost', 'int')
         }
     }
     #microgrids;

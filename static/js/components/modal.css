@@ -124,7 +124,7 @@ div#circuitTableView div.div--modal table td:first-child {
     width: 48px;
 }
 div#circuitTableView div.div--modal table td:nth-child(2) {
-    width: 150px;
+    width: 250px;
 }
 div#circuitTableView div.div--modal.indent-level-1 td:nth-child(1) {
     padding-left: 1rem;

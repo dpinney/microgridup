@@ -4,9 +4,10 @@ import numpy as np
 import networkx as nx
 from collections import defaultdict
 from plotly import graph_objects, offline, subplots
+from microgridup_gen_mgs import form_mg_groups, form_mg_mines
 
 # OMF imports
-from omf.solvers import opendss
+from omf.solvers.opendss import dssConvert, _getByName, newQstsPlot
 import microgridup
 
 def get_first_nodes_of_mgs(dssTree, microgrids):
@@ -25,11 +26,11 @@ def get_first_nodes_of_mgs(dssTree, microgrids):
 
 def get_all_mg_elements(dssPath, microgrids, omdPath=None):
 	if not dssPath:
-		dssTree = opendss.dssConvert.omdToTree(omdPath)
-		G = opendss.dssConvert.dss_to_networkx(None, dssTree)
+		dssTree = dssConvert.omdToTree(omdPath)
+		G = dssConvert.dss_to_networkx(None, dssTree)
 	else:
-		dssTree = opendss.dssConvert.dssToTree(dssPath)
-		G = opendss.dssConvert.dss_to_networkx(dssPath)
+		dssTree = dssConvert.dssToTree(dssPath)
+		G = dssConvert.dss_to_networkx(dssPath)
 	first_nodes = get_first_nodes_of_mgs(dssTree, microgrids)
 	all_mg_elements = {}
 	for key in first_nodes:
@@ -52,61 +53,60 @@ def convert_to_json(all_mg_elements):
 		json[key] = list(all_mg_elements[key])
 	return json
 
-def plot_inrush_data(dssPath, microgrids, out_html, outageStart, outageEnd, logger, vsourceRatings, motor_perc=0.5):
+def plot_inrush_data(dssPath, microgrids, out_html, outage_start, outage_end, outage_length, logger, vsourceRatings, motor_perc=0.5):
 	# Grab all elements by mg. 
 	all_mg_elements = get_all_mg_elements(dssPath, microgrids)
-	print('JSON compatible representation of all_mg_elements (for jinja-ing into the circuit map):',convert_to_json(all_mg_elements))
-	logger.warning(f'JSON compatible representation of all_mg_elements (for jinja-ing into the circuit map): {convert_to_json(all_mg_elements)}')
-	dssTree = opendss.dssConvert.dssToTree(dssPath)
+	# print('JSON compatible representation of all_mg_elements (for jinja-ing into the circuit map):',convert_to_json(all_mg_elements))
+	# logger.warning(f'JSON compatible representation of all_mg_elements (for jinja-ing into the circuit map): {convert_to_json(all_mg_elements)}')
+	dssTree = dssConvert.dssToTree(dssPath)
 
 	# Divide up transformers and loads by microgrid.
-	data = defaultdict(list)
+	table_data = defaultdict(list)
 	for key in microgrids:
-		data['Microgrid ID'].append(key)
+		table_data['Microgrid ID'].append(key)
 
 		# # of Interruptions --> Number of times gen drops to zero during sim.
-		dssTree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw = do_manual_balance_approach(outageStart, outageEnd, key, microgrids[key], dssTree, logger)
-		# Stole a few lines from plot_mba_approach().
+		new_dss_tree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw = do_manual_balance_approach(outage_start, outage_end, microgrids[key], dssTree, logger)
+		# Stole a few lines from plot_manual_balance_approach().
 		new_batt_loadshape = list(new_batt_loadshape)
 		cumulative_existing_batt_shapes = list(cumulative_existing_batt_shapes)
-		storage_shape = cumulative_existing_batt_shapes[:outageStart] + new_batt_loadshape + cumulative_existing_batt_shapes[outageEnd:]
-		gen_and_storage_shape = [x-y for x,y in zip(all_rengen_shapes,storage_shape)]
-		data['# of Interruptions'].append(len(count_interruptions_rengenmg(outageStart, outageEnd, all_loads_shapes_kw, gen_and_storage_shape)))
+		gen_and_storage_shape = [x-y for x,y in zip(all_rengen_shapes[outage_start:outage_end],new_batt_loadshape)]
+		table_data['# of Interruptions'].append(len(count_interruptions_rengenmg(outage_start, outage_end, outage_length, all_loads_shapes_kw, gen_and_storage_shape)))
 		
 		# Expected In-rush (kW)
-		loads = [obj for obj in dssTree if 'load.' in obj.get('object','') and obj.get('object','').split('.')[1] in microgrids[key]['loads']]
-		transformers = [obj for obj in dssTree if 'transformer.' in obj.get('object','') and obj.get('object','').split('.')[1] in all_mg_elements[key]]
+		loads = [obj for obj in new_dss_tree if 'load.' in obj.get('object','') and obj.get('object','').split('.')[1] in microgrids[key]['loads']]
+		transformers = [obj for obj in new_dss_tree if 'transformer.' in obj.get('object','') and obj.get('object','').split('.')[1] in all_mg_elements[key]]
 		expected_inrush = estimate_inrush(loads + transformers, motor_perc)
-		data['Expected In-rush (kW)'].append(round(sum(expected_inrush.values()), 3))
+		table_data['Expected In-rush (kW)'].append(round(sum(expected_inrush.values()), 3))
 
 		# Expected In-rush (kW) from transformers
-		data['In-rush (kW) from transformers'].append(round(sum([expected_inrush[ob] for ob in expected_inrush if 'transformer' in ob]), 3))
+		table_data['In-rush (kW) from transformers'].append(round(sum([expected_inrush[ob] for ob in expected_inrush if 'transformer' in ob]), 3))
 
 		# Expected In-rush (kW) from loads
-		data['Expected In-rush (kW) from loads'].append(round(sum([expected_inrush[ob] for ob in expected_inrush if 'load' in ob]), 3))
+		table_data['Expected In-rush (kW) from loads'].append(round(sum([expected_inrush[ob] for ob in expected_inrush if 'load' in ob]), 3))
 
 		# In-rush as % of total generation
 		gen_bus = microgrids[key]['gen_bus']
-		all_generation = [ob for ob in dssTree if ob.get('bus1','x.x').split('.')[0] == gen_bus and 'generator' in ob.get('object')]
+		all_generation = [ob for ob in new_dss_tree if ob.get('bus1','x.x').split('.')[0] == gen_bus and 'generator' in ob.get('object')]
 		total_generation = 0
 		for ob in all_generation:
 			total_generation += float(ob.get('kw'))
 		if total_generation == 0:
-			data['In-rush as % of total generation'].append(None)
+			table_data['In-rush as % of total generation'].append(None)
 		else:
-			data['In-rush as % of total generation'].append(round(100*sum(expected_inrush.values())/total_generation, 3))
+			table_data['In-rush as % of total generation'].append(round(100*sum(expected_inrush.values())/total_generation, 3))
 
 		# Soft Start load (kW)
-		data['Soft Start load (kW)'].append(round(gradual_load_pickup(dssTree, loads, motor_perc), 3))
+		table_data['Soft Start load (kW)'].append(round(gradual_load_pickup(new_dss_tree, loads, motor_perc), 3))
 
 		# Super-cap Sizing
-		data['Super-cap Sizing ($)'].append(round(super_cap_size(sum(expected_inrush.values())), 3))
+		table_data['Super-cap Sizing ($)'].append(round(super_cap_size(sum(expected_inrush.values())), 3))
 
 		# Total fossil surge. Send total fossil kW power per mg to function, return product after multiplication by surge factor. 
-		fossilGens = [ob for ob in dssTree if ob.get('bus1','x.x').split('.')[0] == gen_bus and 'generator.fossil' in ob.get('object','')]
-		data['Total fossil surge (kW)'].append(round(calculate_fossil_surge_power(fossilGens, vsourceRatings, gen_bus), 3))
+		fossilGens = [ob for ob in new_dss_tree if ob.get('bus1','x.x').split('.')[0] == gen_bus and 'generator.fossil' in ob.get('object','')]
+		table_data['Total fossil surge (kW)'].append(round(calculate_fossil_surge_power(fossilGens, vsourceRatings, gen_bus), 3))
 	
-	df = pd.DataFrame(data)
+	df = pd.DataFrame(table_data)
 	
 	table_html = '<h1>In-rush Current Report</h1>' + df.to_html(justify='left').replace('border="1"','border="0"')
 	with open(out_html,'w') as outFile:
@@ -184,20 +184,19 @@ def calc_all_motor_inrush(dssTree, motor_perc=0.5):
 			motor_inrushes[obj.get('object')] = inrush
 	return motor_inrushes
 
-def count_interruptions_rengenmg(outageStart, outageEnd, all_loads_shapes_kw, gen_and_storage_shape):
+def count_interruptions_rengenmg(outage_start, outage_end, outage_length, all_loads_shapes_kw, gen_and_storage_shape):
 	# Count instances where gen_and_storage_shape fail to align with all_loads_shapes_kw.
-	lengthOfOutage = outageEnd - outageStart
-	demand = all_loads_shapes_kw[outageStart:outageEnd]
-	supply = gen_and_storage_shape[outageStart:outageEnd]
+	demand = all_loads_shapes_kw[outage_start:outage_end]
+	supply = gen_and_storage_shape
 
 	interruptions = []
 	iS, iE = 0, 0
 	idx = 0
 	try: #HACK: not working for Eglin.
-		while idx < lengthOfOutage:
+		while idx < outage_length:
 			if supply[idx] < demand[idx]:
 				iS = idx
-				while idx < lengthOfOutage and supply[idx] < demand[idx]:
+				while idx < outage_length and supply[idx] < demand[idx]:
 					idx += 1
 				iE = idx
 				interruptions.append((iS,iE))
@@ -207,7 +206,7 @@ def count_interruptions_rengenmg(outageStart, outageEnd, all_loads_shapes_kw, ge
 		pass
 	return interruptions
 
-def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTree, logger):
+def do_manual_balance_approach(outage_start, outage_end, mg_values, dssTree, logger):
 	# Manually constructs battery loadshapes for outage and reinserts into tree based on a proportional to kWh basis. 
 	gen_bus = mg_values['gen_bus']
 	# Do vector subtraction to figure out battery loadshapes. 
@@ -226,7 +225,7 @@ def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTre
 			list_load_loadshape = [float(shape) for shape in load_loadshape[0][1:-1].split(",")]
 			load_loadshapes.append(list_load_loadshape)
 		data = np.array(load_loadshapes)
-		all_loads_shapes_kw = np.sum(data,0)
+		all_loads_shapes_kw = np.sum(data, axis=0)
 	else:
 		print("Error: No loads.")
 		logger.warning("Error: No loads.")
@@ -252,7 +251,7 @@ def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTre
 		data = np.array(rengen_loadshapes)
 		all_rengen_shapes = np.sum(data,0)
 	else:
-		all_rengen_shapes = np.zeros(len(all_loads_shapes_kw))
+		all_rengen_shapes = np.zeros(len(all_loads_shapes_kw)) # 8760.
 	
 	# Third, get battery sizes.
 	batt_obj = [
@@ -261,8 +260,7 @@ def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTre
 		and 'storage' in ob.get('object')
 	]
 	# If there are multiple batteries at one bus, combine their kW ratings and kWh capacities. 
-	batt_kws = []
-	batt_kwhs = []
+	batt_kws, batt_kwhs = [], []
 	batt_obj.sort(key=lambda x:float(x.get('kwhrated')))
 	# Create lists of all ratings and capacities and their sums. 
 	for ob in batt_obj:
@@ -275,18 +273,19 @@ def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTre
 	new_batt_loadshape = all_loads_shapes_kw - all_rengen_shapes # NOTE: <-- load – rengen. 3 cases: above 0, 0, less than 0
 
 	# Slice to outage length.
-	new_batt_loadshape = new_batt_loadshape[outageStart:outageEnd]
+	new_batt_loadshape_sliced = new_batt_loadshape[outage_start:outage_end]
 
+	cumulative_existing_batt_shapes = pd.Series(dtype='float64')
 	try:
 		# Option 1: Find battery's starting capacity based on charge and discharge history by the start of the outage.
-		cumulative_existing_batt_shapes = pd.Series(dtype='float64')
+		# cumulative_existing_batt_shapes = pd.Series(dtype='float64')
 		# Get existing battery's(ies') loadshapes. 
 		for obj in batt_obj:
 			batt_loadshape_name = obj.get("yearly")
 			full_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")]
 			ds_full_loadshape = pd.Series([float(shape) for shape in full_loadshape[0][1:-1].split(",")])
 			cumulative_existing_batt_shapes = cumulative_existing_batt_shapes.add(ds_full_loadshape, fill_value=0)
-		starting_capacity = batt_kwh + sum(cumulative_existing_batt_shapes[:outageStart])
+		starting_capacity = batt_kwh + sum(cumulative_existing_batt_shapes[:outage_start])
 	except:
 		# Option 2: Set starting_capacity to the batt_kwh, assuming the battery starts the outage at full charge. 
 		starting_capacity = batt_kwh
@@ -297,24 +296,24 @@ def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTre
 	# Discharge battery (allowing for negatives that recharge (until hitting capacity)) until battery reaches 0 charge. Allow starting charge to be configurable. 
 	hour = 0
 	total_surplus = [] # Curtailed renewable generation (cannot fit in battery) during outage.
-	while hour < len(new_batt_loadshape):
+	while hour < len(new_batt_loadshape_sliced):
 		surplus = 0 # Note: this variable stores how much rengen we need to curb per step. Create a cumulative sum to find overall total.
 		dischargeable = starting_capacity if starting_capacity < batt_kw else batt_kw
-		indicator = new_batt_loadshape[hour] - dischargeable 
+		indicator = new_batt_loadshape_sliced[hour] - dischargeable 
 		# There is more rengen than load and we can charge our battery (up until reaching batt_kwh).
-		if new_batt_loadshape[hour] < 0:
-			starting_capacity += abs(new_batt_loadshape[hour])
+		if new_batt_loadshape_sliced[hour] < 0:
+			starting_capacity += abs(new_batt_loadshape_sliced[hour])
 			if starting_capacity > batt_kwh:
 				surplus = starting_capacity - batt_kwh
 				starting_capacity = batt_kwh
-			new_batt_loadshape[hour] = starting_capacity - (starting_capacity + new_batt_loadshape[hour] + surplus)
+			new_batt_loadshape_sliced[hour] = starting_capacity - (starting_capacity + new_batt_loadshape_sliced[hour] + surplus)
 		# There is load left to cover and we can discharge the battery to cover it in its entirety. 
 		elif indicator < 0:
-			starting_capacity -= new_batt_loadshape[hour]
-			new_batt_loadshape[hour] *= -1 
+			starting_capacity -= new_batt_loadshape_sliced[hour]
+			new_batt_loadshape_sliced[hour] *= -1 
 		# There is load left to cover after discharging as much battery as possible for the hour. Load isn't supported.
 		else:
-			new_batt_loadshape[hour] = -1 * dischargeable
+			new_batt_loadshape_sliced[hour] = -1 * dischargeable
 			starting_capacity -= dischargeable
 			unsupported_load_kwh += indicator
 		total_surplus.append(surplus)
@@ -322,48 +321,47 @@ def do_manual_balance_approach(outageStart, outageEnd, mg_key, mg_values, dssTre
 	# print(f"Total curtailed renewable generation during outage for {mg_key} = {sum(total_surplus)}.")
 
 	# Replace each outage portion of the existing battery loadshapes with a proportion of the new loadshape equal to the proportion of the battery's kwh capacity to the total kwh capacity on the bus.
+	new_dss_tree = dssTree.copy()
 	for idx in range(len(batt_kwhs)):
 		factor = batt_kwhs[idx] / batt_kwh
-		new_shape = list((new_batt_loadshape * factor)/batt_kws[idx])
+		new_shape = list((new_batt_loadshape_sliced * factor)/batt_kws[idx])
 		# Get existing battery loadshape
 		batt_loadshape_name = batt_obj[idx].get("yearly")
 		full_loadshape = [ob.get("mult") for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")]
 		list_full_loadshape = [float(shape) for shape in full_loadshape[0][1:-1].split(",")]
 		# Replace outage portion with outage loadshape.
-		final_batt_loadshape = list_full_loadshape[:outageStart] + new_shape + list_full_loadshape[outageEnd:]
+		final_batt_loadshape = list_full_loadshape[:outage_start] + new_shape + list_full_loadshape[outage_end:]
 		# Get index of battery in tree. 
 		batt_loadshape_idx = dssTree.index([ob for ob in dssTree if ob.get("object") and batt_loadshape_name in ob.get("object")][0])
 		# Replace mult with new loadshape and reinsert into tree.
-		dssTree[batt_loadshape_idx]['mult'] = str(final_batt_loadshape).replace(" ","")
-	return dssTree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw
+		new_dss_tree[batt_loadshape_idx]['mult'] = str(final_batt_loadshape).replace(" ","")
+	return new_dss_tree, new_batt_loadshape_sliced, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw
 
-def plot_manual_balance_approach(mg_key, year, outageStart, outageEnd, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw):
+def plot_manual_balance_approach(mg_key, year, outage_start, outage_end, outage_length, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw):
 	# Creates plot of manually constructed battery activity, load, and renewable generation (all cumulative).
-	lengthOfOutage = outageEnd - outageStart
-	data = []
+	traces = []
 	new_batt_loadshape = list(new_batt_loadshape)
 	cumulative_existing_batt_shapes = list(cumulative_existing_batt_shapes)
-	storage_shape = cumulative_existing_batt_shapes[:outageStart] + new_batt_loadshape + cumulative_existing_batt_shapes[outageEnd:]
 	# Both gen and storage shapes after running battery algorithm.
-	rengen_during_outage_post_curtailment = [x-y for x,y in zip(all_rengen_shapes[outageStart:outageEnd],total_surplus)]
-	all_rengen_shapes = list(all_rengen_shapes[:outageStart]) + rengen_during_outage_post_curtailment + list(all_rengen_shapes[outageEnd:])
-	gen_and_storage_shape = [x-y for x,y in zip(all_rengen_shapes,storage_shape)]
+	rengen_during_outage_post_curtailment = [x-y for x,y in zip(all_rengen_shapes[outage_start:outage_end],total_surplus)]
+	gen_and_storage_shape = [x-y for x,y in zip(rengen_during_outage_post_curtailment,new_batt_loadshape)]
 	# According to David – storage should be flipped. Discharging is positive. Charging is negative. 
-	storage_shapes_for_plot = [-1 * x for x in storage_shape]
+	storage_shapes_for_plot = [-1 * x for x in new_batt_loadshape]
 
 	y_axis_names = ["All loads loadshapes (kW)","All renewable generators loadshapes (kW)","All storage shapes (kW)","Generation and storage (added together)"]
-	plotting_variables = [all_loads_shapes_kw[outageStart:outageEnd], all_rengen_shapes[outageStart:outageEnd], storage_shapes_for_plot[outageStart:outageEnd], gen_and_storage_shape[outageStart:outageEnd]]
-	start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outageStart)
+	plotting_variables = [all_loads_shapes_kw[outage_start:outage_end], rengen_during_outage_post_curtailment, storage_shapes_for_plot, gen_and_storage_shape]
+
+	start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outage_start)
 	for idx in range(len(plotting_variables)):
 		# Traces for gen, load, storage.
 		trace = graph_objects.Scatter(
-			x = pd.to_datetime(range(lengthOfOutage), unit = 'h', origin = start_time),
+			x = pd.to_datetime(range(outage_length), unit = 'h', origin = start_time),
 			y = plotting_variables[idx],
 			showlegend = True,
 			name = y_axis_names[idx],
 			hoverlabel = dict(namelength = -1)
 		)
-		data.append(trace)
+		traces.append(trace)
 
 	# Plots load traces, gen traces, storage traces.
 	layout = graph_objects.Layout(
@@ -375,93 +373,164 @@ def plot_manual_balance_approach(mg_key, year, outageStart, outageEnd, new_batt_
 			color="black"
 		)
 	)
-	fig = graph_objects.Figure(data, layout)
+	fig = graph_objects.Figure(traces, layout)
 	out_name = f'{mg_key}_gen_load_storage.plot.html'
 	offline.plot(fig, filename=out_name, auto_open=False)
 	return out_name
 
-def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_name, y_axis_name, outageStart, lengthOfOutage, ansi_bands=False, batt_cycle_chart=False, fossil_loading_chart=False, vsource_ratings=None, rengen_mgs=None):
-	outageEnd = outageStart + lengthOfOutage
-	gen_data = pd.read_csv(csvName)
-	data = []
-	unreasonable_voltages = {}
-	batt_cycles = {}
-	diesel_dict = {}
-	mmbtu_dict = {}
+def make_chart(csvName, y_list, year, microgrids, chart_name, y_axis_name, outage_start, outage_end, outage_length, batt_kwh_ratings, fossil_kw_ratings, vsource_ratings={}, rengen_kw_ratings={}, rengen_mgs={}):
+	'''
+	:param csvName: CSV name generated by newQstsPlot. Prefix is timezcontrol.
+	:type csvName: str
+	:param y_list: columns in the CSV generated by newQstsPlot that are to be used as Y-axes
+	:type y_list: list
+	:param year: year of analysis
+	:type year: int
+	:param microgrids: all of the microgrid definitions (as defined by microgrid_gen_mgs.py) for the given circuit
+	:type microgrids: dict
+	:param chart_name: denotes whether plot is for gen, load, or control. Becomes chart title.
+	:type chart_name: str
+	:param y_axis_name: key for y axis. Different for each of gen/load/control.
+	:type y_axis_name: str
+	:type outage_start: int
+	:param outage_end: hour marking end of outage
+	:type outage_end: int
+	:param outage_length: length of outage in hours
+	:type outage_length: int
+	:param batt_kwh_ratings: kwh ratings for each battery in circuit, keyed by object name
+	:type batt_kwh_ratings: dict
+	:param fossil_kw_ratings: kw ratings for every fossil generator in circuit, keyed by object name
+	:type fossil_kw_ratings: dict
+	:param vsource_ratings: kw ratings for each microgrid-forming vsource in circuit (aka largest fossil generator in microgrids that were replaced with a vsource of identical size), keyed by object name
+	:type vsource_ratings: dict
+	:param rengen_kw_ratings: kw ratings for each rengen object in circuit, keyed by object name
+	:type rengen_kw_ratings: dict
+	:param rengen_mgs: load, rengen, cumulative battery, surplus rengen, and generic loadshapes during outage of microgrid with no fossil generators
+	:type rengen_mgs: dict
+	:return: no return value
+	:rtype: None
+	'''
+	rengen_proportional_loadshapes = form_rengen_proportional_loadshapes(rengen_mgs, rengen_kw_ratings, microgrids)
+	storage_proportional_loadshapes = form_storage_proportional_loadshapes(rengen_mgs, batt_kwh_ratings, microgrids) # Divide batteries into microgrids, find mg total kwh capacities for storage, and form element specific loadshapes.
+	fossil_kwh_output, diesel_dict, mmbtu_dict, fossil_traces, batt_cycles, glc_traces = extract_charting_data(csvName, microgrids, y_list, outage_start, outage_end, outage_length, fossil_kw_ratings, vsource_ratings, year, rengen_mgs, storage_proportional_loadshapes, batt_kwh_ratings, rengen_proportional_loadshapes)
+	if chart_name == 'Generator Output':
+		make_fossil_loading_chart(csvName, fossil_traces, fossil_kwh_output, diesel_dict, mmbtu_dict)
+		make_batt_cycle_chart(csvName, batt_cycles)
+	ansi_bands = True if chart_name == 'Load Voltage' else False
+	make_glc_plots(csvName, chart_name, y_axis_name, glc_traces, outage_start, outage_length, year, ansi_bands)
+
+def form_rengen_proportional_loadshapes(rengen_mgs, rengen_kw_ratings, microgrids):
+	'''
+	:param rengen_mgs: load, rengen, cumulative battery, surplus rengen, and generic loadshapes during outage of microgrid with no fossil generators
+	:type rengen_mgs: dict
+	:param rengen_kw_ratings: kw ratings for each rengen object in circuit, keyed by object name
+	:type rengen_kw_ratings: dict
+	:param microgrids: all of the microgrid definitions (as defined by microgrid_gen_mgs.py) for the given circuit
+	:type microgrids: dict
+	:return: loadshapes for each rengen object organized by microgrid
+	:rtype: dict
+	'''
+	# Define variable to house all rengen element-specific loadshapes organized by microgrid. 
+	rengen_proportional_loadshapes = {}
+	# Make load loadshape outage patch. Subtract surplus from rengen, add rengen and storage, and compare to load loadshapes. Inequalities = 0, equalities = 1.  
+	for mg_key in rengen_mgs:
+		# Both gen and storage shapes after running battery algorithm.
+		rengen_during_outage_post_curtailment = [x-y for x,y in zip(rengen_mgs[mg_key]["All rengen loadshapes during outage (kw)"],rengen_mgs[mg_key]["Surplus rengen"])]
+		gen_and_storage_shape = [round(x-y, 8) for x,y in zip(rengen_during_outage_post_curtailment,rengen_mgs[mg_key]["Cumulative battery loadshape during outage (kw)"])] 
+		loadshapes_rounded = [round(num, 8) for num in rengen_mgs[mg_key]["All loads loadshapes during outage (kw)"]]
+		generic_mg_loadshape = [1 if x==y else 0 for x,y in zip(gen_and_storage_shape,loadshapes_rounded)] # Bool indicator if generator and storage can support load for each hour during outage.
+		rengen_mgs[mg_key]["Generic loadshape (kw)"] = generic_mg_loadshape
+
+		# Divide up cumulative rengen loadshapes during outage proportionally by size to each rengen element. 
+		mg_specific_rengen = {} # Define temporary variable to grab the kw ratings of rengen elements specific to current microgrid. 
+		mg_proportional_rengen_shapes = {} # Define sub dictionary to be added to collection of all dictionaries.
+		for item in rengen_kw_ratings:
+			if microgrids[mg_key]['gen_bus'] in item or item in microgrids[mg_key]['gen_obs_existing']:
+				mg_specific_rengen[item] = float(rengen_kw_ratings[item])
+		total_mg_rengen_capacity_kw = sum(mg_specific_rengen.values())
+		for element in mg_specific_rengen:
+			factor = mg_specific_rengen[element] / total_mg_rengen_capacity_kw
+			# Add each element's loadshapes to mg specific dictionary. 
+			mg_proportional_rengen_shapes[element] = [x*factor for x in rengen_mgs[mg_key]["All rengen loadshapes during outage (kw)"]]
+		# Finally, add all mg specific loadshapes to all mgs dictionary variable.
+		rengen_proportional_loadshapes[mg_key] = mg_proportional_rengen_shapes
+	return rengen_proportional_loadshapes
+
+def form_storage_proportional_loadshapes(rengen_mgs, batt_kwh_ratings, microgrids):
+	'''
+	:param rengen_mgs: load, rengen, cumulative battery, surplus rengen, and generic loadshapes during outage of microgrid with no fossil generators
+	:type rengen_mgs: dict
+	:param batt_kwh_ratings: kwh ratings for each battery in circuit, keyed by object name
+	:type batt_kwh_ratings: dict
+	:param microgrids: all of the microgrid definitions (as defined by microgrid_gen_mgs.py) for the given circuit
+	:type microgrids: dict
+	:return: loadshapes for each battery organized by microgrid
+	:rtype: dict
+	'''
+	storage_proportional_loadshapes = {} # Define variable to house all storage element-specific loadshapes organized by microgrid.
+	for mg_key in rengen_mgs:
+		# Divide up cumulative storage loadshapes during outage proportionally by size to each storage element.
+		mg_specific_storage = {} # Define temporary variable to grab the kwh ratings of storage elements specific to current microgrid.
+		mg_proportional_storage_shapes = {} # Define sub dictionary to be added to collection of all dictionaries.
+		for item in batt_kwh_ratings:
+			if microgrids[mg_key]["gen_bus"] in item or item in microgrids[mg_key]['gen_obs_existing']:
+				mg_specific_storage[item] = float(batt_kwh_ratings[item])
+		total_mg_storage_capacity_kwh = sum(mg_specific_storage.values())
+		for element in mg_specific_storage:
+			factor = mg_specific_storage[element] / total_mg_storage_capacity_kwh
+			# Add each element's loadshapes to mg specific dictionary. 
+			mg_proportional_storage_shapes[element] = [x*factor for x in rengen_mgs[mg_key]["Cumulative battery loadshape during outage (kw)"]]
+		# Finally, add all mg specific loadshapes to all mgs dictionary variable.
+		storage_proportional_loadshapes[mg_key] = mg_proportional_storage_shapes
+	return storage_proportional_loadshapes
+
+def extract_charting_data(csvName, microgrids, y_list, outage_start, outage_end, outage_length, fossil_kw_ratings, vsource_ratings, year, rengen_mgs, storage_proportional_loadshapes, batt_kwh_ratings, rengen_proportional_loadshapes):
+	'''
+	:param csvName: CSV name generated by newQstsPlot. Prefix is timezcontrol.
+	:type csvName: str
+	:param microgrids: all of the microgrid definitions (as defined by microgrid_gen_mgs.py) for the given circuit
+	:type microgrids: dict
+	:param y_list: columns in the CSV generated by newQstsPlot that are to be used as Y-axes
+	:type y_list: list
+	:param outage_start: hour marking start of outage
+	:type outage_start: int
+	:param outage_end: hour marking end of outage
+	:type outage_end: int
+	:param outage_length: length of outage in hours
+	:type outage_length: int
+	:param fossil_kw_ratings: kw ratings for every fossil generator in circuit, keyed by object name
+	:type fossil_kw_ratings: dict
+	:param vsource_ratings: kw ratings for each microgrid-forming vsource in circuit (aka largest fossil generator in microgrids that were replaced with a vsource of identical size), keyed by object name
+	:type vsource_ratings: dict
+	:param year: year of analysis
+	:type year: int
+	:param rengen_mgs: load, rengen, cumulative battery, surplus rengen, and generic loadshapes during outage of microgrid with no fossil generators
+	:type rengen_mgs: dict
+	:param storage_proportional_loadshapes: loadshapes for each battery organized by microgrid
+	:type storage_proportional_loadshapes: dict
+	:param batt_kwh_ratings: kwh ratings for each battery in circuit, keyed by object name
+	:type batt_kwh_ratings: dict
+	:param rengen_proportional_loadshapes: loadshapes for each rengen object organized by microgrid
+	:type rengen_proportional_loadshapes: dict
+	:return: total fossil output in kWh, diesel consumption in gallons during the outage (keyed by legend group), diesel consumption in mmbtu during the outage (keyed by legend group), ploty Scatter objects representing fossil loading percent, number of battery cycles each battery experiences (keyed by battery name and phase), list of 3 traces (plotly Scatter objects) for gen/load/control
+	:rtype: int, dict, dict, list, dict, list
+	'''
+	diesel_dict, mmbtu_dict, fossil_traces, batt_cycles, unreasonable_voltages, glc_traces = {}, {}, [], {}, {}, []
 	fossil_kwh_output = 0
-	batt_kwh_ratings = {}
-	fossil_kw_ratings = {}
-	fossil_traces = []
-
-	# Info we need from tree: every solar by name with corresponding kw, every wind by name with corresponding kw.
-	if rengen_mgs:
-		rengen_kw_ratings = {}
-		for item in tree:
-			if "generator.solar" in item.get("object","x.x") or "generator.wind" in item.get("object","x.x"):
-				rengen_kw_ratings[item.get("object").split(".")[1]] = item.get("kw")
-
-		# Define variable to house all rengen element-specific loadshapes organized by microgrid. 
-		rengen_proportional_loadshapes = {}
-		# Make load loadshape outage patch. Subtract surplus from rengen, add rengen and storage, and compare to load loadshapes. Inequalities = 0, equalities = 1.  
-		for mg_key in rengen_mgs:
-			# Both gen and storage shapes after running battery algorithm.
-			rengen_during_outage_post_curtailment = [x-y for x,y in zip(rengen_mgs[mg_key]["All rengen loadshapes during outage (kw)"],rengen_mgs[mg_key]["Surplus rengen"])]
-			gen_and_storage_shape = [round(x-y, 8) for x,y in zip(rengen_during_outage_post_curtailment,rengen_mgs[mg_key]["Cumulative battery loadshape during outage (kw)"])] 
-			loadshapes_rounded = [round(num, 8) for num in rengen_mgs[mg_key]["All loads loadshapes during outage (kw)"]]
-			generic_mg_loadshape = [1 if x==y else 0 for x,y in zip(gen_and_storage_shape,loadshapes_rounded)]
-			rengen_mgs[mg_key]["Generic loadshape (kw)"] = generic_mg_loadshape
-
-			# Divide up cumulative rengen loadshapes during outage proportionally by size to each rengen element. 
-			# Define temporary variable to grab the kw ratings of rengen elements specific to current microgrid. 
-			mg_specific_rengen = {}
-			# Define sub dictionary to be added to collection of all dictionaries.
-			mg_proportional_rengen_shapes = {}
-			for item in rengen_kw_ratings:
-				if microgrids[mg_key]["gen_bus"] in item:
-					mg_specific_rengen[item] = float(rengen_kw_ratings[item])
-			total_mg_rengen_capacity_kw = sum(mg_specific_rengen.values())
-			for element in mg_specific_rengen:
-				factor = mg_specific_rengen[element] / total_mg_rengen_capacity_kw
-				# Add each element's loadshapes to mg specific dictionary. 
-				mg_proportional_rengen_shapes[element] = [x*factor for x in rengen_mgs[mg_key]["All rengen loadshapes during outage (kw)"]]
-			# Finally, add all mg specific loadshapes to all mgs dictionary variable.
-			rengen_proportional_loadshapes[mg_key] = mg_proportional_rengen_shapes
-
-
-	# Info we need from tree: every battery by name with corresponding kwhrated, every fossil gen by name with corresponding kw.
-	if batt_cycle_chart == True or fossil_loading_chart == True:
-		for item in tree:
-			if "generator.fossil" in item.get("object","x.x"):
-				fossil_kw_ratings[item.get("object").split(".")[1]] = item.get("kw")
-			if "storage.battery" in item.get("object","x.x"):
-				batt_kwh_ratings[item.get("object").split(".")[1]] = item.get("kwhrated")
-
-	# Similar to above, divide batteries into microgrids, find mg total kwh capacities for storage, and form element specific loadshapes.
-	if rengen_mgs:
-		# Define variable to house all storage element-specific loadshapes organized by microgrid. 
-		storage_proportional_loadshapes = {}
-		for mg_key in rengen_mgs:
-			# Divide up cumulative storage loadshapes during outage proportionally by size to each storage element. 
-			# Define temporary variable to grab the kwh ratings of storage elements specific to current microgrid. 
-			mg_specific_storage = {}
-			# Define sub dictionary to be added to collection of all dictionaries.
-			mg_proportional_storage_shapes = {}
-			for item in batt_kwh_ratings:
-				if microgrids[mg_key]["gen_bus"] in item:
-					mg_specific_storage[item] = float(batt_kwh_ratings[item])
-			total_mg_storage_capacity_kwh = sum(mg_specific_storage.values())
-			for element in mg_specific_storage:
-				factor = mg_specific_storage[element] / total_mg_storage_capacity_kwh
-				# Add each element's loadshapes to mg specific dictionary. 
-				mg_proportional_storage_shapes[element] = [x*factor for x in rengen_mgs[mg_key]["Cumulative battery loadshape during outage (kw)"]]
-			# Finally, add all mg specific loadshapes to all mgs dictionary variable.
-			storage_proportional_loadshapes[mg_key] = mg_proportional_storage_shapes
-
+	gen_data = pd.read_csv(csvName)
 	# Loop through objects in circuit.
-	for ob_name in set(gen_data[category_name]): 
+	for ob_name in set(gen_data['Name']):
+		# Declare variable for searching for object without phases.
+		if ob_name[-6:] == '_1_2_3':
+			ob_name_no_phases = ob_name[:-6]
+		elif ob_name[-2:] == '_1' or ob_name[-2:] == '_2' or ob_name[-2:] == '_3':
+			ob_name_no_phases = ob_name[:-2]
+		else:
+			ob_name_no_phases = ob_name
+		
 		# Set appropriate legend group based on microgrid.
 		for key in microgrids:
-			if microgrids[key]['gen_bus'] in ob_name or ob_name.split("-")[1] in microgrids[key]["loads"]:
+			if microgrids[key]['gen_bus'] in ob_name or ob_name.split("-")[1] in microgrids[key]["loads"] or ob_name.split("-")[1] in microgrids[key]['gen_obs_existing']:
 				legend_group = key
 			else:
 				legend_group = "Not_in_MG"
@@ -469,7 +538,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 		# Loop through phases.
 		for y_name in y_list: 
 			# print(f"this is the normal function! ob_name = {ob_name} and y_name = {y_name}")
-			this_series = gen_data[gen_data[category_name] == ob_name]
+			this_series = gen_data[gen_data['Name'] == ob_name]
 			
 			# Clean up series. 
 			this_series[y_name] = pd.to_numeric(this_series[y_name], errors='coerce')
@@ -478,14 +547,14 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 			# Amass data for fuel consumption chart.
 			if ("lead_gen_" in ob_name or "fossil_" in ob_name) and not this_series[y_name].isnull().values.any():
 				this_series[y_name] = this_series[y_name].astype(float)
-				additional = sum(abs(this_series[y_name].iloc[outageStart:outageEnd])) if "fossil_" in ob_name else sum(this_series[y_name].iloc[outageStart:outageEnd])
+				additional = sum(abs(this_series[y_name].iloc[outage_start:outage_end])) if "fossil_" in ob_name else sum(this_series[y_name].iloc[outage_start:outage_end])
 				fossil_kwh_output += additional
-				fossil_kw_rating = fossil_kw_ratings[ob_name.split("-")[1]] if "fossil_" in ob_name else vsource_ratings[ob_name.split("-")[1]]
-				fossil_loading_average_decimal = additional / (float(fossil_kw_rating) * lengthOfOutage)
+				fossil_kw_rating = fossil_kw_ratings[ob_name_no_phases.split("-")[1]] if "fossil_" in ob_name_no_phases else vsource_ratings[ob_name_no_phases.split("-")[1]]
+				fossil_loading_average_decimal = additional / (float(fossil_kw_rating) * outage_length)
 				diesel_consumption_gal_per_hour = (0.065728897 * fossil_loading_average_decimal + 0.003682709) * float(fossil_kw_rating) + (-0.027979695 * fossil_loading_average_decimal + 0.568328949)
-				diesel_consumption_outage = diesel_consumption_gal_per_hour * lengthOfOutage
+				diesel_consumption_outage = diesel_consumption_gal_per_hour * outage_length
 				mmbtu_consumption_mmbtu_per_hour = (0.0112913202545883 * fossil_loading_average_decimal + 0.00171037274039439) * float(fossil_kw_rating) + (-0.0560953826993578* fossil_loading_average_decimal + 0.074238182761738)
-				mmbtu_consumption_outage = mmbtu_consumption_mmbtu_per_hour * lengthOfOutage
+				mmbtu_consumption_outage = mmbtu_consumption_mmbtu_per_hour * outage_length
 				if legend_group in diesel_dict.keys():
 					diesel_dict[legend_group] += diesel_consumption_outage
 				else:
@@ -496,9 +565,9 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 					mmbtu_dict[legend_group] = mmbtu_consumption_outage
 				# Make fossil loading percentages traces.
 				fossil_percent_loading = [(x / float(fossil_kw_rating)) * -100 for x in this_series[y_name]] if "fossil_" in ob_name else [(x / float(fossil_kw_rating)) * 100 for x in this_series[y_name]]
-				graph_start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outageStart-24)
+				graph_start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outage_start-24)
 				fossil_trace = graph_objects.Scatter(
-					x = pd.to_datetime(range(lengthOfOutage+48), unit = 'h', origin = graph_start_time),
+					x = pd.to_datetime(range(outage_length+48), unit = 'h', origin = graph_start_time),
 					y = fossil_percent_loading,
 					legendgroup=legend_group,
 					legendgrouptitle_text=legend_group,
@@ -512,7 +581,7 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 				if rengen_mgs and legend_group in rengen_mgs:
 					curr_series_list = list(this_series[y_name])
 					outage_portion = storage_proportional_loadshapes[legend_group][ob_name.split("-")[1]]
-					all_batt_loadshapes = curr_series_list[:outageStart] + outage_portion + curr_series_list[outageEnd:]
+					all_batt_loadshapes = curr_series_list[:outage_start] + outage_portion + curr_series_list[outage_end:]
 					batt_kwh_input_output = sum([abs(x) for x in all_batt_loadshapes])
 				else:
 					batt_kwh_input_output = sum(abs(this_series[y_name]))
@@ -536,27 +605,27 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 			else:
 				y_axis = this_series[y_name]
 			# Splice over the outage portions if manual balance approach was used (rengen only circuit).
-			try: #HACK: unreliable as of 2023-07-12
-				if rengen_mgs and legend_group in rengen_mgs:
-					if "mongenerator-wind" in ob_name or "mongenerator-solar" in ob_name:
-						splice = rengen_proportional_loadshapes[legend_group][ob_name.split("-")[1]]
-						y_axis = list(y_axis.iloc[:outageStart]) + splice + list(y_axis.iloc[outageEnd:])
-					if "mongenerator-battery" in ob_name:
-						splice = storage_proportional_loadshapes[legend_group][ob_name.split("-")[1]]
-						y_axis = list(y_axis.iloc[:outageStart]) + splice + list(y_axis.iloc[outageEnd:])
-					if "monload-" in ob_name:
-						splice = rengen_mgs[legend_group]["Generic loadshape (kw)"]
-						y_axis = list(y_axis.iloc[:outageStart]) + splice + list(y_axis.iloc[outageEnd:])
-					plot_legend_group = f"{legend_group} – Manual Balance Approach used during outage"
-				else:
-					plot_legend_group = legend_group
-			except:
-				pass
+			# try: #HACK: unreliable as of 2023-07-12. Fix pushed on 2024-04-26.
+			if rengen_mgs and legend_group in rengen_mgs:
+				if "mongenerator-wind" in ob_name or "mongenerator-solar" in ob_name:
+					splice = rengen_proportional_loadshapes.get(legend_group,{}).get(ob_name.split("-")[1],[])
+					y_axis = list(y_axis.iloc[:outage_start]) + splice + list(y_axis.iloc[outage_end:])
+				if "mongenerator-battery" in ob_name:
+					splice = storage_proportional_loadshapes.get(legend_group,{}).get(ob_name.split("-")[1],[])
+					y_axis = list(y_axis.iloc[:outage_start]) + splice + list(y_axis.iloc[outage_end:])
+				if "monload-" in ob_name:
+					splice = rengen_mgs.get(legend_group,{}).get("Generic loadshape (kw)",[])
+					y_axis = list(y_axis.iloc[:outage_start]) + splice + list(y_axis.iloc[outage_end:])
+				plot_legend_group = f"{legend_group} – Manual Balance Approach used during outage"
+			else:
+				plot_legend_group = legend_group
+			# except:
+				# pass
 			# Add traces for gen, load, and control to list of Scatter objects.
 			if not this_series[y_name].isnull().values.any():
-				graph_start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outageStart-24)
+				graph_start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outage_start-24)
 				trace = graph_objects.Scatter(
-					x = pd.to_datetime(range(lengthOfOutage+48), unit = 'h', origin = graph_start_time),
+					x = pd.to_datetime(range(outage_length+48), unit = 'h', origin = graph_start_time),
 					y = y_axis,
 					legendgroup=plot_legend_group,
 					legendgrouptitle_text=plot_legend_group,
@@ -564,72 +633,123 @@ def make_chart(csvName, category_name, x, y_list, year, microgrids, tree, chart_
 					name = name,
 					hoverlabel = dict(namelength = -1)
 				)
-				data.append(trace)
+				glc_traces.append(trace)
+	return fossil_kwh_output, diesel_dict, mmbtu_dict, fossil_traces, batt_cycles, glc_traces
+
+def make_fossil_loading_chart(csvName, fossil_traces, fossil_kwh_output, diesel_dict, mmbtu_dict):
+	'''
+	:param csvName: CSV name generated by newQstsPlot. Prefix is timezcontrol.
+	:type csvName: str
+	:param fossil_traces: ploty Scatter objects representing fossil loading percent
+	:type fossil_traces: list
+	:param diesel_dict: stores diesel consumption in gallons during the outage, keyed by legend group
+	:type diesel_dict: dict
+	:param mmbtu_dict: stores diesel consumption in mmbtu during the outage, keyed by legend group
+	:type mmbtu_dict: dict
+	:return: don't return anything. Instead, plot figure to file.
+	:rtype: None 
+	'''
 	# Make fossil genset loading plot. 
-	if fossil_loading_chart == True:
-		new_layout = graph_objects.Layout(
-			title = f"Fossil Genset Loading Percentage ({csvName})",
-			xaxis = dict(title = 'Date'),
-			yaxis = dict(title = 'Fossil Percent Loading'),
-			font = dict(family="sans-serif", color="black"))
-		fossil_fig = graph_objects.Figure(fossil_traces, new_layout)
-		offline.plot(fossil_fig, filename=f'{csvName}_fossil_loading.plot.html', auto_open=False)
+	new_layout = graph_objects.Layout(
+		title = f"Fossil Genset Loading Percentage ({csvName})",
+		xaxis = dict(title = 'Date'),
+		yaxis = dict(title = 'Fossil Percent Loading'),
+		font = dict(family="sans-serif", color="black"))
+	fossil_fig = graph_objects.Figure(fossil_traces, new_layout)
+	offline.plot(fossil_fig, filename=f'{csvName}_fossil_loading.plot.html', auto_open=False)
+	# Calculate total fossil genset consumption and make fossil fuel consumption chart. 
+	fossil_kwh_output = "{:e}".format(fossil_kwh_output)
+	total_gal_diesel = "{:e}".format(sum(diesel_dict.values()))
+	total_mmbtu_gas = "{:e}".format(sum(mmbtu_dict.values()))
+	# Make fossil fuel consumption chart. 
+	diesel_dict = dict(sorted(diesel_dict.items()))
+	mmbtu_dict = dict(sorted(mmbtu_dict.items()))
+	# Construct plot.
+	fig = subplots.make_subplots(shared_xaxes=True, specs=[[{"secondary_y": True}]])
+	fig.add_trace(graph_objects.Bar(x = list(diesel_dict.keys()), y = list(diesel_dict.values()), name="Diesel"), secondary_y=False)
+	fig.add_trace(graph_objects.Bar(x = list(mmbtu_dict.keys()), y = list(mmbtu_dict.values()), name="Gas"), secondary_y=True)
+	fig.update_layout(
+		title_text = f"Diesel and Natural Gas Equivalent Consumption During Outage By Microgrid<br><sup>Total Consumption in Gallons of Diesel = {total_gal_diesel} || Total Consumption in MMBTU Natural Gas = {total_mmbtu_gas}|| Total Output in kWh = {fossil_kwh_output}</sup>",
+		font = dict(family="sans-serif", color="black"),
+		legend=dict(orientation='h'))
+	fig.update_xaxes(title_text="Microgrid")
+	fig.update_yaxes(title_text="Gallons of Diesel Equivalent Consumed During Outage", secondary_y=False)
+	fig.update_yaxes(title_text="MMBTU of Natural Gas Equivalent Consumed During Outage", secondary_y=True)
+	offline.plot(fig, filename=f'{csvName}_fuel_consumption.plot.html', auto_open=False)
 
-		# Calculate total fossil genset consumption and make fossil fuel consumption chart. 
-		fossil_kwh_output = "{:e}".format(fossil_kwh_output)
-		total_gal_diesel = "{:e}".format(sum(diesel_dict.values()))
-		total_mmbtu_gas = "{:e}".format(sum(mmbtu_dict.values()))
-		# Make fossil fuel consumption chart. 
-		diesel_dict = dict(sorted(diesel_dict.items()))
-		mmbtu_dict = dict(sorted(mmbtu_dict.items()))
-
-		fig = subplots.make_subplots(shared_xaxes=True, specs=[[{"secondary_y": True}]])
-		fig.add_trace(graph_objects.Bar(x = list(diesel_dict.keys()), y = list(diesel_dict.values()), name="Diesel"), secondary_y=False)
-		fig.add_trace(graph_objects.Bar(x = list(mmbtu_dict.keys()), y = list(mmbtu_dict.values()), name="Gas"), secondary_y=True)
-		fig.update_layout(
-			title_text = f"Diesel and Natural Gas Equivalent Consumption During Outage By Microgrid<br><sup>Total Consumption in Gallons of Diesel = {total_gal_diesel} || Total Consumption in MMBTU Natural Gas = {total_mmbtu_gas}|| Total Ouput in kWh = {fossil_kwh_output}</sup>",
-			font = dict(family="sans-serif", color="black"),
-			legend=dict(orientation='h'))
-		fig.update_xaxes(title_text="Microgrid")
-		fig.update_yaxes(title_text="Gallons of Diesel Equivalent Consumed During Outage", secondary_y=False)
-		fig.update_yaxes(title_text="MMBTU of Natural Gas Equivalent Consumed During Outage", secondary_y=True)
-
-		offline.plot(fig, filename=f'{csvName}_fuel_consumption.plot.html', auto_open=False)
-
+def make_batt_cycle_chart(csvName, batt_cycles):
+	'''
+	:param csvName: CSV name generated by newQstsPlot. Prefix is timezcontrol.
+	:type csvName: str
+	:param batt_cycles: stores number of battery cycles each battery experiences, keyed by battery name and phase
+	:type batt_cycles: dict
+	:return: don't return anything. Instead, plot figure to file.
+	:rtype: None 
+	'''
 	# Make battery cycles bar chart.
-	if batt_cycle_chart == True:
-		batt_cycles = dict(sorted(batt_cycles.items()))
-		new_trace = graph_objects.Bar(
-			x = list(batt_cycles.keys()), 
-			y = list(batt_cycles.values()))
-		new_layout = graph_objects.Layout(
-			title = "Battery Cycles During Analysis Period",
-			xaxis = dict(title = 'Battery'),
-			yaxis = dict(title = 'Cycles'),
-			font = dict(family="sans-serif", color="black"))
-		new_fig = graph_objects.Figure(new_trace, new_layout)
-		offline.plot(new_fig, filename=f'{csvName}_battery_cycles.plot.html', auto_open=False)
+	batt_cycles = dict(sorted(batt_cycles.items()))
+	new_trace = graph_objects.Bar(
+		x = list(batt_cycles.keys()), 
+		y = list(batt_cycles.values()))
+	new_layout = graph_objects.Layout(
+		title = "Battery Cycles During Analysis Period",
+		xaxis = dict(title = 'Battery'),
+		yaxis = dict(title = 'Cycles'),
+		font = dict(family="sans-serif", color="black"))
+	new_fig = graph_objects.Figure(new_trace, new_layout)
+	offline.plot(new_fig, filename=f'{csvName}_battery_cycles.plot.html', auto_open=False)
 
+def make_glc_plots(csvName, chart_name, y_axis_name, glc_traces, outage_start, outage_length, year, ansi_bands):
+	'''
+	:param csvName: CSV name generated by newQstsPlot. Prefix is timezcontrol.
+	:type csvName: str
+	:param chart_name: denotes whether plot is for gen, load, or control. Becomes chart title.
+	:type chart_name: str
+	:param y_axis_name: key for y axis. Different for each of gen/load/control.
+	:type y_axis_name: str
+	:param glc_traces: list of 3 traces (plotly Scatter objects) for gen/load/control
+	:type glc_traces: list
+	:param outage_start: hour marking start of outage
+	:type outage_start: int
+	:param outage_length: length of outage in hours
+	:type outage_length: int
+	:param year: year of analysis
+	:type year: int
+	:param ansi_bands: in load plot, red dotted lines denoting 0.9 - 1.1 of load voltage
+	:type ansi_bands: bool
+	:return: don't return anything. Instead, plot figure to file.
+	:rtype: None
+	'''
 	# Plots for gen, load, control.
 	layout = graph_objects.Layout(
 		title = f'{chart_name} <br><sup>Dotted black lines indicate outage start and end times</sup>',
 		xaxis = dict(title = 'Date'),
 		yaxis = dict(title = y_axis_name),
 		font = dict(family="sans-serif", color="black"))
-	fig = graph_objects.Figure(data, layout)
+	fig = graph_objects.Figure(glc_traces, layout)
 	if ansi_bands == True:
 		line_style = {'color':'Red', 'width':3, 'dash':'dashdot'}
 		fig.add_hline(y=0.9, line=line_style)
 		fig.add_hline(y=1.1, line=line_style)
 	# Add outage start and end markers.
 	outage_line_style = {'color':'Black', 'width':1, 'dash':'dot'}
-	start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outageStart)
-	end_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outageStart) + pd.Timedelta(hours=lengthOfOutage)
+	start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outage_start)
+	end_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outage_start) + pd.Timedelta(hours=outage_length)
 	fig.add_vline(x=start_time, line=outage_line_style)
 	fig.add_vline(x=end_time, line=outage_line_style)
 	offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
-def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_length, logger):
+def faulted_lines_in_graph(path_to_dss, faulted_lines):
+	omd = dssConvert.dssToOmd(path_to_dss, '', write_out=False)
+	for key in omd:
+		if omd[key].get('name','') == faulted_lines:
+			return True
+	return False
+
+def play(path_to_dss, work_dir, microgrids, faulted_lines, outage_start, outage_length, logger):
+	# First run a check to ensure faulted_lines is in graph.
+	if not faulted_lines_in_graph(path_to_dss, faulted_lines):
+		raise ValueError("The provided outage location is not in the provided circuit. Control simulation skipped.")
 	# It seems like the only way to send fewer steps to newQstsPlot (outage_length + 48 steps) is to revise the timestamps fed to actions. Rather than giving actions the hours of year that represent outage start and outage end, feed actions 25 for the outage start and 25 + outage_length for the outage end.
 	actions_outage_start = 25
 	actions_outage_end = actions_outage_start + outage_length
@@ -637,15 +757,15 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 	actions = {}
 	print('CONTROLLING ON', microgrids)
 	logger.warning(f'CONTROLLING ON {microgrids}')
-	# microgridup.py changes our directory to the one containing the currently running analysis. This is to help opendss run. If we're running this function by itself, we need to chdir into the workDir argument.
+	# microgridup.py changes our directory to the one containing the currently running analysis. This is to help opendss run. If we're running this function by itself, we need to chdir into the work_dir argument.
 	curr_dir = os.getcwd()
-	workDir = os.path.abspath(workDir)
-	if curr_dir != workDir:
-		os.chdir(workDir)
+	work_dir = os.path.abspath(work_dir)
+	if curr_dir != work_dir:
+		os.chdir(work_dir)
 	# Read in inputs.
-	outageEnd = outage_start + outage_length
+	outage_end = outage_start + outage_length
 	# Read in the circuit information.
-	dssTree = opendss.dssConvert.dssToTree(pathToDss)
+	dssTree = dssConvert.dssToTree(path_to_dss)
 	# Add the fault, modeled as a 3 phase open, to the actions.
 	faulted_lines = faulted_lines.split(',')
 	open_line_actions = ''
@@ -678,7 +798,7 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 		load_crit_pairs = zip(load_list, crit_list)
 		for load_name, load_kw in load_crit_pairs:
 			try:
-				this_load = opendss._getByName(dssTree, load_name)
+				this_load = _getByName(dssTree, load_name)
 				old_kw = this_load['kw']
 				this_load['kw'] = str(load_kw)
 				print(f'reduced {load_name} from {old_kw} to {load_kw}')
@@ -688,7 +808,7 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 		# Have all microgrids switch out of the circuit during fault.
 		switch_name = mg_values['switch']
 		# HACK: we don't store whether the switch is a line or transformer in the microgrid dict, so make a best guess
-		switch_type = opendss._getByName(dssTree, switch_name)['object'].split('.')[0]
+		switch_type = _getByName(dssTree, switch_name)['object'].split('.')[0]
 		actions[actions_outage_start] += f'''
 			open object={switch_type}.{switch_name} term=1
 			open object={switch_type}.{switch_name} term=2
@@ -704,7 +824,7 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 		all_mg_fossil = [
 			ob for ob in dssTree
 			if ob.get('bus1','x.x').split('.')[0] == gen_bus
-			and 'generator.' in ob.get('object')
+			and 'generator.fossil' in ob.get('object')
 		]
 		all_mg_fossil.sort(key=lambda x:float(x.get('kw')))
 		# Insert a vsource for the largest fossil unit in each microgrid.
@@ -712,9 +832,8 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 			manual_balance_approach = False
 			# vsource variables.
 			big_gen_ob = all_mg_fossil[-1]
-			big_gen_bus = big_gen_ob.get('bus1')
 			big_gen_index = dssTree.index(big_gen_ob)
-			safe_busname = big_gen_bus.replace('.','_')
+			safe_busname = gen_bus.replace('.','_')
 			vsource_ob_and_name = f'vsource.lead_gen_{safe_busname}'
 			line_name = f'line.line_for_lead_gen_{safe_busname}'
 			new_bus_name = f'bus_for_lead_gen_{safe_busname}.1.2.3'
@@ -724,8 +843,8 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 			try:
 				gen_base_kv = float(gen_base_kv_str)
 			except:
-				print(f"HACK: no voltage detected for {vsource_ob_and_name} on {big_gen_bus} so falling back on default 4.16kv")
-				logger.warning(f"HACK: no voltage detected for {vsource_ob_and_name} on {big_gen_bus} so falling back on default 4.16kv")
+				print(f"HACK: no voltage detected for {vsource_ob_and_name} on {gen_bus} so falling back on default 4.16kv")
+				logger.warning(f"HACK: no voltage detected for {vsource_ob_and_name} on {gen_bus} so falling back on default 4.16kv")
 				gen_base_kv = 4.16
 			if phase_count == '3':
 				gen_base_kv = gen_base_kv * math.sqrt(3)
@@ -734,9 +853,7 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 			# Remove fossil unit, add new gen and line
 			del dssTree[big_gen_index]
 			dssTree.insert(big_gen_index, {'!CMD':'new', 'object':vsource_ob_and_name, 'basekv':str(gen_base_kv), 'bus1':new_bus_name, 'phases':phase_count})
-			# dssTree.insert(big_gen_index, {'!CMD':'new', 'object':vsource_ob_and_name, 'basekv':gen_base_kv, 'bus1':new_bus_name, 'pu':1.00, 'r1':0, 'x1':0.0001, 'r0':0, 'x0':0.0001})
-			# print("dssTree[big_gen_index]",dssTree[big_gen_index])
-			dssTree.insert(big_gen_index, {'!CMD':'new', 'object':line_name, 'bus1':big_gen_bus, 'bus2':new_bus_name, 'switch':'yes'})
+			dssTree.insert(big_gen_index, {'!CMD':'new', 'object':line_name, 'bus1':gen_bus, 'bus2':new_bus_name, 'switch':'yes'})
 			# Disable the new lead gen by default.
 			actions[1] += f'''
 				open {line_name}
@@ -754,13 +871,13 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 		else:
 			manual_balance_approach = True
 		# Manually construct battery loadshapes for outage.
-		dssTree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw = do_manual_balance_approach(outage_start, outageEnd, mg_key, mg_values, dssTree, logger)
+		new_dss_tree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw = do_manual_balance_approach(outage_start, outage_end, mg_values, dssTree, logger)
 		# Manual Balance Approach plotting call.
 		if manual_balance_approach == True:
-			fname = plot_manual_balance_approach(mg_key, 2019, outage_start, outageEnd, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw)
+			fname = plot_manual_balance_approach(mg_key, 2019, outage_start, outage_end, outage_length, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw)
 			rengen_fnames.append(fname)
-			rengen_mgs[mg_key] = {"All loads loadshapes during outage (kw)":list(all_loads_shapes_kw[outage_start:outageEnd]),
-			"All rengen loadshapes during outage (kw)":list(all_rengen_shapes[outage_start:outageEnd]),
+			rengen_mgs[mg_key] = {"All loads loadshapes during outage (kw)":list(all_loads_shapes_kw[outage_start:outage_end]),
+			"All rengen loadshapes during outage (kw)":list(all_rengen_shapes[outage_start:outage_end]),
 			"Cumulative battery loadshape during outage (kw)":list(new_batt_loadshape),
 			"Surplus rengen":total_surplus}
 	# print("big_gen_ratings",big_gen_ratings)
@@ -769,10 +886,10 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 	actions[actions_outage_start] += f'calcv\n'
 	actions[actions_outage_end] += f'calcv\n'
 	# Write the adjusted opendss file with new kw, generators.
-	opendss.dssConvert.treeToDss(dssTree, 'circuit_control.dss')
+	dssConvert.treeToDss(new_dss_tree, 'circuit_control.dss')
 	# Run the simulation.  can hang, so wait at most 4 minutes for it to complete
 	FPREFIX = 'timezcontrol'
-	opendss.newQstsPlot(
+	newQstsPlot(
 		'circuit_control.dss',
 		stepSizeInMinutes=60, 
 		numberOfSteps=outage_length+48,
@@ -780,34 +897,45 @@ def play(pathToDss, workDir, microgrids, faulted_lines, outage_start, outage_len
 		actions=actions,
 		filePrefix=FPREFIX
 	)
-	# Merge gen and source csvs for plotting fossil loading percentages
-	inputs = [f'{FPREFIX}_gen.csv', f'{FPREFIX}_source.csv']
-	# First determine the field names from the top line of each input file
-	fieldnames = []
-	for filename in inputs:
-		with open(filename, "r", newline="") as f_in:
-			reader = csv.reader(f_in)
-			headers = next(reader)
-			for h in headers:
-				if h not in fieldnames:
-					fieldnames.append(h)
-	# Then copy the data
-	with open(f"{FPREFIX}_source_and_gen.csv", "w", newline="") as f_out:
-		writer = csv.DictWriter(f_out, fieldnames=fieldnames)
-		writer.writeheader()
+	if os.path.exists(f'{FPREFIX}_gen.csv') and os.path.exists(f'{FPREFIX}_source.csv'):
+		# Merge gen and source csvs for plotting fossil loading percentages
+		inputs = [f'{FPREFIX}_gen.csv', f'{FPREFIX}_source.csv']
+		# First determine the field names from the top line of each input file
+		fieldnames = []
 		for filename in inputs:
 			with open(filename, "r", newline="") as f_in:
-				reader = csv.DictReader(f_in)  # Uses the field names in this file
-				for line in reader:
-					writer.writerow(line)
+				reader = csv.reader(f_in)
+				headers = next(reader)
+				for h in headers:
+					if h not in fieldnames:
+						fieldnames.append(h)
+		# Then copy the data
+		with open(f"{FPREFIX}_source_and_gen.csv", "w", newline="") as f_out:
+			writer = csv.DictWriter(f_out, fieldnames=fieldnames)
+			writer.writeheader()
+			for filename in inputs:
+				with open(filename, "r", newline="") as f_in:
+					reader = csv.DictReader(f_in)  # Uses the field names in this file
+					for line in reader:
+						writer.writerow(line)
+	# Collect fossil_kw_ratings, batt_kwh_ratings, and rengen_kw_ratings.
+	batt_kwh_ratings, fossil_kw_ratings, rengen_kw_ratings = {}, {}, {}
+	# Info we need from tree: every battery by name with corresponding kwhrated, every fossil gen by name with corresponding kw, every rengen by name with corresponding kw rated.
+	for item in new_dss_tree:
+		if "generator.fossil" in item.get("object","x.x"):
+			fossil_kw_ratings[item.get("object").split(".")[1]] = item.get("kw")
+		if "storage.battery" in item.get("object","x.x"):
+			batt_kwh_ratings[item.get("object").split(".")[1]] = item.get("kwhrated")
+		if "generator.solar" in item.get("object","x.x") or "generator.wind" in item.get("object","x.x"):
+				rengen_kw_ratings[item.get("object").split(".")[1]] = item.get("kw")
 	# Generate the output charts.
-	make_chart(f'{FPREFIX}_source_and_gen.csv', 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, dssTree, "Generator Output", "Average Hourly kW", outage_start, outage_length, batt_cycle_chart=True, fossil_loading_chart=True, vsource_ratings=big_gen_ratings, rengen_mgs=rengen_mgs)
-	make_chart(f'{FPREFIX}_load.csv', 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, dssTree, "Load Voltage", "PU", outage_start, outage_length, ansi_bands=True, rengen_mgs=rengen_mgs)
-	try:
-		make_chart(f'{FPREFIX}_control.csv', 'Name', 'hour', ['Tap(pu)'], 2019, microgrids, dssTree, "Tap Position", "PU", outage_start, outage_length)
-	except:
-		pass #TODO: better detection of missing control data.
-	plot_inrush_data(pathToDss, microgrids, f'{FPREFIX}_inrush_plot.html', outage_start, outageEnd, logger, vsourceRatings=big_gen_ratings)
+	if os.path.exists(f'{FPREFIX}_source_and_gen.csv'):
+		make_chart(f'{FPREFIX}_source_and_gen.csv', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, "Generator Output", "Average Hourly kW", outage_start, outage_end, outage_length, batt_kwh_ratings, fossil_kw_ratings, vsource_ratings=big_gen_ratings, rengen_kw_ratings=rengen_kw_ratings, rengen_mgs=rengen_mgs)
+	if os.path.exists(f'{FPREFIX}_load.csv'):
+		make_chart(f'{FPREFIX}_load.csv', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, "Load Voltage", "PU", outage_start, outage_end, outage_length, batt_kwh_ratings, fossil_kw_ratings, rengen_kw_ratings=rengen_kw_ratings, rengen_mgs=rengen_mgs)
+	if os.path.exists(f'{work_dir}/{FPREFIX}_control.csv'):
+		make_chart(f'{FPREFIX}_control.csv', ['Tap(pu)'], 2019, microgrids, "Tap Position", "PU", outage_start, outage_end, outage_length, batt_kwh_ratings, fossil_kw_ratings)
+	plot_inrush_data(path_to_dss, microgrids, f'{FPREFIX}_inrush_plot.html', outage_start, outage_end, outage_length, logger, vsourceRatings=big_gen_ratings)
 	# Write final output file.
 	output_slug = '''	
 		<head>
@@ -863,9 +991,9 @@ def _tests():
 	for _dir in control_test_args:
 		model_dir = f'{_myDir}/data/projects/{_dir}'
 		curr_dir = os.getcwd()
-		workDir = os.path.abspath(model_dir)
-		if curr_dir != workDir:
-			os.chdir(workDir)
+		work_dir = os.path.abspath(model_dir)
+		if curr_dir != work_dir:
+			os.chdir(work_dir)
 		if 'lukes' in _dir:
 			continue # NOTE: Remove this statement if support for lukes (multiple points of connection) is added.
 		final_run_count = len(control_test_args[_dir]) - 1 # FULL_NAME is based on the count of the microgrid in the final run.

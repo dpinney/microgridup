@@ -114,8 +114,8 @@ def mg_phase_and_kv(dss_filename, microgrid, mg_name, logger):
 	# neutral phase is assumed, and should not be explicit in load_phase_list
 	if load_phase_list[0] == '0':
 		load_phase_list = load_phase_list[1:]
-		print("load_phase_list after removal of ground phase:", load_phase_list)
-		logger.warning("load_phase_list after removal of ground phase:", load_phase_list)
+		print(f"load_phase_list after removal of ground phase: {load_phase_list}")
+		logger.warning(f"load_phase_list after removal of ground phase: {load_phase_list}")
 	out_dict['phases'] = load_phase_list
 	# Kv selection method prior to January 2022:
 	# Choose the maximum voltage based upon the phases that are supported, assuming all phases in mg can be supported from gen_bus and that existing tranformers will handle any kv change
@@ -130,7 +130,7 @@ def mg_phase_and_kv(dss_filename, microgrid, mg_name, logger):
 	# TODO: match up the calculated kv at the gen_bus with the appropriate line to neutral or line to line kv from voltagebases from the BASE_NAME dss file so that PU voltages compute accurately
 	out_dict['kv'] = gen_bus_kv
 	print('mg_phase_and_kv out_dict:', out_dict)
-	logger.warning('mg_phase_and_kv out_dict:', out_dict)
+	logger.warning(f'mg_phase_and_kv out_dict: {out_dict}')
 	return out_dict
 	
 def build_new_gen_ob_and_shape(REOPT_FOLDER, GEN_NAME, microgrid, dss_filename, mg_name, logger):
@@ -784,13 +784,12 @@ def gen_powerflow_results(CIRCUIT_FILE, YEAR, QSTS_STEPS, logger):
 		keepAllFiles=False,
 		actions={},
 		filePrefix='timeseries')
-	make_chart('timeseries_gen.csv', CIRCUIT_FILE, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], YEAR, QSTS_STEPS, "Generator Output", "Average hourly kW")
+	if os.path.exists(f'timeseries_gen.csv'):
+		make_chart('timeseries_gen.csv', CIRCUIT_FILE, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], YEAR, QSTS_STEPS, "Generator Output", "Average hourly kW")
 	make_chart('timeseries_load.csv', CIRCUIT_FILE, 'Name', 'hour', ['V1(PU)','V2(PU)','V3(PU)'], YEAR, QSTS_STEPS, "Load Voltage", "PU", ansi_bands = True)
 	make_chart('timeseries_source.csv', CIRCUIT_FILE, 'Name', 'hour', ['P1(kW)','P2(kW)','P3(kW)'], YEAR, QSTS_STEPS, "Voltage Source Output", "Average hourly kW")
-	try:
+	if os.path.exists(f'timeseries_control'):
 		make_chart('timeseries_control.csv', CIRCUIT_FILE, 'Name', 'hour', ['Tap(pu)'], YEAR, QSTS_STEPS, "Tap Position", "PU")
-	except:
-		pass #TODO: better detection of missing control data.
 
 def run(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, input_dss_filename, mg_name, LOAD_NAME, output_dss_filename, ADD_COST_NAME, logger, REOPT_INPUTS):
 	gen_obs = build_new_gen_ob_and_shape(REOPT_FOLDER_FINAL, GEN_NAME, microgrid, input_dss_filename, mg_name, logger)
@@ -948,7 +947,7 @@ def _tests():
 	if curr_dir != workDir:
 		os.chdir(workDir)
 	microgrids = control_test_args[_dir]
-	logger = microgridup.setup_logging(f'{MGU_FOLDER}/logs.txt')
+	logger = microgridup.setup_logging(f'{MGU_FOLDER}/logs.log')
 	# As many tests per directory as there are microgrids/REopt API calls per directory.
 	mg_names_sorted = sorted(microgrids.keys())
 	REOPT_INPUTS = {

@@ -4,7 +4,7 @@ from collections import OrderedDict
 from matplotlib import pyplot as plt
 from flask import Flask, request, redirect, render_template, jsonify, url_for
 from omf.solvers.opendss import dssConvert
-from microgridup_gen_mgs import mg_group, nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, topological_sort
+from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_mg_mines, form_mg_groups
 from microgridup import full
 from subprocess import Popen
 from flask import send_from_directory
@@ -104,7 +104,7 @@ def load(project):
 	
 @app.route('/check_status/<project>')
 def check_status(project):
-	'''Used by template_in_progress.html to redirect to output_final.html once it exists.'''
+	'''Used by template_in_progress.html to redirect to output_final.html once it exists. Used by template_home.html to update status in boxes.'''
 	files = os.listdir(f'{_projectDir}/{project}')
 	if 'output_final.html' in files and '0running.txt' not in files and '0crashed.txt' not in files:
 		return jsonify(status='complete', url=f'/data/projects/{project}/output_final.html')
@@ -272,7 +272,6 @@ def getLoadsFromExistingFile():
 @app.route('/previewOldPartitions', methods=['POST'])
 def previewOldPartitions():
 	data = request.get_json()
-	# filename = data['filename']
 	model_dir = data['MODEL_DIR']
 	filename = f'{_mguDir}/data/projects/{model_dir}/circuit.dss'
 	MG_MINES = data['MG_MINES']
@@ -281,10 +280,15 @@ def previewOldPartitions():
 	parts = []
 	for mg in MG_MINES:
 		cur_mg = []
-		cur_mg.extend([load for load in MG_MINES[mg].get('loads')])
-		# cur_mg.append(MG_MINES[mg].get('switch'))
 		cur_mg.append(MG_MINES[mg].get('gen_bus'))
-		cur_mg.extend([load for load in MG_MINES[mg].get('gen_obs_existing')])
+		try:
+			# Try to extend mg by all elements topographically downstream from gen_bus.
+			all_descendants = list(nx.descendants(G, MG_MINES[mg].get('gen_bus')))
+			cur_mg.extend(all_descendants)
+		except:
+			# If that didn't work, use old method.
+			cur_mg.extend([load for load in MG_MINES[mg].get('gen_obs_existing')])
+			cur_mg.extend([load for load in MG_MINES[mg].get('loads')])
 		parts.append(cur_mg)
 	# Check to see if omd contains coordinates for each important node.
 	if has_full_coords(omd):
@@ -324,7 +328,7 @@ def build_pos_from_omd(omd):
 
 def has_full_coords(omd):
 	has_coords = True
-	should_have_coords = set(['circuit','vsource','load','generator','storage','capacitor','bus'])
+	should_have_coords = set(['vsource','load','generator','storage','capacitor','bus'])
 	for key in omd:
 		ob = omd[key]
 		if ob.get('object') in should_have_coords:
@@ -389,7 +393,7 @@ def previewPartitions():
 				return {}
 	except:
 		return jsonify('Invalid partitioning method')
-	MG_MINES = mg_group(CIRC_FILE, CRITICAL_LOADS, METHOD, algo_params={'num_mgs':MGQUANT})
+	MG_MINES = form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd)
 	for mg in MG_MINES:
 		if not MG_MINES[mg]['switch']:
 			print(f'Selected partitioning method produced invalid results. Please choose a different partitioning method.')
@@ -461,20 +465,28 @@ def run():
 	crit_loads = json.loads(request.form['CRITICAL_LOADS'])
 	mg_method = request.form['MG_DEF_METHOD']
 	MGQUANT = int(json.loads(request.form['mgQuantity']))
+	G = dssConvert.dss_to_networkx(dss_path)
+	omd = dssConvert.dssToOmd(dss_path, '', RADIUS=0.0004, write_out=False)
 	if mg_method == 'loadGrouping':
 		pairings = json.loads(request.form['MICROGRIDS'])
-		microgrids = mg_group(dss_path, crit_loads, 'loadGrouping', pairings)	
+		mg_groups = form_mg_groups(G, crit_loads, 'loadGrouping', pairings)
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
 	elif mg_method == 'manual':
 		algo_params = json.loads(request.form['MICROGRIDS'])
-		microgrids = mg_group(dss_path, crit_loads, 'manual', algo_params)
+		mg_groups = form_mg_groups(G, crit_loads, 'manual', algo_params)
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd, switch=algo_params['switch'], gen_bus=algo_params['gen_bus'])
 	elif mg_method == 'lukes':
-		microgrids = mg_group(dss_path, crit_loads, 'lukes')
+		mg_groups = form_mg_groups(G, crit_loads, 'lukes', algo_params)
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
 	elif mg_method == 'branch':
-		microgrids = mg_group(dss_path, crit_loads, 'branch')
+		mg_groups = form_mg_groups(G, crit_loads, 'branch')
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
 	elif mg_method == 'bottomUp':
-		microgrids = mg_group(dss_path, crit_loads, 'bottomUp', algo_params={'num_mgs':MGQUANT})
+		mg_groups = form_mg_groups(G, crit_loads, 'bottomUp', algo_params={'num_mgs':MGQUANT})
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
 	elif mg_method == 'criticalLoads':
-		microgrids = mg_group(dss_path, crit_loads, 'criticalLoads', algo_params={'num_mgs':MGQUANT})
+		mg_groups = form_mg_groups(G, crit_loads, 'criticalLoads', algo_params={'num_mgs':MGQUANT})
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
 	elif mg_method == '': 
 		microgrids = json.loads(request.form['MICROGRIDS'])
 	# Form REOPT_INPUTS. 

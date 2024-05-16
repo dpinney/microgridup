@@ -323,7 +323,7 @@ def build_pos_from_omd(omd):
 			name = ob.get('name')
 			lat = float(ob.get('latitude'))
 			lon = float(ob.get('longitude'))
-			pos[name] = (lat,lon)
+			pos[name] = (lon,lat)
 	return pos
 
 def has_full_coords(omd):

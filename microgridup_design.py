@@ -96,8 +96,14 @@ def create_production_factor_series_csv(microgrids, logger, reopt_inputs, invali
 		with open('reopt_loadshapes/allInputData.json', 'w') as f:
 			json.dump(allInputData, f, indent=4)
 		__neoMetaModel__.runForeground('reopt_loadshapes')
-		with open('reopt_loadshapes/results.json') as f:
-			results = json.load(f)
+		try:
+			with open('reopt_loadshapes/results.json') as f:
+				results = json.load(f)
+		except FileNotFoundError as e:
+			with open('reopt_loadshapes/stderr.txt') as f:
+				err_msg = f.read()
+			logger.warning(err_msg)
+			raise e
 		shutil.rmtree('reopt_loadshapes')
 		production_factor_series_df = pd.DataFrame()
 		production_factor_series_df['pv_production_factor_series'] = pd.Series(results['PV']['production_factor_series'])

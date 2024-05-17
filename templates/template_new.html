@@ -250,7 +250,7 @@
         <nav class="js-nav--topNav">
             <div>
                 <a href="/">
-                    <span class="span--sectionTitle">MicrogridUp &raquo; {% if editing %}Edit Model{% else %}New{% endif %}</span>
+                    <span class="span--sectionTitle">MicrogridUp &raquo; {% if editing %}Edit Project{% else %}New{% endif %}</span>
                 </a>
             </div>
         </nav>
@@ -261,11 +261,11 @@
             <p style="color:white; margin:0px"><a style="color:white; text-decoration:none" href="/"><b>MicrogridUP</b></a> &raquo; New</p>
         </div>-->
         <div id='introInfo' class='step'>
-            <h3>Step 1: Input model information</h3>
+            <h3>Step 1: Input project information</h3>
             <form id="modelInfoForm" enctype="multipart/form-data">
                 <h5>Site and Energy Provider</h5>
                 <div class="chunk">
-                    <label class="tooltip" for="MODEL_DIR">Model Name<span class="classic">Model names must be entirely lowercase.</span></label>
+                    <label class="tooltip" for="MODEL_DIR">Project Name<span class="classic">Project names must be entirely lowercase.</span></label>
                     <input type="text" name="MODEL_DIR" value="{{in_data.MODEL_DIR}}" pattern="[a-z0-9_\-]+" required/>
                 </div>
                 <div class="chunk">
@@ -675,7 +675,7 @@
                 <div id="microgridParameterMVC" class="chunk"></div>
                 <br>
             </form>
-            <button id="submitEverything" type="submit">Run model</button>
+            <button id="submitEverything" type="submit">Run Project</button>
         </div>
         <div id="loading-background"></div>
         <div id="loading-indicator">
@@ -1328,13 +1328,13 @@
 			var model_dir = $('input[name="MODEL_DIR"]').val()
 			// Do not proceed if model has no name.
 			if (model_dir === '') {
-				alert('Please specify a model name.')
+				alert('Please specify a project name.')
 				return 
 			}
 			// Do not proceed if input contains capital letters.
 			const pattern = new RegExp('[A-Z]');
 			if (pattern.test(model_dir)) {
-				alert('Model names must be entirely lowercase. Please return to Step 1 and provide Model Name with lowercase input.')
+				alert('Project names must be entirely lowercase. Please return to Step 1 and provide Project Name with lowercase input.')
 				return
 			}
 			var form_data = new FormData($('#upload-file')[0]);

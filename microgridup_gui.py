@@ -1,4 +1,5 @@
 import base64, io, json, multiprocessing, os, platform, shutil, datetime, time
+import re
 import networkx as nx
 from collections import OrderedDict
 from matplotlib import pyplot as plt
@@ -152,14 +153,33 @@ def duplicate():
 	if (project not in projects) or (new_name in projects):
 		return 'Duplication failed. Project does not exist or the new name is invalid.'
 	else:
-		shutil.copytree(f'{_projectDir}/{project}', f'{_projectDir}/{new_name}')
-		with open(f'data/projects/{new_name}/allInputData.json') as file:
+		shutil.copytree(os.path.join(_projectDir, project), os.path.join(_projectDir, new_name))
+		with open(os.path.join('data', 'projects', new_name, 'allInputData.json')) as file:
 			inputs = json.load(file)
 		inputs['MODEL_DIR'] = inputs['MODEL_DIR'].replace(project, new_name)
 		inputs['BASE_DSS'] = inputs['BASE_DSS'].replace(project, new_name)
 		inputs['LOAD_CSV'] = inputs['LOAD_CSV'].replace(project, new_name)
-		with open(f'data/projects/{new_name}/allInputData.json', 'w') as file:
+		with open(os.path.join('data', 'projects', new_name, 'allInputData.json'), 'w') as file:
 			json.dump(inputs, file, indent=4)
+		with open(os.path.join('data', 'projects', new_name, 'output_final.html')) as file:
+		# with open(f'data/projects/{new_name}/output_final.html') as file:
+			html_content = file.read()
+		patterns = [
+			(r'<title>MicrogridUP &raquo; ' + project + '</title>', r'<title>MicrogridUP &raquo; ' + new_name + r'</title>'),
+			(r'<span class="span--sectionTitle">MicrogridUp &raquo; '+ project +' &raquo;</span>', r'<span class="span--sectionTitle">MicrogridUp &raquo; ' + new_name + r' &raquo;</span>')
+		]
+		for pattern, repl in patterns:
+			html_content = re.sub(pattern, repl, html_content)
+		ul_pattern = re.compile(r'(<ul[^>]*>.*?<\/ul>)', re.DOTALL)
+
+		def replace_in_ul(match):
+			ul_content = match.group(1)
+			ul_content = re.sub(r'(/rfile/' + re.escape(project) + r'/)', r'/rfile/' + new_name + r'/', ul_content)
+			return ul_content
+
+		html_content = ul_pattern.sub(replace_in_ul, html_content)
+		with open(os.path.join('data', 'projects', new_name, 'output_final.html'), 'w', encoding='utf-8') as file:
+			file.write(html_content)
 		return f'Successfully duplicated {project} as {new_name}.'
 
 @app.route('/jsonToDss', methods=['GET','POST'])

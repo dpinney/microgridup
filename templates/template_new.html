@@ -251,6 +251,7 @@
             <div>
                 <a href="/">
                     <span class="span--sectionTitle">MicrogridUp &raquo; {% if editing %}Edit Project{% else %}New{% endif %}</span>
+                    <span class="span--sectionTitle">MicrogridUp &raquo; {% if editing %}Edit Project{% else %}New{% endif %}</span>
                 </a>
             </div>
         </nav>
@@ -265,7 +266,7 @@
             <form id="modelInfoForm" enctype="multipart/form-data">
                 <h5>Site and Energy Provider</h5>
                 <div class="chunk">
-                    <label class="tooltip" for="MODEL_DIR">Model Name<span class="classic">Project names must be entirely lowercase.</span></label>
+                    <label class="tooltip" for="MODEL_DIR">Project Name<span class="classic">Project names must be entirely lowercase.</span></label>
                     <input type="text" name="MODEL_DIR" value="{{in_data.MODEL_DIR}}" pattern="[a-z0-9_\-]+" required/>
                 </div>
                 <div class="chunk">
@@ -382,12 +383,12 @@
                     <input type="text" name="value_of_lost_load" value="{{ in_data.REOPT_INPUTS.get('value_of_lost_load','1') }}" pattern="^\d+\.?\d*?$"/>
                 </div>
                 <div class="chunk">
-                    <label class="tooltip" for="single_phase_relay_cost">Single-Phase Relay Cost ($)<span class="classic">Specify the cost of a single-phase relay in $.</span></label>
-                    <input type="text" name="single_phase_relay_cost" value="{{ in_data.REOPT_INPUTS.get('single_phase_relay_cost','300') }}" pattern="^\d+$"/>
+                    <label class="tooltip" for="singlePhaseRelayCost">Single-Phase Relay Cost ($)<span class="classic">Specify the cost of a single-phase relay in $.</span></label>
+                    <input type="text" name="singlePhaseRelayCost" value="{{ in_data.REOPT_INPUTS.get('singlePhaseRelayCost','300') }}" pattern="^\d+$"/>
                 </div>
                 <div class="chunk">
-                    <label class="tooltip" for="three_phase_relay_cost">Three-Phase Relay Cost ($)<span class="classic">Specify the cost of a three-phase relay in $.</span></label>
-                    <input type="text" name="three_phase_relay_cost" value="{{ in_data.REOPT_INPUTS.get('three_phase_relay_cost','20000') }}" pattern="^\d+\.?\d*?$"/>
+                    <label class="tooltip" for="threePhaseRelayCost">Three-Phase Relay Cost ($)<span class="classic">Specify the cost of a three-phase relay in $.</span></label>
+                    <input type="text" name="threePhaseRelayCost" value="{{ in_data.REOPT_INPUTS.get('threePhaseRelayCost','20000') }}" pattern="^\d+\.?\d*?$"/>
                 </div>
                 <div>
                     <i class="fa fa-plus-square"></i>
@@ -794,12 +795,14 @@
 			MODEL_DIR: MODEL_DIR,
 			MG_MINES: MG_MINES
 		};
+		document.body.style.cursor = 'progress';
 		$.ajax({
 			type: 'POST',
 			url: '/previewOldPartitions',
 			data: JSON.stringify(data),
 			contentType: 'application/json',
 			success: function(data, status) {
+				document.body.style.cursor = 'default';
 				var img = $('<img id="oldPartitionPreview">');
 				img.attr('src', 'data:image/gif;base64,' + data.pic_hash);
 				oldPartitionsDiv.prepend('<br>')
@@ -810,6 +813,7 @@
 				{% endif %}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
+				document.body.style.cursor = 'default';
 				console.log(textStatus + ' : ' + errorThrown);
 			}
 		})
@@ -859,7 +863,7 @@
 				$(this).empty();
 				$(this).append('<option value="">None</option>')
 				for (let i = 0; i < numMgs; i++) {
-					var count = i + 1;
+					var count = i;
 					$(this).append('<option value="Mg' + count + '">Mg' + count + '</option>');
 				}
 			});
@@ -924,6 +928,7 @@
 			}
 			// Get mgQuantity, if applicable. 
 			var mgQuantity = $('#minQuantMgs').val() ? $('#minQuantMgs').val() : 0;
+			document.body.style.cursor = 'progress';
 			$.ajax({
 				url: 'previewPartitions',
 				type: 'POST',
@@ -935,6 +940,7 @@
 					modelDir: JSON.stringify("{{in_data['MODEL_DIR']}}")
 				},
 				success: function(data, status) {
+					document.body.style.cursor = 'default';
 					if (data === 'Invalid partitioning method') {
 						alert('Selected partitioning method produced invalid results. Please choose a different partitioning method.');
 					} else {
@@ -947,6 +953,7 @@
 					}
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
+					document.body.style.cursor = 'default';
 					console.log(textStatus + ' : ' + errorThrown)
 				}
 			});
@@ -1113,6 +1120,22 @@
 		const mgParameterOverrides = window.microgridParameterModel.getExportData();
 		form1.append('mgParameterOverrides', JSON.stringify(mgParameterOverrides));
 
+		// - Append data to get single phase load count and three phase load count per load
+		const existingJsCircuitModel = JSON.parse('{{ in_data.REOPT_INPUTS.get("js_circuit_model", "") | tojson | safe }}');
+		if (window.circuitModel.getElements().length > 0) {
+			// - The user has created a new circuit model, so use that
+			form1.append('jsCircuitModel', JSON.stringify(window.circuitModel.getElements().map(e => JSON.stringify(e.getProperties('props')))))
+		} else {
+			// - The user has not created a new circuit model
+			if (existingJsCircuitModel !== '') {
+				//  - If there is an existing circuit model (i.e. this is an "edit" run), use that
+				form1.append('jsCircuitModel', JSON.stringify(existingJsCircuitModel.map(e => JSON.stringify(e))));
+			} else {
+				//  - If there is no existing circuit model (i.e. the user is using an uploaded DSS file), do not add the "jsCircuitModel" key to the
+				//    form
+			}
+		}
+
 		// Show loading indicator.
 		$('#loading-background').show();
 		$("#loading-indicator").show();
@@ -1216,13 +1239,64 @@
 			var test = $(this).val();
 			$("div.desc").hide();
 			$("#circuit" + test).show();
-            if (test === 'Creator') {
-                window.outageLocationInputView.updateInput();
-            } else {
-                window.outageLocationInputView.setValue("{{in_data.FAULTED_LINES}}");
-            }
+			if (test === 'Creator') {
+				const circuitElements = [
+					{
+						name: 'substation_1',
+						namespace: 'element',
+						type: 'substation',
+						basekv: 2.4
+					},
+					{
+						name: 'feeder_1',
+						namespace: 'element',
+						type: 'feeder',
+						parent: 'element.substation_1',
+					},
+					{
+						name: 'solar_1',
+						namespace: 'element',
+						type: 'solar',
+						parent: 'element.feeder_1',
+						kw: 440
+					},
+					{
+						name: 'wind_1',
+						namespace: 'element',
+						type: 'wind',
+						parent: 'element.feeder_1',
+						kw: 200
+					},
+					{
+						name: 'fossil_1',
+						namespace: 'element',
+						type: 'fossil',
+						parent: 'element.feeder_1',
+						kw: 265
+					},
+					{
+						name: 'battery_1',
+						namespace: 'element',
+						type: 'battery',
+						parent: 'element.feeder_1',
+						kwh: 307,
+						kw: 79
+					}
+				].map(element => new window.CircuitElement(element));
+				for (const e of circuitElements) {
+					window.circuitModel.addElement(e);
+					// - The CircuitTableView is already a graph observer, so it will become an observer of every new element that is added
+					// - The CircuitUserControlsView is already a graph observer, so it will become an observer of every new element that is added
+					// - The OutageLocationInputview is already a graph observer, so it will become an observer of every new element that is added
+				}
+				window.outageLocationInputView.updateInput();
+			} else {
+				for (const e of window.circuitModel.getElements((e) => e.getProperty('type') === 'substation')) {
+					window.circuitModel.removeElement(e.fullName);
+				}
+				window.outageLocationInputView.setValue("{{in_data.FAULTED_LINES}}");
+			}
 		});
-		
 		// If user clicked edit, show used circuit.
 		if ($('#circuitPostCreation').length) {
 			$('#circuitUpload').show();
@@ -1255,13 +1329,13 @@
 			var model_dir = $('input[name="MODEL_DIR"]').val()
 			// Do not proceed if model has no name.
 			if (model_dir === '') {
-				alert('Please specify a model name.')
+				alert('Please specify a project name.')
 				return 
 			}
 			// Do not proceed if input contains capital letters.
 			const pattern = new RegExp('[A-Z]');
 			if (pattern.test(model_dir)) {
-				alert('Model names must be entirely lowercase. Please return to Step 1 and provide Model Name with lowercase input.')
+				alert('Project names must be entirely lowercase. Please return to Step 1 and provide Project Name with lowercase input.')
 				return
 			}
 			var form_data = new FormData($('#upload-file')[0]);
@@ -1356,53 +1430,12 @@
 	import { CircuitElement, CircuitModel, CircuitController, CircuitTableView, CircuitUserControlsView, CsvLoadParser, OutageLocationInputView } from '/static/js/components/circuitBuilder/circuitBuilder.js';
 	import { MicrogridParameterModel, MicrogridParameterController, MicrogridParameterView } from '/static/js/components/microgridParameterMVC/microgridParameterMVC.js'
 	// - CircuitBuilder
-	const circuitElements = [
-		{
-			name: 'substation_1',
-			namespace: 'element',
-			type: 'substation',
-			basekv: 2.4
-		},
-		{
-			name: 'feeder_1',
-			namespace: 'element',
-			type: 'feeder',
-			parent: 'element.substation_1',
-		},
-		{
-			name: 'solar_1',
-			namespace: 'element',
-			type: 'solar',
-			parent: 'element.feeder_1',
-			kw: 440
-		},
-		{
-			name: 'wind_1',
-			namespace: 'element',
-			type: 'wind',
-			parent: 'element.feeder_1',
-			kw: 200
-		},
-		{
-			name: 'fossil_1',
-			namespace: 'element',
-			type: 'fossil',
-			parent: 'element.feeder_1',
-			kw: 265
-		},
-		{
-			name: 'battery_1',
-			namespace: 'element',
-			type: 'battery',
-			parent: 'element.feeder_1',
-			kwh: 307,
-			kw: 79
-		},
-	].map(element => new CircuitElement(element));
+	window.CircuitElement = CircuitElement;
 	const model = new CircuitModel();
+	window.circuitModel = model;
 	const controller = new CircuitController(model);
 	const outageLocationInputView = new OutageLocationInputView(controller);
-    window.outageLocationInputView = outageLocationInputView;
+	window.outageLocationInputView = outageLocationInputView;
 	model.addObserver(outageLocationInputView);
 	const view = new CircuitTableView(controller);
 	model.addObserver(view);
@@ -1414,12 +1447,6 @@
 	document.getElementById('outageLocationInputInsert').append(outageLocationInputView.modal.divElement);
 	document.getElementById('circuitCreator').append(view.modal.divElement);
 	document.getElementById('circuitCreator').append(controls.modal.divElement);
-	for (const e of circuitElements) {
-		model.addElement(e);
-		// - The CircuitTableView is already a graph observer, so it will become an observer of every new element that is added
-		// - The CircuitUserControlsView is already a graph observer, so it will become an observer of every new element that is added
-		// - The OutageLocationInputview is already a graph observer, so it will become an observer of every new element that is added
-	}
 	outageLocationInputView.setValue("{{in_data.FAULTED_LINES}}");
 	const csvLoadParserInsert = document.getElementById('csvLoadParserInsert');
 	if (csvLoadParserInsert !== null) {

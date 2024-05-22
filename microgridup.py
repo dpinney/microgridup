@@ -9,6 +9,7 @@ import shutil
 import os
 import json
 import pandas as pd
+import numpy as np
 import plotly.graph_objects as go
 import csv
 import jinja2 as j2
@@ -22,14 +23,14 @@ if MGU_FOLDER == '/':
 	MGU_FOLDER = '' #workaround for docker root installs
 PROJ_FOLDER = f'{MGU_FOLDER}/data/projects'
 
-def setup_logging(log_file):
-    logger = logging.getLogger('custom_logger')
-    logger.setLevel(logging.WARNING)
-    formatter = logging.Formatter('%(asctime)s - %(message)s')
-    file_handler = logging.FileHandler(log_file)
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-    return logger
+def setup_logging(log_file, mg_name=None):
+	logger = logging.getLogger(f'reopt_{mg_name}') if mg_name else logging.getLogger()
+	logger.setLevel(logging.WARNING)
+	formatter = logging.Formatter('%(asctime)s %(processName)-10s %(name)s %(message)s')
+	file_handler = logging.FileHandler(log_file)
+	file_handler.setFormatter(formatter)
+	logger.addHandler(file_handler)
+	return logger
 
 def _walkTree(dirName):
 	listOfFiles = []
@@ -37,33 +38,22 @@ def _walkTree(dirName):
 		listOfFiles += [os.path.join(dirpath, file) for file in filenames]
 	return listOfFiles
 
-def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
+def summary_stats(reps, MICROGRIDS):
 	'''Helper function within full() to take in a dict of lists of the microgrid
 	attributes and append a summary value for each attribute'''
-	# print("reps['Maximum 1 hr Load (kW)']",reps['Maximum 1 hr Load (kW)'])
-	# add up all of the loads in MICROGRIDS into one loadshape
-	# used previously to call items out of mg_name: gen_bus_name = mg_ob['gen_bus']
-	# grab all the load names from all of the microgrids analyzed
-	mg_load_names = []
-	for mg in MICROGRIDS:
-		for load_name in MICROGRIDS[mg]['loads']:
-			mg_load_names.append(load_name)
-	# add up all of the loads in MICROGRIDS into one loadshape
-	loads = pd.read_csv(MODEL_LOAD_CSV)
-	loads.columns = [str(x).lower() for x in loads.columns]
-	loads['full_load']= loads[mg_load_names].sum(axis=1)
-	#print('loads.head()', loads.head())
-	max_load = int(loads['full_load'].max())
-	min_load = int(loads['full_load'].min())
-	avg_load = int(loads['full_load'].mean())
+	load_df = pd.read_csv('loads.csv')
+	# - Remove any columns that contain hourly indicies instead of kW values
+	load_df = load_df.iloc[:, load_df.apply(microgridup_design.is_not_timeseries_column).to_list()]
+	load_series = load_df.apply(sum, axis=1)
 	reps['Microgrid Name'].append('Summary')
 	reps['Generation Bus'].append('None')
-	# minimum coincident load across all mgs
-	reps['Minimum 1 hr Load (kW)'].append(round(min_load))
-	reps['Average 1 hr Load (kW)'].append(round(avg_load))
-	reps['Average Daytime 1 hr Load (kW)'].append(round(sum(reps['Average Daytime 1 hr Load (kW)'])))
-	# maximum coincident load acorss all mgs
-	reps['Maximum 1 hr Load (kW)'].append(round(max_load))
+	reps['Minimum 1 hr Load (kW)'].append(round(load_series.min()))
+	reps['Average 1 hr Load (kW)'].append(round(load_series.mean()))
+	reps['Average Daytime 1 hr Load (kW)'].append(round(np.average(np.average(np.array(np.split(load_series.to_numpy(), 365))[:, 9:17], axis=1))))
+	reps['Maximum 1 hr Load (kW)'].append(round(load_series.max()))
+	reps['Minimum 1 hr Critical Load (kW)'].append(round(sum(reps['Minimum 1 hr Critical Load (kW)'])))
+	reps['Average 1 hr Critical Load (kW)'].append(round(sum(reps['Average 1 hr Critical Load (kW)'])))
+	reps['Average Daytime 1 hr Critical Load (kW)'].append(round(sum(reps['Average Daytime 1 hr Critical Load (kW)'])))
 	reps['Maximum 1 hr Critical Load (kW)'].append(round(sum(reps['Maximum 1 hr Critical Load (kW)'])))
 	reps['Existing Fossil Generation (kW)'].append(round(sum(reps['Existing Fossil Generation (kW)'])))
 	reps['New Fossil Generation (kW)'].append(round(sum(reps['New Fossil Generation (kW)'])))
@@ -84,10 +74,10 @@ def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
 	# print("wgtd_avg_renewables_perc:", wgtd_avg_renewables_perc)
 	reps['Renewable Generation (% of Annual kWh)'].append(round(wgtd_avg_renewables_perc))
 	# using yr 1 emissions and percent reductions, calculate a weighted average of % reduction in emissions for yr 1
-	yr1_emis = reps['Emissions (Yr 1 Tons CO2)']
 	reps['Emissions (Yr 1 Tons CO2)'].append(round(sum(reps['Emissions (Yr 1 Tons CO2)'])))
 	# print("yr1_emis:", yr1_emis)
 	emis_reduc_perc = reps['Emissions Reduction (Yr 1 % CO2)']
+	yr1_emis = reps['Emissions (Yr 1 Tons CO2)']
 	total_tons_list = [yr1_emis[i]/(1-emis_reduc_perc[i]/100) for i in range(len(emis_reduc_perc))]
 	reduc_tons_list = [a*b/100 for a,b in zip(total_tons_list,emis_reduc_perc)]
 	reduc_percent_yr1 = sum(reduc_tons_list)/sum(total_tons_list)*100
@@ -101,7 +91,7 @@ def summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV):
 	# else:
 	# 	reps['Minimum Outage Survived (h)'].append(None)
 	if all([h != None for h in reps['Average Outage Survived (h)']]):
-		reps['Average Outage Survived (h)'].append(round(min(reps['Average Outage Survived (h)']),0))
+		reps['Average Outage Survived (h)'].append(round(min(reps['Average Outage Survived (h)']), 0))
 	else:
 		reps['Average Outage Survived (h)'].append(None)
 	# print(reps)
@@ -271,22 +261,22 @@ def get_all_colorable_elements(dss_path, omd_path=None):
     colorable_elements = [x for x in tree if x['!CMD'] in ('new','edit','setbusxy') and 'loadshape' not in x.get('object','') and 'line' not in x.get('object','')]
     return colorable_elements
 
-def check_each_mg_for_reopt_error(number_of_microgrids, logger):
-	for number in range(number_of_microgrids):
-		path = f'reopt_mg{number}/results.json'
+def check_each_mg_for_reopt_error(MICROGRIDS, logger):
+	for mg in MICROGRIDS:
+		path = f'reopt_{mg}/results.json'
 		if os.path.isfile(path):
 			with open(path) as file:
 				results = json.load(file)
 			if results.get('Messages',{}).get('errors',{}):
 				error_message_list = results.get('Messages',{}).get('errors',{})
-				print(f'Error in REopt folder reopt_mg{number}: {error_message_list}')
-				logger.warning(f'Error in REopt folder reopt_mg{number}: {error_message_list}')
+				print(f'Error in REopt folder reopt_{mg}: {error_message_list}')
+				logger.warning(f'Error in REopt folder reopt_{mg}: {error_message_list}')
 			else:
-				logger.warning(f'No error messages returned in REopt folder reopt_mg{number}.')
-				print(f'No error messages returned in REopt folder reopt_mg{number}.')
+				logger.warning(f'No error messages returned in REopt folder reopt_{mg}.')
+				print(f'No error messages returned in REopt folder reopt_{mg}.')
 		else:
-			print(f'An Exception occured but REopt folder reopt_mg{number} does not exist.')
-			logger.warning(f'An Exception occured but REopt folder reopt_mg{number} does not exist.')
+			print(f'An Exception occured but results.json in REopt folder reopt_{mg} does not exist.')
+			logger.warning(f'An Exception occured but results.json in REopt folder reopt_{mg} does not exist.')
 
 def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINES, DESCRIPTION='', INVALIDATE_CACHE=True, OUTAGE_CSV=None, DELETE_FILES=False, open_results=False):
 	''' Generate a full microgrid plan for the given inputs. '''
@@ -302,7 +292,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 	if not os.path.isdir(MODEL_DIR):
 		os.mkdir(MODEL_DIR)
 	# Setup logging.
-	log_file = f'{MODEL_DIR}/logs.txt'
+	log_file = f'{MODEL_DIR}/logs.log'
 	if os.path.exists(log_file):
 		open(log_file, 'w').close()
 	logger = setup_logging(log_file)
@@ -417,7 +407,12 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 			allInputData = json.load(file)
 		outage_start = int(allInputData['outage_start_hour'])
 		outage_length = int(allInputData['outageDuration'])
-		microgridup_control.play('circuit_plus_mgAll.dss', os.getcwd(), new_mg_for_control, FAULTED_LINES, outage_start, outage_length, logger)
+		try:
+			microgridup_control.play('circuit_plus_mgAll.dss', os.getcwd(), new_mg_for_control, FAULTED_LINES, outage_start, outage_length, logger)
+		except ValueError as e:
+			error_message = str(e)
+			print(error_message)
+			logger.warning(error_message)
 		# Resilience simulation with outages. Optional. Skipped if no OUTAGE_CSV
 		if OUTAGE_CSV:
 			all_microgrid_loads = [x.get('loads',[]) for x in MICROGRIDS.values()]
@@ -427,7 +422,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		reports = [x for x in os.listdir('.') if x.startswith('ultimate_rep_')]
 		reports.sort()
 		reps = pd.concat([pd.read_csv(x) for x in reports]).to_dict(orient='list')
-		stats = summary_stats(reps, MICROGRIDS, MODEL_LOAD_CSV)
+		stats = summary_stats(reps, MICROGRIDS)
 		mg_add_cost_files = [x for x in os.listdir('.') if x.startswith('mg_add_cost_')]
 		mg_add_cost_files.sort()
 		# create a row-based list of lists of mg_add_cost_files
@@ -441,7 +436,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		if os.path.exists("user_warnings.txt"):
 			with open("user_warnings.txt") as myfile:
 				warnings = myfile.read()
-		#microgridup_design.create_economic_microgrid(MICROGRIDS, logger, REOPT_INPUTS, INVALIDATE_CACHE)
+		microgridup_design.create_economic_microgrid(MICROGRIDS, logger, REOPT_INPUTS, INVALIDATE_CACHE)
 		names_and_folders = {x.split('_')[1]: x for x in sorted([dir_ for dir_ in os.listdir('.') if dir_.startswith('reopt_')])}
 		# generate a decent chart of additional generation.
 		chart_html = summary_charts(stats)
@@ -464,6 +459,12 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 			in_data['MODEL_DIR'] = in_data['MODEL_DIR'].split('/')[-1]
 		with open(f'{MGU_FOLDER}/templates/template_new.html') as f:
 			view_inputs_template = j2.Template(f.read())
+		# - Encode the circuit model properly
+		if 'js_circuit_model' in in_data['REOPT_INPUTS']:
+			js_circuit_model = []
+			for s in json.loads(in_data['REOPT_INPUTS']['js_circuit_model']):
+				js_circuit_model.append(json.loads(s))
+			in_data['REOPT_INPUTS']['js_circuit_model'] = js_circuit_model
 		view_inputs_html = view_inputs_template.render(in_data=in_data, iframe_mode=True)
 		with open('view_inputs.html', 'w') as f:
 			f.write(view_inputs_html)
@@ -481,11 +482,11 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 			outFile.write(out)
 		if open_results:
 			os.system(f'open {FINAL_REPORT}')
-	except Exception:
+	except Exception as e:
 		print(traceback.format_exc())
 		logger.warning(traceback.format_exc())
 		os.system(f'touch "{MODEL_DIR}/0crashed.txt"')
-		check_each_mg_for_reopt_error(len(MICROGRIDS), logger)
+		check_each_mg_for_reopt_error(MICROGRIDS, logger)
 	finally:
 		os.chdir(curr_dir)
 		os.system(f'rm "{workDir}/0running.txt"')

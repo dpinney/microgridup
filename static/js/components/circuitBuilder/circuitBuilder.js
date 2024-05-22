@@ -137,6 +137,7 @@ class CircuitElement {
         //const onlyLetters = /^[A-Za-z\-_]+$/;
         const onlyNumbers = /^\d*\.?\d+$/;
         const lettersOrNumbers = /^[\w\-]+$/;
+        const onlyIntegers = /^\d+$/;
         if (namespace === 'props') {
             if (['name', 'namespace', 'type'].includes(property)) {
                 if (typeof propertyVal !== 'string') {
@@ -163,15 +164,20 @@ class CircuitElement {
                 }
                 const [namespace, name] = ary;
                 if (!lettersOrNumbers.test(namespace)) {
-                    throw Error('The namespace component of the "parent" property can only include the following: (1) alphanumeric characters, (2) "-", and (3) "_". ')
+                    throw Error('The namespace component of the "parent" property can only include the following: (1) alphanumeric characters, (2) "-", and (3) "_". ');
                 }
                 if (!lettersOrNumbers.test(name)) {
-                    throw Error('The name component of the "parent" property can only include the following: (1) alphanumeric characters, (2) "-", and (3) "_". ')
+                    throw Error('The name component of the "parent" property can only include the following: (1) alphanumeric characters, (2) "-", and (3) "_". ');
                 }
             }
             if (['kw', 'kwh', 'basekv'].includes(property)) {
                 if (!onlyNumbers.test(propertyVal)) {
-                    throw Error(`The value of the "${property}" property can only include positive numbers.`)
+                    throw Error(`The value of the "${property}" property can only include positive numbers.`);
+                }
+            }
+            if (['singlePhaseLoadCount', 'threePhaseLoadCount'].includes(property)) {
+                if (!onlyIntegers.test(propertyVal)) {
+                    throw Error(`The value of the "${property}" property can only include positive integers.`);
                 }
             }
             if (['loadProfile'].includes(property)) {
@@ -313,6 +319,10 @@ class CsvLoadParser {
                     });
                     element.setProperty('loadProfile', loadProfile);
                     element.setProperty('kw', Math.max(...loadProfile));
+                    // - When using the manual circuit builder, assume that there is at least one single phase load and one three phase load in the
+                    //   composite load. This makes debugging easier
+                    element.setProperty('singlePhaseLoadCount', 1);
+                    element.setProperty('threePhaseLoadCount', 1);
                     csvLoadsElements.push(element);
                 }
             }
@@ -364,7 +374,7 @@ class OutageLocationInputView {
         this.#input = input;
         input.id = 'FAULTED_LINES';
         input.name = 'FAULTED_LINES';
-        input.pattern = '\\w+(?:,\\w+)?'
+        input.pattern = '\\w+(?:,\\w+)*'
         input.required = true;
         this.updateInput();
         modal.divElement.append(input);
@@ -485,9 +495,12 @@ class CircuitModel {
      * @param {function} func - a function that takes a CircuitElement as an argument and returns true or false
      * @returns {Array} an array of CircuitElements
      */
-    getElements(func) {
-        if (typeof func !== 'function') {
+    getElements(func=null) {
+        if (func !== null && typeof func !== 'function') {
             throw TypeError('The "func" argument must be typeof "function".');
+        }
+        if (func === null) {
+            func = () => true;
         }
         return this.#graph.filterNodes((key, element) => {
             return func(element);

@@ -9,9 +9,9 @@ from collections import defaultdict, deque
 # New colab with updated experiments: https://colab.research.google.com/drive/1j_u30UdnhaRovtG6Odhe_ivDKwBlc5qY?usp=sharing
 
 # Test inputs
-CIRC_FILE = 'lehigh_base_3mg.dss'
-CRITICAL_LOADS = ['645_hangar','684_command_center', '611_runway','675a_hospital','634a_data_center', '634b_radar', '634c_atc_tower']
-ALGO = 'lukes' #'branch'
+# CIRC_FILE = 'lehigh_base_3mg.dss'
+# CRITICAL_LOADS = ['645_hangar','684_command_center', '611_runway','675a_hospital','634a_data_center', '634b_radar', '634c_atc_tower']
+# ALGO = 'lukes' #'branch'
 
 # Networkx helper functions
 def nx_get_branches(G):
@@ -26,23 +26,24 @@ def get_all_trees(F):
 # Helper function to remove cycles and loops from a graph using hacky topological sort because nx_topological_sort breaks on cycles.
 def remove_loops(G):
 	# Delete edges to all parents except the first in topological order.
+	H = G.copy()
 	order = []
-	for k,v in nx.dfs_successors(G).items():
+	for k,v in nx.dfs_successors(H).items():
 		if k not in order:
 			order.append(k)
 		for v_ in v:
 			if v_ not in order:
 				order.append(v_)
 	for node in order: 
-		parents = list(G.predecessors(node))
+		parents = list(H.predecessors(node))
 		if len(parents) > 1:
 			ordered_parents = [x for x in order if x in parents]
 			for idx in range(1,len(ordered_parents)):
-				G.remove_edge(ordered_parents[idx],node)
+				H.remove_edge(ordered_parents[idx],node)
 		# Origin shouldn't have any parents. TO DO: Figure out why this sometimes breaks circuits with cycles to the source.
 		# elif node == order[0] and len(parents) == 1:
 			# G.remove_edge(parents[0],node)
-	return G
+	return H
 
 # Used by both bottom up and critical load algorithms.
 def only_child(G, mgs):
@@ -295,7 +296,7 @@ def manual_groups(G, pairings):
 		mgs[mg] = list(nx.nodes(nx.dfs_tree(G, cur_lca)))
 	# Only return the contents of each MG but do so in order specified by the user.
 	parts = []
-	counter = 1
+	counter = 0
 	while mgs:
 		key = f'Mg{counter}'
 		if mgs.get(key):
@@ -326,57 +327,57 @@ def get_edge_name(fr, to, omd_list):
 	return None if len(edges) == 0 else edges[0]
 
 def topological_sort(G):
-    in_degree = {v: 0 for v in G}
-    for u in G:
-        for v in G[u]:
-            in_degree[v] += 1
-    queue = deque([u for u in in_degree if in_degree[u] == 0])
-    result = []
-    while queue:
-        u = queue.popleft()
-        result.append(u)
-        for v in G[u]:
-            in_degree[v] -= 1
-            if in_degree[v] == 0:
-                queue.append(v)
-    if len(result) != len(G):
-        raise ValueError("Graph contains a cycle")
-    return result
+	'Standardizes topological sort across networkx versions.'
+	in_degree = {v: 0 for v in G}
+	for u in G:
+		for v in G[u]:
+			in_degree[v] += 1
+	queue = deque([u for u in in_degree if in_degree[u] == 0])
+	result = []
+	while queue:
+		u = queue.popleft()
+		result.append(u)
+		for v in G[u]:
+			in_degree[v] -= 1
+			if in_degree[v] == 0:
+				queue.append(v)
+	if len(result) != len(G):
+		raise ValueError("Graph contains a cycle")
+	return result
 
-def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
-	def helper(MG_GROUPS, switch, gen_bus):
-		all_mgs = [
-			(M_ID, MG_GROUP, MG_GROUP[0], nx_out_edges(G, MG_GROUP))
-			for (M_ID, MG_GROUP) in enumerate([list(x) for x in MG_GROUPS])
-		]
-		MG_MINES = {}
-		for idx in range(len(all_mgs)):
-			M_ID, MG_GROUP, TREE_ROOT, BORDERS = all_mgs[idx]
-			this_switch = switch[f'Mg{M_ID+1}'] if switch else [get_edge_name(swedge[0], swedge[1], omd_list) for swedge in BORDERS]
-			if this_switch and type(this_switch) == list:
-				this_switch = this_switch[-1] if this_switch[-1] else this_switch[0] # TODO: Why is this_switch a list? Which value do we use? 
-			this_gen_bus = gen_bus[f'Mg{M_ID+1}'] if gen_bus else TREE_ROOT
-			MG_MINES[f'mg{M_ID}'] = {
-				'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
-				'switch': this_switch, 
-				'gen_bus': this_gen_bus,
-				'gen_obs_existing': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') in ('generator','storage')],
-				'critical_load_kws': [0.0 if ob.get('name') not in CRITICAL_LOADS else float(ob.get('kw','0')) for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
-				'max_potential': '700', #TODO: this and other vars, how to set? Ask Matt.
-				'max_potential_diesel': '1000000',
-				'battery_capacity': '10000'
-			}
-		return MG_MINES
-	'''Generate a group of mgs from circ_path with crit_loads
-	algo must be one of ["lukes", "branch", "bottomUp", "criticalLoads"]
+def form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd, switch=None, gen_bus=None):
+	'''Generate microgrid data structure from a networkx graph, group of mgs, and omd. 
+	Optional parameters switch and gen_bus must be supplied when the manual partitioning method is used.'''
+	omd_list = list(omd.values())
+	all_mgs = [
+		(M_ID, MG_GROUP, MG_GROUP[0], nx_out_edges(G, MG_GROUP))
+		for (M_ID, MG_GROUP) in enumerate([list(x) for x in MG_GROUPS])
+	]
+	MG_MINES = {}
+	for idx in range(len(all_mgs)):
+		M_ID, MG_GROUP, TREE_ROOT, BORDERS = all_mgs[idx]
+		this_switch = switch[f'Mg{M_ID+1}'] if switch else [get_edge_name(swedge[0], swedge[1], omd_list) for swedge in BORDERS]
+		if this_switch and type(this_switch) == list:
+			this_switch = this_switch[-1] if this_switch[-1] else this_switch[0] # TODO: Why is this_switch a list? Which value do we use? 
+		this_gen_bus = gen_bus[f'Mg{M_ID+1}'] if gen_bus else TREE_ROOT
+		MG_MINES[f'mg{M_ID}'] = {
+			'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
+			'switch': this_switch, 
+			'gen_bus': this_gen_bus,
+			'gen_obs_existing': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') in ('generator','storage')],
+			'critical_load_kws': [0.0 if ob.get('name') not in CRITICAL_LOADS else float(ob.get('kw','0')) for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
+			'max_potential': '700', #TODO: this and other vars, how to set? Ask Matt.
+			'max_potential_diesel': '1000000',
+			'battery_capacity': '10000'
+		}
+	return MG_MINES
+
+def form_mg_groups(G, CRITICAL_LOADS, algo, algo_params={}):
+	'''Generate a group of mgs from networkx graph and crit_loads
+	algo must be one of ["lukes", "branch", "bottomUp", "criticalLoads", "loadGrouping", "manual"]
 	lukes algo params is 'size':int giving size of each mg.
 	branch algo params is 'i_branch': giving which branch in the tree to split on.'''
-	# Load data
-	G = opendss.dssConvert.dss_to_networkx(circ_path)
-	omd = opendss.dssConvert.dssToOmd(circ_path, None, write_out=False)
-	omd_list = list(omd.values())
 	# Generate microgrids
-	switch, gen_bus = None, None
 	all_trees = get_all_trees(G)
 	all_trees_pruned = [tree for tree in all_trees if len(tree.nodes()) > 1]
 	num_trees_pruned = len(all_trees_pruned)
@@ -395,13 +396,10 @@ def mg_group(circ_path, CRITICAL_LOADS, algo, algo_params={}):
 			MG_GROUPS.extend(manual_groups(tree, algo_params))
 		elif algo == 'manual':
 			MG_GROUPS.extend(manual_groups(tree, algo_params['pairings']))
-			switch = algo_params['switch']
-			gen_bus = algo_params['gen_bus']
 		else:
 			print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", or "criticalLoads". No mgs generated.')
 			return {}
-	MG_MINES = helper(MG_GROUPS, switch, gen_bus)
-	return MG_MINES
+	return MG_GROUPS
 
 def _tests():
 	_myDir = os.path.abspath(os.path.dirname(__file__))
@@ -413,6 +411,8 @@ def _tests():
 	MG_MINES = test_params['MG_MINES']
 	algo_params = test_params['algo_params']
 	crit_loads = test_params['crit_loads']
+	lehigh_dss_path = f'{_myDir}/testfiles/lehigh_base_3mg.dss'
+	wizard_dss_path = f'{_myDir}/testfiles/wizard_base_3mg.dss'
 	# Testing microgridup_gen_mgs.mg_group().
 	for _dir in MG_MINES:
 		if MG_MINES[_dir][1] == 'manual':
@@ -421,9 +421,15 @@ def _tests():
 			params = algo_params['pairings']
 		try:
 			_dir.index('wizard')
-			MINES_TEST = mg_group(f'{_myDir}/testfiles/wizard_base_3mg.dss', crit_loads, MG_MINES[_dir][1], params)
+			G = opendss.dssConvert.dss_to_networkx(wizard_dss_path)
+			omd = opendss.dssConvert.dssToOmd(wizard_dss_path, '', RADIUS=0.0004, write_out=False)
+			MG_GROUPS_TEST = form_mg_groups(G, crit_loads, MG_MINES[_dir][1], params)
+			MINES_TEST = form_mg_mines(G, MG_GROUPS_TEST, crit_loads, omd, params.get('switch'), params.get('gen_bus'))
 		except ValueError as e:
-			MINES_TEST = mg_group(f'{_myDir}/testfiles/lehigh_base_3mg.dss', crit_loads, MG_MINES[_dir][1], params)
+			G = opendss.dssConvert.dss_to_networkx(lehigh_dss_path)
+			omd = opendss.dssConvert.dssToOmd(lehigh_dss_path, '', RADIUS=0.0004, write_out=False)
+			MG_GROUPS_TEST = form_mg_groups(G, crit_loads, MG_MINES[_dir][1], params)
+			MINES_TEST = form_mg_mines(G, MG_GROUPS_TEST, crit_loads, omd, params.get('switch'), params.get('gen_bus'))
 		# Lukes algorithm outputs different configuration each time. Not repeatable. Also errors out later in the MgUP run.
 		if MG_MINES[_dir][1] != 'lukes':
 			assert MINES_TEST == MG_MINES[_dir][0], f'MGU_MINES_{_dir} did not match expected output.\nExpected output: {MG_MINES[_dir][0]}.\nReceived output: {MINES_TEST}.'

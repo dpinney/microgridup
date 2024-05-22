@@ -1,10 +1,11 @@
 import base64, io, json, multiprocessing, os, platform, shutil, datetime, time
+import re
 import networkx as nx
 from collections import OrderedDict
 from matplotlib import pyplot as plt
 from flask import Flask, request, redirect, render_template, jsonify, url_for
 from omf.solvers.opendss import dssConvert
-from microgridup_gen_mgs import mg_group, nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, topological_sort
+from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_mg_mines, form_mg_groups
 from microgridup import full
 from subprocess import Popen
 from flask import send_from_directory
@@ -46,7 +47,7 @@ def verify_password(username, password):
 @app.route('/get_logs/<model_name>')
 def get_logs(model_name):
     # Read the logs from the corresponding log file.
-    log_file = os.path.join('data/projects', model_name, 'logs.txt')
+    log_file = os.path.join('data/projects', model_name, 'logs.log')
     if os.path.exists(log_file):
         with open(log_file, 'r') as file:
             logs = file.readlines()
@@ -104,7 +105,7 @@ def load(project):
 	
 @app.route('/check_status/<project>')
 def check_status(project):
-	'''Used by template_in_progress.html to redirect to output_final.html once it exists.'''
+	'''Used by template_in_progress.html to redirect to output_final.html once it exists. Used by template_home.html to update status in boxes.'''
 	files = os.listdir(f'{_projectDir}/{project}')
 	if 'output_final.html' in files and '0running.txt' not in files and '0crashed.txt' not in files:
 		return jsonify(status='complete', url=f'/data/projects/{project}/output_final.html')
@@ -121,6 +122,12 @@ def edit(project):
 			in_data['MODEL_DIR'] = in_data['MODEL_DIR'].split('/')[-1]
 	except:
 		in_data = None
+	# - Encode the circuit model properly
+	if 'js_circuit_model' in in_data['REOPT_INPUTS']:
+		js_circuit_model = []
+		for s in json.loads(in_data['REOPT_INPUTS']['js_circuit_model']):
+			js_circuit_model.append(json.loads(s))
+		in_data['REOPT_INPUTS']['js_circuit_model'] = js_circuit_model
 	return render_template('template_new.html', in_data=in_data, iframe_mode=False, editing=True)
 
 @app.route('/delete/<project>')
@@ -146,14 +153,33 @@ def duplicate():
 	if (project not in projects) or (new_name in projects):
 		return 'Duplication failed. Project does not exist or the new name is invalid.'
 	else:
-		shutil.copytree(f'{_projectDir}/{project}', f'{_projectDir}/{new_name}')
-		with open(f'data/projects/{new_name}/allInputData.json') as file:
+		shutil.copytree(os.path.join(_projectDir, project), os.path.join(_projectDir, new_name))
+		with open(os.path.join('data', 'projects', new_name, 'allInputData.json')) as file:
 			inputs = json.load(file)
 		inputs['MODEL_DIR'] = inputs['MODEL_DIR'].replace(project, new_name)
 		inputs['BASE_DSS'] = inputs['BASE_DSS'].replace(project, new_name)
 		inputs['LOAD_CSV'] = inputs['LOAD_CSV'].replace(project, new_name)
-		with open(f'data/projects/{new_name}/allInputData.json', 'w') as file:
+		with open(os.path.join('data', 'projects', new_name, 'allInputData.json'), 'w') as file:
 			json.dump(inputs, file, indent=4)
+		with open(os.path.join('data', 'projects', new_name, 'output_final.html')) as file:
+		# with open(f'data/projects/{new_name}/output_final.html') as file:
+			html_content = file.read()
+		patterns = [
+			(r'<title>MicrogridUP &raquo; ' + project + '</title>', r'<title>MicrogridUP &raquo; ' + new_name + r'</title>'),
+			(r'<span class="span--sectionTitle">MicrogridUp &raquo; '+ project +' &raquo;</span>', r'<span class="span--sectionTitle">MicrogridUp &raquo; ' + new_name + r' &raquo;</span>')
+		]
+		for pattern, repl in patterns:
+			html_content = re.sub(pattern, repl, html_content)
+		ul_pattern = re.compile(r'(<ul[^>]*>.*?<\/ul>)', re.DOTALL)
+
+		def replace_in_ul(match):
+			ul_content = match.group(1)
+			ul_content = re.sub(r'(/rfile/' + re.escape(project) + r'/)', r'/rfile/' + new_name + r'/', ul_content)
+			return ul_content
+
+		html_content = ul_pattern.sub(replace_in_ul, html_content)
+		with open(os.path.join('data', 'projects', new_name, 'output_final.html'), 'w', encoding='utf-8') as file:
+			file.write(html_content)
 		return f'Successfully duplicated {project} as {new_name}.'
 
 @app.route('/jsonToDss', methods=['GET','POST'])
@@ -266,28 +292,39 @@ def getLoadsFromExistingFile():
 @app.route('/previewOldPartitions', methods=['POST'])
 def previewOldPartitions():
 	data = request.get_json()
-	# filename = data['filename']
 	model_dir = data['MODEL_DIR']
 	filename = f'{_mguDir}/data/projects/{model_dir}/circuit.dss'
 	MG_MINES = data['MG_MINES']
-	G = dssConvert.dss_to_networkx(filename)
-
+	omd = dssConvert.dssToOmd(filename, '', RADIUS=0.0004, write_out=False)
+	G = dssConvert.dss_to_networkx(filename, omd=omd)
 	parts = []
 	for mg in MG_MINES:
 		cur_mg = []
-		cur_mg.extend([load for load in MG_MINES[mg].get('loads')])
-		# cur_mg.append(MG_MINES[mg].get('switch'))
 		cur_mg.append(MG_MINES[mg].get('gen_bus'))
-		cur_mg.extend([load for load in MG_MINES[mg].get('gen_obs_existing')])
+		try:
+			# Try to extend mg by all elements topographically downstream from gen_bus.
+			all_descendants = list(nx.descendants(G, MG_MINES[mg].get('gen_bus')))
+			cur_mg.extend(all_descendants)
+		except:
+			# If that didn't work, use old method.
+			cur_mg.extend([load for load in MG_MINES[mg].get('gen_obs_existing')])
+			cur_mg.extend([load for load in MG_MINES[mg].get('loads')])
 		parts.append(cur_mg)
-
+	# Check to see if omd contains coordinates for each important node.
+	if has_full_coords(omd):
+		pos = build_pos_from_omd(omd)
+		# If dss had coords, dssToOmd gave all important elements coords. Can remove all elements without coords.
+		remove_nodes_without_coords(G, omd)
+	else:
+		pos = nice_pos(G)
+		# Remove elements like 'clear' and 'set' which have no edges to other nodes.
+		remove_nodes_without_edges(G)
 	# Make and save plot, convert to base64 hash, send to frontend.
 	plt.switch_backend('Agg')
 	plt.figure(figsize=(14,12), dpi=350)
-	pos_G = nice_pos(G)
 	# Add here later: function to convert MG_MINES to algo_params[pairings] for passing to manual_groups(). Would be more accurate when passed to node_group_map() than parts.
 	n_color_map = node_group_map(G, parts)
-	nx.draw(G, with_labels=True, pos=pos_G, node_color=n_color_map)
+	nx.draw(G, with_labels=True, pos=pos, node_color=n_color_map)
 	pic_IObytes = io.BytesIO()
 	plt.savefig(pic_IObytes,  format='png')
 	pic_IObytes.seek(0)
@@ -306,12 +343,12 @@ def build_pos_from_omd(omd):
 			name = ob.get('name')
 			lat = float(ob.get('latitude'))
 			lon = float(ob.get('longitude'))
-			pos[name] = (lat,lon)
+			pos[name] = (lon,lat)
 	return pos
 
 def has_full_coords(omd):
 	has_coords = True
-	should_have_coords = set(['circuit','vsource','load','generator','storage','capacitor','bus'])
+	should_have_coords = set(['vsource','load','generator','storage','capacitor','bus'])
 	for key in omd:
 		ob = omd[key]
 		if ob.get('object') in should_have_coords:
@@ -329,6 +366,10 @@ def remove_nodes_without_coords(G, omd):
 		if node not in all_nodes_with_coords:
 			G.remove_node(node)
 
+def remove_nodes_without_edges(G):
+	isolated_nodes = [node for node, degree in G.degree() if degree == 0]
+	G.remove_nodes_from(isolated_nodes)
+
 @app.route('/previewPartitions', methods = ['GET','POST'])
 @app.route('/edit/previewPartitions', methods = ['GET','POST'])
 def previewPartitions():
@@ -345,10 +386,12 @@ def previewPartitions():
 	# Check to see if omd contains coordinates for each important node.
 	if has_full_coords(omd):
 		pos = build_pos_from_omd(omd)
+		# If dss had coords, dssToOmd gave all important elements coords. Can remove all elements without coords.
+		remove_nodes_without_coords(G, omd)
 	else:
 		pos = nice_pos(G)
-	# Delete non-grid-element nodes from NetworkX graph.
-	remove_nodes_without_coords(G, omd)
+		# Remove elements like 'clear' and 'set' which have no edges to other nodes.
+		remove_nodes_without_edges(G)
 	algo_params={}
 	all_trees = get_all_trees(G)
 	all_trees_pruned = [tree for tree in all_trees if len(tree.nodes()) > 1]
@@ -370,7 +413,7 @@ def previewPartitions():
 				return {}
 	except:
 		return jsonify('Invalid partitioning method')
-	MG_MINES = mg_group(CIRC_FILE, CRITICAL_LOADS, METHOD, algo_params={'num_mgs':MGQUANT})
+	MG_MINES = form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd)
 	for mg in MG_MINES:
 		if not MG_MINES[mg]['switch']:
 			print(f'Selected partitioning method produced invalid results. Please choose a different partitioning method.')
@@ -442,20 +485,28 @@ def run():
 	crit_loads = json.loads(request.form['CRITICAL_LOADS'])
 	mg_method = request.form['MG_DEF_METHOD']
 	MGQUANT = int(json.loads(request.form['mgQuantity']))
+	G = dssConvert.dss_to_networkx(dss_path)
+	omd = dssConvert.dssToOmd(dss_path, '', RADIUS=0.0004, write_out=False)
 	if mg_method == 'loadGrouping':
 		pairings = json.loads(request.form['MICROGRIDS'])
-		microgrids = mg_group(dss_path, crit_loads, 'loadGrouping', pairings)	
+		mg_groups = form_mg_groups(G, crit_loads, 'loadGrouping', pairings)
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
 	elif mg_method == 'manual':
 		algo_params = json.loads(request.form['MICROGRIDS'])
-		microgrids = mg_group(dss_path, crit_loads, 'manual', algo_params)
+		mg_groups = form_mg_groups(G, crit_loads, 'manual', algo_params)
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd, switch=algo_params['switch'], gen_bus=algo_params['gen_bus'])
 	elif mg_method == 'lukes':
-		microgrids = mg_group(dss_path, crit_loads, 'lukes')
+		mg_groups = form_mg_groups(G, crit_loads, 'lukes', algo_params)
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
 	elif mg_method == 'branch':
-		microgrids = mg_group(dss_path, crit_loads, 'branch')
+		mg_groups = form_mg_groups(G, crit_loads, 'branch')
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
 	elif mg_method == 'bottomUp':
-		microgrids = mg_group(dss_path, crit_loads, 'bottomUp', algo_params={'num_mgs':MGQUANT})
+		mg_groups = form_mg_groups(G, crit_loads, 'bottomUp', algo_params={'num_mgs':MGQUANT})
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
 	elif mg_method == 'criticalLoads':
-		microgrids = mg_group(dss_path, crit_loads, 'criticalLoads', algo_params={'num_mgs':MGQUANT})
+		mg_groups = form_mg_groups(G, crit_loads, 'criticalLoads', algo_params={'num_mgs':MGQUANT})
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
 	elif mg_method == '': 
 		microgrids = json.loads(request.form['MICROGRIDS'])
 	# Form REOPT_INPUTS. 
@@ -471,8 +522,8 @@ def run():
 		'analysisYears':request.form['analysisYears'],
 		'outageDuration':request.form['outageDuration'],
 		'value_of_lost_load':request.form['value_of_lost_load'],
-		'single_phase_relay_cost':request.form['single_phase_relay_cost'],
-		'three_phase_relay_cost':request.form['three_phase_relay_cost'],
+		'single_phase_relay_cost':request.form['singlePhaseRelayCost'],
+		'three_phase_relay_cost':request.form['threePhaseRelayCost'],
 		'omCostEscalator':request.form['omCostEscalator'],
 		'discountRate':request.form['discountRate'],
 		'solar':request.form['solar'],
@@ -515,6 +566,9 @@ def run():
 		'mgParameterOverrides': json.loads(request.form['mgParameterOverrides']),
 		'maxRuntimeSeconds': request.form['maxRuntimeSeconds']
 	}
+	# - The js_circuit_model is always optional, but should exist for circuits that were built with the manual circuit editor
+	if 'jsCircuitModel' in request.form:
+		REOPT_INPUTS['js_circuit_model'] = request.form['jsCircuitModel']
 	mgu_args = [
 		f'{_projectDir}/{request.form["MODEL_DIR"]}',
 		dss_path,

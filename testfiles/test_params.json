@@ -230,7 +230,8 @@
             "mg1": {},
             "mg2": {},
             "mg3": {}
-        }
+        },
+        "maxRuntimeSeconds": 240
     },
     "templateDssTree": [
         {

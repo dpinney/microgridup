@@ -1,0 +1,64 @@
+2024-04-03 19:46:31,115 Process-1  root Logging status updates for /Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh1mg.
+2024-04-03 19:46:31,116 Process-1  root Rerunning existing project. DSS file not moved.
+2024-04-03 19:46:31,116 Process-1  root Rerunning existing project. Load CSV file not moved.
+2024-04-03 19:46:31,116 Process-1  root Rerunning existing project. Outages CSV file not moved.
+2024-04-03 19:51:16,431 Process-1  root load_phases on bus_name: phases ['1'] on bus 634.1
+2024-04-03 19:51:16,432 Process-1  root load_phases on bus_name: phases ['1'] on bus 634.1
+2024-04-03 19:51:16,432 Process-1  root load_phases on bus_name: phases ['1'] on bus 634.1
+2024-04-03 19:51:16,432 Process-1  root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-04-03 19:51:16,433 Process-1  root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-04-03 19:51:16,433 Process-1  root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-04-03 19:51:16,434 Process-1  root load_phases on bus_name: phases ['1', '2', '3'] on bus 692.1.2.3
+2024-04-03 19:51:16,434 Process-1  root load_phases on bus_name: phases ['3'] on bus 684.3
+2024-04-03 19:51:16,434 Process-1  root load_phases on bus_name: phases ['3'] on bus 652.3
+2024-04-03 19:51:16,435 Process-1  root load_phases on bus_name: phases ['3'] on bus 611.3
+2024-04-03 19:51:16,435 Process-1  root load_phases on bus_name: phases ['2'] on bus 645.2
+2024-04-03 19:51:16,436 Process-1  root load_phases on bus_name: phases ['2'] on bus 646.2
+2024-04-03 19:51:16,436 Process-1  root More than one load voltage is specified on microgrid mg0. Check Oneline diagram to verify that phases and voltages of ['634a_data_center', '634b_radar', '634c_atc_tower', '675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2', '684_command_center', '652_residential', '611_runway', '645_hangar', '646_office'] are correctly supported by gen_bus 670.
+
+2024-04-03 19:51:16,446 Process-1  root mg_phase_and_kv out_dict:
+2024-04-03 19:51:16,465 Process-1  root Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
+
+2024-04-03 19:51:16,466 Process-1  root Pre-existing battery battery_684_existing will not be utilized to support loads in microgrid mg0.
+
+2024-04-03 19:51:16,581 Process-1  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 19:51:16,581 Process-1  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 19:51:16,581 Process-1  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 19:51:16,582 Process-1  root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+
+2024-04-03 19:51:16,582 Process-1  root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+
+2024-04-03 19:51:16,582 Process-1  root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+
+2024-04-03 19:51:16,583 Process-1  root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+
+2024-04-03 19:51:16,583 Process-1  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 19:51:16,583 Process-1  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 19:51:16,584 Process-1  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 19:51:16,584 Process-1  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 19:51:16,584 Process-1  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-04-03 19:51:16,613 Process-1  root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 4286.4071, 'solar_size_existing': 1240.0, 'solar_size_new': 3046.4071000000004, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 1522.81, 'fossil_size_existing': 226.0, 'fossil_size_new': 1296.81, 'battery_cap_total': 583.48, 'battery_cap_existing': 407.0, 'battery_cap_new': 176.48000000000002, 'battery_pow_total': 442.47, 'battery_pow_existing': 101.0, 'battery_pow_new': 341.47}
+2024-04-03 19:51:16,852 Process-1  root QSTS with circuit_plus_mgAll.dss AND CWD IS /Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh1mg
+2024-04-03 19:51:18,969 Process-1  root CONTROLLING ON {'mg0': {'critical_load_kws': [70, 90, 10, 150, 200, 200, 400, 20, 30, 70, 0, 0], 'gen_bus': '670', 'gen_obs_existing': ['solar_634_existing', 'solar_675_existing', 'fossil_684_existing', 'fossil_646_existing', 'battery_634_existing', 'battery_684_existing'], 'loads': ['634a_data_center', '634b_radar', '634c_atc_tower', '675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2', '684_command_center', '652_residential', '611_runway', '645_hangar', '646_office'], 'switch': '650632'}}
+2024-04-03 19:51:18,974 Process-1  root reduced 634a_data_center from 160 to 70
+2024-04-03 19:51:18,975 Process-1  root reduced 634b_radar from 120 to 90
+2024-04-03 19:51:18,975 Process-1  root reduced 634c_atc_tower from 120 to 10
+2024-04-03 19:51:18,975 Process-1  root reduced 675a_hospital from 485 to 150
+2024-04-03 19:51:18,975 Process-1  root reduced 675b_residential1 from 68 to 200
+2024-04-03 19:51:18,975 Process-1  root reduced 675c_residential1 from 290 to 200
+2024-04-03 19:51:18,976 Process-1  root reduced 692_warehouse2 from 170 to 400
+2024-04-03 19:51:18,976 Process-1  root reduced 684_command_center from 1155 to 20
+2024-04-03 19:51:18,976 Process-1  root reduced 652_residential from 128 to 30
+2024-04-03 19:51:18,976 Process-1  root reduced 611_runway from 170 to 70
+2024-04-03 19:51:18,976 Process-1  root reduced 645_hangar from 170 to 0
+2024-04-03 19:51:18,976 Process-1  root reduced 646_office from 230 to 0
+2024-04-03 19:51:20,468 Process-1  root JSON compatible representation of all_mg_elements (for jinja-ing into the circuit map): {'mg0': ['692', '670b_residential2', '611', '684', 'solar_670', 'fossil_646_existing', '684_command_center', '634', '634a_data_center', '670a_residential2', '675a_hospital', '670', '675c_residential1', 'cap2', '645_hangar', 'solar_634_existing', '670c_residential2', '645', '692_warehouse2', 'cap1', '675', 'fossil_684_existing', '634c_atc_tower', 'xfm1', '675b_residential1', '611_runway', '632', '646', '671', 'battery_670', '634b_radar', '652_residential', '646_office', '652', '633', 'solar_675_existing', '680', 'fossil_670']}
+2024-04-03 19:51:20,503 Process-1  root Control microgrids count 1 and renewable count 0

@@ -23,28 +23,28 @@ new object=monitor.monload-670a_residential2 element=load.670a_residential2 term
 new object=monitor.monload-670b_residential2 element=load.670b_residential2 terminal=1 mode=0
 new object=monitor.monload-670c_residential2 element=load.670c_residential2 terminal=1 mode=0
 new object=monitor.mongenerator-solar_634_existing element=generator.solar_634_existing terminal=1 mode=1 ppolar=no
-new object=monitor.mongenerator-fossil_675_existing element=generator.fossil_675_existing terminal=1 mode=1 ppolar=no
+new object=monitor.monvsource-lead_gen_675 element=vsource.lead_gen_675 terminal=1 mode=0
 new object=monitor.moncapacitor-cap1 element=capacitor.cap1 terminal=1 mode=6
 new object=monitor.moncapacitor-cap2 element=capacitor.cap2 terminal=1 mode=6
 new object=monitor.mongenerator-battery_634 element=storage.battery_634 terminal=1 mode=1 ppolar=no
-new object=monitor.mongenerator-fossil_634 element=generator.fossil_634 terminal=1 mode=1 ppolar=no
-new object=monitor.monvsource-lead_gen_634_1 element=vsource.lead_gen_634_1 terminal=1 mode=0
+new object=monitor.monvsource-lead_gen_634 element=vsource.lead_gen_634 terminal=1 mode=0
+new object=monitor.mongenerator-solar_634 element=generator.solar_634 terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-battery_675 element=storage.battery_675 terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-fossil_675 element=generator.fossil_675 terminal=1 mode=1 ppolar=no
-new object=monitor.monvsource-lead_gen_675_1_2_3 element=vsource.lead_gen_675_1_2_3 terminal=1 mode=0
+new object=monitor.mongenerator-solar_675 element=generator.solar_675 terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-battery_646 element=storage.battery_646 terminal=1 mode=1 ppolar=no
-new object=monitor.mongenerator-fossil_646 element=generator.fossil_646 terminal=1 mode=1 ppolar=no
-new object=monitor.monvsource-lead_gen_646_2 element=vsource.lead_gen_646_2 terminal=1 mode=0
+new object=monitor.monvsource-lead_gen_646 element=vsource.lead_gen_646 terminal=1 mode=0
+new object=monitor.mongenerator-solar_646 element=generator.solar_646 terminal=1 mode=1 ppolar=no
 set mode=yearly stepsize=60m 
 set number=1
 
-				open line.line_for_lead_gen_634_1
+				open line.line_for_lead_gen_634
 				calcv
 			
-				open line.line_for_lead_gen_675_1_2_3
+				open line.line_for_lead_gen_675
 				calcv
 			
-				open line.line_for_lead_gen_646_2
+				open line.line_for_lead_gen_646
 				calcv
 			solve
 solve
@@ -79,21 +79,21 @@ solve
 			open object=line.632633 term=2
 			open object=line.632633 term=3
 		
-				close line.line_for_lead_gen_634_1
+				close line.line_for_lead_gen_634
 				calcv
 			
 			open object=line.671692 term=1
 			open object=line.671692 term=2
 			open object=line.671692 term=3
 		
-				close line.line_for_lead_gen_675_1_2_3
+				close line.line_for_lead_gen_675
 				calcv
 			
 			open object=line.632645 term=1
 			open object=line.632645 term=2
 			open object=line.632645 term=3
 		
-				close line.line_for_lead_gen_646_2
+				close line.line_for_lead_gen_646
 				calcv
 			calcv
 solve
@@ -153,21 +153,21 @@ solve
 			close object=line.632633 term=2
 			close object=line.632633 term=3
 		
-				open line.line_for_lead_gen_634_1
+				open line.line_for_lead_gen_634
 				calcv
 			
 			close object=line.671692 term=1
 			close object=line.671692 term=2
 			close object=line.671692 term=3
 		
-				open line.line_for_lead_gen_675_1_2_3
+				open line.line_for_lead_gen_675
 				calcv
 			
 			close object=line.632645 term=1
 			close object=line.632645 term=2
 			close object=line.632645 term=3
 		
-				open line.line_for_lead_gen_646_2
+				open line.line_for_lead_gen_646
 				calcv
 			calcv
 solve
@@ -215,15 +215,15 @@ export monitors monitorname=monload-670a_residential2
 export monitors monitorname=monload-670b_residential2
 export monitors monitorname=monload-670c_residential2
 export monitors monitorname=mongenerator-solar_634_existing
-export monitors monitorname=mongenerator-fossil_675_existing
+export monitors monitorname=monvsource-lead_gen_675
 export monitors monitorname=moncapacitor-cap1
 export monitors monitorname=moncapacitor-cap2
 export monitors monitorname=mongenerator-battery_634
-export monitors monitorname=mongenerator-fossil_634
-export monitors monitorname=monvsource-lead_gen_634_1
+export monitors monitorname=monvsource-lead_gen_634
+export monitors monitorname=mongenerator-solar_634
 export monitors monitorname=mongenerator-battery_675
 export monitors monitorname=mongenerator-fossil_675
-export monitors monitorname=monvsource-lead_gen_675_1_2_3
+export monitors monitorname=mongenerator-solar_675
 export monitors monitorname=mongenerator-battery_646
-export monitors monitorname=mongenerator-fossil_646
-export monitors monitorname=monvsource-lead_gen_646_2
+export monitors monitorname=monvsource-lead_gen_646
+export monitors monitorname=mongenerator-solar_646

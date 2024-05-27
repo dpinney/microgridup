@@ -400,8 +400,8 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 399,0.0,0.0,0.0,,0.0,,mongenerator-battery_634,,,
 400,0.0,0.0,0.0,,0.0,,mongenerator-battery_634,,,
 401,0.0,-30.9087,-8.58401e-05,,0.0,,mongenerator-battery_634,,,
-402,0.0,26.017,-4.9014e-06,,0.0,,mongenerator-battery_634,,,
-403,0.0,8.37903,0.000161431,,0.0,,mongenerator-battery_634,,,
+402,0.0,26.018,-4.90151e-06,,0.0,,mongenerator-battery_634,,,
+403,0.0,8.37903,0.00016145,,0.0,,mongenerator-battery_634,,,
 404,0.0,0.0,0.0,,0.0,,mongenerator-battery_634,,,
 405,0.0,0.0,0.0,,0.0,,mongenerator-battery_634,,,
 406,0.0,0.0,0.0,,0.0,,mongenerator-battery_634,,,
@@ -1360,7 +1360,7 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 399,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 400,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 401,0.0,-127.437,-8.38763e-05,-122.005,-0.000564116,-107.657,mongenerator-battery_675,-0.00145207,0.0,0.0
-402,0.0,-95.8263,9.35305e-05,-92.9797,0.000259137,-82.79,mongenerator-battery_675,-0.00150127,0.0,0.0
+402,0.0,-95.8263,9.35304e-05,-92.9797,0.000259137,-82.79,mongenerator-battery_675,-0.00150127,0.0,0.0
 403,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 404,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 405,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
@@ -3760,7 +3760,7 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 399,0.0,-251.732,-2.45182e-05,,0.0,,mongenerator-solar_634,,,
 400,0.0,-183.493,1.01808e-05,,0.0,,mongenerator-solar_634,,,
 401,0.0,-23.9026,-6.63828e-05,,0.0,,mongenerator-solar_634,,,
-402,0.0,-0.376562,7.09414e-08,,0.0,,mongenerator-solar_634,,,
+402,0.0,-0.376562,7.09403e-08,,0.0,,mongenerator-solar_634,,,
 403,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
 404,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
 405,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
@@ -4240,7 +4240,7 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 399,0.0,-90.5405,-8.81846e-06,,0.0,,mongenerator-solar_634_existing,,,
 400,0.0,-65.9969,3.66173e-06,,0.0,,mongenerator-solar_634_existing,,,
 401,0.0,-8.59705,-2.38759e-05,,0.0,,mongenerator-solar_634_existing,,,
-402,0.0,-0.135438,2.55155e-08,,0.0,,mongenerator-solar_634_existing,,,
+402,0.0,-0.135438,2.5515e-08,,0.0,,mongenerator-solar_634_existing,,,
 403,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
 404,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
 405,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
@@ -5200,7 +5200,7 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 399,0.0,-555.479,-0.00102845,-523.32,0.00309814,-456.643,mongenerator-solar_675,-0.0159686,0.0,0.0
 400,0.0,-388.02,8.02559e-05,-372.67,-0.00134285,-323.209,mongenerator-solar_675,6.8982e-05,0.0,0.0
 401,0.0,-47.937,-3.1551e-05,-45.8938,-0.000212199,-40.4964,mongenerator-solar_675,-0.000546213,0.0,0.0
-402,0.0,-0.738315,7.20626e-07,-0.716382,1.99658e-06,-0.637873,mongenerator-solar_675,-1.15669e-05,0.0,0.0
+402,0.0,-0.738314,7.20625e-07,-0.716382,1.99658e-06,-0.637873,mongenerator-solar_675,-1.15669e-05,0.0,0.0
 403,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
 404,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
 405,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0

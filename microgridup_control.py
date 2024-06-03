@@ -551,7 +551,7 @@ def extract_charting_data(csvName, microgrids, y_list, outage_start, outage_end,
 				fossil_kwh_output += additional
 				fossil_kw_rating = fossil_kw_ratings[ob_name_no_phases.split("-")[1]] if "fossil_" in ob_name_no_phases else vsource_ratings[ob_name_no_phases.split("-")[1]]
 				fossil_loading_average_decimal = additional / (float(fossil_kw_rating) * outage_length)
-				diesel_consumption_gal_per_hour = (0.065728897 * fossil_loading_average_decimal + 0.003682709) * float(fossil_kw_rating) + (-0.027979695 * fossil_loading_average_decimal + 0.568328949)
+				diesel_consumption_gal_per_hour = (0.065728897 * fossil_loading_average_decimal + 0.003682709) * float(fossil_kw_rating) + (-0.027979695 * fossil_loading_average_decimal + 0.568328949) # See this link for calculations: https://docs.google.com/document/d/11-W5XSjTWYlBpBKOZmwk6jfjbo8prSgLM88Q07SSo3s/edit?usp=sharing.
 				diesel_consumption_outage = diesel_consumption_gal_per_hour * outage_length
 				mmbtu_consumption_mmbtu_per_hour = (0.0112913202545883 * fossil_loading_average_decimal + 0.00171037274039439) * float(fossil_kw_rating) + (-0.0560953826993578* fossil_loading_average_decimal + 0.074238182761738)
 				mmbtu_consumption_outage = mmbtu_consumption_mmbtu_per_hour * outage_length

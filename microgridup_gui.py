@@ -405,7 +405,7 @@ def previewPartitions():
 			elif METHOD == 'branch':
 				MG_GROUPS.extend(nx_group_branch(tree, i_branch=algo_params.get('i_branch',0)))
 			elif METHOD == 'bottomUp':
-				MG_GROUPS.extend(nx_bottom_up_branch(tree, num_mgs=MGQUANT/num_trees_pruned, large_or_small='large'))
+				MG_GROUPS.extend(nx_bottom_up_branch(tree, num_mgs=MGQUANT/num_trees_pruned, large_or_small='large', omd=omd, cannot_be_mg=['regcontrol']))
 			elif METHOD == 'criticalLoads':
 				MG_GROUPS.extend(nx_critical_load_branch(tree, CRITICAL_LOADS, num_mgs=MGQUANT/num_trees_pruned, large_or_small='large'))
 			else:
@@ -502,7 +502,7 @@ def run():
 		mg_groups = form_mg_groups(G, crit_loads, 'branch')
 		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
 	elif mg_method == 'bottomUp':
-		mg_groups = form_mg_groups(G, crit_loads, 'bottomUp', algo_params={'num_mgs':MGQUANT})
+		mg_groups = form_mg_groups(G, crit_loads, 'bottomUp', algo_params={'num_mgs':MGQUANT, 'omd':omd, 'cannot_be_mg':['regcontrol']})
 		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
 	elif mg_method == 'criticalLoads':
 		mg_groups = form_mg_groups(G, crit_loads, 'criticalLoads', algo_params={'num_mgs':MGQUANT})
@@ -607,7 +607,7 @@ def node_group_map(graph, parts, color_list=['red','orange','yellow','green','bl
 
 def nice_pos(G):
 	''' return nice positions for charting G. '''
-	# return nx.drawing.nx_agraph.graphviz_layout(G)
+	# return nx.drawing.nx_agraph.graphviz_layout(G, prog="twopi")
 	# return nx.spring_layout(G, iterations=500)
 	return nx.kamada_kawai_layout(G)
 

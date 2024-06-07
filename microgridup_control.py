@@ -4,7 +4,6 @@ import numpy as np
 import networkx as nx
 from collections import defaultdict
 from plotly import graph_objects, offline, subplots
-from microgridup_gen_mgs import form_mg_groups, form_mg_mines
 
 # OMF imports
 from omf.solvers.opendss import dssConvert, _getByName, newQstsPlot

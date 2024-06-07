@@ -194,14 +194,31 @@ def nx_group_lukes(G, size, node_weight=None, edge_weight=None):
 	G_topo_order = nx.DiGraph(nx.algorithms.traversal.breadth_first_search.bfs_edges(G, tree_root))
 	return nx.algorithms.community.lukes.lukes_partitioning(G_topo_order, size, node_weight=node_weight, edge_weight=edge_weight)
 
-def nx_bottom_up_branch(G, num_mgs=3, large_or_small='large'):
+def get_object_type_from_omd(node_name, omd):
+	'''Get object type from omd given name.'''
+	for key in omd:
+		if omd[key].get('name') == node_name:
+			return omd[key].get('object')
+	return None 
+
+def get_end_nodes(G, omd, cannot_be_mg):
+	'''Find nodes with parents but no children. Omit leaves if they cannot be a microgrid on their own.'''
+	end_nodes = []
+	for node in G.nodes():
+		if G.out_degree(node) == 0 and G.in_degree(node)!=0:
+			object_type = get_object_type_from_omd(node, omd)
+			if object_type not in cannot_be_mg:
+				end_nodes.append([node])
+	return end_nodes
+
+def nx_bottom_up_branch(G, num_mgs=3, large_or_small='large', omd={}, cannot_be_mg=[]):
 	'Form all microgrid combinations starting with leaves and working up to source maintaining single points of connection for each.'
 	try:
 		list(topological_sort(G))
 	except ValueError:
 		G = remove_loops(G)
 	# Find leaves.
-	end_nodes = [[x] for x in G.nodes() if G.out_degree(x)==0 and G.in_degree(x)!=0]
+	end_nodes = get_end_nodes(G, omd, cannot_be_mg)
 	mgs = defaultdict(list)
 	for node in end_nodes:
 		mgs[node[-1]] = []
@@ -389,7 +406,7 @@ def form_mg_groups(G, CRITICAL_LOADS, algo, algo_params={}):
 		elif algo == 'branch':
 			MG_GROUPS.extend(nx_group_branch(tree, i_branch=algo_params.get('i_branch',0)))
 		elif algo == 'bottomUp':
-			MG_GROUPS.extend(nx_bottom_up_branch(tree, num_mgs=algo_params.get('num_mgs',3)/num_trees_pruned, large_or_small='large'))
+			MG_GROUPS.extend(nx_bottom_up_branch(tree, num_mgs=algo_params.get('num_mgs',3)/num_trees_pruned, large_or_small='large', omd=algo_params.get('omd',{}), cannot_be_mg=algo_params.get('cannot_be_mg',[])))
 		elif algo == 'criticalLoads':
 			MG_GROUPS.extend(nx_critical_load_branch(tree, CRITICAL_LOADS, num_mgs=algo_params.get('num_mgs',3)/num_trees_pruned, large_or_small='large'))
 		elif algo == 'loadGrouping':

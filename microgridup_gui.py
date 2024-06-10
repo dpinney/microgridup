@@ -1,18 +1,16 @@
-import base64, io, json, multiprocessing, os, platform, shutil, datetime, time
+import base64, io, json, multiprocessing, os, platform, shutil, datetime, time, markdown, re
 import re
 import networkx as nx
 from collections import OrderedDict
 from matplotlib import pyplot as plt
-from flask import Flask, request, redirect, render_template, jsonify, url_for
+from flask import Flask, request, redirect, render_template, jsonify, url_for, send_from_directory, Blueprint
 from omf.solvers.opendss import dssConvert
 from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_mg_mines, form_mg_groups
 from microgridup import full
 from subprocess import Popen
-from flask import send_from_directory
 from pathlib import Path
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
-from blueprint import data_dir_blueprint
 
 _mguDir = os.path.abspath(os.path.dirname(__file__))
 if _mguDir == '/':
@@ -20,15 +18,31 @@ if _mguDir == '/':
 _projectDir = f'{_mguDir}/data/projects'
 
 app = Flask(__name__)
-# - Use a blueprint to add another directory to serve static assets (i.e. the "data/" directory)
+
+# - Use blueprints to add additional static directories
+# - data_dir_blueprint is needed to access our model results from the data/ folder
+data_dir_blueprint = Blueprint('data_dir_blueprint', __name__, static_folder='data')
 app.register_blueprint(data_dir_blueprint)
-auth = HTTPBasicAuth()
+
+# - doc_blueprint is is needed to serve images that are in the microgridup playbook documentation
+doc_blueprint = Blueprint('doc_blueprint', __name__, static_folder='docs/microgridup-playbook/media')
+@doc_blueprint.route('/doc', methods=['GET'])
+def doc():
+	with (Path(_mguDir) / 'docs' / 'microgridup-playbook' / 'README.md').open() as f:
+		readme = f.read()
+	regex = re.compile(r'(?<=^## Table of Contents\n\n).*(?=\n\n^## Overview)', re.MULTILINE | re.DOTALL)
+	md_with_html_toc = regex.sub('[TOC]', readme)
+	md = markdown.Markdown(extensions=['toc'])
+	return md.convert(md_with_html_toc)
+app.register_blueprint(doc_blueprint)
 
 users = {} # if blank then no authentication.
 users_path = f'{_mguDir}/data/static/users.json'
 if os.path.exists(users_path):
 	user_json = json.load(open(users_path))
 	users = {k:generate_password_hash(user_json[k]) for k in user_json}
+
+auth = HTTPBasicAuth()
 
 # authenticate every request if user json available.
 @app.before_request
@@ -588,6 +602,19 @@ def run():
 	time.sleep(5)
 	return redirect(f'/')
 
+#@doc_blueprint.route('/doc', methods=['GET'])
+#def doc():
+#    '''
+#    - Return the MicrogridUp playbook documentation in HTML
+#    - Use a blueprint to host this route so images can be served from microgridup-playbook/media
+#	'''
+#    with (Path(_mguDir) / 'docs' / 'microgridup-playbook' / 'README.md').open() as f:
+#        readme = f.read()
+#    regex = re.compile(r'(?<=^## Table of Contents\n\n).*(?=\n\n^## Overview)', re.MULTILINE | re.DOTALL)
+#    md_with_html_toc = regex.sub('[TOC]', readme)
+#    md = markdown.Markdown(extensions=['toc'])
+#    return md.convert(md_with_html_toc)
+
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = {'dss'}
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -663,22 +690,21 @@ def before_request():
 		return redirect(url, code=301)
 
 if __name__ == "__main__":
-	app.run(debug=True, use_debugger=False, use_reloader=False, host="0.0.0.0", port="5000")
-	#if platform.system() == "Darwin":  # MacOS
-	#	os.environ['NO_PROXY'] = '*' # Workaround for macOS proxy behavior
-	#	multiprocessing.set_start_method('forkserver') # Workaround for Catalina exec/fork behavior
-	#gunicorn_args = ['gunicorn', '-w', '5', '--reload', 'microgridup_gui:app','--worker-class=sync', '--timeout=100']
-	#mguPath = Path(_mguDir)
-	#if (mguPath/'ssl').exists() and (mguPath/'logs').exists():
-	#	# if production directories, run in prod mode with logging and ssl.
-	#	gunicorn_args.extend(['--access-logfile', mguPath / 'logs/mgu.access.log', '--error-logfile', mguPath / 'logs/mgu.error.log', '--capture-output'])
-	#	gunicorn_args.extend(['--certfile', mguPath / 'ssl/cert.pem', '--keyfile', mguPath / 'ssl/privkey.pem', '--ca-certs', mguPath/'ssl/fullchain.pem'])
-	#	gunicorn_args.extend(['-b', '0.0.0.0:443'])
-	#	redirProc = Popen(['gunicorn', '-w', '5', '-b', '0.0.0.0:80', 'microgridup_gui:reApp']) # don't need to wait, only wait on main proc.
-	#	appProc = Popen(gunicorn_args)
-	#else:
-	#	# no production directories, run in dev mode, i.e. no log files, no ssl.
-	#	# app.run(debug=True, host="0.0.0.0") # old flask way, don't use.
-	#	gunicorn_args.extend(['-b', '0.0.0.0:5000'])
-	#	appProc = Popen(gunicorn_args)
-	#appProc.wait()
+	if platform.system() == "Darwin":  # MacOS
+		os.environ['NO_PROXY'] = '*' # Workaround for macOS proxy behavior
+		multiprocessing.set_start_method('forkserver') # Workaround for Catalina exec/fork behavior
+	gunicorn_args = ['gunicorn', '-w', '5', '--reload', 'microgridup_gui:app','--worker-class=sync', '--timeout=100']
+	mguPath = Path(_mguDir)
+	if (mguPath/'ssl').exists() and (mguPath/'logs').exists():
+		# if production directories, run in prod mode with logging and ssl.
+		gunicorn_args.extend(['--access-logfile', mguPath / 'logs/mgu.access.log', '--error-logfile', mguPath / 'logs/mgu.error.log', '--capture-output'])
+		gunicorn_args.extend(['--certfile', mguPath / 'ssl/cert.pem', '--keyfile', mguPath / 'ssl/privkey.pem', '--ca-certs', mguPath/'ssl/fullchain.pem'])
+		gunicorn_args.extend(['-b', '0.0.0.0:443'])
+		redirProc = Popen(['gunicorn', '-w', '5', '-b', '0.0.0.0:80', 'microgridup_gui:reApp']) # don't need to wait, only wait on main proc.
+		appProc = Popen(gunicorn_args)
+	else:
+		# no production directories, run in dev mode, i.e. no log files, no ssl.
+		# app.run(debug=True, host="0.0.0.0") # old flask way, don't use.
+		gunicorn_args.extend(['-b', '0.0.0.0:5000'])
+		appProc = Popen(gunicorn_args)
+	appProc.wait()

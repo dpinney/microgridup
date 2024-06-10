@@ -1,22 +1,16 @@
-MicrogridUP Software Playbook:
+# MicrogridUP Software Playbook: A User Guide
 
-PREPARED BY:
+**PREPARED BY:**
 
 NRECA Research
 
-A User Guide
-
 March 2024
-
-MicrogridUP Software Playbook:
-
-**A User Guide**
 
 Prepared by NRECA Research with funding from the Department of Defense’s
 Environmental Security Technology Certification Program (ESTCP) under
 award number EW20-B8-5055.
 
-NRECA Research Project Team
+**NRECA Research Project Team**
 
 **Lauren Khair**
 
@@ -58,7 +52,7 @@ All Rights Reserved.
 > suppliers, and as such, it must be used in accordance with the NRECA
 > copyright policy.
 
-**Acknowledgements**
+## Acknowledgements
 
 NRECA Research and the MicrogridUP team thank the following individuals
 and organizations for their contributions to the MicrogridUP software
@@ -89,100 +83,48 @@ development and Playbook:
 - Chris Wilkins and Laura Moorefield, Moorefield Research & Consulting,
   LLC
 
-# Table of Contents
+## Table of Contents
 
-[Overview [4](#overview)](#overview)
+- [Overview](#overview)
+- [Prerequisites](#prerequisites)
+  - [Docker Requirements](#docker-requirements)
+  - [MicrogridUP Hardware and Software Requirements](#microgridup-hardware-and-software-requirements)
+  - [MicrogridUP Input Data Requirements](#microgridup-input-data-requirements)
+- [Installation](#installation)
+- [Using MicrogridUP](#using-microgridup)
+  - [General Guidance/Tips](#general-guidancetips)
+  - [Working with Projects](#working-with-projects)
+  - [Creating a New Project](#creating-a-new-project)
+- [Outputs](#outputs)
+  - [Overview](#overview-1)
+  - [Map](#map)
+  - [Interconnection](#interconnection)
+  - [Control](#control)
+  - [Microgrids](#microgrids)
+  - [Files](#files)
+  - [Inputs](#inputs)
+- [Appendix A: Descriptions of Input Data Requirements](#appendix-a-descriptions-of-input-data-requirements)
+  - [User Goals](#user-goals)
+  - [Circuit File](#circuit-file)
+  - [Existing Distributed Generation](#existing-distributed-generation)
+  - [Distribution System Equipment Specifications](#distribution-system-equipment-specifications)
+  - [Critical Loads](#critical-loads)
+  - [Metering Data](#metering-data)
+  - [Full Rate Schedule](#full-rate-schedule)
+  - [Outage Statistics](#outage-statistics)
+  - [Weather Data](#weather-data)
+  - [Resilience Metrics and Microgrid Siting](#resilience-metrics-and-microgrid-siting)
+  - [Microgrid Specifications](#microgrid-specifications)
+- [Appendix B: Technology-Specific Considerations for MicrogridUP Modeling](#appendix-b-technology-specific-considerations-for-microgridup-modeling)
+  - [Diesel and Natural Gas Generators (Reciprocating Internal Combustion Engines (RICE))](#diesel-and-natural-gas-generators-reciprocating-internal-combustion-engines-rice)
+  - [Combined Heat & Power (CHP)](#combined-heat--power-chp)
+  - [Other Generators](#other-generators)
+  - [PV Systems](#pv-systems)
+  - [Wind Generators](#wind-generators)
+  - [Energy Storage Systems (ESS)](#energy-storage-systems-ess)
+  - [Codes and Standards](#codes-and-standards)
 
-[Prerequisites [6](#prerequisites)](#prerequisites)
-
-[Docker Requirements [6](#docker-requirements)](#docker-requirements)
-
-[MicrogridUP Hardware and Software Requirements
-[6](#microgridup-hardware-and-software-requirements)](#microgridup-hardware-and-software-requirements)
-
-[MicrogridUP Input Data Requirements
-[7](#microgridup-input-data-requirements)](#microgridup-input-data-requirements)
-
-[Installation [8](#installation)](#installation)
-
-[Using MicrogridUP [10](#using-microgridup)](#using-microgridup)
-
-[General Guidance/Tips
-[10](#general-guidancetips)](#general-guidancetips)
-
-[Working with Projects
-[10](#working-with-projects)](#working-with-projects)
-
-[Creating a New Project
-[11](#creating-a-new-project)](#creating-a-new-project)
-
-[Outputs [16](#outputs)](#outputs)
-
-[Overview [16](#overview-1)](#overview-1)
-
-[Map [17](#map)](#map)
-
-[Interconnection [18](#interconnection)](#interconnection)
-
-[Control [19](#control)](#control)
-
-[Microgrids [20](#microgrids)](#microgrids)
-
-[Files [21](#files)](#files)
-
-[Inputs [21](#inputs)](#inputs)
-
-[Appendix A: Descriptions of Input Data Requirements
-[22](#appendix-a-descriptions-of-input-data-requirements)](#appendix-a-descriptions-of-input-data-requirements)
-
-[User Goals [22](#user-goals)](#user-goals)
-
-[Circuit File [22](#circuit-file)](#circuit-file)
-
-[Existing Distributed Generation
-[22](#existing-distributed-generation)](#existing-distributed-generation)
-
-[Distribution System Equipment Specifications
-[22](#distribution-system-equipment-specifications)](#distribution-system-equipment-specifications)
-
-[Critical Loads [23](#_Toc160729943)](#_Toc160729943)
-
-[Metering Data [23](#metering-data)](#metering-data)
-
-[Full Rate Schedule [23](#full-rate-schedule)](#full-rate-schedule)
-
-[Outage Statistics [23](#outage-statistics)](#outage-statistics)
-
-[Weather Data [24](#weather-data)](#weather-data)
-
-[Resilience Metrics and Microgrid Siting
-[24](#resilience-metrics-and-microgrid-siting)](#resilience-metrics-and-microgrid-siting)
-
-[Microgrid Specifications
-[24](#microgrid-specifications)](#microgrid-specifications)
-
-[Appendix B: Technology-Specific Considerations for MicrogridUP Modeling
-[33](#appendix-b-technology-specific-considerations-for-microgridup-modeling)](#appendix-b-technology-specific-considerations-for-microgridup-modeling)
-
-[Diesel and Natural Gas Generators (Reciprocating Internal Combustion
-Engines (RICE))
-[33](#diesel-and-natural-gas-generators-reciprocating-internal-combustion-engines-rice)](#diesel-and-natural-gas-generators-reciprocating-internal-combustion-engines-rice)
-
-[Combined Heat & Power (CHP)
-[34](#combined-heat-power-chp)](#combined-heat-power-chp)
-
-[Other Generators [34](#other-generators)](#other-generators)
-
-[PV Systems [34](#pv-systems)](#pv-systems)
-
-[Wind Generators [37](#wind-generators)](#wind-generators)
-
-[Energy Storage Systems (ESS)
-[38](#energy-storage-systems-ess)](#energy-storage-systems-ess)
-
-[Codes and Standards [40](#codes-and-standards)](#codes-and-standards)
-
-# Overview
+## Overview
 
 The MicrogridUP software is a microgrid planning tool that enables
 military installations and utility privatization (UP) system owners to
@@ -202,12 +144,12 @@ for renewable generation and energy storage, military planners are
 exploring microgrids as a resilient and increasingly cost-effective
 energy management solution to ensure continuity of critical loads.
 
-**What is a Microgrid?**
-
-A microgrid, as defined by the U.S. DOE, is: “a group of interconnected
-loads and distributed energy resources that acts as a single
-controllable entity with respect to the grid. It can connect and
-disconnect from the grid to operate in grid-connected or island mode.”
+> **What is a Microgrid?**
+>
+> A microgrid, as defined by the U.S. DOE, is: “a group of interconnected
+> loads and distributed energy resources that acts as a single
+> controllable entity with respect to the grid. It can connect and
+> disconnect from the grid to operate in grid-connected or island mode.”
 
 While other microgrid planning tools are available, they may lack the
 robust elements needed to fully anticipate hardware, software, and
@@ -226,8 +168,6 @@ microgrids for multibuilding sites at military installations, including:
 
 - Gas and electric rates
 
-<!-- -->
-
 - All relevant installation circuits—low voltage (building), medium
   voltage (distribution), and high voltage (transmission)
 
@@ -238,8 +178,8 @@ computational problems in large installation microgrid design—optimal
 distribution design and generation mix. Prior to release, the tool was
 field-validated at four diverse military installations.
 
-<img src="./media/image3.png" style="width:5.3in;height:2.86937in"
-alt="A picture containing map Description automatically generated" />
+<img src="./media/image3.png" style="width:5.3in;height:2.86937in" alt="Figure 1. Four test installations and the utilities that serve them through UP contracts." />
+<caption><p>Figure 1. Four test installations and the utilities that serve them through UP contracts.</p></caption>
 
 Key goals of the MicrogridUP tool are:
 
@@ -275,9 +215,9 @@ Sandia National Laboratories Report entitled [*Cybersecurity of
 Networked Microgrids: Challenges, Potential Solutions, and Future
 Directions*](https://www.sandia.gov/research/publications/details/cybersecurity-of-networked-microgrids-challenges-potential-solutions-and-fu-2020-12-22/).
 
-# Prerequisites
+## Prerequisites
 
-## Docker Requirements
+### Docker Requirements
 
 MicrogridUP is a web application that is installed on a local system
 using Docker, a software platform designed to run containerized
@@ -290,12 +230,11 @@ for your operating system:
 
 - **Mac**: <https://docs.docker.com/desktop/install/mac-install/>
 
-- **Windows**:
-  <https://docs.docker.com/desktop/install/windows-install/>
+- **Windows**: <https://docs.docker.com/desktop/install/windows-install/>
 
 - **Linux**: <https://docs.docker.com/desktop/install/linux-install/>
 
-## MicrogridUP Hardware and Software Requirements
+### MicrogridUP Hardware and Software Requirements
 
 As mentioned above, MicrogridUP can run on any Mac, Windows, or Linux
 system that supports Docker Desktop software. See the links above in
@@ -306,7 +245,7 @@ files and data used in the analysis stay on the local system. No
 information is shared beyond the system on which MicrogridUP is
 installed.
 
-## MicrogridUP Input Data Requirements
+### MicrogridUP Input Data Requirements
 
 The quality of the outputs that MicrogridUP generates is directly
 related to the quality of the input data it receives. The table below
@@ -326,8 +265,6 @@ will output more accurate projects and estimates if you provide actual
 data for each **Data Type** below.
 
 <table>
-<caption><p>Figure 1. Four test installations and the utilities that
-serve them through UP contracts.</p></caption>
 <colgroup>
 <col style="width: 16%" />
 <col style="width: 29%" />
@@ -395,7 +332,7 @@ For additional descriptions of input data requirements and uses, see
 [Appendix A: Descriptions of Input Data
 Requirements](#appendix-a-descriptions-of-input-data-requirements).
 
-# Installation
+## Installation
 
 MicrogridUP is a web application using Docker, a software platform
 designed to run containerized applications. To use MicrogridUP, you must
@@ -418,13 +355,14 @@ install the MicrogridUP app.
 
 2.  Open a command prompt and enter this command to download the
     MicrogridUP app:
-
-> docker pull ghcr.io/dpinney/microgridup:main
+    ```
+    docker pull ghcr.io/dpinney/microgridup:main
+    ```
 
 3.  To start MicrogridUP, run this command:
-
-> docker run -d -p 5001:5000 --name mgucont
-> ghcr.io/dpinney/microgridup:main
+    ```
+    docker run -d -p 5001:5000 --name mgucont ghcr.io/dpinney/microgridup:main
+    ```
 
 4.  Once the command completes, open a web browser and navigate to
     <http://127.0.0.1:5001>.
@@ -433,19 +371,24 @@ install the MicrogridUP app.
 
     <img src="./media/image4.png" style="width:6.181in;height:2.175in" />
 
-> For next steps, see [Using MicrogridUP](#using-microgridup).
+    For next steps, see [Using MicrogridUP](#using-microgridup).
 
 5.  To stop using the MicrogridUP app:
 
-    1.  Run docker stop mgucont at a command prompt.
-
+    1.  Run the following with a command prompt:
+        ```
+        docker stop mgucont
+        ```
     2.  Close Docker Desktop.
 
 6.  To start the app again:
 
     1.  Open Docker Desktop.
 
-    2.  Run docker start mgucont at a command prompt.
+    2.  Run the following command with a command prompt:
+        ```
+        docker start mgucont
+        ```
 
     3.  Open a web browser and navigate to <http://127.0.0.1:5001>.
 
@@ -453,9 +396,9 @@ To upgrade, repeat steps 2-4 above. To retain your project data, migrate
 the folder /data/projects/ from the original container to the new one
 before deleting the old container.
 
-# Using MicrogridUP
+## Using MicrogridUP
 
-## General Guidance/Tips
+### General Guidance/Tips
 
 MicrogridUP is a robust optimization model that incorporates a wide
 range of input data. Due to the complexity of the underlying
@@ -476,7 +419,7 @@ MicrogridUP:
 
 - Run complex scenarios overnight.
 
-## Working with Projects
+### Working with Projects
 
 When opening MicrogridUP, you should see the Home screen below.
 
@@ -500,9 +443,9 @@ From the Home screen you can:
 
 - Duplicate, edit, or delete an existing project.
 
-## Creating a New Project
+### Creating a New Project
 
-### Step 1: Input project information
+#### Step 1: Input project information
 
 1.  From the MicrogridUP Home screen, click the empty square with the +
     character. The MicrogridUP \> New screen opens.
@@ -529,7 +472,7 @@ style="width:6.48333in;height:2.78243in" />
 > field. For detailed information, see Table 1 in the [Microgrid
 > Specifications](#microgrid-specifications) section of Appendix A.
 
-### Step 2: Specify existing circuit
+#### Step 2: Specify existing circuit
 
 In this step, you will characterize the distribution system and
 designate any critical loads.
@@ -617,7 +560,7 @@ style="width:4.08695in;height:2.16667in" />
 <img src="./media/image8.png"
 style="width:4.73333in;height:4.69154in" />
 
-### Step 3: Partition circuit into microgrids
+#### Step 3: Partition circuit into microgrids
 
 In this step, you can explore different methods for partitioning your
 circuit into microgrids and choose one that best fits your environment.
@@ -636,7 +579,7 @@ circuit into microgrids and choose one that best fits your environment.
 2.  Click **Preview partitions** to see the number and locations of the
     microgrids that will be modeled using the specified method.
 
-### Step 4: Select technologies to be used in microgrids
+#### Step 4: Select technologies to be used in microgrids
 
 Next select the types of energy and/or storage technologies to be used.
 
@@ -652,7 +595,7 @@ Next select the types of energy and/or storage technologies to be used.
 
 2.  If necessary, change the default values for each technology.
 
-### Step 5 (Optional): Override technology parameters per-microgrid
+#### Step 5 (Optional): Override technology parameters per-microgrid
 
 By default, the values specified in Step 4 (for example, available fuel)
 are applied globally to all microgrids. In this step, you can override
@@ -694,7 +637,7 @@ locations) that can be done in this input.
     automatically. For more information on these results, see
     [Outputs](#outputs).
 
-# Outputs
+## Outputs
 
 MicrogridUP produces the following outputs for each modeled microgrid
 project: overview of the economics and resilience of the design;
@@ -705,7 +648,7 @@ Interconnection, Control, Microgrids, Files, and Inputs—and most output
 tabs include graphs or images. Where relevant, tabular outputs are also
 included for easy export to other tools such as Microsoft Excel.
 
-## Overview
+### Overview
 
 The Overview tab provides results of the full design with the following
 outputs:
@@ -728,10 +671,10 @@ outputs:
 - Distribution Upgrades needed to create Microgrids—detailed list of all
   distribution upgrades that will be necessary to host the microgrids.
 
-<img src="./media/image11.png"
-style="width:6.63253in;height:3.05833in" />
+<img src="./media/image11.png" style="width:6.63253in;height:3.05833in" />
+<caption><p>Figure 1. Screenshot of sample graphs from Overview tab</p></caption>
 
-## Map
+### Map
 
 The Map tab includes a GIS map of modeled microgrid or network of
 microgrids, with different colors indicating distinct microgrids. This
@@ -742,7 +685,10 @@ and their detailed specifications. Should you need to manually adjust
 the circuit, the overlaid one-line interface allows full editing
 support.
 
-## Interconnection
+<img src="./media/image12.png" style="width:6.5in;height:3.06736in" />
+<caption><p>Figure 2. Screenshot of sample microgrid map from Map tab</p></caption>
+
+### Interconnection
 
 The Interconnection tab displays quasi-static load-flow simulation
 results for the project under normal (no fault) operations along with a
@@ -765,8 +711,9 @@ includes graphics depicting:
   interconnection at each bus on the circuit.
 
 <img src="./media/image13.png" style="width:6.5in;height:3.06736in" />
+<caption><p>Figure 3. Screenshot of sample graph from Interconnection tab</p></caption>
 
-## Control
+### Control
 
 The Control tab provides detailed results of how the microgrid(s) will
 perform during the user-specified critical outage, e.g., a 7-day loss of
@@ -777,13 +724,9 @@ lowest renewable output. The Control tab includes graphics depicting:
 
 - Load Voltage—maximum voltage of critical loads.
 
-<!-- -->
-
 - Tap Position—tap setting on voltage regulators on the circuit. This
   can be used to verify new generation does not lead to excessive tap
   changer operation.
-
-<!-- -->
 
 - Battery Cycles During Analysis Period—number of battery cycles during
   the critical outage.
@@ -810,8 +753,9 @@ lowest renewable output. The Control tab includes graphics depicting:
   information from the user inputs.
 
 <img src="./media/image14.png" style="width:6.5in;height:3.09306in" />
+<caption><p>Figure 4. Screenshot of sample graphs from Control tab</p></caption>
 
-## Microgrids
+### Microgrids
 
 The Microgrids tab includes detailed annual results for the generation
 additions and annual energy consumption and generation. Because outages
@@ -843,18 +787,19 @@ individual microgrid in the system, with graphics depicting:
 - Input Data
 
 <img src="./media/image15.png" style="width:6.5in;height:3.07986in" />
+<caption><p>Figure 5. Screenshot of sample graphs from Microgrids tab</p></caption>
 
-## Files
+### Files
 
 The Files tab includes a list of files used and generated the
 MicrogridUP analysis.
 
-## Inputs
+### Inputs
 
 The Inputs tab displays all input values provided by the MicrogridUP
 user.
 
-# Appendix A: Descriptions of Input Data Requirements
+## Appendix A: Descriptions of Input Data Requirements
 
 Appendix A provides additional information on MicrogridUP’s input data
 requirements, default values (where relevant), definitions, and usage or
@@ -865,7 +810,7 @@ Energy Optimization Tool (REopt®), available from:
 the REopt Web Tool User Manual for additional information on certain
 inputs.
 
-## User Goals 
+### User Goals 
 
 - Description: Resilience and operational goals for the target
   facilities. Includes providing for both long-term outages and
@@ -880,7 +825,7 @@ inputs.
 
 - Source: Customer
 
-## Circuit File
+### Circuit File
 
 - Description: Full Windmil/Cymdist data model (including GIS data
   showing physical locations of buildings and other assets).
@@ -891,7 +836,7 @@ inputs.
 
 - Source: Owner of distribution system
 
-## Existing Distributed Generation
+### Existing Distributed Generation
 
 - Description: Optional list of existing distributed generation, both
   renewable and fossil-based (e.g., combined heat and power (CHP),
@@ -906,7 +851,7 @@ inputs.
 
 - Source: Customer
 
-## Distribution System Equipment Specifications
+### Distribution System Equipment Specifications
 
 - Description: Technical specifications of equipment in existing
   distribution system which might need to be used in the microgrid,
@@ -922,19 +867,7 @@ inputs.
 - Source: Customer, owner of distribution system (likely multiple
   documents)
 
-## Critical Loads
-
-**Is your military base able to sub-meter individual buildings and
-loads?**
-
-Sub-metering allows the installation to control which buildings or
-portions of a circuit may be “islanded," or included inside the
-microgrid.
-
-**What:** Loads that must be supported during an external outage.
-
-**Need:** Defined size, duration, location, to be able to design an
-optimal microgrid.
+### Critical Loads
 
 - Description: Prioritized list of critical loads, defined as loads that
   must be powered during resiliency events. These loads must be
@@ -946,7 +879,19 @@ optimal microgrid.
 
 - Source: Customer
 
-## Metering Data
+> **Is your military base able to sub-meter individual buildings and
+> loads?**
+> 
+> Sub-metering allows the installation to control which buildings or
+> portions of a circuit may be “islanded," or included inside the
+> microgrid.
+> 
+> **What:** Loads that must be supported during an external outage.
+> 
+> **Need:** Defined size, duration, location, to be able to design an
+> optimal microgrid.
+
+### Metering Data
 
 - Description: At least one year of historical load data for both
   electricity and gas consumption.
@@ -959,7 +904,7 @@ optimal microgrid.
 
 - Source: Customer and customer utilities
 
-## Full Rate Schedule
+### Full Rate Schedule
 
 - Description: Details of the electric utility rate structure, include
   rate name, fixed charges, energy charges (kWh), and demand charges
@@ -975,7 +920,7 @@ optimal microgrid.
 
 - Source: Customer and customer utilities
 
-## Outage Statistics
+### Outage Statistics
 
 - Description: Data from all historical outages, including locations and
   equipment (optional)
@@ -986,7 +931,7 @@ optimal microgrid.
 
 - Source: Customer
 
-## Weather Data
+### Weather Data
 
 - Description: MicrogridUP accesses weather data, especially solar
   insolation and wind resource, through the REOpt performance software;
@@ -997,7 +942,7 @@ optimal microgrid.
 
 - Source: MicrogridUP
 
-## Resilience Metrics and Microgrid Siting 
+### Resilience Metrics and Microgrid Siting
 
 - Description: A core input to MicrogridUP is the minimum survival time
   for critical loads (e.g., 336 hours in the case of Army resilience
@@ -1016,7 +961,7 @@ optimal microgrid.
 
 - Source: Customer
 
-## Microgrid Specifications
+### Microgrid Specifications
 
 The microgrid is specified in two steps. First, it is segmented by
 specifying a “FAULTED_LINE” variable to be a switch that can disconnect
@@ -1031,9 +976,9 @@ analysis. Table 1 shows the software’s default values and descriptions
 in Step 1 of the interface. Table 2 shows the default values and
 descriptions for Step 4.
 
+**Table 1. Fields Used in Step 1 of the MicrogridUP Interface**
+
 <table>
-<caption><p>Figure 1. Screenshot of sample graphs from Overview
-tab</p></caption>
 <colgroup>
 <col style="width: 35%" />
 <col style="width: 18%" />
@@ -1232,11 +1177,9 @@ much.</p></td>
 </tbody>
 </table>
 
-Figure 1. Screenshot of sample graphs from Overview tab
+**Table 2. Fields Used in Step 4 of the MicrogridUP Interface**
 
 <table>
-<caption><p><img src="./media/image12.png"
-style="width:6.5in;height:3.12639in" /></p></caption>
 <colgroup>
 <col style="width: 35%" />
 <col style="width: 18%" />
@@ -1544,8 +1487,6 @@ required.</strong> For more information, please see <a
 href="https://reopt.nrel.gov/tool/reopt-user-manual.pdf#page=5"><u>The
 REopt Web Tool User Manual.</u></a></p>
 <table>
-<caption><p>Figure 2. Screenshot of sample microgrid map from Map
-tab</p></caption>
 <colgroup>
 <col style="width: 28%" />
 <col style="width: 44%" />
@@ -1631,16 +1572,14 @@ solar.</td>
 </tbody>
 </table>
 
-<img src="./media/image12.png" style="width:6.5in;height:3.12639in" />
-
-# Appendix B: Technology-Specific Considerations for MicrogridUP Modeling
+## Appendix B: Technology-Specific Considerations for MicrogridUP Modeling
 
 Appendix B provides an overview of various technologies commonly used in
-microgrids**.**
+microgrids.
 
-## Diesel and Natural Gas Generators (Reciprocating Internal Combustion Engines (RICE))
+### Diesel and Natural Gas Generators (Reciprocating Internal Combustion Engines (RICE))
 
-### RICE Rating
+#### RICE Rating
 
 Diesel and natural gas generators are rated by their real power (kW) and
 apparent power (kVA) or power factor (kVA/kW). Generators are typically
@@ -1657,7 +1596,7 @@ constant power up to its full rating. They are typically not designed
 for variable loads. Prime and continuous generators often have extended
 lube oil capacities, which allow maintenance to be extended.
 
-### RICE Generator Sizing and Minimum Loads
+#### RICE Generator Sizing and Minimum Loads
 
 Operation of generators for extended periods at less than 30% loading
 for diesel models and 50% loading for natural gas models can cause a
@@ -1682,7 +1621,7 @@ banks if necessary. Natural gas generators should not be run for more
 than 30 minutes at less than 30% load, or for more than two hours at
 loads between 30 and 50%.
 
-### RICE Maintenance
+#### RICE Maintenance
 
 Engine/generators should be “exercised” at regular intervals when used
 in standby operation. They need to be maintained on a frequent basis
@@ -1704,7 +1643,7 @@ problem, especially for diesel generators, since diesel becomes sluggish
 at low temperatures and is prone to various things growing in diesel
 fuel that has been stored for an extended period of time.
 
-### RICE Decommissioning
+#### RICE Decommissioning
 
 Decommissioning can be as simple as towing a trailer-mounted generator
 away, but is generally more complex, including removal of the generator
@@ -1712,7 +1651,7 @@ itself, the fuel tank and delivery pipes, and removal of all controls
 and electrical connections. It often involves dealing with hazardous
 materials which require special handling.
 
-## Combined Heat & Power (CHP)
+### Combined Heat & Power (CHP)
 
 Combined Heat and Power (CHP) systems use generators to supply
 electricity and then use the “waste heat” from these generators to
@@ -1726,16 +1665,16 @@ use megawatt-scale utility gas turbines. CHP systems have all of the
 issues associated with generators but add “plumbing” associated with
 heat recovery.
 
-## Other Generators
+### Other Generators
 
-### Microturbines
+#### Microturbines
 
 Microturbines are small (25-500 kW) gas turbines (basically jet engines)
 attached to generators. They typically have slightly higher efficiencies
 and lower emissions than RICE generators and are often combined with CHP
 to improve efficiency.
 
-### Fuel Cells
+#### Fuel Cells
 
 Fuel cells are solid state generators that produce DC electricity using
 hydrogen as a fuel. The hydrogen is often supplied from electricity
@@ -1750,9 +1689,9 @@ only 25-35% efficiency. Production of hydrogen using excess renewable
 energy has been proposed as a way of reducing the effects of this low
 efficiency.
 
-## PV Systems
+### PV Systems
 
-### PV System Design and Rating
+#### PV System Design and Rating
 
 Photovoltaic (PV) systems are rated in both DC power and AC power. The
 PV modules themselves generate DC energy, which must be converted to AC
@@ -1812,7 +1751,7 @@ Structures must be designed for specific wind and soil conditions. Most
 PV system capital costs are described as “dollars per watt” where the
 “watt” refers to the DC datasheet rating of the PV array.
 
-### PV Performance and Warranties 
+#### PV Performance and Warranties
 
 The performance of a PV array is different than “conventional
 generators” since they are “intermittent passive” rather than “active”
@@ -1862,7 +1801,7 @@ inverter (DC-coupled), others use separate inverters for the PV array
 and battery and tie the inverters together before connecting to the grid
 (AC-Coupled).
 
-### PV Maintenance 
+#### PV Maintenance
 
 PV modules and inverters are solid state with few if any moving parts.
 This means that for fixed-mount systems, maintenance is limited to
@@ -1898,7 +1837,7 @@ often-overlooked aspect of a large PV array. Techniques to manage growth
 include gravel, low profile ground covers, prairie/pollinator crops, or
 grass with sheep to manage the growth.
 
-### PV Decommissioning 
+#### PV Decommissioning
 
 PV systems typically have a service life of around 25 years. When this
 period is finished, they should either be repowered using new modules
@@ -1910,9 +1849,9 @@ available in the U.S. as some landfills no longer accept PV panels, laws
 are changing to require recycling, recovered materials have monetary
 value, and new PV panels can be manufactured using recovered materials.
 
-## Wind Generators 
+### Wind Generators 
 
-### Wind System Design and Rating
+#### Wind System Design and Rating
 
 Modern wind generators use rotating turbine blades to convert wind to
 rotary power. There are many different wind turbine designs. The first
@@ -1969,9 +1908,9 @@ Decommissioning of wind turbines is basically a reverse of the
 installation procedure. Wind turbine blade recycling processes are in
 development.[^2]
 
-## Energy Storage Systems (ESS)
+### Energy Storage Systems (ESS)
 
-### ESS Rating
+#### ESS Rating
 
 There are four basic types of electrical energy storage—electrostatic
 (super-capacitors, superconducting magnetic energy storage),
@@ -2020,7 +1959,7 @@ less expensive than LiFEPO4 (lithium iron phosphate), but these
 batteries have better cycling characteristics and are considered less
 susceptible to fire.
 
-### ESS Performance and Warranties
+#### ESS Performance and Warranties
 
 Energy storage systems are controlled via their power electronics,
 setting specific discharge and recharge rates. It takes more energy to
@@ -2053,7 +1992,7 @@ more useful capacity over the life of the battery, but it comes with an
 added cost, both for initial oversizing and for periodic replacement of
 modules.
 
-### ESS Maintenance
+#### ESS Maintenance
 
 Solid state electrochemical energy storage systems require little active
 maintenance since there are few moving parts outside of relays and parts
@@ -2066,7 +2005,7 @@ provided with containment of any unanticipated spillage. All energy
 storage systems require inspection of electrical and electronic
 components to identify corrosion and other problems.
 
-### ESS Decommissioning
+#### ESS Decommissioning
 
 Decommissioning batteries can be as simple as removing the ESS
 enclosures to a site where the individual components can be recycled or
@@ -2082,7 +2021,7 @@ be completely recovered at end of life, and the balance of components
 are generally recyclable. Zinc and bromine from that category of flow
 batteries can also be recovered at end-of-life.
 
-## Codes and Standards 
+### Codes and Standards
 
 The following commercial standards may apply to equipment used in
 microgrids:
@@ -2142,7 +2081,6 @@ microgrids:
 
 [^1]: <https://www.govinfo.gov/content/pkg/USCODE-2019-title10/html/USCODE-2019-title10-subtitleA-partIV-chap173-subchapI-sec2911.htm>
 
-[^2]: See:
-    <https://www.energy.gov/eere/wind/articles/carbon-rivers-makes-wind-turbine-blade-recycling-and-upcycling-reality-support>
+[^2]: <https://www.energy.gov/eere/wind/articles/carbon-rivers-makes-wind-turbine-blade-recycling-and-upcycling-reality-support>
 
 [^3]: <https://www.epa.gov/hw/lithium-ion-battery-recycling>

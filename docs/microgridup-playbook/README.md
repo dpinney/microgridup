@@ -15,15 +15,18 @@ award number EW20-B8-5055.
 **Lauren Khair**
 
 Co-PI, MicrogridUP  
+
 Senior Director of Energy Research & Resilience  
+
 <Lauren.Khair@nreca.coop>
 
-**David Pinney**  
+**David Pinney**
+
 Co-PI, MicrogridUP
 
 Principal Analytical Tools & Software Products
 
-David.Pinney@nreca.coop
+<David.Pinney@nreca.coop>
 
 Copyright © 2024 by the National Rural Electric Cooperative Association.
 All Rights Reserved.
@@ -178,7 +181,7 @@ computational problems in large installation microgrid design—optimal
 distribution design and generation mix. Prior to release, the tool was
 field-validated at four diverse military installations.
 
-<img src="./media/image3.png" style="width:5.3in;height:2.86937in" alt="Figure 1. Four test installations and the utilities that serve them through UP contracts." />
+<img src="./media/image3.png" alt="Figure 1. Four test installations and the utilities that serve them through UP contracts." />
 <caption><p>Figure 1. Four test installations and the utilities that serve them through UP contracts.</p></caption>
 
 Key goals of the MicrogridUP tool are:
@@ -282,8 +285,7 @@ File Formats</th>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Meter Data<br />
-for Base</td>
+<td>Meter Data for Base</td>
 <td>One year of 15-minute AMI data</td>
 <td>One year of monthly energy consumption per building and SCADA load
 profiles for individual feeders</td>
@@ -369,7 +371,7 @@ install the MicrogridUP app.
 
     The MicrogridUP app should open to the Home screen below.
 
-    <img src="./media/image4.png" style="width:6.181in;height:2.175in" />
+    <img src="./media/image4.png"/>
 
     For next steps, see [Using MicrogridUP](#using-microgridup).
 
@@ -423,7 +425,7 @@ MicrogridUP:
 
 When opening MicrogridUP, you should see the Home screen below.
 
-<img src="./media/image5.png" style="width:6.775in;height:2.38402in" />
+<img src="./media/image5.png"/>
 
 Each box on this screen represents a completed project. A **project**
 consists of a set of input data and the microgrid design created by
@@ -453,8 +455,7 @@ From the Home screen you can:
 > Many of the fields in a new project have default values, but these can
 > be changed.
 
-<img src="./media/image6.png"
-style="width:6.48333in;height:2.78243in" />
+<img src="./media/image6.png"/>
 
 2.  Enter a **Project Name**. This name will be used to identify this
     project on the Home screen.
@@ -526,8 +527,7 @@ match exactly.
     loads** are loads which must be powered during outages or other
     resiliency events.
 
-<img src="./media/image7.png"
-style="width:4.08695in;height:2.16667in" />
+<img src="./media/image7.png"/>
 
 **To Build a Circuit Manually:**
 
@@ -557,8 +557,7 @@ style="width:4.08695in;height:2.16667in" />
     are loads which must be powered during outages or other resiliency
     events.
 
-<img src="./media/image8.png"
-style="width:4.73333in;height:4.69154in" />
+<img src="./media/image8.png"/>
 
 #### Step 3: Partition circuit into microgrids
 
@@ -567,8 +566,7 @@ circuit into microgrids and choose one that best fits your environment.
 
 1.  Under Step 3, select a **Microgrid Definition Method**.
 
-    <img src="./media/image9.png"
-    style="width:3.06667in;height:0.97984in" />
+    <img src="./media/image9.png"/>
 
     For more information about each of these methods, see the tooltips
     beside each method.
@@ -585,8 +583,7 @@ Next select the types of energy and/or storage technologies to be used.
 
 1.  Under Step 4, select one or more technologies.
 
-    <img src="./media/image10.png"
-    style="width:4.34167in;height:0.77185in" />
+    <img src="./media/image10.png"/>
 
 > As you select each box, additional fields for that option are
 > displayed with default values. For detailed information, see Table 2
@@ -671,7 +668,7 @@ outputs:
 - Distribution Upgrades needed to create Microgrids—detailed list of all
   distribution upgrades that will be necessary to host the microgrids.
 
-<img src="./media/image11.png" style="width:6.63253in;height:3.05833in" />
+<img src="./media/image11.png"/>
 <caption><p>Figure 1. Screenshot of sample graphs from Overview tab</p></caption>
 
 ### Map
@@ -685,7 +682,7 @@ and their detailed specifications. Should you need to manually adjust
 the circuit, the overlaid one-line interface allows full editing
 support.
 
-<img src="./media/image12.png" style="width:6.5in;height:3.06736in" />
+<img src="./media/image12.png"/>
 <caption><p>Figure 2. Screenshot of sample microgrid map from Map tab</p></caption>
 
 ### Interconnection
@@ -710,7 +707,7 @@ includes graphics depicting:
 - Traditional Hosting Capacity By Bus—total kW capable of
   interconnection at each bus on the circuit.
 
-<img src="./media/image13.png" style="width:6.5in;height:3.06736in" />
+<img src="./media/image13.png"/>
 <caption><p>Figure 3. Screenshot of sample graph from Interconnection tab</p></caption>
 
 ### Control
@@ -752,7 +749,7 @@ lowest renewable output. The Control tab includes graphics depicting:
   total cost of the microgrid. Inrush calculations use circuit
   information from the user inputs.
 
-<img src="./media/image14.png" style="width:6.5in;height:3.09306in" />
+<img src="./media/image14.png"/>
 <caption><p>Figure 4. Screenshot of sample graphs from Control tab</p></caption>
 
 ### Microgrids
@@ -786,7 +783,7 @@ individual microgrid in the system, with graphics depicting:
 
 - Input Data
 
-<img src="./media/image15.png" style="width:6.5in;height:3.07986in" />
+<img src="./media/image15.png"/>
 <caption><p>Figure 5. Screenshot of sample graphs from Microgrids tab</p></caption>
 
 ### Files

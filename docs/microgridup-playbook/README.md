@@ -638,8 +638,6 @@ circuit into microgrids and choose one that best fits your environment.
 
 ### Step 4: Select technologies to be used in microgrids
 
-### 
-
 Next select the types of energy and/or storage technologies to be used.
 
 1.  Under Step 4, select one or more technologies.
@@ -653,8 +651,6 @@ Next select the types of energy and/or storage technologies to be used.
 > of Appendix A.
 
 2.  If necessary, change the default values for each technology.
-
-### 
 
 ### Step 5 (Optional): Override technology parameters per-microgrid
 
@@ -769,8 +765,6 @@ includes graphics depicting:
   interconnection at each bus on the circuit.
 
 <img src="./media/image13.png" style="width:6.5in;height:3.06736in" />
-
-## 
 
 ## Control
 

@@ -602,19 +602,6 @@ def run():
 	time.sleep(5)
 	return redirect(f'/')
 
-#@doc_blueprint.route('/doc', methods=['GET'])
-#def doc():
-#    '''
-#    - Return the MicrogridUp playbook documentation in HTML
-#    - Use a blueprint to host this route so images can be served from microgridup-playbook/media
-#	'''
-#    with (Path(_mguDir) / 'docs' / 'microgridup-playbook' / 'README.md').open() as f:
-#        readme = f.read()
-#    regex = re.compile(r'(?<=^## Table of Contents\n\n).*(?=\n\n^## Overview)', re.MULTILINE | re.DOTALL)
-#    md_with_html_toc = regex.sub('[TOC]', readme)
-#    md = markdown.Markdown(extensions=['toc'])
-#    return md.convert(md_with_html_toc)
-
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = {'dss'}
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

@@ -1,0 +1,19 @@
+Microgrid,Location,Recommended Upgrade,Component Count,Cost Estimate ($)
+mg2,mg2,Microgrid Design,1,100000
+mg2,mg2,Microgrid Controls,1,100000
+mg2,cb_101,SCADA disconnect switch,1,50000
+mg2,load_1006,3-phase relay(s),1,20000
+mg2,load_1007,3-phase relay(s),1,20000
+mg2,load_1011,3-phase relay(s),1,20000
+mg2,load_1012,3-phase relay(s),1,20000
+mg2,load_1014,3-phase relay(s),1,20000
+mg2,load_1015,3-phase relay(s),1,20000
+mg2,load_1016,3-phase relay(s),1,20000
+mg2,load_1017,3-phase relay(s),1,20000
+mg2,load_1003,3-phase relay(s),1,20000
+mg2,load_1004,3-phase relay(s),1,20000
+mg2,load_1005,3-phase relay(s),1,20000
+mg2,load_1008,3-phase relay(s),1,20000
+mg2,load_1009,3-phase relay(s),1,20000
+mg2,load_1010,3-phase relay(s),1,20000
+mg2,load_1013,3-phase relay(s),1,20000

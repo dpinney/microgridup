@@ -6,6 +6,7 @@ data/projects/*
 !data/projects/lehigh4mgs/*
 !data/projects/lehighauto_3mg/*
 !data/projects/iowa240/*
+!data/projects/mackelroy/*
 
 # MicrogridUP: ignore production files
 ssl/*

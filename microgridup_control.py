@@ -147,13 +147,13 @@ def gradual_load_pickup(dssTree, loads, motor_perc=0.5):
 def calc_transformer_inrush(dssTransformerDict, default_resistance_transformer='[0.55,0.55]'):
 	'''Formula source: https://www.electrical4u.net/transformer/transformer-inrush-current-calculator-with-formula/'''
 	# TO DO: figure out if inrushes should be calculated separately for each winding. Current calculates separately but then adds together for one inrush per transformer. 
-	# I(peak) = 1.414 Vm / R(ohms) 
-	inrush = 0
+	# I(peak)(amps) = 1.414 Vm / R(ohms) 
+	inrush_amps = 0
 	for idx in range(len(dssTransformerDict.get('kvs')[1:-1].split(','))):
 		voltage = float(dssTransformerDict.get('kvs')[1:-1].split(',')[idx])
 		resistance = float(dssTransformerDict.get('%rs',default_resistance_transformer)[1:-1].split(',')[idx]) * float(dssTransformerDict.get('kvas')[1:-1].split(',')[idx])
-		inrush += math.sqrt(2) * voltage / resistance 
-	return inrush
+		inrush_amps += math.sqrt(2) * voltage / resistance 
+	return inrush_amps
 
 def calc_all_transformer_inrush(dssTree):
 	transformer_inrushes = {}

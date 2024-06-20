@@ -1,0 +1,431 @@
+redirect "circuit_plus_mgAll.dss"
+set datapath="/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/mackelroy"
+set maxcontroliter=1000
+calcvoltagebases
+new object=monitor.monvsource-source element=vsource.source terminal=1 mode=0
+new object=monitor.monload-load_1006 element=load.load_1006 terminal=1 mode=0
+new object=monitor.monload-load_1007 element=load.load_1007 terminal=1 mode=0
+new object=monitor.monload-load_1011 element=load.load_1011 terminal=1 mode=0
+new object=monitor.monload-load_1012 element=load.load_1012 terminal=1 mode=0
+new object=monitor.monload-load_1014 element=load.load_1014 terminal=1 mode=0
+new object=monitor.monload-load_1015 element=load.load_1015 terminal=1 mode=0
+new object=monitor.monload-load_1016 element=load.load_1016 terminal=1 mode=0
+new object=monitor.monload-load_1017 element=load.load_1017 terminal=1 mode=0
+new object=monitor.monload-load_2008 element=load.load_2008 terminal=1 mode=0
+new object=monitor.monload-load_2009 element=load.load_2009 terminal=1 mode=0
+new object=monitor.monload-load_2014 element=load.load_2014 terminal=1 mode=0
+new object=monitor.monload-load_2015 element=load.load_2015 terminal=1 mode=0
+new object=monitor.monload-load_2016 element=load.load_2016 terminal=1 mode=0
+new object=monitor.monload-load_2017 element=load.load_2017 terminal=1 mode=0
+new object=monitor.monload-load_2018 element=load.load_2018 terminal=1 mode=0
+new object=monitor.monload-load_2020 element=load.load_2020 terminal=1 mode=0
+new object=monitor.monload-load_2022 element=load.load_2022 terminal=1 mode=0
+new object=monitor.monload-load_2023 element=load.load_2023 terminal=1 mode=0
+new object=monitor.monload-load_2024 element=load.load_2024 terminal=1 mode=0
+new object=monitor.monload-load_2025 element=load.load_2025 terminal=1 mode=0
+new object=monitor.monload-load_2028 element=load.load_2028 terminal=1 mode=0
+new object=monitor.monload-load_2031 element=load.load_2031 terminal=1 mode=0
+new object=monitor.monload-load_2045 element=load.load_2045 terminal=1 mode=0
+new object=monitor.monload-load_2046 element=load.load_2046 terminal=1 mode=0
+new object=monitor.monload-load_2047 element=load.load_2047 terminal=1 mode=0
+new object=monitor.monload-load_2048 element=load.load_2048 terminal=1 mode=0
+new object=monitor.monload-load_2049 element=load.load_2049 terminal=1 mode=0
+new object=monitor.monload-load_2050 element=load.load_2050 terminal=1 mode=0
+new object=monitor.monload-load_2051 element=load.load_2051 terminal=1 mode=0
+new object=monitor.monload-load_2054 element=load.load_2054 terminal=1 mode=0
+new object=monitor.monload-load_2055 element=load.load_2055 terminal=1 mode=0
+new object=monitor.monload-load_2056 element=load.load_2056 terminal=1 mode=0
+new object=monitor.monload-load_2059 element=load.load_2059 terminal=1 mode=0
+new object=monitor.monload-load_2060 element=load.load_2060 terminal=1 mode=0
+new object=monitor.monload-load_3009 element=load.load_3009 terminal=1 mode=0
+new object=monitor.monload-load_3010 element=load.load_3010 terminal=1 mode=0
+new object=monitor.monload-load_3011 element=load.load_3011 terminal=1 mode=0
+new object=monitor.monload-load_3012 element=load.load_3012 terminal=1 mode=0
+new object=monitor.monload-load_3013 element=load.load_3013 terminal=1 mode=0
+new object=monitor.monload-load_3014 element=load.load_3014 terminal=1 mode=0
+new object=monitor.monload-load_3016 element=load.load_3016 terminal=1 mode=0
+new object=monitor.monload-load_3017 element=load.load_3017 terminal=1 mode=0
+new object=monitor.monload-load_3018 element=load.load_3018 terminal=1 mode=0
+new object=monitor.monload-load_3019 element=load.load_3019 terminal=1 mode=0
+new object=monitor.monload-load_3020 element=load.load_3020 terminal=1 mode=0
+new object=monitor.monload-load_3021 element=load.load_3021 terminal=1 mode=0
+new object=monitor.monload-load_3023 element=load.load_3023 terminal=1 mode=0
+new object=monitor.monload-load_3024 element=load.load_3024 terminal=1 mode=0
+new object=monitor.monload-load_3025 element=load.load_3025 terminal=1 mode=0
+new object=monitor.monload-load_3026 element=load.load_3026 terminal=1 mode=0
+new object=monitor.monload-load_3027 element=load.load_3027 terminal=1 mode=0
+new object=monitor.monload-load_3028 element=load.load_3028 terminal=1 mode=0
+new object=monitor.monload-load_3029 element=load.load_3029 terminal=1 mode=0
+new object=monitor.monload-load_3041 element=load.load_3041 terminal=1 mode=0
+new object=monitor.monload-load_3042 element=load.load_3042 terminal=1 mode=0
+new object=monitor.monload-load_3043 element=load.load_3043 terminal=1 mode=0
+new object=monitor.monload-load_3044 element=load.load_3044 terminal=1 mode=0
+new object=monitor.monload-load_3045 element=load.load_3045 terminal=1 mode=0
+new object=monitor.monload-load_3056 element=load.load_3056 terminal=1 mode=0
+new object=monitor.monload-load_3057 element=load.load_3057 terminal=1 mode=0
+new object=monitor.monload-load_3058 element=load.load_3058 terminal=1 mode=0
+new object=monitor.monload-load_3059 element=load.load_3059 terminal=1 mode=0
+new object=monitor.monload-load_3060 element=load.load_3060 terminal=1 mode=0
+new object=monitor.monload-load_3061 element=load.load_3061 terminal=1 mode=0
+new object=monitor.monload-load_3062 element=load.load_3062 terminal=1 mode=0
+new object=monitor.monload-load_3063 element=load.load_3063 terminal=1 mode=0
+new object=monitor.monload-load_3064 element=load.load_3064 terminal=1 mode=0
+new object=monitor.monload-load_3065 element=load.load_3065 terminal=1 mode=0
+new object=monitor.monload-load_3066 element=load.load_3066 terminal=1 mode=0
+new object=monitor.monload-load_3067 element=load.load_3067 terminal=1 mode=0
+new object=monitor.monload-load_3083 element=load.load_3083 terminal=1 mode=0
+new object=monitor.monload-load_3084 element=load.load_3084 terminal=1 mode=0
+new object=monitor.monload-load_3085 element=load.load_3085 terminal=1 mode=0
+new object=monitor.monload-load_3086 element=load.load_3086 terminal=1 mode=0
+new object=monitor.monload-load_3087 element=load.load_3087 terminal=1 mode=0
+new object=monitor.monload-load_3088 element=load.load_3088 terminal=1 mode=0
+new object=monitor.monload-load_3089 element=load.load_3089 terminal=1 mode=0
+new object=monitor.monload-load_3090 element=load.load_3090 terminal=1 mode=0
+new object=monitor.monload-load_3091 element=load.load_3091 terminal=1 mode=0
+new object=monitor.monload-load_3093 element=load.load_3093 terminal=1 mode=0
+new object=monitor.monload-load_3094 element=load.load_3094 terminal=1 mode=0
+new object=monitor.monload-load_3095 element=load.load_3095 terminal=1 mode=0
+new object=monitor.monload-load_3096 element=load.load_3096 terminal=1 mode=0
+new object=monitor.monload-load_3097 element=load.load_3097 terminal=1 mode=0
+new object=monitor.monload-load_3098 element=load.load_3098 terminal=1 mode=0
+new object=monitor.monload-load_3099 element=load.load_3099 terminal=1 mode=0
+new object=monitor.monload-load_3101 element=load.load_3101 terminal=1 mode=0
+new object=monitor.monload-load_3102 element=load.load_3102 terminal=1 mode=0
+new object=monitor.monload-load_3103 element=load.load_3103 terminal=1 mode=0
+new object=monitor.monload-load_3104 element=load.load_3104 terminal=1 mode=0
+new object=monitor.monload-load_3105 element=load.load_3105 terminal=1 mode=0
+new object=monitor.monload-load_3106 element=load.load_3106 terminal=1 mode=0
+new object=monitor.monload-load_3108 element=load.load_3108 terminal=1 mode=0
+new object=monitor.monload-load_3109 element=load.load_3109 terminal=1 mode=0
+new object=monitor.monload-load_3110 element=load.load_3110 terminal=1 mode=0
+new object=monitor.monload-load_3111 element=load.load_3111 terminal=1 mode=0
+new object=monitor.monload-load_3112 element=load.load_3112 terminal=1 mode=0
+new object=monitor.monload-load_3114 element=load.load_3114 terminal=1 mode=0
+new object=monitor.monload-load_3115 element=load.load_3115 terminal=1 mode=0
+new object=monitor.monload-load_3116 element=load.load_3116 terminal=1 mode=0
+new object=monitor.monload-load_3117 element=load.load_3117 terminal=1 mode=0
+new object=monitor.monload-load_3120 element=load.load_3120 terminal=1 mode=0
+new object=monitor.monload-load_3121 element=load.load_3121 terminal=1 mode=0
+new object=monitor.monload-load_3122 element=load.load_3122 terminal=1 mode=0
+new object=monitor.monload-load_3123 element=load.load_3123 terminal=1 mode=0
+new object=monitor.monload-load_3124 element=load.load_3124 terminal=1 mode=0
+new object=monitor.monload-load_3125 element=load.load_3125 terminal=1 mode=0
+new object=monitor.monload-load_3126 element=load.load_3126 terminal=1 mode=0
+new object=monitor.monload-load_3127 element=load.load_3127 terminal=1 mode=0
+new object=monitor.monload-load_3128 element=load.load_3128 terminal=1 mode=0
+new object=monitor.monload-load_3129 element=load.load_3129 terminal=1 mode=0
+new object=monitor.monload-load_3130 element=load.load_3130 terminal=1 mode=0
+new object=monitor.monload-load_3131 element=load.load_3131 terminal=1 mode=0
+new object=monitor.monload-load_3132 element=load.load_3132 terminal=1 mode=0
+new object=monitor.monload-load_3134 element=load.load_3134 terminal=1 mode=0
+new object=monitor.monload-load_3135 element=load.load_3135 terminal=1 mode=0
+new object=monitor.monload-load_3136 element=load.load_3136 terminal=1 mode=0
+new object=monitor.monload-load_3137 element=load.load_3137 terminal=1 mode=0
+new object=monitor.monload-load_3138 element=load.load_3138 terminal=1 mode=0
+new object=monitor.monload-load_3139 element=load.load_3139 terminal=1 mode=0
+new object=monitor.monload-load_3141 element=load.load_3141 terminal=1 mode=0
+new object=monitor.monload-load_3142 element=load.load_3142 terminal=1 mode=0
+new object=monitor.monload-load_3143 element=load.load_3143 terminal=1 mode=0
+new object=monitor.monload-load_3144 element=load.load_3144 terminal=1 mode=0
+new object=monitor.monload-load_3145 element=load.load_3145 terminal=1 mode=0
+new object=monitor.monload-load_3146 element=load.load_3146 terminal=1 mode=0
+new object=monitor.monload-load_3147 element=load.load_3147 terminal=1 mode=0
+new object=monitor.monload-load_3148 element=load.load_3148 terminal=1 mode=0
+new object=monitor.monload-load_3149 element=load.load_3149 terminal=1 mode=0
+new object=monitor.monload-load_3150 element=load.load_3150 terminal=1 mode=0
+new object=monitor.monload-load_3151 element=load.load_3151 terminal=1 mode=0
+new object=monitor.monload-load_3152 element=load.load_3152 terminal=1 mode=0
+new object=monitor.monload-load_3153 element=load.load_3153 terminal=1 mode=0
+new object=monitor.monload-load_3154 element=load.load_3154 terminal=1 mode=0
+new object=monitor.monload-load_3155 element=load.load_3155 terminal=1 mode=0
+new object=monitor.monload-load_3157 element=load.load_3157 terminal=1 mode=0
+new object=monitor.monload-load_3158 element=load.load_3158 terminal=1 mode=0
+new object=monitor.monload-load_3159 element=load.load_3159 terminal=1 mode=0
+new object=monitor.monload-load_3160 element=load.load_3160 terminal=1 mode=0
+new object=monitor.monload-load_3161 element=load.load_3161 terminal=1 mode=0
+new object=monitor.monload-load_3162 element=load.load_3162 terminal=1 mode=0
+new object=monitor.monload-load_1003 element=load.load_1003 terminal=1 mode=0
+new object=monitor.monload-load_1004 element=load.load_1004 terminal=1 mode=0
+new object=monitor.monload-load_1005 element=load.load_1005 terminal=1 mode=0
+new object=monitor.monload-load_1008 element=load.load_1008 terminal=1 mode=0
+new object=monitor.monload-load_1009 element=load.load_1009 terminal=1 mode=0
+new object=monitor.monload-load_1010 element=load.load_1010 terminal=1 mode=0
+new object=monitor.monload-load_1013 element=load.load_1013 terminal=1 mode=0
+new object=monitor.monload-load_2002 element=load.load_2002 terminal=1 mode=0
+new object=monitor.monload-load_2003 element=load.load_2003 terminal=1 mode=0
+new object=monitor.monload-load_2005 element=load.load_2005 terminal=1 mode=0
+new object=monitor.monload-load_2010 element=load.load_2010 terminal=1 mode=0
+new object=monitor.monload-load_2011 element=load.load_2011 terminal=1 mode=0
+new object=monitor.monload-load_2029 element=load.load_2029 terminal=1 mode=0
+new object=monitor.monload-load_2030 element=load.load_2030 terminal=1 mode=0
+new object=monitor.monload-load_2032 element=load.load_2032 terminal=1 mode=0
+new object=monitor.monload-load_2034 element=load.load_2034 terminal=1 mode=0
+new object=monitor.monload-load_2035 element=load.load_2035 terminal=1 mode=0
+new object=monitor.monload-load_2037 element=load.load_2037 terminal=1 mode=0
+new object=monitor.monload-load_2040 element=load.load_2040 terminal=1 mode=0
+new object=monitor.monload-load_2041 element=load.load_2041 terminal=1 mode=0
+new object=monitor.monload-load_2042 element=load.load_2042 terminal=1 mode=0
+new object=monitor.monload-load_2043 element=load.load_2043 terminal=1 mode=0
+new object=monitor.monload-load_2052 element=load.load_2052 terminal=1 mode=0
+new object=monitor.monload-load_2053 element=load.load_2053 terminal=1 mode=0
+new object=monitor.monload-load_2058 element=load.load_2058 terminal=1 mode=0
+new object=monitor.monload-load_3002 element=load.load_3002 terminal=1 mode=0
+new object=monitor.monload-load_3004 element=load.load_3004 terminal=1 mode=0
+new object=monitor.monload-load_3006 element=load.load_3006 terminal=1 mode=0
+new object=monitor.monload-load_3007 element=load.load_3007 terminal=1 mode=0
+new object=monitor.monload-load_3031 element=load.load_3031 terminal=1 mode=0
+new object=monitor.monload-load_3032 element=load.load_3032 terminal=1 mode=0
+new object=monitor.monload-load_3033 element=load.load_3033 terminal=1 mode=0
+new object=monitor.monload-load_3034 element=load.load_3034 terminal=1 mode=0
+new object=monitor.monload-load_3035 element=load.load_3035 terminal=1 mode=0
+new object=monitor.monload-load_3036 element=load.load_3036 terminal=1 mode=0
+new object=monitor.monload-load_3037 element=load.load_3037 terminal=1 mode=0
+new object=monitor.monload-load_3038 element=load.load_3038 terminal=1 mode=0
+new object=monitor.monload-load_3039 element=load.load_3039 terminal=1 mode=0
+new object=monitor.monload-load_3047 element=load.load_3047 terminal=1 mode=0
+new object=monitor.monload-load_3048 element=load.load_3048 terminal=1 mode=0
+new object=monitor.monload-load_3049 element=load.load_3049 terminal=1 mode=0
+new object=monitor.monload-load_3050 element=load.load_3050 terminal=1 mode=0
+new object=monitor.monload-load_3051 element=load.load_3051 terminal=1 mode=0
+new object=monitor.monload-load_3052 element=load.load_3052 terminal=1 mode=0
+new object=monitor.monload-load_3054 element=load.load_3054 terminal=1 mode=0
+new object=monitor.monload-load_3070 element=load.load_3070 terminal=1 mode=0
+new object=monitor.monload-load_3071 element=load.load_3071 terminal=1 mode=0
+new object=monitor.monload-load_3072 element=load.load_3072 terminal=1 mode=0
+new object=monitor.monload-load_3073 element=load.load_3073 terminal=1 mode=0
+new object=monitor.monload-load_3074 element=load.load_3074 terminal=1 mode=0
+new object=monitor.monload-load_3077 element=load.load_3077 terminal=1 mode=0
+new object=monitor.monload-load_3078 element=load.load_3078 terminal=1 mode=0
+new object=monitor.monload-load_3081 element=load.load_3081 terminal=1 mode=0
+new object=monitor.monregcontrol-reg_contr_a element=transformer.sub_regulator_a terminal=2 mode=2
+new object=monitor.monregcontrol-reg_contr_b element=transformer.sub_regulator_b terminal=2 mode=2
+new object=monitor.monregcontrol-reg_contr_c element=transformer.sub_regulator_c terminal=2 mode=2
+new object=monitor.moncapacitor-cap_201 element=capacitor.cap_201 terminal=1 mode=6
+new object=monitor.moncapacitor-cap_301 element=capacitor.cap_301 terminal=1 mode=6
+new object=monitor.mongenerator-battery_bus3004 element=storage.battery_bus3004 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-fossil_bus3004 element=generator.fossil_bus3004 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-solar_bus3004 element=generator.solar_bus3004 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-battery_bus1001 element=storage.battery_bus1001 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-fossil_bus1001 element=generator.fossil_bus1001 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-solar_bus1001 element=generator.solar_bus1001 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-battery_bus2001 element=storage.battery_bus2001 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-fossil_bus2001 element=generator.fossil_bus2001 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-solar_bus2001 element=generator.solar_bus2001 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-battery_bus3005 element=storage.battery_bus3005 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-fossil_bus3005 element=generator.fossil_bus3005 terminal=1 mode=1 ppolar=no
+new object=monitor.mongenerator-solar_bus3005 element=generator.solar_bus3005 terminal=1 mode=1 ppolar=no
+set mode=yearly stepsize=60m 
+set number=480
+solve
+export monitors monitorname=monvsource-source
+export monitors monitorname=monload-load_1006
+export monitors monitorname=monload-load_1007
+export monitors monitorname=monload-load_1011
+export monitors monitorname=monload-load_1012
+export monitors monitorname=monload-load_1014
+export monitors monitorname=monload-load_1015
+export monitors monitorname=monload-load_1016
+export monitors monitorname=monload-load_1017
+export monitors monitorname=monload-load_2008
+export monitors monitorname=monload-load_2009
+export monitors monitorname=monload-load_2014
+export monitors monitorname=monload-load_2015
+export monitors monitorname=monload-load_2016
+export monitors monitorname=monload-load_2017
+export monitors monitorname=monload-load_2018
+export monitors monitorname=monload-load_2020
+export monitors monitorname=monload-load_2022
+export monitors monitorname=monload-load_2023
+export monitors monitorname=monload-load_2024
+export monitors monitorname=monload-load_2025
+export monitors monitorname=monload-load_2028
+export monitors monitorname=monload-load_2031
+export monitors monitorname=monload-load_2045
+export monitors monitorname=monload-load_2046
+export monitors monitorname=monload-load_2047
+export monitors monitorname=monload-load_2048
+export monitors monitorname=monload-load_2049
+export monitors monitorname=monload-load_2050
+export monitors monitorname=monload-load_2051
+export monitors monitorname=monload-load_2054
+export monitors monitorname=monload-load_2055
+export monitors monitorname=monload-load_2056
+export monitors monitorname=monload-load_2059
+export monitors monitorname=monload-load_2060
+export monitors monitorname=monload-load_3009
+export monitors monitorname=monload-load_3010
+export monitors monitorname=monload-load_3011
+export monitors monitorname=monload-load_3012
+export monitors monitorname=monload-load_3013
+export monitors monitorname=monload-load_3014
+export monitors monitorname=monload-load_3016
+export monitors monitorname=monload-load_3017
+export monitors monitorname=monload-load_3018
+export monitors monitorname=monload-load_3019
+export monitors monitorname=monload-load_3020
+export monitors monitorname=monload-load_3021
+export monitors monitorname=monload-load_3023
+export monitors monitorname=monload-load_3024
+export monitors monitorname=monload-load_3025
+export monitors monitorname=monload-load_3026
+export monitors monitorname=monload-load_3027
+export monitors monitorname=monload-load_3028
+export monitors monitorname=monload-load_3029
+export monitors monitorname=monload-load_3041
+export monitors monitorname=monload-load_3042
+export monitors monitorname=monload-load_3043
+export monitors monitorname=monload-load_3044
+export monitors monitorname=monload-load_3045
+export monitors monitorname=monload-load_3056
+export monitors monitorname=monload-load_3057
+export monitors monitorname=monload-load_3058
+export monitors monitorname=monload-load_3059
+export monitors monitorname=monload-load_3060
+export monitors monitorname=monload-load_3061
+export monitors monitorname=monload-load_3062
+export monitors monitorname=monload-load_3063
+export monitors monitorname=monload-load_3064
+export monitors monitorname=monload-load_3065
+export monitors monitorname=monload-load_3066
+export monitors monitorname=monload-load_3067
+export monitors monitorname=monload-load_3083
+export monitors monitorname=monload-load_3084
+export monitors monitorname=monload-load_3085
+export monitors monitorname=monload-load_3086
+export monitors monitorname=monload-load_3087
+export monitors monitorname=monload-load_3088
+export monitors monitorname=monload-load_3089
+export monitors monitorname=monload-load_3090
+export monitors monitorname=monload-load_3091
+export monitors monitorname=monload-load_3093
+export monitors monitorname=monload-load_3094
+export monitors monitorname=monload-load_3095
+export monitors monitorname=monload-load_3096
+export monitors monitorname=monload-load_3097
+export monitors monitorname=monload-load_3098
+export monitors monitorname=monload-load_3099
+export monitors monitorname=monload-load_3101
+export monitors monitorname=monload-load_3102
+export monitors monitorname=monload-load_3103
+export monitors monitorname=monload-load_3104
+export monitors monitorname=monload-load_3105
+export monitors monitorname=monload-load_3106
+export monitors monitorname=monload-load_3108
+export monitors monitorname=monload-load_3109
+export monitors monitorname=monload-load_3110
+export monitors monitorname=monload-load_3111
+export monitors monitorname=monload-load_3112
+export monitors monitorname=monload-load_3114
+export monitors monitorname=monload-load_3115
+export monitors monitorname=monload-load_3116
+export monitors monitorname=monload-load_3117
+export monitors monitorname=monload-load_3120
+export monitors monitorname=monload-load_3121
+export monitors monitorname=monload-load_3122
+export monitors monitorname=monload-load_3123
+export monitors monitorname=monload-load_3124
+export monitors monitorname=monload-load_3125
+export monitors monitorname=monload-load_3126
+export monitors monitorname=monload-load_3127
+export monitors monitorname=monload-load_3128
+export monitors monitorname=monload-load_3129
+export monitors monitorname=monload-load_3130
+export monitors monitorname=monload-load_3131
+export monitors monitorname=monload-load_3132
+export monitors monitorname=monload-load_3134
+export monitors monitorname=monload-load_3135
+export monitors monitorname=monload-load_3136
+export monitors monitorname=monload-load_3137
+export monitors monitorname=monload-load_3138
+export monitors monitorname=monload-load_3139
+export monitors monitorname=monload-load_3141
+export monitors monitorname=monload-load_3142
+export monitors monitorname=monload-load_3143
+export monitors monitorname=monload-load_3144
+export monitors monitorname=monload-load_3145
+export monitors monitorname=monload-load_3146
+export monitors monitorname=monload-load_3147
+export monitors monitorname=monload-load_3148
+export monitors monitorname=monload-load_3149
+export monitors monitorname=monload-load_3150
+export monitors monitorname=monload-load_3151
+export monitors monitorname=monload-load_3152
+export monitors monitorname=monload-load_3153
+export monitors monitorname=monload-load_3154
+export monitors monitorname=monload-load_3155
+export monitors monitorname=monload-load_3157
+export monitors monitorname=monload-load_3158
+export monitors monitorname=monload-load_3159
+export monitors monitorname=monload-load_3160
+export monitors monitorname=monload-load_3161
+export monitors monitorname=monload-load_3162
+export monitors monitorname=monload-load_1003
+export monitors monitorname=monload-load_1004
+export monitors monitorname=monload-load_1005
+export monitors monitorname=monload-load_1008
+export monitors monitorname=monload-load_1009
+export monitors monitorname=monload-load_1010
+export monitors monitorname=monload-load_1013
+export monitors monitorname=monload-load_2002
+export monitors monitorname=monload-load_2003
+export monitors monitorname=monload-load_2005
+export monitors monitorname=monload-load_2010
+export monitors monitorname=monload-load_2011
+export monitors monitorname=monload-load_2029
+export monitors monitorname=monload-load_2030
+export monitors monitorname=monload-load_2032
+export monitors monitorname=monload-load_2034
+export monitors monitorname=monload-load_2035
+export monitors monitorname=monload-load_2037
+export monitors monitorname=monload-load_2040
+export monitors monitorname=monload-load_2041
+export monitors monitorname=monload-load_2042
+export monitors monitorname=monload-load_2043
+export monitors monitorname=monload-load_2052
+export monitors monitorname=monload-load_2053
+export monitors monitorname=monload-load_2058
+export monitors monitorname=monload-load_3002
+export monitors monitorname=monload-load_3004
+export monitors monitorname=monload-load_3006
+export monitors monitorname=monload-load_3007
+export monitors monitorname=monload-load_3031
+export monitors monitorname=monload-load_3032
+export monitors monitorname=monload-load_3033
+export monitors monitorname=monload-load_3034
+export monitors monitorname=monload-load_3035
+export monitors monitorname=monload-load_3036
+export monitors monitorname=monload-load_3037
+export monitors monitorname=monload-load_3038
+export monitors monitorname=monload-load_3039
+export monitors monitorname=monload-load_3047
+export monitors monitorname=monload-load_3048
+export monitors monitorname=monload-load_3049
+export monitors monitorname=monload-load_3050
+export monitors monitorname=monload-load_3051
+export monitors monitorname=monload-load_3052
+export monitors monitorname=monload-load_3054
+export monitors monitorname=monload-load_3070
+export monitors monitorname=monload-load_3071
+export monitors monitorname=monload-load_3072
+export monitors monitorname=monload-load_3073
+export monitors monitorname=monload-load_3074
+export monitors monitorname=monload-load_3077
+export monitors monitorname=monload-load_3078
+export monitors monitorname=monload-load_3081
+export monitors monitorname=monregcontrol-reg_contr_a
+export monitors monitorname=monregcontrol-reg_contr_b
+export monitors monitorname=monregcontrol-reg_contr_c
+export monitors monitorname=moncapacitor-cap_201
+export monitors monitorname=moncapacitor-cap_301
+export monitors monitorname=mongenerator-battery_bus3004
+export monitors monitorname=mongenerator-fossil_bus3004
+export monitors monitorname=mongenerator-solar_bus3004
+export monitors monitorname=mongenerator-battery_bus1001
+export monitors monitorname=mongenerator-fossil_bus1001
+export monitors monitorname=mongenerator-solar_bus1001
+export monitors monitorname=mongenerator-battery_bus2001
+export monitors monitorname=mongenerator-fossil_bus2001
+export monitors monitorname=mongenerator-solar_bus2001
+export monitors monitorname=mongenerator-battery_bus3005
+export monitors monitorname=mongenerator-fossil_bus3005
+export monitors monitorname=mongenerator-solar_bus3005

@@ -211,6 +211,11 @@
       0%,100% { opacity: 1; }
       50% { opacity: 0; }
     }
+    /* Disabled links/spans/anchor tags when server is offline. */
+    .disabled-link, .disabled-span, .disabled-parent {
+        pointer-events: none;
+        color: gray;
+    }
     </style>
   </head>
   <body class="loading">
@@ -589,7 +594,63 @@
         }
     }
 
+    function disableLinks() {
+        const links = document.querySelectorAll('ul li a');
+        links.forEach(link => {
+            link.classList.add('disabled-link');
+        });
+        const spans = document.querySelectorAll('.span--sectionTitle');
+        spans.forEach(span => {
+            span.classList.add('disabled-span');
+            const parentLink = span.closest('a');
+            if (parentLink) {
+                parentLink.classList.add('disabled-parent');
+            }
+        });
+    }
+
+    function enableLinks() {
+        const links = document.querySelectorAll('ul li a');
+        links.forEach(link => {
+            link.classList.remove('disabled-link');
+        });
+        const spans = document.querySelectorAll('.span--sectionTitle');
+        spans.forEach(span => {
+            span.classList.remove('disabled-span');
+            const parentLink = span.closest('a');
+            if (parentLink) {
+                parentLink.classList.remove('disabled-parent');
+            }
+        });
+    }
+
+    async function checkServerStatus() {
+        try {
+            const response = await fetch('/healthcheck');
+            if (response.ok) {
+                const data = await response.json();
+                if (data.status === 'running') {
+                    enableLinks();
+                } else {
+                    console.log('Unexpected condition: data.status !== "running".');
+                    disableLinks();
+                }
+            } else {
+                console.log('Unexpected condition: !(response.ok).');
+                disableLinks();
+            }
+        } catch (error) {
+            if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                disableLinks();
+            } else {
+                console.error('Unexpected error:', error);
+            }
+        }
+    }
+
     main();
+    var checkServerStatusId = setInterval(checkServerStatus, 5000); // Stop check from frontend using `clearInterval(checkServerStatusId);`.
+    checkServerStatus();
     </script>
   </body>
 </html>

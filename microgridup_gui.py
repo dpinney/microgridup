@@ -94,6 +94,10 @@ def home():
 	projects, project_timestamps, project_descriptions = list_projects()
 	return render_template('template_home.html', projects=projects, project_timestamps=project_timestamps, project_descriptions=project_descriptions)
 
+@app.route('/healthcheck')
+def healthcheck():
+    return jsonify(status="running")
+
 @app.route('/rfile/<project>/<filename>')
 def rfile(project, filename):
 	return send_from_directory(os.path.join(_projectDir, project), filename)

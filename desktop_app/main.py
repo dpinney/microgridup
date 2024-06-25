@@ -13,9 +13,15 @@ root_dir = pathlib.Path(__file__).parent
 
 
 '''
-- Packaging
-    - macOS: $ pyinstaller --windowed -n MicrogridUp --icon NRECA-logo.icns --add-data="src:src" main.py
-    - Windows:
+- pyinstaller packaging to create .app or .exe
+    - macOS:    $ pyinstaller --windowed -n MicrogridUp --icon NRECA-logo.icns --add-data="src:src" main.py
+    - Windows:  $ pyinstaller --windowed -n MicrogridUp --icon NRECA-logo.ico --add-data="src:src" main.py
+    - Linux:
+- Installer creation
+    - macOS: run $ ./build-dmg
+    - Windows: use InstallForge (https://installforge.net/) with the provided MicrogridUp-InstallerForgeProfile.ifp file. The InstallForge
+      configuration will need to be modified to work on your computer. See
+      (https://www.pythonguis.com/tutorials/packaging-pyside6-applications-windows-pyinstaller-installforge/#hiding-the-console-window)
     - Linux:
 '''
 
@@ -24,6 +30,13 @@ def main():
     '''
     - The browser window should only be shown to the user when the LoadingScreen calls the finished_callback() function.
     '''
+    # - Set the Windows taskbar icon
+    try:
+        from ctypes import windll  # Only exists on Windows.
+        myappid = 'nreca.microgridup.desktop_app.1'
+        windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    except ImportError:
+        pass
     app = QApplication()
     web_browser = browser.Browser()
     loading_screen = startup.LoadingScreen(finished_callback=lambda: show_browser(web_browser))

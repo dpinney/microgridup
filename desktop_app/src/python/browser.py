@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
 
-import pathlib
-from main import root_dir
+import pathlib, platform
 from PySide6.QtCore import QUrl, Qt, QSize
-from PySide6.QtGui import QPixmap
+from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtWidgets import QMainWindow, QWidget, QPushButton, QHBoxLayout, QVBoxLayout
 from PySide6.QtWebEngineCore import QWebEnginePage
 from PySide6.QtWebEngineWidgets import QWebEngineView
+import main
 
 
 class Browser(QMainWindow):
@@ -17,7 +17,10 @@ class Browser(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        with (pathlib.Path(root_dir) / 'src' / 'styles' / 'main.qss').open() as f:
+        if platform.system() == 'Windows':
+            icon = QIcon(str(pathlib.Path(main.root_dir) / 'NRECA-logo.ico'))
+            self.setWindowIcon(icon)
+        with (pathlib.Path(main.root_dir) / 'src' / 'styles' / 'main.qss').open() as f:
             self.setStyleSheet(f.read())
         self.setWindowTitle('MicrogridUp')
         # - Set up the web views
@@ -28,17 +31,17 @@ class Browser(QMainWindow):
         self.doc_browser = None
         # - Set up button(s) by the web view
         self.refresh_button = QPushButton()
-        icon = QPixmap(str(pathlib.Path(root_dir) / 'src' / 'images' / 'refresh-icon.svg'))
+        icon = QPixmap(str(pathlib.Path(main.root_dir) / 'src' / 'images' / 'refresh-icon.svg'))
         self.refresh_button.setIcon(icon)
         self.refresh_button.setIconSize(QSize(24, 24))
         self.refresh_button.clicked.connect(self.browser.reload)
         self.home_button = QPushButton()
-        icon = QPixmap(str(pathlib.Path(root_dir) / 'src' / 'images' / 'home-icon.svg'))
+        icon = QPixmap(str(pathlib.Path(main.root_dir) / 'src' / 'images' / 'home-icon.svg'))
         self.home_button.setIcon(icon)
         self.home_button.setIconSize(QSize(30, 30))
         self.home_button.clicked.connect(self.go_home)
         self.help_button = QPushButton()
-        icon = QPixmap(str(pathlib.Path(root_dir) / 'src' / 'images' / 'help-icon.svg'))
+        icon = QPixmap(str(pathlib.Path(main.root_dir) / 'src' / 'images' / 'help-icon.svg'))
         self.help_button.setIcon(icon)
         self.help_button.setIconSize(QSize(29, 29))
         self.help_button.clicked.connect(self.go_help)

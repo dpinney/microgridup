@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
 
-import sys, traceback
+import sys, traceback, platform, pathlib
+from PySide6.QtGui import QIcon
 from PySide6.QtCore import QRunnable, Slot, QThreadPool, Signal, QObject, QSize, Qt
 from PySide6.QtWidgets import QVBoxLayout, QLabel, QWidget, QMainWindow
 import src.python.docker as docker
+import main
 
 
 class LoadingScreen(QMainWindow):
@@ -18,6 +20,9 @@ class LoadingScreen(QMainWindow):
         :type finished_callback: function
         '''
         super().__init__()
+        if platform.system() == 'Windows':
+            icon = QIcon(str(pathlib.Path(main.root_dir) / 'NRECA-logo.ico'))
+            self.setWindowIcon(icon)
         self.setWindowTitle('Loading MicrogridUp...')
         self.container_id = 'mgu-container'
         self.finished_callback = finished_callback

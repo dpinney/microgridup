@@ -4,91 +4,132 @@
 import platform, subprocess, sys, time
 
 
-if platform.system() == 'Darwin':
-    docker_desktop_cmd = 'open -a Docker'
-    docker_cli_cmd = '/usr/local/bin/docker'
-elif platform.system() == 'Linux':
-    docker_desktop_cmd = None
-    docker_cli_cmd = None
-elif platform.system() == 'Windows':
-    docker_desktop_cmd = '"C:/Program Files/Docker/Docker/Docker Desktop.exe"'
-    docker_cli_cmd = '"C:/Program Files/Docker/Docker/resources/bin/docker.exe"'
-else:
-    print('The MicrogridUp app could not determine the operating system.')
-    sys.exit()
-
-
-def initialize_docker():
+class Docker:
     '''
-    - x
+    - A class to initialize the Docker environment
     '''
-    # - Start Docker Desktop
-    #   - If Docker is already running, this command won't do anything
-    #   - Installing Docker Desktop makes the $ docker $ command available, but ONLY after Docker Desktop has been opened and configured by the user
-    try:
-        subprocess.run(f'{docker_desktop_cmd}', shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except subprocess.CalledProcessError as e:
-        print(f'The MicrogridUp app could not start the Docker Desktop application via the cmd command $ {docker_desktop_cmd}. ' +
-            'If Docker is not installed, please install and configure Docker from https://docs.docker.com/desktop/. Otherwise start the Docker Desktop application manually.')
-        sys.exit()
-    # - Pull the image
-    try:
-        print('Pulling the latest MicrogridUp image. This could take some time...')
-        subprocess.run(f'{docker_cli_cmd} pull ghcr.io/dpinney/microgridup:main', shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except subprocess.CalledProcessError as e:
-        print('The MicrogridUp app could not pull the ghcr.io/dpinney/microgridup:main Docker image. Please pull the image manually.')
-        sys.exit()
-    # - Check if the Docker volume already exists
-    #   - If it does exist, we don't need to do anything
-    try:
-        subprocess.run(f'{docker_cli_cmd} volume inspect mgu-volume', shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except subprocess.CalledProcessError as e:
-        # - If the volume does not exist, create it and pre-populate it with data
-        try:
-            subprocess.run(f'{docker_cli_cmd} volume create mgu-volume', shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except subprocess.CalledProcessError as e:
-            print('The MicrogridUp app could not create a persistent volume for the container. Please manually create a volume called "mgu-volume".')
+
+    def __init__(self, progress_callback=print):
+        '''
+        :param progress_callback: the function to report progress (e.g. print() or src.python.WorkerSignals.progress.emit())
+        :type progress_callback: function
+        '''
+        self.progress_callback = progress_callback
+        # - Determine the appropriate commands based on the operating system
+        if platform.system() == 'Darwin':
+            self.docker_desktop_cmd = 'open -a Docker'
+            self.docker_cli_cmd = '/usr/local/bin/docker'
+        elif platform.system() == 'Linux':
+            self.docker_desktop_cmd = None
+            self.docker_cli_cmd = None
+        elif platform.system() == 'Windows':
+            self.docker_desktop_cmd = '"C:/Program Files/Docker/Docker/Docker Desktop.exe"'
+            self.docker_cli_cmd = '"C:/Program Files/Docker/Docker/resources/bin/docker.exe"'
+        else:
+            self.progress_callback('The MicrogridUp app could not determine the operating system.')
             sys.exit()
+
+    def initialize_docker(self):
+        '''
+        Start the mgu-container
+
+        :return: the ID of the started container
+        :rtype: str
+        '''
+        # - Start Docker Desktop
+        #   - If Docker is already running, this command won't do anything
+        #   - Installing Docker Desktop makes the $ docker $ command available, but ONLY after Docker Desktop has been opened and configured by the user
         try:
-            subprocess.run(
-                f'{docker_cli_cmd} run --rm --mount type=volume,src="mgu-volume",dst="/mgu-volume" --entrypoint bash ghcr.io/dpinney/microgridup:main "-c" "cp -r /data/projects/* /mgu-volume/"',
-                shell=True,
-                check=True,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL)
+            self.progress_callback('Starting Docker Desktop...')
+            self.start_subprocess(f'{self.docker_desktop_cmd}')
         except subprocess.CalledProcessError as e:
-            print('The MicrogridUp app could not copy data from the Docker image at data/projects into the persistent volume mounted at data/projects.')
+            self.progress_callback(f'The MicrogridUp app could not start the Docker Desktop application via the cmd command $ {self.docker_desktop_cmd}. ' +
+                'If Docker is not installed, please install and configure Docker from https://docs.docker.com/desktop/. Otherwise start the Docker Desktop application manually.')
             sys.exit()
-    # - Start the container in detached mode with the persistent volume
-    start_container_cmd = f'{docker_cli_cmd} run -d --rm -p 5000:5000 --name mgu-container --mount type=volume,source="mgu-volume",target="/data/projects" ghcr.io/dpinney/microgridup:main'
-    try:
-        p = subprocess.run(start_container_cmd, shell=True, check=True, capture_output=True, encoding='utf-8')
-        container_id = p.stdout
-    except subprocess.CalledProcessError as e:
-        # - If there was an error, try the following:
+        # - Pull the image
         try:
-            # - Check if the container is still running from a previous run and shut it down
-            subprocess.run(f'{docker_cli_cmd} stop mgu-container', shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            time.sleep(10)
-            # - Try to start it again
+            self.progress_callback('Checking for the latest MicrogridUp image...')
+            self.start_subprocess(f'{self.docker_cli_cmd} pull ghcr.io/dpinney/microgridup:main')
+        except subprocess.CalledProcessError as e:
+            self.progress_callback('The MicrogridUp app could not pull the ghcr.io/dpinney/microgridup:main Docker image.')
+            sys.exit()
+        # - Check if the Docker volume already exists
+        #   - If it does exist, we don't need to do anything
+        try:
+            self.progress_callback('Checking for the mgu-volume volume...')
+            self.start_subprocess(f'{self.docker_cli_cmd} volume inspect mgu-volume')
+        except subprocess.CalledProcessError as e:
+            # - If the volume does not exist, create it and pre-populate it with data
+            try:
+                self.progress_callback('Creating the mgu-volume volume...')
+                self.start_subprocess(f'{self.docker_cli_cmd} volume create mgu-volume')
+            except subprocess.CalledProcessError as e:
+                self.progress_callback('The MicrogridUp app could not create a persistent volume for the container.')
+                sys.exit()
+            try:
+                self.progress_callback('Filling the mgu-volume volume with examples...')
+                self.start_subprocess(f'{self.docker_cli_cmd} run --rm --mount type=volume,src="mgu-volume",dst="/mgu-volume" --entrypoint bash ghcr.io/dpinney/microgridup:main "-c" "cp -r /data/projects/* /mgu-volume/"')
+            except subprocess.CalledProcessError as e:
+                self.progress_callback('The MicrogridUp app could not copy data from the Docker image at data/projects into the persistent volume mounted at data/projects.')
+                sys.exit()
+        # - Start the container in detached mode with the persistent volume
+        start_container_cmd = f'{self.docker_cli_cmd} run -d --rm -p 5000:5000 --name mgu-container --mount type=volume,source="mgu-volume",target="/data/projects" ghcr.io/dpinney/microgridup:main'
+        try:
+            self.progress_callback('Starting the mgu-container on port 5000...')
+            # - We want to block until we get the stdout
             p = subprocess.run(start_container_cmd, shell=True, check=True, capture_output=True, encoding='utf-8')
+            self.progress_callback('    ' + p.stderr)
             container_id = p.stdout
         except subprocess.CalledProcessError as e:
-            # - If we still failed, then port 5000 probably isn't available
-            print('The MicrogridUp app could not start the Docker container and bind the web server on port 5000. Please check that port 5000 is open on your local machine.')
+            # - If there was an error, try the following:
+            try:
+                # - Check if the container is still running from a previous run and shut it down
+                self.progress_callback('There was a problem starting the mgu-container. Trying to restart the container...')
+                self.start_subprocess(f'{self.docker_cli_cmd} stop mgu-container')
+                time.sleep(10)
+                # - Try to start it again
+                p = subprocess.run(start_container_cmd, shell=True, check=True, capture_output=True, encoding='utf-8')
+                self.progress_callback('    ' + p.stderr)
+                container_id = p.stdout
+            except subprocess.CalledProcessError as e:
+                # - If we still failed, then port 5000 probably isn't available
+                self.progress_callback('The MicrogridUp app could not start the Docker container and bind the web server on port 5000. Please check that port 5000 is open on your local machine.')
+                sys.exit()
+        # - Wait for the web server to start
+        self.progress_callback('Waiting for the web server in the mgu-container to start up...')
+        time.sleep(60)
+        return container_id
+
+    def stop_docker(self, container_id):
+        '''
+        Stop the mgu-container
+
+        :param container_id: the ID of the container to shut down
+        :type b: str
+        :rtype: None
+        '''
+        try:
+            self.progress_callback('Stopping the mgu-container...')
+            self.start_subprocess(f'{self.docker_cli_cmd} stop {container_id}')
+        except subprocess.CalledProcessError as e:
+            self.progress_callback('The MicrogridUp app could not stop the Docker container.')
             sys.exit()
-    # - Wait for the web server to start
-    time.sleep(20)
-    return container_id
+
+    def start_subprocess(self, cmd):
+        '''
+        - Convenience function for calling subprocess.Popen()
+        '''
+        with subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
+            while p.poll() is None:
+                self.progress_callback('    ' + p.stdout.read1().decode('utf-8'))
+                self.progress_callback('    ' + p.stderr.read1().decode('utf-8'))
 
 
-def stop_docker(container_id):
-    try:
-        subprocess.run(f'{docker_cli_cmd} stop {container_id}', shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except subprocess.CalledProcessError as e:
-        print('The MicrogridUp app could not stop the Docker container.')
-        sys.exit()
+def _test():
+    d = Docker()
+    container_id = d.initialize_docker()
+    d.stop_docker(container_id)
 
 
 if __name__ == '__main__':
-    pass
+    _test()

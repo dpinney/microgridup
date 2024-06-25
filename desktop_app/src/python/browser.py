@@ -20,10 +20,12 @@ class Browser(QMainWindow):
         with (pathlib.Path(root_dir) / 'src' / 'styles' / 'main.qss').open() as f:
             self.setStyleSheet(f.read())
         self.setWindowTitle('MicrogridUp')
-        # - Set up the web view
+        # - Set up the web views
         self.browser = QWebEngineView()
         self.browser.setPage(CustomWebEnginePage(parent=self))
-        self.browser.setUrl(QUrl('http://localhost:5000'))
+        self.browser.load(QUrl('http://localhost:5000'))
+        self.browser.page().newWindowRequested.connect(self.open_new_window)
+        self.doc_browser = None
         # - Set up button(s) by the web view
         self.refresh_button = QPushButton()
         icon = QPixmap(str(pathlib.Path(root_dir) / 'src' / 'images' / 'refresh-icon.svg'))
@@ -58,23 +60,43 @@ class Browser(QMainWindow):
         self.setCentralWidget(self.container)
 
     def go_home(self):
+        '''
+        Go to the home page
+        '''
         self.browser.load(QUrl('http://localhost:5000/'))
 
     def go_help(self):
-        self.browser.load(QUrl('http://localhost:5000/doc'))
+        '''
+        Show the help documentation in a new window
+        '''
+        pos = None
+        size = None
+        if self.doc_browser is not None:
+            pos = self.doc_browser.pos()
+            size = self.doc_browser.size()
+            self.doc_browser.close()
+        self.doc_browser = QWebEngineView()
+        self.doc_browser.load('http://localhost:5000/doc')
+        if pos is not None:
+            self.doc_browser.move(pos)
+        if size is not None:
+            self.doc_browser.resize(size)
+        self.doc_browser.setWindowTitle('MicrogridUp Documentation')
+        self.doc_browser.show()
 
+    def open_new_window(self, request):
+        '''
+        Handle new window requests. E.g. show the documentation page in a separate window
+        '''
+        if request.requestedUrl().host() == 'localhost':
+            if request.requestedUrl().path() == '/doc':
+                self.go_help()
 
 class CustomWebEnginePage(QWebEnginePage):
 
     def acceptNavigationRequest(self, url, type_, isMainFrame):
         '''
-        - Override this method so that we block access to any websites outside of localhost
+        Override this method so that we block access to any websites outside of localhost
         '''
         if url.host() == 'localhost':
             return super().acceptNavigationRequest(url, type_, isMainFrame)
-
-    def createWindow(self, type_):
-        '''
-        - Override this method so that anchor links with target="_blank" will open in the current tab
-        '''
-        return self

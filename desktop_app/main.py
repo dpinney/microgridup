@@ -19,7 +19,7 @@ root_dir = pathlib.Path(__file__).parent
     - Linux:
 - Installer creation
     - macOS: run $ ./build-dmg
-    - Windows: use InstallForge (https://installforge.net/) with the provided MicrogridUp-InstallerForgeProfile.ifp file. The InstallForge
+    - Windows: use InstallForge (https://installforge.net/) with the provided MicrogridUp-InstallerForgeProfileExample.ifp file. The InstallForge
       configuration will need to be modified to work on your computer. See
       (https://www.pythonguis.com/tutorials/packaging-pyside6-applications-windows-pyinstaller-installforge/#hiding-the-console-window)
     - Linux:

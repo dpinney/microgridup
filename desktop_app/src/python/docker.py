@@ -121,8 +121,12 @@ class Docker:
         '''
         with subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
             while p.poll() is None:
-                self.progress_callback('    ' + p.stdout.read1().decode('utf-8'))
-                self.progress_callback('    ' + p.stderr.read1().decode('utf-8'))
+                stdout = p.stdout.read1().decode('utf-8')
+                if len(stdout) > 0:
+                    self.progress_callback('    ' + stdout)
+                stderr = p.stderr.read1().decode('utf-8')
+                if len(stderr) > 0:
+                    self.progress_callback('    ' + stderr)
 
 
 def _test():

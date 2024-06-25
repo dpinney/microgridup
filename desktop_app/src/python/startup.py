@@ -23,7 +23,7 @@ class LoadingScreen(QMainWindow):
         self.finished_callback = finished_callback
         self.label = QLabel('Initializing the Docker container...')
         font = self.label.font()
-        font.setPointSize(15)
+        font.setPointSize(10)
         self.label.setFont(font)
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)

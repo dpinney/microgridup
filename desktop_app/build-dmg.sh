@@ -4,16 +4,18 @@
 
 # - Script to create a .dmg on macOS
 #   - First, $ brew install create-dmg
-#   - Second, make sure MicrogridUp.app is up to date, then run this script
 
-# Create a folder (named dmg) to prepare our DMG in (if it doesn't already exist).
+# - Run pyinstaller
+pyinstaller --windowed -n MicrogridUp --icon NRECA-logo.icns --add-data="src:src" main.py
+# - Create a folder to prepare our .dmg
 mkdir -p dist/dmg
-# Empty the dmg folder.
+# - Empty the dmg/ folder
 rm -r dist/dmg/*
-# Copy the app bundle to the dmg folder.
-cp -r "dist/MicrogridUp.app" dist/dmg
-# If the DMG already exists, delete it.
+# - Copy the app bundle to the dmg/ folder
+cp -R "dist/MicrogridUp.app" dist/dmg
+# If the .dmg already exists, delete it
 test -f "dist/MicrogridUp.dmg" && rm "dist/MicrogridUp.dmg"
+
 create-dmg \
   --volname "MicrogridUp Installer" \
   --volicon "NRECA-logo.icns" \
@@ -24,4 +26,5 @@ create-dmg \
   --hide-extension "MicrogridUp.app" \
   --app-drop-link 425 120 \
   "dist/MicrogridUp.dmg" \
-  "dist/dmg/"
+  "dist/dmg/" \
+  --filesystem APFS

@@ -14,7 +14,7 @@ root_dir = pathlib.Path(__file__).parent
 
 '''
 - Packaging
-    - macOS: $ pyinstaller --windowed -n microgridup --add-data="src:src" main.py
+    - macOS: $ pyinstaller --windowed -n MicrogridUp --icon NRECA-logo.icns --add-data="src:src" main.py
     - Windows:
     - Linux:
 '''

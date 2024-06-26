@@ -5,8 +5,8 @@ import sys, traceback, platform, pathlib
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import QRunnable, Slot, QThreadPool, Signal, QObject, QSize, Qt
 from PySide6.QtWidgets import QVBoxLayout, QLabel, QWidget, QMainWindow
-import src.python.docker as docker
 import main
+import src.python.docker as docker
 
 
 class LoadingScreen(QMainWindow):
@@ -14,18 +14,13 @@ class LoadingScreen(QMainWindow):
     Show the user a screen of the Docker container initialization so they don't think the application is slow and broken
     '''
 
-    def __init__(self, finished_callback):
-        '''
-        :param finished_callback: the function to call when the Docker container has finished initializing
-        :type finished_callback: function
-        '''
+    def __init__(self):
         super().__init__()
         if platform.system() == 'Windows':
-            icon = QIcon(str(pathlib.Path(main.root_dir) / 'NRECA-logo.ico'))
+            icon = QIcon(str(pathlib.Path(main.root_dir) / 'src' / 'images' / 'NRECA-logo.ico'))
             self.setWindowIcon(icon)
         self.setWindowTitle('Loading MicrogridUp...')
-        self.container_id = 'mgu-container'
-        self.finished_callback = finished_callback
+        self.threadpool = QThreadPool()
         self.label = QLabel('Initializing the Docker container...')
         font = self.label.font()
         font.setPointSize(10)
@@ -37,16 +32,20 @@ class LoadingScreen(QMainWindow):
         w.setLayout(layout)
         self.setCentralWidget(w)
         self.resize(QSize(1000, 1000))
-        self.show()
-        self.threadpool = QThreadPool()
-        self.spawn_docker_with_external_thread()
 
-    def spawn_docker_with_external_thread(self):
+    def initialize_app(self, success_callback, failure_callback):
+        '''
+        Launch a worker thread to initialize the Docker container
+
+        :param success_callback: the function to call when the Docker container has successfully initialized
+        :type success_callback: function
+        :param failure_callback: the function to call when the Docker container fails to initialize
+        :type failure_callback: function
+        '''
         worker = Worker(self.initialize_docker)
-        worker.signals.result.connect(self.set_container_id)
-        worker.signals.finished.connect(self.display_finished_message)
-        worker.signals.finished.connect(self.finished_callback)
         worker.signals.progress.connect(self.show_progress)
+        worker.signals.result.connect(success_callback)
+        worker.signals.error.connect(failure_callback)
         self.threadpool.start(worker)
 
     def initialize_docker(self, progress_signal):
@@ -61,22 +60,6 @@ class LoadingScreen(QMainWindow):
         '''
         d = docker.Docker(progress_signal.emit)
         return d.initialize_docker()
-
-    def set_container_id(self, id):
-        '''
-        Store the ID of the container that was just started when the Worker instance emits the "result" signal
-
-        :param id: the ID of the container
-        :type id: str
-        '''
-        self.container_id = id
-
-    def display_finished_message(self):
-        '''
-        Show the user that the Docker container has started when the Worker instance emits the "finished" signal
-        '''
-        self.label.setText(self.label.text() + '\n' + 'The Docker container has started!')
-        self.close()
 
     def show_progress(self, msg):
         '''
@@ -96,7 +79,7 @@ class Worker(QRunnable):
         self.args = args
         self.kwargs = kwargs
         self.signals = WorkerSignals()
-        # - Always include the "progress" signal as the progress_siganl argument to the function which will run in a separate thread
+        # - Always include the "progress" signal as the progress_signal argument to the function which will run in a separate thread
         self.kwargs['progress_signal'] = self.signals.progress
 
     @Slot()
@@ -109,18 +92,15 @@ class Worker(QRunnable):
             self.signals.error.emit((exctype, value, traceback.format_exc()))
         else:
             self.signals.result.emit(result)
-        finally:
-            self.signals.finished.emit()
 
 
 class WorkerSignals(QObject):
     '''
     Define custom signals so that the Worker instances can emit signals to the Qt event loop thread
     '''
-    finished = Signal()
-    error = Signal(tuple)
-    result = Signal(object)
     progress = Signal(str)
+    result = Signal(object)
+    error = Signal(tuple)
 
 
 if __name__ == '__main__':

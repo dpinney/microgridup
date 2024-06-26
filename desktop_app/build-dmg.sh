@@ -6,7 +6,7 @@
 #   - First, $ brew install create-dmg
 
 # - Run pyinstaller
-pyinstaller --windowed -n MicrogridUp --icon NRECA-logo.icns --add-data="src:src" main.py
+pyinstaller --windowed -n MicrogridUp --icon ./src/images/NRECA-logo.icns --add-data="src:src" main.py
 # - Create a folder to prepare our .dmg
 mkdir -p dist/dmg
 # - Empty the dmg/ folder
@@ -18,7 +18,7 @@ test -f "dist/MicrogridUp.dmg" && rm "dist/MicrogridUp.dmg"
 
 create-dmg \
   --volname "MicrogridUp Installer" \
-  --volicon "NRECA-logo.icns" \
+  --volicon "./src/images/NRECA-logo.icns" \
   --window-pos 200 120 \
   --window-size 600 300 \
   --icon-size 100 \

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-import platform, subprocess, sys, time
+import platform, subprocess, time
 
 
 class Docker:
@@ -27,7 +27,7 @@ class Docker:
             self.docker_cli_cmd = '"C:/Program Files/Docker/Docker/resources/bin/docker.exe"'
         else:
             self.progress_callback('The MicrogridUp app could not determine the operating system.')
-            sys.exit()
+            raise subprocess.CalledProcessError(1, 'platform.system()')
 
     def initialize_docker(self):
         '''
@@ -44,15 +44,15 @@ class Docker:
             self.start_subprocess(f'{self.docker_desktop_cmd}')
         except subprocess.CalledProcessError as e:
             self.progress_callback(f'The MicrogridUp app could not start the Docker Desktop application via the cmd command $ {self.docker_desktop_cmd}. ' +
-                'If Docker is not installed, please install and configure Docker from https://docs.docker.com/desktop/. Otherwise start the Docker Desktop application manually.')
-            sys.exit()
+                'If Docker Desktop is not installed, please install and configure Docker Desktop from https://docs.docker.com/desktop/.')
+            raise e
         # - Pull the image
         try:
             self.progress_callback('Checking for the latest MicrogridUp image...')
             self.start_subprocess(f'{self.docker_cli_cmd} pull ghcr.io/dpinney/microgridup:main')
         except subprocess.CalledProcessError as e:
-            self.progress_callback('The MicrogridUp app could not pull the ghcr.io/dpinney/microgridup:main Docker image.')
-            sys.exit()
+            self.progress_callback('The MicrogridUp app could not pull the ghcr.io/dpinney/microgridup:main Docker image. Check that Docker Desktop is working properly, then restart the app.')
+            raise e
         # - Check if the Docker volume already exists
         #   - If it does exist, we don't need to do anything
         try:
@@ -65,13 +65,13 @@ class Docker:
                 self.start_subprocess(f'{self.docker_cli_cmd} volume create mgu-volume')
             except subprocess.CalledProcessError as e:
                 self.progress_callback('The MicrogridUp app could not create a persistent volume for the container.')
-                sys.exit()
+                raise e
             try:
                 self.progress_callback('Filling the mgu-volume volume with examples...')
                 self.start_subprocess(f'{self.docker_cli_cmd} run --rm --mount type=volume,src="mgu-volume",dst="/mgu-volume" --entrypoint bash ghcr.io/dpinney/microgridup:main "-c" "cp -r /data/projects/* /mgu-volume/"')
             except subprocess.CalledProcessError as e:
                 self.progress_callback('The MicrogridUp app could not copy data from the Docker image at data/projects into the persistent volume mounted at data/projects.')
-                sys.exit()
+                raise e
         # - Start the container in detached mode with the persistent volume
         start_container_cmd = f'{self.docker_cli_cmd} run -d --rm -p 5000:5000 --name mgu-container --mount type=volume,source="mgu-volume",target="/data/projects" ghcr.io/dpinney/microgridup:main'
         try:
@@ -94,7 +94,7 @@ class Docker:
             except subprocess.CalledProcessError as e:
                 # - If we still failed, then port 5000 probably isn't available
                 self.progress_callback('The MicrogridUp app could not start the Docker container and bind the web server on port 5000. Please check that port 5000 is open on your local machine.')
-                sys.exit()
+                raise e
         # - Wait for the web server to start
         self.progress_callback('Waiting for the web server in the mgu-container to start up...')
         time.sleep(60)
@@ -113,20 +113,22 @@ class Docker:
             self.start_subprocess(f'{self.docker_cli_cmd} stop {container_id}')
         except subprocess.CalledProcessError as e:
             self.progress_callback('The MicrogridUp app could not stop the Docker container.')
-            sys.exit()
+            raise e
 
     def start_subprocess(self, cmd):
         '''
-        - Convenience function for calling subprocess.Popen()
+        Convenience function for calling subprocess.Popen(), monitoring the stdout and stderr, and raising an error if the subprocess fails
         '''
         with subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
             while p.poll() is None:
                 stdout = p.stdout.read1().decode('utf-8')
                 if len(stdout) > 0:
-                    self.progress_callback('    ' + stdout)
+                    self.progress_callback('        ' + stdout)
                 stderr = p.stderr.read1().decode('utf-8')
                 if len(stderr) > 0:
-                    self.progress_callback('    ' + stderr)
+                    self.progress_callback('        ' + stderr)
+            if p.returncode != 0:
+                raise subprocess.CalledProcessError(p.returncode, cmd)
 
 
 def _test():

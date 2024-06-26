@@ -46,6 +46,7 @@ class Docker:
             self.progress_callback(f'The MicrogridUp app could not start the Docker Desktop application via the cmd command $ {self.docker_desktop_cmd}. ' +
                 'If Docker Desktop is not installed, please install and configure Docker Desktop from https://docs.docker.com/desktop/.')
             raise e
+        time.sleep(5)
         # - Pull the image
         try:
             self.progress_callback('Checking for the latest MicrogridUp image...')
@@ -97,7 +98,7 @@ class Docker:
                 raise e
         # - Wait for the web server to start
         self.progress_callback('Waiting for the web server in the mgu-container to start up...')
-        time.sleep(60)
+        time.sleep(50)
         return container_id
 
     def stop_docker(self, container_id):

@@ -15,7 +15,7 @@ root_dir = pathlib.Path(__file__).parent
 '''
 - pyinstaller packaging to create .app or .exe
     - macOS:    $ pyinstaller --windowed -n MicrogridUp --icon ./src/images/NRECA-logo.icns --add-data="src:src" main.py
-    - Windows:  $ pyinstaller --windowed -n MicrogridUp --icon NRECA-logo.ico --add-data="src:src" main.py
+    - Windows:  $ pyinstaller --windowed -n MicrogridUp --icon ./src/images/NRECA-logo.ico --add-data="src:src" main.py
     - Linux:
 - Installer creation
     - macOS: run $ ./build-dmg

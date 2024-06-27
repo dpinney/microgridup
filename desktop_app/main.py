@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-import pathlib, os
+import pathlib, os, time
 from PySide6.QtWidgets import QApplication
 import src.python.browser as browser
 import src.python.docker as docker
@@ -14,21 +14,24 @@ root_dir = pathlib.Path(__file__).parent
 
 '''
 - pyinstaller packaging to create .app or .exe
-    - macOS:    $ pyinstaller --windowed -n MicrogridUp --icon NRECA-logo.icns --add-data="src:src" main.py
-    - Windows:  $ pyinstaller --windowed -n MicrogridUp --icon NRECA-logo.ico --add-data="src:src" main.py
+    - macOS:    $ pyinstaller --windowed -n MicrogridUp --icon ./src/images/NRECA-logo.icns --add-data="src:src" main.py
+    - Windows:  $ pyinstaller --windowed -n MicrogridUp --icon ./src/images/NRECA-logo.ico --add-data="src:src" main.py
     - Linux:
 - Installer creation
     - macOS: run $ ./build-dmg
-    - Windows: use InstallForge (https://installforge.net/) with the provided MicrogridUp-InstallerForgeProfileExample.ifp file. The InstallForge
-      configuration will need to be modified to work on your computer. See
-      (https://www.pythonguis.com/tutorials/packaging-pyside6-applications-windows-pyinstaller-installforge/#hiding-the-console-window)
+    - Windows:
+        - Install InstallForge: https://installforge.net/
+        - Read a tutorial (optional): https://www.pythonguis.com/tutorials/packaging-pyside6-applications-windows-pyinstaller-installforge/#hiding-the-console-window
+        - Open the provided MicrogridUp-InstallerForgeProfileExample.ifp in InstallFroge
+        - Modify the paths in the various settings according to the pathing on your computer
+        - Click "build"
     - Linux:
 '''
 
 
 def main():
     '''
-    - The browser window should only be shown to the user when the LoadingScreen calls the finished_callback() function.
+    The browser window should only be shown to the user if the Docker container successfully initializes
     '''
     # - Set the Windows taskbar icon
     try:
@@ -39,20 +42,29 @@ def main():
         pass
     app = QApplication()
     web_browser = browser.Browser()
-    loading_screen = startup.LoadingScreen(finished_callback=lambda: show_browser(web_browser))
+    loading_screen = startup.LoadingScreen()
+    container_id = {}
+
+    def success(id):
+        # - Refresh the browser before showing it so it shows the MicrogridUp home hpage
+        web_browser.home_button.click()
+        time.sleep(1)
+        web_browser.show()
+        loading_screen.close()
+        container_id['id'] = id
+
+    def failure(e):
+        loading_screen.show_progress('The MicrogridUp app failed to start.')
+        exctype, value, traceback = e
+        loading_screen.show_progress(traceback)
+
+    loading_screen.initialize_app(success, failure)
+    loading_screen.show()
     app.exec()
     d = docker.Docker()
-    d.stop_docker(loading_screen.container_id)
+    d.stop_docker(container_id.get('id'))
     # - Force exit without clean-up instead of hanging
     os._exit(0)
-
-
-def show_browser(web_browser):
-    '''
-    - Click on the home button to make the browser refresh before showing it to the user
-    '''
-    web_browser.home_button.click()
-    web_browser.show()
 
 
 if __name__ == '__main__':

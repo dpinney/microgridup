@@ -18,7 +18,7 @@ class Browser(QMainWindow):
     def __init__(self):
         super().__init__()
         if platform.system() == 'Windows':
-            icon = QIcon(str(pathlib.Path(main.root_dir) / 'NRECA-logo.ico'))
+            icon = QIcon(str(pathlib.Path(main.root_dir) / 'src' / 'images' / 'NRECA-logo.ico'))
             self.setWindowIcon(icon)
         with (pathlib.Path(main.root_dir) / 'src' / 'styles' / 'main.qss').open() as f:
             self.setStyleSheet(f.read())

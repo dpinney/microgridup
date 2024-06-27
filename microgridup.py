@@ -394,7 +394,7 @@ def full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FA
 		new_path = './color_test.omd'
 		omd = json.load(open(OMD_NAME))
 		omd['attachments'] = out
-		with open('hosting_capacity/color_by.csv') as f:
+		with open('hosting_capacity/color_by_traditional.csv') as f:
 			omd['attachments']['coloringFiles']['color_by.csv'] = {
 				'csv': f.read()
 			}

@@ -474,7 +474,7 @@
                     <option value="" disabled selected>Select method</option>
                     <option value="manual" {% if in_data.MG_DEF_METHOD == 'manual' %}selected{% endif %} title="Assign each load to a specific microgrid and input the generation bus and switch for each microgrid.">Manual</option>
                     <option value="loadGrouping" {% if in_data.MG_DEF_METHOD == 'load_grouping' %}selected{% endif %} title="Assign each load to a specific microgrid. Generation buses and switches will be selected automatically.">Load Grouping</option>
-                    <option value="lukes" {% if in_data.MG_DEF_METHOD == 'lukes' %}selected{% endif %} title="Use Lukes' 'Efficient Algorithm for the Partitioning of Trees' (1974) to divide circuit into microgrids.">Lukes</option>
+                    <!-- <option value="lukes" {% if in_data.MG_DEF_METHOD == 'lukes' %}selected{% endif %} title="Use Lukes' 'Efficient Algorithm for the Partitioning of Trees' (1974) to divide circuit into microgrids.">Lukes</option> -->
                     <option value="branch" {% if in_data.MG_DEF_METHOD == 'branch' %}selected{% endif %} title="Divide circuit into microgrids at the first bus from which there are multiple feeders.">Branch</option>
                     <option value="bottomUp" {% if in_data.MG_DEF_METHOD == 'bottom-up' %}selected{% endif %} title="Form microgrids at the ends of each feeder and add elements upstream of each element to the same microgrid, merging with neighboring microgrids, until there are the desired number of microgrids.">Bottom-Up</option>
                     <option value="criticalLoads" {% if in_data.MG_DEF_METHOD == 'critical_loads' %}selected{% endif %} title="Form a microgrid for each critical load and add elements upstream of each critical load to the same microgrid, merging with neighboring microgrids, until there are the desired number of microgrids.">Critical Loads</option>
@@ -839,11 +839,49 @@
 		});
 	}
 
+	// Check to see if uploaded circuit contains cycles when user clicks 'Go' during manual or loadGrouping partitioning.
+	async function has_cycle() {
+		const model_dir = $('input[name="MODEL_DIR"]').val(); // model_dir is safe to send over HTTP (unlike full path to uploads folder contained in window.filename). Full path is constructed in backend.
+		const dss_path = $('#circuitPostCreation').val();
+		let dss_path_indicator;
+		if (dss_path == undefined) {
+			dss_path_indicator = 'DIRECT TO UPLOADS FOLDER';
+		} else {
+			dss_path_indicator = dss_path;
+		}
+
+		try {
+			const response = await fetch('/has_cycles', {
+				method: 'POST',
+				body: JSON.stringify({
+					MODEL_DIR: model_dir, 
+					DSS_PATH_INDICATOR: dss_path_indicator
+				}),
+				headers: {
+					'Content-type': 'application/json; charset=UTF-8'
+				}
+			})
+			const data = await response.json();
+			if (data.result == true) {
+				return true;
+			} else if (data.result == false) {
+				return false;
+			}
+		} catch(error) {
+			console.warn('Unexpected error:', error);
+		}
+	}
+
 	function attachDropdownsEventHandler() {
 		// Manual partitioning dynamic dropdown creation. 
-		$('#makeDropdownsButton').on('click', function() {
+		$('#makeDropdownsButton').on('click', async function() {
 			if (window.circuitIsSpecified === false) {
 				alert('Please complete step 2.')
+				return
+			}
+			const circuit_has_cycle = await has_cycle();
+			if (circuit_has_cycle == true) {
+				alert('Circuit contains a cycle. Please remove cycle from circuit or choose a different partitioning method.')
 				return
 			}
 			if ($('#mgQuantity').val() === "") {

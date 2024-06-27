@@ -5,7 +5,7 @@ from collections import OrderedDict
 from matplotlib import pyplot as plt
 from flask import Flask, request, redirect, render_template, jsonify, url_for, send_from_directory, Blueprint
 from omf.solvers.opendss import dssConvert
-from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_mg_mines, form_mg_groups
+from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_mg_mines, form_mg_groups, topological_sort
 from microgridup import full
 from subprocess import Popen
 from pathlib import Path
@@ -449,6 +449,23 @@ def previewPartitions():
 	pic_IObytes.seek(0)
 	pic_hash = base64.b64encode(pic_IObytes.read()).decode('ascii')
 	return jsonify({'pic_hash': pic_hash, 'MG_MINES': MG_MINES})
+
+@app.route('/has_cycles', methods=['GET','POST'])
+def has_cycles():
+	model_dir = request.json['MODEL_DIR']
+	dss_path_indicator = request.json['DSS_PATH_INDICATOR']
+	if dss_path_indicator == 'DIRECT TO UPLOADS FOLDER':
+		dss_path = f'{_mguDir}/uploads/BASE_DSS_{model_dir}' # New circuit uploaded/created.
+	elif dss_path_indicator == 'circuit.dss':
+		dss_path = f'{_mguDir}/data/projects/{model_dir}/circuit.dss' # Reusing circuit.dss in project directory.
+	else:
+		print(f'Unexpected dss_path_indicator: {dss_path_indicator}.')
+	G = dssConvert.dss_to_networkx(dss_path)
+	try:
+		list(topological_sort(G))
+		return jsonify(result=False)
+	except ValueError:
+		return jsonify(result=True)
 
 @app.route('/run', methods=["POST"])
 def run():

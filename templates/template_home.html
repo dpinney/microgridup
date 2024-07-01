@@ -365,7 +365,7 @@
             boxes.sort((a, b) => {
                 const timestampElementA = a.querySelector('.timestamp');
                 const timestampA = timestampElementA ? timestampElementA.textContent : 0; // If no timestamp is found, set to 0.
-                const timestampElementB = a.querySelector('.timestamp');
+                const timestampElementB = b.querySelector('.timestamp');
                 const timestampB = timestampElementB ? timestampElementB.textContent : 0;
                 const dateA = new Date(timestampA);
                 const dateB = new Date(timestampB);

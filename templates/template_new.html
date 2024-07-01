@@ -115,46 +115,12 @@
 			max-width: 700px;
 			padding: 10px;
 		}
-		.wizard-dropbutton {
-		  color: white;
-		  border: none;
-		}
-		.wizard-dropdown {
-		  position: relative;
-		  display: inline-block;
-		}
-		.wizard-dropdown-content {
-		  display: none;
-		  position: absolute;
-		  background-color: #f1f1f1;
-		  min-width: 160px;
-		  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-		  z-index: 1;
-		}
-		.wizard-dropdown-content div {
-		  color: black;
-		  padding: 12px 16px;
-		  text-decoration: none;
-		  display: block;
-		}
-		.wizard-dropdown-content div:hover {background-color: #ddd; cursor: pointer;}
-		.wizard-dropdown:hover .wizard-dropdown-content {display: block;}
-		.wizard-dropdown:hover .wizard-dropbutton {background-color: mediumseagreen;}
-		.substation {
-		    padding-left: 0px;
-		    list-style: none;
-		}
-		#elements .feeder {
-			padding-left: 40px;
-			list-style: none;
-		}
-		#elements .load, .solar, .battery, .wind, .fossil {
-			padding-left: 80px;
-			list-style: none;
-		}
-		#elements li i {
-			cursor:pointer;
-		}
+		.partitionDescription {
+            display: none;
+        }
+        .partitionDescription.active {
+            display: block;
+        }
 		#loading-background {
 			position: fixed;
 			top: 0;
@@ -483,6 +449,21 @@
                     <option value="bottomUp" {% if in_data.MG_DEF_METHOD == 'bottom-up' %}selected{% endif %} title="Form microgrids at the ends of each feeder and add elements upstream of each element to the same microgrid, merging with neighboring microgrids, until there are the desired number of microgrids.">Bottom-Up</option>
                     <option value="criticalLoads" {% if in_data.MG_DEF_METHOD == 'critical_loads' %}selected{% endif %} title="Form a microgrid for each critical load and add elements upstream of each critical load to the same microgrid, merging with neighboring microgrids, until there are the desired number of microgrids.">Critical Loads</option>
                 </select></br>
+				<div id="manualDescription" class="partitionDescription">
+					<p>Assign each load to a specific microgrid and input the generation bus and switch for each microgrid.</p>
+				</div>
+				<div id="loadGroupingDescription" class="partitionDescription">
+					<p>Assign each load to a specific microgrid. Generation buses and switches will be selected automatically.</p>
+				</div>
+				<div id="branchDescription" class="partitionDescription">
+					<p>Divide circuit into microgrids at the first bus from which there are multiple feeders.</p>
+				</div>
+				<div id="bottomUpDescription" class="partitionDescription">
+					<p>Form microgrids at the ends of each feeder and add elements upstream of each element to the same microgrid, merging with neighboring microgrids, until there are the desired number of microgrids.</p>
+				</div>
+				<div id="criticalLoadsDescription" class="partitionDescription">
+					<p>Form a microgrid for each critical load and add elements upstream of each critical load to the same microgrid, merging with neighboring microgrids, until there are the desired number of microgrids.</p>
+				</div>
                 <form id="partitionManuallyForm" style="display: none;">
                     <label for="mgQuantity">How many microgrids?</label>
                     <input id="mgQuantity" type="text" autocomplete="off" placeholder="# of microgrids" />
@@ -934,8 +915,17 @@
 	function attachPartitioningEventHandler() {
 		// Hide/show manual partitioning div. 
 		$('#partitionMethod').change(function() {
+			// Show appropriate description in body of partition block.
+			const selectedPartitioningMethod = this.value;
+			const partitionDescriptions = document.querySelectorAll('.partitionDescription');
+            partitionDescriptions.forEach(function(partitionDescription) {
+                partitionDescription.classList.remove('active');
+            });
+			const selectedPartitioningMethodDescription = selectedPartitioningMethod + 'Description';
+            document.getElementById(selectedPartitioningMethodDescription).classList.add('active');
+
 			$('#minQuantMgs').val('');
-			if ($(this).val() == 'manual' || $(this).val() == 'loadGrouping') {
+			if (selectedPartitioningMethod == 'manual' || selectedPartitioningMethod == 'loadGrouping') {
 				$('#partitionManuallyForm').show();
 				$('#makeDropdownsButton').show();
 				$('#previewPartitionsButton').hide();
@@ -948,10 +938,10 @@
 				$('#dropDowns').hide();
 				$('#previewPartitionsButton').show();
 			}
-			if ($(this).val() == 'loadGrouping') {
+			if (selectedPartitioningMethod == 'loadGrouping') {
 				$('#switchGenbus').remove();
 			}
-			if ($(this).val() == 'bottomUp' || $(this).val() == 'criticalLoads') {
+			if (selectedPartitioningMethod == 'bottomUp' || selectedPartitioningMethod == 'criticalLoads') {
 				$('#minQuantMgsForm').show();
 				$('#makeDropdownsButton').hide();
 			}

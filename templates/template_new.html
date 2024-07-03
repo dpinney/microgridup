@@ -443,7 +443,6 @@
                 <select id="partitionMethod" name="MG_DEF_METHOD" style="margin-right:6px" disabled>
                     <option value="" disabled selected>Select method</option>
                     <option value="manual" {% if in_data.MG_DEF_METHOD == 'manual' %}selected{% endif %} title="Assign each load to a specific microgrid and input the generation bus and switch for each microgrid.">Manual</option>
-                    <option value="loadGrouping" {% if in_data.MG_DEF_METHOD == 'load_grouping' %}selected{% endif %} title="Assign each load to a specific microgrid. Generation buses and switches will be selected automatically.">Load Grouping</option>
                     <!-- <option value="lukes" {% if in_data.MG_DEF_METHOD == 'lukes' %}selected{% endif %} title="Use Lukes' 'Efficient Algorithm for the Partitioning of Trees' (1974) to divide circuit into microgrids.">Lukes</option> -->
                     <option value="branch" {% if in_data.MG_DEF_METHOD == 'branch' %}selected{% endif %} title="Divide circuit into microgrids at the first bus from which there are multiple feeders.">Branch</option>
                     <option value="bottomUp" {% if in_data.MG_DEF_METHOD == 'bottom-up' %}selected{% endif %} title="Form microgrids at the ends of each feeder and add elements upstream of each element to the same microgrid, merging with neighboring microgrids, until there are the desired number of microgrids.">Bottom-Up</option>
@@ -452,7 +451,7 @@
 				<div id="manualDescription" class="partitionDescription">
 					<p>Assign each load to a specific microgrid and input the generation bus and switch for each microgrid.</p>
 				</div>
-				<div id="loadGroupingDescription" class="partitionDescription">
+				<div id="manualDescriptionUsedWizard" class="partitionDescription">
 					<p>Assign each load to a specific microgrid. Generation buses and switches will be selected automatically.</p>
 				</div>
 				<div id="branchDescription" class="partitionDescription">
@@ -681,7 +680,7 @@
     </main>
 	<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 	<script>
-	// Function to check if a .file-input (can be a file input or read-only text input) has a value and show/hide the associated Remove File button.
+	/** Check if a .file-input (can be a file input or read-only text input) has a value and show/hide the associated Remove File button. */
 	function toggleRemoveButton(chunk, btnElement) {
 		const fileInput = $(chunk).find('input.file-input');
 		const removeBtn = $(chunk).find('button.remove-btn');
@@ -718,7 +717,7 @@
 		}
 	}
 
-	// Function to limit description text.
+	/** Limit description text. */
 	function limitTextareaCharacters() {
 		var textarea = $('#DESCRIPTION')[0];
 		var characterCount = $('#characterCount')[0];
@@ -732,7 +731,7 @@
 		characterCount.textContent = text.length + " / 140";
 	}
 
-	// Function to toggle technology checkboxes.
+	/** Toggle technology checkboxes. */
 	function toggleDivVisibility(checkboxId, divId) {
 		const checkbox = $(`#${checkboxId}`);
 		const div = $(`#${divId}`);
@@ -743,7 +742,7 @@
 		}
 	}
 
-	// Populate critical load selection div if editing an existing circuit.
+	/** Populate critical load selection div if editing an existing circuit. */
 	function getLoadsFromExistingFile(MODEL_DIR, criticalLoads) {
 		$.ajax({
 			url: '/getLoadsFromExistingFile',
@@ -771,6 +770,7 @@
 				}
 				if (loads.length === 0) {
 					$('#criticalLoadsSelect').append('<p>No loads to select from.</p>')
+					$('#dropDowns').append('<p>No loads to assign to microgrids.</p>')
 				}
 				// Make directory uneditable. 
 				$('input[name="MODEL_DIR"]').prop("readonly", true);
@@ -782,7 +782,7 @@
 		});
 	}
 
-	// Function to show previously selected partitions on edit flow.
+	/** Show previously selected partitions on edit flow. */
 	function showOldPartitions(MODEL_DIR, MG_MINES) {
 		$('#stepThree').hide();
 		var oldPartitionsDiv = $('<div>').attr('id','oldPartitionDiv').addClass('chunk');
@@ -824,23 +824,23 @@
 		});
 	}
 
-	// Check to see if uploaded circuit contains cycles when user clicks 'Go' during manual or loadGrouping partitioning.
+	/** Check to see if uploaded circuit contains cycles when user clicks 'Go' during manual. */
 	async function has_cycle() {
-		const model_dir = $('input[name="MODEL_DIR"]').val(); // model_dir is safe to send over HTTP (unlike full path to uploads folder contained in window.filename). Full path is constructed in backend.
-		const dss_path = $('#circuitPostCreation').val();
-		let dss_path_indicator;
-		if (dss_path == undefined) {
-			dss_path_indicator = 'DIRECT TO UPLOADS FOLDER';
+		const modelDir = document.querySelector('input[name="MODEL_DIR"]').value; // modelDir is safe to send over HTTP (unlike full path to uploads folder contained in window.filename). Full path is constructed in backend.
+		const dssPath = document.getElementById('circuitPostCreation');
+		let dssPathIndicator;
+		if (dssPath == undefined) {
+			dssPathIndicator = 'DIRECT TO UPLOADS FOLDER';
 		} else {
-			dss_path_indicator = dss_path;
+			dssPathIndicator = dssPath.value;
 		}
 
 		try {
 			const response = await fetch('/has_cycles', {
 				method: 'POST',
 				body: JSON.stringify({
-					MODEL_DIR: model_dir, 
-					DSS_PATH_INDICATOR: dss_path_indicator
+					MODEL_DIR: modelDir, 
+					DSS_PATH_INDICATOR: dssPathIndicator
 				}),
 				headers: {
 					'Content-type': 'application/json; charset=UTF-8'
@@ -875,6 +875,8 @@
 			}
 			// Manual grouping GUI includes inputs for gen_bus and switch.
 			var numMgs = $('#mgQuantity').val();
+			// TODO: throw an error if user inputs 0.
+			// TODO: throw an error if user inputs non-numeric text.
 			const mgs = {};
 			for (let i = 0; i < numMgs; i++) {
 				mgs[`mg${i}`] = {};
@@ -883,14 +885,16 @@
 			if ($('#partitionMethod').val() == 'manual') {
 				// Clear existing #switchGenbus if it exists already. 
 				$('#switchGenbus').remove();
-				$('#dropDowns').prepend('<div id="switchGenbus"></div>')
-				for (let i = 0; i < numMgs; i++) {
-					var count = i + 1;
-					$('#switchGenbus').append('<label for="mg' + count + 'Genbus">Mg' + count + ' Gen Bus: </label>');
-					$('#switchGenbus').append('<input id="mg' + count + 'Genbus" type="text"></input>');
-					$('#switchGenbus').append('<label for="mg' + count + 'Switch"> Mg' + count + ' Switch: </label>');
-					$('#switchGenbus').append('<input id="mg' + count + 'Switch" type="text"></input>');
-					$('#switchGenbus').append('<br>');
+				if (window.circuitModel.getElements().length == 0) { // Bypass the below code if user used wizard.
+					$('#dropDowns').prepend('<div id="switchGenbus"></div>')
+					for (let i = 0; i < numMgs; i++) {
+						var count = i + 1;
+						$('#switchGenbus').append('<label for="mg' + count + 'Genbus">Mg' + count + ' Gen Bus: </label>');
+						$('#switchGenbus').append('<input id="mg' + count + 'Genbus" type="text" placeholder="Optional"></input>');
+						$('#switchGenbus').append('<label for="mg' + count + 'Switch"> Mg' + count + ' Switch: </label>');
+						$('#switchGenbus').append('<input id="mg' + count + 'Switch" type="text" placeholder="Optional"></input>');
+						$('#switchGenbus').append('<br>');
+					}
 				}
 			}
 			$('#dropDowns label select').each(function() {
@@ -914,18 +918,25 @@
 
 	function attachPartitioningEventHandler() {
 		// Hide/show manual partitioning div. 
-		$('#partitionMethod').change(function() {
+		document.getElementById('partitionMethod').addEventListener('change', function() {
 			// Show appropriate description in body of partition block.
 			const selectedPartitioningMethod = this.value;
 			const partitionDescriptions = document.querySelectorAll('.partitionDescription');
             partitionDescriptions.forEach(function(partitionDescription) {
                 partitionDescription.classList.remove('active');
             });
-			const selectedPartitioningMethodDescription = selectedPartitioningMethod + 'Description';
-            document.getElementById(selectedPartitioningMethodDescription).classList.add('active');
+			let selectedPartitioningMethodDescription;
+			const partitioningMethods = ['manual', 'branch', 'bottomUp', 'criticalLoads'];
+			if (selectedPartitioningMethod == 'manual' && window.circuitModel.getElements().length > 0) { // Manual partitioning description should be slightly different when the wizard is used since gen_bus and switch inputs aren't shown.
+				selectedPartitioningMethodDescription = selectedPartitioningMethod + 'Description' + 'UsedWizard';	
+				document.getElementById(selectedPartitioningMethodDescription).classList.add('active');
+			} else if (partitioningMethods.includes(selectedPartitioningMethod)) {
+				selectedPartitioningMethodDescription = selectedPartitioningMethod + 'Description';
+				document.getElementById(selectedPartitioningMethodDescription).classList.add('active');
+			} else if (selectedPartitioningMethod == '') {} // Show no description because no partition method has been selected yet. 
 
-			$('#minQuantMgs').val('');
-			if (selectedPartitioningMethod == 'manual' || selectedPartitioningMethod == 'loadGrouping') {
+			document.getElementById('minQuantMgs').value = ''; // Clear input from bottomUp and criticalLoads partitioning.
+			if (selectedPartitioningMethod == 'manual') {
 				$('#partitionManuallyForm').show();
 				$('#makeDropdownsButton').show();
 				$('#previewPartitionsButton').hide();
@@ -938,9 +949,6 @@
 				$('#dropDowns').hide();
 				$('#previewPartitionsButton').show();
 			}
-			if (selectedPartitioningMethod == 'loadGrouping') {
-				$('#switchGenbus').remove();
-			}
 			if (selectedPartitioningMethod == 'bottomUp' || selectedPartitioningMethod == 'criticalLoads') {
 				$('#minQuantMgsForm').show();
 				$('#makeDropdownsButton').hide();
@@ -948,7 +956,7 @@
 		})
 	}
 
-	// Grab partitioning preview.
+	/** Grab partitioning preview. */
 	function attachPartitionButtonEventHandler() {
 		$('#previewPartitionsButton').click(function() {
 			if (window.circuitIsSpecified === false) {
@@ -1046,7 +1054,7 @@
 		}
 	}
 
-	// Submit everything. 
+	/** Submit everything. */
 	function submitEverything() {
 		// Do not proceed if no circuit is specified.
 		if (window.filename === '') {
@@ -1069,11 +1077,11 @@
 				form1.append(pair[0], pair[1]);
 			}
 		// Specify circuit location.
-		const dss_path = $('#circuitPostCreation').val();
-		if (dss_path == undefined) {
+		const dssPath = document.getElementById('circuitPostCreation');
+		if (dssPath == undefined) {
 			form1.append('DSS_PATH','Direct to uploads folder.');
 		} else {
-			form1.append('DSS_PATH',dss_path);
+			form1.append('DSS_PATH',dssPath.value);
 		}
 		// Specify outages path if reused.
 		const outages_path = document.getElementsByName('HISTORICAL_OUTAGES')[0].value;
@@ -1096,44 +1104,28 @@
 		form1.append('MG_DEF_METHOD',method);
 
 		// Do not proceed if manual is selected and no partitions are created.
-		if ((method === 'manual' && !$('#dropDowns').is(':visible')) || (method === 'loadGrouping' && !$('#dropDowns').is(':visible'))) {
+		if ((method === 'manual' && !$('#dropDowns').is(':visible'))) {
 			alert('Please enter a number of microgrids and press Go.')
 			return
 		}
-		// If manual or loadGrouping is selected, append a 'MICROGRIDS' value.
+		// If manual is selected, append a 'MICROGRIDS' value.
 		var MICROGRIDS = {}
-		if ((method == 'manual') || (method == 'loadGrouping')) {
-			$('#dropDowns label').each( function() {
-				// Skip the Gen Buses and Switches.
+		if (method == 'manual') {
+			$('#dropDowns label').each(function() {
 				if (this.hasAttribute('for')) {
-					return true
+					return true // Skip the Gen Buses and Switches.
 				}
-				// console.log(this);
 				var load = $(this).text().split(' ')[1]
 				var mg = $(this).find(':selected').text()
-				if (method === 'loadGrouping') {
-					MICROGRIDS[mg] ??= [];
-					MICROGRIDS[mg].push(load);
-				}
-				else if (method === 'manual') {
-					MICROGRIDS.pairings ??= {};
-					MICROGRIDS.pairings[mg] ??= [];
-					MICROGRIDS['pairings'][mg].push(load); 
-				}
-			} )
+				MICROGRIDS.pairings ??= {};
+				MICROGRIDS.pairings[mg] ??= [];
+				MICROGRIDS['pairings'][mg].push(load); 
+			})
 			// Do not proceed if no loads are in microgrids.
-			if ('pairings' in MICROGRIDS) {
-				const pairings = MICROGRIDS.pairings;
-				if (typeof pairings === 'object' && Object.keys(pairings).length === 1 && 'None' in pairings) {
-					alert('At least one load should be placed in a microgrid. Please return to step 3.')
-					return
-				}
-			} else {
-				const keys = Object.keys(MICROGRIDS);
-				if (keys.length === 1 && keys[0] === 'None') {
-					alert('At least one load should be placed in a microgrid. Please return to step 3.')
-					return
-				}
+			const pairings = MICROGRIDS.pairings;
+			if (typeof pairings === 'object' && Object.keys(pairings).length === 1 && 'None' in pairings) {
+				alert('At least one load should be placed in a microgrid. Please return to step 3.')
+				return
 			}
 			// If manual is selected, append switch and gen_bus values.
 			var counter = 0;
@@ -1413,11 +1405,11 @@
 					}
 					if (loads.length === 0) {
 						$('#criticalLoadsSelect').append('<p>No loads to select from.</p>')
+						$('#dropDowns').append('<p>No loads to assign to microgrids.</p>')
 					}
-					// Set filename.
-					window.filename = data.filename;
-					// Make directory uneditable. 
-					$('input[name="MODEL_DIR"]').prop("readonly", true);
+					window.filename = data.filename; // Set filename.
+					$('input[name="MODEL_DIR"]').prop("readonly", true); // Make directory uneditable. 
+					document.getElementById('partitionMethod').dispatchEvent(new Event('change')); // Manually trigger dropdown select menu change to potentially refresh partition method descriptions (manual partitioning description differs dependent on wizard vs upload).
 				},
 				error: function(data) {
 					alert(data.responseJSON.error);

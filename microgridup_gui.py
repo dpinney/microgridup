@@ -161,7 +161,7 @@ def delete(project):
 	return redirect(url_for('home'))
 
 @app.route('/new')
-def newGui():
+def new_gui():
 	with open(f'{_mguDir}/static/lehigh_3mg_inputs.json') as default_in_file:
 		default_in = json.load(default_in_file)
 	return render_template('template_new.html', in_data=default_in, iframe_mode=False, editing=False)
@@ -203,8 +203,8 @@ def duplicate():
 			file.write(html_content)
 		return f'Successfully duplicated {project} as {new_name}.'
 
-@app.route('/jsonToDss', methods=['GET','POST'])
-def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False, on_edit_flow=None):
+@app.route('/wizard_to_dss', methods=['GET','POST'])
+def wizard_to_dss(model_dir=None, lat=None, lon=None, elements=None, test_run=False, on_edit_flow=None):
 	if not model_dir:
 		model_dir = request.form['MODEL_DIR']
 	if not lat:
@@ -276,7 +276,7 @@ def jsonToDss(model_dir=None, lat=None, lon=None, elements=None, test_run=False,
 		t = dssConvert.dssToTree(dssFilePath)
 		return jsonify(loads=loads, filename=dssFilePath)
 	else:
-		print(f'Test run of jsonToDss() for {model_dir} complete.')
+		print(f'Test run of wizard_to_dss() for {model_dir} complete.')
 		return dssFilePath
 
 @app.route('/uploadDss', methods = ['POST'])
@@ -525,14 +525,10 @@ def run():
 	MGQUANT = int(json.loads(request.form['mgQuantity']))
 	G = dssConvert.dss_to_networkx(dss_path)
 	omd = dssConvert.dssToOmd(dss_path, '', RADIUS=0.0004, write_out=False)
-	if mg_method == 'loadGrouping':
-		pairings = json.loads(request.form['MICROGRIDS'])
-		mg_groups = form_mg_groups(G, crit_loads, 'loadGrouping', pairings)
-		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
-	elif mg_method == 'manual':
+	if mg_method == 'manual':
 		algo_params = json.loads(request.form['MICROGRIDS'])
 		mg_groups = form_mg_groups(G, crit_loads, 'manual', algo_params)
-		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd, switch=algo_params['switch'], gen_bus=algo_params['gen_bus'])
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd, switch=algo_params.get('switch', None), gen_bus=algo_params.get('gen_bus', None))
 	elif mg_method == 'lukes':
 		mg_groups = form_mg_groups(G, crit_loads, 'lukes', algo_params)
 		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
@@ -667,9 +663,9 @@ def _tests():
 		e['type'] = e['class']
 		e['name'] = e['text']
 	templateDssTree = [OrderedDict(item) for item in test_params['templateDssTree']]
-	# Testing jsonToDss().
+	# Testing wizard_to_dss().
 	for _dir in wizard_dir:
-		dssFilePath = jsonToDss(_dir, lat, lon, elements, True, 'true')
+		dssFilePath = wizard_to_dss(_dir, lat, lon, elements, True, 'true')
 		dssTree = dssConvert.dssToTree(dssFilePath)
 		expectedDssTree = templateDssTree
 		expectedDssTree[2] = OrderedDict([('!CMD', 'new'), ('object', f'circuit.{_dir.lower()}')])

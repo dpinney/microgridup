@@ -373,10 +373,10 @@ def form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd, switch=None, gen_bus=None):
 	MG_MINES = {}
 	for idx in range(len(all_mgs)):
 		M_ID, MG_GROUP, TREE_ROOT, BORDERS = all_mgs[idx]
-		this_switch = switch[f'Mg{M_ID+1}'] if switch else [get_edge_name(swedge[0], swedge[1], omd_list) for swedge in BORDERS]
+		this_switch = switch[f'Mg{M_ID+1}'] if switch and switch[f'Mg{M_ID+1}'] != [''] else [get_edge_name(swedge[0], swedge[1], omd_list) for swedge in BORDERS]
 		if this_switch and type(this_switch) == list:
 			this_switch = this_switch[-1] if this_switch[-1] else this_switch[0] # TODO: Why is this_switch a list? Which value do we use? 
-		this_gen_bus = gen_bus[f'Mg{M_ID+1}'] if gen_bus else TREE_ROOT
+		this_gen_bus = gen_bus[f'Mg{M_ID+1}'] if gen_bus and gen_bus[f'Mg{M_ID+1}'] != [''] else TREE_ROOT
 		MG_MINES[f'mg{M_ID}'] = {
 			'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
 			'switch': this_switch, 
@@ -391,7 +391,7 @@ def form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd, switch=None, gen_bus=None):
 
 def form_mg_groups(G, CRITICAL_LOADS, algo, algo_params={}):
 	'''Generate a group of mgs from networkx graph and crit_loads
-	algo must be one of ["lukes", "branch", "bottomUp", "criticalLoads", "loadGrouping", "manual"]
+	algo must be one of ["lukes", "branch", "bottomUp", "criticalLoads", "manual"]
 	lukes algo params is 'size':int giving size of each mg.
 	branch algo params is 'i_branch': giving which branch in the tree to split on.'''
 	# Generate microgrids
@@ -409,8 +409,6 @@ def form_mg_groups(G, CRITICAL_LOADS, algo, algo_params={}):
 			MG_GROUPS.extend(nx_bottom_up_branch(tree, num_mgs=algo_params.get('num_mgs',3)/num_trees_pruned, large_or_small='large', omd=algo_params.get('omd',{}), cannot_be_mg=algo_params.get('cannot_be_mg',[])))
 		elif algo == 'criticalLoads':
 			MG_GROUPS.extend(nx_critical_load_branch(tree, CRITICAL_LOADS, num_mgs=algo_params.get('num_mgs',3)/num_trees_pruned, large_or_small='large'))
-		elif algo == 'loadGrouping':
-			MG_GROUPS.extend(manual_groups(tree, algo_params))
 		elif algo == 'manual':
 			MG_GROUPS.extend(manual_groups(tree, algo_params['pairings']))
 		else:

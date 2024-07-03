@@ -1067,7 +1067,7 @@ class CircuitUserControlsView {
             formData.append('on_edit_flow',window.on_edit_flow);
             const that = this;
             $.ajax({
-                url: '/jsonToDss',
+                url: '/wizard_to_dss',
                 type: 'POST',
                 contentType: false,
                 data: formData,
@@ -1090,17 +1090,17 @@ class CircuitUserControlsView {
                     }
                     if (loads.length === 0) {
                         $('#criticalLoadsSelect').append('<p>No loads to select from.</p>')
+                        $('#dropDowns').append('<p>No loads to assign to microgrids.</p>')
                     }
                     // Global variable!
                     window.filename = data.filename;
                     // Make directory uneditable.
                     $('input[name="MODEL_DIR"]').prop("readonly", true);
-                    // Remove manual option from partitioning options because switches and gen_bus are predetermined.
-                    $("#partitionMethod option[value='manual']").remove();
                     // Enable partition selector.
                     $('#previewPartitionsButton').prop('disabled', false);
                     $('#partitionMethod').prop('disabled', false);
                     that.modal.setBanner('', ['hidden']);
+                    document.getElementById('partitionMethod').dispatchEvent(new Event('change')); // Manually trigger dropdown select menu change to potentially refresh partition method descriptions (manual is different dependent on wizard vs upload).
                 },
                 error: function(data) {
                     that.modal.setBanner(data.responseJSON.error, ['caution']);

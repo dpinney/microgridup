@@ -286,7 +286,9 @@ def check_if_loads_in_tree(G, pairs):
 			nodes_not_in_tree.append(node)
 	return loads_in_tree, nodes_not_in_tree
 
-def manual_groups(G, pairings):
+def load_grouping(G, pairings):
+	'''Accepts loads paired to each microgrid and uses networkx to infer other existing objects in that subtree of the circuit.
+	Graph G cannot contain loops.'''
 	# Create reference dict of lcas for each pair of two nodes.
 	tree_root = list(topological_sort(G))[0]
 	lcas = nx.tree_all_pairs_lowest_common_ancestor(G, root=tree_root)
@@ -320,6 +322,17 @@ def manual_groups(G, pairings):
 			parts.append(mgs[key])
 			del mgs[key]
 		counter += 1
+	return parts
+
+def manual(pairings, gen_obs_existing):
+	'''Partitioning without networkx. 
+	Accepts dict of loads paired by mg and dict of gen_obs_existing paired by mg from user input.'''
+	pairings.pop('None', None)
+	parts = []
+	for mg in pairings:
+		loads = pairings[mg]
+		mg_gen_obs_existing = gen_obs_existing[mg].split(',')
+		parts.append(loads + mg_gen_obs_existing)
 	return parts
 
 def nx_get_parent(G, n):
@@ -364,7 +377,7 @@ def topological_sort(G):
 
 def form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd, switch=None, gen_bus=None):
 	'''Generate microgrid data structure from a networkx graph, group of mgs, and omd. 
-	Optional parameters switch and gen_bus must be supplied when the manual partitioning method is used.'''
+	Optional parameters switch and gen_bus may be supplied when loadGrouping or manual partitioning is used.'''
 	omd_list = list(omd.values())
 	all_mgs = [
 		(M_ID, MG_GROUP, MG_GROUP[0], nx_out_edges(G, MG_GROUP))
@@ -373,10 +386,10 @@ def form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd, switch=None, gen_bus=None):
 	MG_MINES = {}
 	for idx in range(len(all_mgs)):
 		M_ID, MG_GROUP, TREE_ROOT, BORDERS = all_mgs[idx]
-		this_switch = switch[f'Mg{M_ID+1}'] if switch and switch[f'Mg{M_ID+1}'] != [''] else [get_edge_name(swedge[0], swedge[1], omd_list) for swedge in BORDERS]
+		this_switch = switch[f'Mg{M_ID}'] if switch and switch[f'Mg{M_ID}'] != [''] else [get_edge_name(swedge[0], swedge[1], omd_list) for swedge in BORDERS]
 		if this_switch and type(this_switch) == list:
 			this_switch = this_switch[-1] if this_switch[-1] else this_switch[0] # TODO: Why is this_switch a list? Which value do we use? 
-		this_gen_bus = gen_bus[f'Mg{M_ID+1}'] if gen_bus and gen_bus[f'Mg{M_ID+1}'] != [''] else TREE_ROOT
+		this_gen_bus = gen_bus[f'Mg{M_ID}'] if gen_bus and gen_bus[f'Mg{M_ID}'] != '' else TREE_ROOT
 		MG_MINES[f'mg{M_ID}'] = {
 			'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
 			'switch': this_switch, 
@@ -391,9 +404,10 @@ def form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd, switch=None, gen_bus=None):
 
 def form_mg_groups(G, CRITICAL_LOADS, algo, algo_params={}):
 	'''Generate a group of mgs from networkx graph and crit_loads
-	algo must be one of ["lukes", "branch", "bottomUp", "criticalLoads", "manual"]
+	algo must be one of ["lukes", "branch", "bottomUp", "criticalLoads", "loadGrouping", "manual"]
 	lukes algo params is 'size':int giving size of each mg.
-	branch algo params is 'i_branch': giving which branch in the tree to split on.'''
+	branch algo params is 'i_branch': giving which branch in the tree to split on.
+	'''
 	# Generate microgrids
 	all_trees = get_all_trees(G)
 	all_trees_pruned = [tree for tree in all_trees if len(tree.nodes()) > 1]
@@ -409,8 +423,10 @@ def form_mg_groups(G, CRITICAL_LOADS, algo, algo_params={}):
 			MG_GROUPS.extend(nx_bottom_up_branch(tree, num_mgs=algo_params.get('num_mgs',3)/num_trees_pruned, large_or_small='large', omd=algo_params.get('omd',{}), cannot_be_mg=algo_params.get('cannot_be_mg',[])))
 		elif algo == 'criticalLoads':
 			MG_GROUPS.extend(nx_critical_load_branch(tree, CRITICAL_LOADS, num_mgs=algo_params.get('num_mgs',3)/num_trees_pruned, large_or_small='large'))
+		elif algo == 'loadGrouping':
+			MG_GROUPS.extend(load_grouping(tree, algo_params['pairings']))
 		elif algo == 'manual':
-			MG_GROUPS.extend(manual_groups(tree, algo_params['pairings']))
+			MG_GROUPS.extend(manual(algo_params['pairings'], algo_params['gen_obs_existing']))
 		else:
 			print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", or "criticalLoads". No mgs generated.')
 			return {}
@@ -430,23 +446,28 @@ def _tests():
 	wizard_dss_path = f'{_myDir}/testfiles/wizard_base_3mg.dss'
 	# Testing microgridup_gen_mgs.mg_group().
 	for _dir in MG_MINES:
-		if MG_MINES[_dir][1] == 'manual':
+		partitioning_method = MG_MINES[_dir][1]
+		# HACK: loadGrouping accepts pairings but not gen_obs_existing. manual accepts both. Other algos accept neither. 
+		if partitioning_method == 'loadGrouping': 
+			params = algo_params.copy()
+			del params['gen_obs_existing']
+		elif partitioning_method == 'manual':
 			params = algo_params
 		else:
-			params = algo_params['pairings']
+			params = {}
 		try:
 			_dir.index('wizard')
 			G = opendss.dssConvert.dss_to_networkx(wizard_dss_path)
 			omd = opendss.dssConvert.dssToOmd(wizard_dss_path, '', RADIUS=0.0004, write_out=False)
-			MG_GROUPS_TEST = form_mg_groups(G, crit_loads, MG_MINES[_dir][1], params)
-			MINES_TEST = form_mg_mines(G, MG_GROUPS_TEST, crit_loads, omd, params.get('switch'), params.get('gen_bus'))
-		except ValueError as e:
+			MG_GROUPS_TEST = form_mg_groups(G, crit_loads, partitioning_method, params)
+			MINES_TEST = form_mg_mines(G, MG_GROUPS_TEST, crit_loads, omd) if partitioning_method != 'manual' else form_mg_mines(G, MG_GROUPS_TEST, crit_loads, omd, params.get('switch'), params.get('gen_bus')) # No valid gen_bus in MG_GROUPS_TEST. When using manual partitioning, the user should specify gen_bus and switch.
+		except ValueError:
 			G = opendss.dssConvert.dss_to_networkx(lehigh_dss_path)
 			omd = opendss.dssConvert.dssToOmd(lehigh_dss_path, '', RADIUS=0.0004, write_out=False)
-			MG_GROUPS_TEST = form_mg_groups(G, crit_loads, MG_MINES[_dir][1], params)
+			MG_GROUPS_TEST = form_mg_groups(G, crit_loads, partitioning_method, params)
 			MINES_TEST = form_mg_mines(G, MG_GROUPS_TEST, crit_loads, omd, params.get('switch'), params.get('gen_bus'))
 		# Lukes algorithm outputs different configuration each time. Not repeatable. Also errors out later in the MgUP run.
-		if MG_MINES[_dir][1] != 'lukes':
+		if partitioning_method != 'lukes':
 			assert MINES_TEST == MG_MINES[_dir][0], f'MGU_MINES_{_dir} did not match expected output.\nExpected output: {MG_MINES[_dir][0]}.\nReceived output: {MINES_TEST}.'
 	return print('Ran all tests for microgridup_gen_mgs.py.')
 

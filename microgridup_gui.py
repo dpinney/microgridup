@@ -222,7 +222,10 @@ def wizard_to_dss(model_dir=None, lat=None, lon=None, elements=None, test_run=Fa
 	# Convert to DSS and return loads.
 	dssString = f'clear \nset defaultbasefrequency=60 \nnew object=circuit.{model_dir} \n'
 	busList = []
-	# Name substation bus after substation itself. Name gen bus after the feeder
+	# Name substation bus after substation itself. Name gen bus after the feeder.
+	print(elements)
+	import pprint
+	pprint.pprint(elements)
 	for ob in elements:
 		obType = ob['type']
 		obName = ob['name']
@@ -525,11 +528,7 @@ def run():
 	MGQUANT = int(json.loads(request.form['mgQuantity']))
 	G = dssConvert.dss_to_networkx(dss_path)
 	omd = dssConvert.dssToOmd(dss_path, '', RADIUS=0.0004, write_out=False)
-	if mg_method == 'manual':
-		algo_params = json.loads(request.form['MICROGRIDS'])
-		mg_groups = form_mg_groups(G, crit_loads, 'manual', algo_params)
-		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd, switch=algo_params.get('switch', None), gen_bus=algo_params.get('gen_bus', None))
-	elif mg_method == 'lukes':
+	if mg_method == 'lukes':
 		mg_groups = form_mg_groups(G, crit_loads, 'lukes', algo_params)
 		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
 	elif mg_method == 'branch':
@@ -541,6 +540,14 @@ def run():
 	elif mg_method == 'criticalLoads':
 		mg_groups = form_mg_groups(G, crit_loads, 'criticalLoads', algo_params={'num_mgs':MGQUANT})
 		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
+	elif mg_method == 'loadGrouping':
+		algo_params = json.loads(request.form['MICROGRIDS'])
+		mg_groups = form_mg_groups(G, crit_loads, 'loadGrouping', algo_params)
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd, switch=algo_params.get('switch', None), gen_bus=algo_params.get('gen_bus', None))
+	elif mg_method == 'manual':
+		algo_params = json.loads(request.form['MICROGRIDS'])
+		mg_groups = form_mg_groups(G, crit_loads, 'manual', algo_params)
+		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd, switch=algo_params.get('switch', None), gen_bus=algo_params.get('gen_bus', None))
 	elif mg_method == '': 
 		microgrids = json.loads(request.form['MICROGRIDS'])
 	# Form REOPT_INPUTS. 

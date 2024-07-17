@@ -223,9 +223,6 @@ def wizard_to_dss(model_dir=None, lat=None, lon=None, elements=None, test_run=Fa
 	dssString = f'clear \nset defaultbasefrequency=60 \nnew object=circuit.{model_dir} \n'
 	busList = []
 	# Name substation bus after substation itself. Name gen bus after the feeder.
-	print(elements)
-	import pprint
-	pprint.pprint(elements)
 	for ob in elements:
 		obType = ob['type']
 		obName = ob['name']

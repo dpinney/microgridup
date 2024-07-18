@@ -424,7 +424,7 @@ def previewPartitions():
 				default_size = int(len(tree.nodes())/3)
 				MG_GROUPS.extend(nx_group_lukes(tree, algo_params.get('size',default_size)))
 			elif METHOD == 'branch':
-				MG_GROUPS.extend(nx_group_branch(tree, i_branch=algo_params.get('i_branch',0)))
+				MG_GROUPS.extend(nx_group_branch(tree, i_branch=algo_params.get('i_branch',0), omd=omd))
 			elif METHOD == 'bottomUp':
 				MG_GROUPS.extend(nx_bottom_up_branch(tree, num_mgs=MGQUANT/num_trees_pruned, large_or_small='large', omd=omd, cannot_be_mg=['regcontrol']))
 			elif METHOD == 'criticalLoads':

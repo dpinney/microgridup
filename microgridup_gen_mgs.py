@@ -174,14 +174,26 @@ def merge_mgs(G, mgs):
 			del mgs[k]
 	return mgs
 
-def nx_group_branch(G, i_branch=0):
+def nx_group_branch(G, i_branch=0, omd={}):
 	'Create graph subgroups at branch point i_branch (topological order).'
 	if not nx.is_tree(G):
 		G = remove_loops(G)
 	tree_root = list(topological_sort(G))[0]
 	edges_in_order = nx.DiGraph(nx.algorithms.traversal.breadth_first_search.bfs_edges(G, tree_root))
 	bbl = nx_get_branches(edges_in_order)
-	first_branch = bbl[i_branch][0]
+	bbl_indices_to_delete = set() # Add a check to ensure branch algo does not consider item level for branching.
+	for idx, bbl_item in enumerate(bbl):
+		bus = bbl_item[0]
+		if bus.endswith('_end'):
+			feeder_name = bus[0:-4]
+			ob_type = get_object_type_from_omd(feeder_name, omd)
+			if ob_type == 'line':
+				bbl_indices_to_delete.add(idx)
+	new_bbl = [item for idx, item in enumerate(bbl) if idx not in bbl_indices_to_delete]
+	if len(new_bbl) == 0:
+		first_branch = list(topological_sort(G))[0] # Consider all but the substation as a microgrid if there are no branching points.
+	else:
+		first_branch = new_bbl[i_branch][0]
 	succs = list(G.successors(first_branch))
 	parts = [list(nx.algorithms.traversal.depth_first_search.dfs_tree(G, x).nodes()) for x in succs]
 	return parts
@@ -418,7 +430,7 @@ def form_mg_groups(G, CRITICAL_LOADS, algo, algo_params={}):
 			default_size = int(len(tree.nodes())/3)
 			MG_GROUPS.extend(nx_group_lukes(tree, algo_params.get('size',default_size)))
 		elif algo == 'branch':
-			MG_GROUPS.extend(nx_group_branch(tree, i_branch=algo_params.get('i_branch',0)))
+			MG_GROUPS.extend(nx_group_branch(tree, i_branch=algo_params.get('i_branch',0), omd=algo_params.get('omd',{})))
 		elif algo == 'bottomUp':
 			MG_GROUPS.extend(nx_bottom_up_branch(tree, num_mgs=algo_params.get('num_mgs',3)/num_trees_pruned, large_or_small='large', omd=algo_params.get('omd',{}), cannot_be_mg=algo_params.get('cannot_be_mg',[])))
 		elif algo == 'criticalLoads':

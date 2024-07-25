@@ -50,19 +50,19 @@ def run_reopt(microgrids, logger, reopt_inputs, invalidate_cache):
 		lat, lon = microgridup_hosting_cap.get_microgrid_coordinates('circuit.dss', microgrid)
 		process_argument_lists.append([f'reopt_{mg_name}', microgrid, mg_specific_reopt_inputs, mg_name, lat, lon, existing_generation_dict, invalidate_cache])
 		# - Uncomment to run in single-process mode
-		run(f'reopt_{mg_name}', microgrid, mg_specific_reopt_inputs, mg_name, lat, lon, existing_generation_dict, invalidate_cache)
+		# run(f'reopt_{mg_name}', microgrid, mg_specific_reopt_inputs, mg_name, lat, lon, existing_generation_dict, invalidate_cache)
 	# - Uncomment to run in multiprocessing mode
-	# with concurrent.futures.ProcessPoolExecutor() as executor:
-	# 	future_list = []
-	# 	for process_argument_list in process_argument_lists:
-	# 		future_list.append(executor.submit(run, *process_argument_list))
-	# 	for f in concurrent.futures.as_completed(future_list):
-	# 		if f.exception() is not None:
-	# 			try:
-	# 				microgrid_name = f.exception().filename.split("/")[0].split("_")[1]
-	# 			except AttributeError:
-	# 				microgrid_name = 'Unknown'
-	# 			raise Exception(f'The REopt optimization for the microgrid {microgrid_name} failed because (1) the optimizer determined there was no feasible solution for the given inputs or (2) the solver could not complete within the user-defined maximum run-time.')
+	with concurrent.futures.ProcessPoolExecutor() as executor:
+		future_list = []
+		for process_argument_list in process_argument_lists:
+			future_list.append(executor.submit(run, *process_argument_list))
+		for f in concurrent.futures.as_completed(future_list):
+			if f.exception() is not None:
+				try:
+					microgrid_name = f.exception().filename.split("/")[0].split("_")[1]
+				except AttributeError:
+					microgrid_name = 'Unknown'
+				raise Exception(f'The REopt optimization for the microgrid {microgrid_name} failed because (1) the optimizer determined there was no feasible solution for the given inputs or (2) the solver could not complete within the user-defined maximum run-time.')
 
 
 def create_production_factor_series_csv(microgrids, logger, reopt_inputs, invalidate_cache):

@@ -1,5 +1,5 @@
 redirect "circuit_control.dss"
-set datapath="/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh1mg"
+set datapath="/Users/thomasjankovic/microgridup/data/projects/lehigh1mg"
 set maxcontroliter=1000
 calcvoltagebases
 new object=monitor.monvsource-source element=vsource.source terminal=1 mode=0
@@ -25,16 +25,15 @@ new object=monitor.monload-670c_residential2 element=load.670c_residential2 term
 new object=monitor.mongenerator-solar_634_existing element=generator.solar_634_existing terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-solar_675_existing element=generator.solar_675_existing terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-fossil_684_existing element=generator.fossil_684_existing terminal=1 mode=1 ppolar=no
-new object=monitor.mongenerator-fossil_646_existing element=generator.fossil_646_existing terminal=1 mode=1 ppolar=no
 new object=monitor.moncapacitor-cap1 element=capacitor.cap1 terminal=1 mode=6
 new object=monitor.moncapacitor-cap2 element=capacitor.cap2 terminal=1 mode=6
 new object=monitor.mongenerator-battery_670 element=storage.battery_670 terminal=1 mode=1 ppolar=no
-new object=monitor.mongenerator-fossil_670 element=generator.fossil_670 terminal=1 mode=1 ppolar=no
-new object=monitor.monvsource-lead_gen_670_1_2_3 element=vsource.lead_gen_670_1_2_3 terminal=1 mode=0
+new object=monitor.monvsource-lead_gen_670 element=vsource.lead_gen_670 terminal=1 mode=0
+new object=monitor.mongenerator-solar_670 element=generator.solar_670 terminal=1 mode=1 ppolar=no
 set mode=yearly stepsize=60m 
 set number=1
 
-				open line.line_for_lead_gen_670_1_2_3
+				open line.line_for_lead_gen_670
 				calcv
 			solve
 solve
@@ -69,7 +68,7 @@ solve
 			open object=line.650632 term=2
 			open object=line.650632 term=3
 		
-				close line.line_for_lead_gen_670_1_2_3
+				close line.line_for_lead_gen_670
 				calcv
 			calcv
 solve
@@ -129,7 +128,7 @@ solve
 			close object=line.650632 term=2
 			close object=line.650632 term=3
 		
-				open line.line_for_lead_gen_670_1_2_3
+				open line.line_for_lead_gen_670
 				calcv
 			calcv
 solve
@@ -179,9 +178,8 @@ export monitors monitorname=monload-670c_residential2
 export monitors monitorname=mongenerator-solar_634_existing
 export monitors monitorname=mongenerator-solar_675_existing
 export monitors monitorname=mongenerator-fossil_684_existing
-export monitors monitorname=mongenerator-fossil_646_existing
 export monitors monitorname=moncapacitor-cap1
 export monitors monitorname=moncapacitor-cap2
 export monitors monitorname=mongenerator-battery_670
-export monitors monitorname=mongenerator-fossil_670
-export monitors monitorname=monvsource-lead_gen_670_1_2_3
+export monitors monitorname=monvsource-lead_gen_670
+export monitors monitorname=mongenerator-solar_670

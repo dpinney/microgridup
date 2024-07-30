@@ -780,8 +780,8 @@
     },
     "attachments": {
         "coloringFiles": {
-            "color_by.csv": {
-                "csv": "bus,max_kw\n684,1\n645,1\n646,1\n634,1\n611,1\n652,1\n670,1\n692,1\n675,1\n",
+            "color_by_traditional.csv": {
+                "csv": "bus,max_kw\n611,1\n634,1\n645,1\n646,1\n652,1\n670,1\n675,1\n684,1\n692,1\n",
                 "colorOnLoadColumnIndex": "1"
             }
         }

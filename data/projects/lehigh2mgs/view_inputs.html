@@ -4,9 +4,9 @@
 	<title>MicrogridUP &raquo; New</title>
     <link rel="stylesheet" href="/static/js/components/modal.css">
     <script type="module" src="/static/js/components/circuitBuilder/circuitBuilder.js"></script>
-    <script src="/static/js/libraries/graphology-library.min.js"></script>
-    <script src="/static/js/libraries/graphology.min.js"></script>
-    <script src="/static/js/libraries/papaparse.min.js"></script>
+    <script src="/static/js/libraries/graphology-library.js"></script>
+    <script src="/static/js/libraries/graphology.js"></script>
+    <script src="/static/js/libraries/papaparse.js"></script>
 	<script src="https://kit.fontawesome.com/92028f16c4.js" crossorigin="anonymous"></script>
 	<style type="text/css">
         :root {
@@ -115,46 +115,12 @@
 			max-width: 700px;
 			padding: 10px;
 		}
-		.wizard-dropbutton {
-		  color: white;
-		  border: none;
-		}
-		.wizard-dropdown {
-		  position: relative;
-		  display: inline-block;
-		}
-		.wizard-dropdown-content {
-		  display: none;
-		  position: absolute;
-		  background-color: #f1f1f1;
-		  min-width: 160px;
-		  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-		  z-index: 1;
-		}
-		.wizard-dropdown-content div {
-		  color: black;
-		  padding: 12px 16px;
-		  text-decoration: none;
-		  display: block;
-		}
-		.wizard-dropdown-content div:hover {background-color: #ddd; cursor: pointer;}
-		.wizard-dropdown:hover .wizard-dropdown-content {display: block;}
-		.wizard-dropdown:hover .wizard-dropbutton {background-color: mediumseagreen;}
-		.substation {
-		    padding-left: 0px;
-		    list-style: none;
-		}
-		#elements .feeder {
-			padding-left: 40px;
-			list-style: none;
-		}
-		#elements .load, .solar, .battery, .wind, .fossil {
-			padding-left: 80px;
-			list-style: none;
-		}
-		#elements li i {
-			cursor:pointer;
-		}
+		.partitionDescription {
+            display: none;
+        }
+        .partitionDescription.active {
+            display: block;
+        }
 		#loading-background {
 			position: fixed;
 			top: 0;
@@ -204,7 +170,6 @@
         span.span--sectionTitle {
             font-family: sans-serif;
             font-size: 2rem;
-            padding-left: 1rem;
         }
         div > span.span--sectionTitle:nth-child(2) {
             padding-left: .5rem;
@@ -240,6 +205,10 @@
         nav.js-nav--topNav svg {
             fill: white;
         }
+
+		fieldset {
+			border: none;
+		}
 	</style>
 </head>
 <body>
@@ -249,16 +218,16 @@
             <p style="color:white; margin:0px"><a style="color:white; text-decoration:none" href="/"><b>MicrogridUP</b></a> &raquo; New</p>
         </div>-->
         <div id='introInfo' class='step'>
-            <h3>Step 1: Input model information</h3>
+            <h3>Step 1: Input project information</h3>
             <form id="modelInfoForm" enctype="multipart/form-data">
                 <h5>Site and Energy Provider</h5>
                 <div class="chunk">
-                    <label class="tooltip" for="MODEL_DIR">Model Name<span class="classic">Model names must be entirely lowercase.</span></label>
+                    <label class="tooltip" for="MODEL_DIR">Project Name<span class="classic">Project names must be entirely lowercase.</span></label>
                     <input type="text" name="MODEL_DIR" value="lehigh2mgs" pattern="[a-z0-9_\-]+" required/>
                 </div>
                 <div class="chunk">
                     <label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">Defines the length of the interconnection analysis in hours.</span></label>
-                    <input type="text" name="QSTS_STEPS" value="480.0" />
+                    <input type="text" name="QSTS_STEPS" value="480" />
                 </div>
                 <br>
                 <div class="chunk">
@@ -363,12 +332,12 @@
                     <input type="text" name="value_of_lost_load" value="100" pattern="^\d+\.?\d*?$"/>
                 </div>
                 <div class="chunk">
-                    <label class="tooltip" for="single_phase_relay_cost">Single-Phase Relay Cost ($)<span class="classic">Specify the cost of a single-phase relay in $.</span></label>
-                    <input type="text" name="single_phase_relay_cost" value="300" pattern="^\d+$"/>
+                    <label class="tooltip" for="singlePhaseRelayCost">Single-Phase Relay Cost ($)<span class="classic">Specify the cost of a single-phase relay in $.</span></label>
+                    <input type="text" name="singlePhaseRelayCost" value="300" pattern="^\d+$"/>
                 </div>
                 <div class="chunk">
-                    <label class="tooltip" for="three_phase_relay_cost">Three-Phase Relay Cost ($)<span class="classic">Specify the cost of a three-phase relay in $.</span></label>
-                    <input type="text" name="three_phase_relay_cost" value="20000" pattern="^\d+\.?\d*?$"/>
+                    <label class="tooltip" for="threePhaseRelayCost">Three-Phase Relay Cost ($)<span class="classic">Specify the cost of a three-phase relay in $.</span></label>
+                    <input type="text" name="threePhaseRelayCost" value="20000" pattern="^\d+\.?\d*?$"/>
                 </div>
                 <div>
                     <i class="fa fa-plus-square"></i>
@@ -432,13 +401,37 @@
                 <label class="tooltip" for="MG_DEF_METHOD">Microgrid Definition Method<span class="classic">Select a method by which the circuit should be partitioned into microgrids.</span></label>
                 <select id="partitionMethod" name="MG_DEF_METHOD" style="margin-right:6px" disabled>
                     <option value="" disabled selected>Select method</option>
-                    <option value="manual"  title="Assign each load to a specific microgrid and input the generation bus and switch for each microgrid.">Manual</option>
-                    <option value="loadGrouping"  title="Assign each load to a specific microgrid. Generation buses and switches will be selected automatically.">Load Grouping</option>
-                    <option value="lukes"  title="Use Lukes' 'Efficient Algorithm for the Partitioning of Trees' (1974) to divide circuit into microgrids.">Lukes</option>
-                    <option value="branch"  title="Divide circuit into microgrids at the first bus from which there are multiple feeders.">Branch</option>
-                    <option value="bottomUp"  title="Form microgrids at the ends of each feeder and add elements upstream of each element to the same microgrid, merging with neighboring microgrids, until there are the desired number of microgrids.">Bottom-Up</option>
-                    <option value="criticalLoads"  title="Form a microgrid for each critical load and add elements upstream of each critical load to the same microgrid, merging with neighboring microgrids, until there are the desired number of microgrids.">Critical Loads</option>
+                    <!-- <option value="lukes" >Lukes</option> -->
+                    <option value="branch" >Branch</option>
+                    <option value="bottomUp" >Bottom-Up</option>
+                    <option value="criticalLoads" >Critical Loads</option>
+					<option value="loadGrouping" >Load Grouping</option>
+                    <option value="manual" >Manual</option>
                 </select></br>
+				<div id="lukesDescription" class="partitionDescription">
+					<p>Use Lukes' "Efficient Algorithm for the Partitioning of Trees" (1974) to divide circuit into microgrids.</p>
+				</div>
+				<div id="branchDescription" class="partitionDescription">
+					<p>Divide circuit into microgrids at the first bus from which there are multiple feeders.</p>
+				</div>
+				<div id="bottomUpDescription" class="partitionDescription">
+					<p>Form microgrids at the ends of each feeder and add elements upstream of each element to the same microgrid, merging with neighboring microgrids, until there are the desired number of microgrids.</p>
+				</div>
+				<div id="criticalLoadsDescription" class="partitionDescription">
+					<p>Form a microgrid for each critical load and add elements upstream of each critical load to the same microgrid, merging with neighboring microgrids, until there are the desired number of microgrids.</p>
+				</div>				
+				<div id="loadGroupingDescription" class="partitionDescription">
+					<p>Assign each load to a specific microgrid and optionally input the generation bus and switch for each microgrid.</p>
+				</div>
+				<div id="loadGroupingDescriptionUsedWizard" class="partitionDescription">
+					<p>Assign each load to a specific microgrid. Generation buses and switches will be selected automatically.</p>
+				</div>
+				<div id="manualDescription" class="partitionDescription">
+					<p>Assign each load to a specific microgrid. Input the existing generation objects for each microgrid and optionally input generation bus and switches for each microgrid.</p>
+				</div>
+				<div id="manualDescriptionUsedWizard" class="partitionDescription">
+					<p>Assign each load to a specific microgrid and input the existing generation objects for each microgrid. Generation buses and switches will be selected automatically.</p>
+				</div>
                 <form id="partitionManuallyForm" style="display: none;">
                     <label for="mgQuantity">How many microgrids?</label>
                     <input id="mgQuantity" type="text" autocomplete="off" placeholder="# of microgrids" />
@@ -647,7 +640,7 @@
                 <div id="microgridParameterMVC" class="chunk"></div>
                 <br>
             </form>
-            <button id="submitEverything" type="submit">Run model</button>
+            <button id="submitEverything" type="submit">Run Project</button>
         </div>
         <div id="loading-background"></div>
         <div id="loading-indicator">
@@ -656,7 +649,7 @@
     </main>
 	<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 	<script>
-	// Function to check if a .file-input (can be a file input or read-only text input) has a value and show/hide the associated Remove File button.
+	/** Check if a .file-input (can be a file input or read-only text input) has a value and show/hide the associated Remove File button. */
 	function toggleRemoveButton(chunk, btnElement) {
 		const fileInput = $(chunk).find('input.file-input');
 		const removeBtn = $(chunk).find('button.remove-btn');
@@ -693,7 +686,7 @@
 		}
 	}
 
-	// Function to limit description text.
+	/** Limit description text. */
 	function limitTextareaCharacters() {
 		var textarea = $('#DESCRIPTION')[0];
 		var characterCount = $('#characterCount')[0];
@@ -707,7 +700,7 @@
 		characterCount.textContent = text.length + " / 140";
 	}
 
-	// Function to toggle technology checkboxes.
+	/** Toggle technology checkboxes. */
 	function toggleDivVisibility(checkboxId, divId) {
 		const checkbox = $(`#${checkboxId}`);
 		const div = $(`#${divId}`);
@@ -718,7 +711,7 @@
 		}
 	}
 
-	// Populate critical load selection div if editing an existing circuit.
+	/** Populate critical load selection div if editing an existing circuit. */
 	function getLoadsFromExistingFile(MODEL_DIR, criticalLoads) {
 		$.ajax({
 			url: '/getLoadsFromExistingFile',
@@ -746,6 +739,7 @@
 				}
 				if (loads.length === 0) {
 					$('#criticalLoadsSelect').append('<p>No loads to select from.</p>')
+					$('#dropDowns').append('<p>No loads to assign to microgrids.</p>')
 				}
 				// Make directory uneditable. 
 				$('input[name="MODEL_DIR"]').prop("readonly", true);
@@ -757,7 +751,7 @@
 		});
 	}
 
-	// Function to show previously selected partitions on edit flow.
+	/** Show previously selected partitions on edit flow. */
 	function showOldPartitions(MODEL_DIR, MG_MINES) {
 		$('#stepThree').hide();
 		var oldPartitionsDiv = $('<div>').attr('id','oldPartitionDiv').addClass('chunk');
@@ -799,43 +793,105 @@
 		});
 	}
 
+	/** Check to see if uploaded circuit contains cycles when user clicks 'Go' during manual. */
+	async function has_cycle() {
+		const modelDir = document.querySelector('input[name="MODEL_DIR"]').value; // modelDir is safe to send over HTTP (unlike full path to uploads folder contained in window.filename). Full path is constructed in backend.
+		const dssPath = document.getElementById('circuitPostCreation');
+		let dssPathIndicator;
+		if (dssPath == undefined) {
+			dssPathIndicator = 'DIRECT TO UPLOADS FOLDER';
+		} else {
+			dssPathIndicator = dssPath.value;
+		}
+
+		try {
+			const response = await fetch('/has_cycles', {
+				method: 'POST',
+				body: JSON.stringify({
+					MODEL_DIR: modelDir, 
+					DSS_PATH_INDICATOR: dssPathIndicator
+				}),
+				headers: {
+					'Content-type': 'application/json; charset=UTF-8'
+				}
+			})
+			const data = await response.json();
+			if (data.result == true) {
+				return true;
+			} else if (data.result == false) {
+				return false;
+			}
+		} catch(error) {
+			console.warn('Unexpected error:', error);
+		}
+	}
+
+	function makeGenObsExisitingInput(count) {
+		$('#switchGenBus').append('<label class="tooltip" for="mg' + count + 'GenObsExisting">Mg' + count + ' Existing Generation Objects <span class="classic">Input existing generation objects separated by commas.</span></label>');
+		$('#switchGenBus').append('<input id="mg' + count + 'GenObsExisting" type="text"></input>');
+		$('#switchGenBus').append('<br>');
+	}
+
+	function makeswitchGenBusInput(count) {
+		$('#switchGenBus').append('<label for="mg' + count + 'GenBus">Mg' + count + ' Gen Bus </label>');
+		$('#switchGenBus').append('<input id="mg' + count + 'GenBus" type="text" placeholder="Optional"></input>');
+		$('#switchGenBus').append('<label for="mg' + count + 'Switch"> Mg' + count + ' Switch </label>');
+		$('#switchGenBus').append('<input id="mg' + count + 'Switch" type="text" placeholder="Optional"></input>');
+		$('#switchGenBus').append('<br>');
+	}
+
 	function attachDropdownsEventHandler() {
 		// Manual partitioning dynamic dropdown creation. 
-		$('#makeDropdownsButton').on('click', function() {
+		$('#makeDropdownsButton').on('click', async function() {
 			if (window.circuitIsSpecified === false) {
 				alert('Please complete step 2.')
 				return
 			}
-			if ($('#mgQuantity').val() === "") {
+			const selectedPartitioningMethod = document.getElementById('partitionMethod').value;
+			if (selectedPartitioningMethod == 'loadGrouping') {
+				const circuit_has_cycle = await has_cycle(); // loadGrouping relies on networkx and networkx breaks when the circuit has a cycle.
+				if (circuit_has_cycle == true) {
+					alert('Circuit contains a cycle. Please remove cycle from circuit or choose a different partitioning method.')
+					return
+				}
+			}
+			if (document.getElementById('mgQuantity').value == undefined) {
 				alert('Please input a number.')
 				return
 			}
 			// Manual grouping GUI includes inputs for gen_bus and switch.
-			var numMgs = $('#mgQuantity').val();
+			const numMgs = document.getElementById('mgQuantity').value;
+			// TODO: throw an error if user inputs 0.
+			// TODO: throw an error if user inputs non-numeric text.
 			const mgs = {};
 			for (let i = 0; i < numMgs; i++) {
 				mgs[`mg${i}`] = {};
 			}
 			createMicrogridParameterMVC(mgs);
-			if ($('#partitionMethod').val() == 'manual') {
-				// Clear existing #switchGenbus if it exists already. 
-				$('#switchGenbus').remove();
-				$('#dropDowns').prepend('<div id="switchGenbus"></div>')
-				for (let i = 0; i < numMgs; i++) {
-					var count = i + 1;
-					$('#switchGenbus').append('<label for="mg' + count + 'Genbus">Mg' + count + ' Gen Bus: </label>');
-					$('#switchGenbus').append('<input id="mg' + count + 'Genbus" type="text"></input>');
-					$('#switchGenbus').append('<label for="mg' + count + 'Switch"> Mg' + count + ' Switch: </label>');
-					$('#switchGenbus').append('<input id="mg' + count + 'Switch" type="text"></input>');
-					$('#switchGenbus').append('<br>');
+			const usedUpload = window.circuitModel.getElements().length == 0;
+			$('#switchGenBus').remove(); // Clear existing #switchGenBus if it exists already.
+			for (let idx = 0; idx < numMgs; idx++) {
+				if (selectedPartitioningMethod == 'manual') {
+					if (idx == 0) {
+						$('#dropDowns').prepend('<div id="switchGenBus"></div>'); // Make div on first loop iteration.
+					}
+					makeGenObsExisitingInput(idx); // manual + wizard = genObsExisting
+					if (usedUpload) {
+						makeswitchGenBusInput(idx); // manual + upload = genObsExisting + switchGenBus
+					}
+				} else if ((selectedPartitioningMethod == 'loadGrouping') && (usedUpload)) {
+					if (idx == 0) {
+						$('#dropDowns').prepend('<div id="switchGenBus"></div>'); // Make div on first loop iteration.
+					}
+					makeswitchGenBusInput(idx);
 				}
 			}
+
 			$('#dropDowns label select').each(function() {
 				$(this).empty();
 				$(this).append('<option value="">None</option>')
-				for (let i = 0; i < numMgs; i++) {
-					var count = i;
-					$(this).append('<option value="Mg' + count + '">Mg' + count + '</option>');
+				for (let idx = 0; idx < numMgs; idx++) {
+					$(this).append('<option value="Mg' + idx + '">Mg' + idx + '</option>');
 				}
 			});
 			$('#dropDowns').show();
@@ -851,9 +907,26 @@
 
 	function attachPartitioningEventHandler() {
 		// Hide/show manual partitioning div. 
-		$('#partitionMethod').change(function() {
-			$('#minQuantMgs').val('');
-			if ($(this).val() == 'manual' || $(this).val() == 'loadGrouping') {
+		document.getElementById('partitionMethod').addEventListener('change', function() {
+			// Show appropriate description in body of partition block.
+			const selectedPartitioningMethod = this.value;
+			const partitionDescriptions = document.querySelectorAll('.partitionDescription');
+            partitionDescriptions.forEach(function(partitionDescription) {
+                partitionDescription.classList.remove('active');
+            });
+			let selectedPartitioningMethodDescription;
+			const partitioningMethods = ['branch', 'bottomUp', 'criticalLoads', 'loadGrouping', 'manual'];
+			if ((selectedPartitioningMethod == 'loadGrouping' && window.circuitModel.getElements().length > 0) || (selectedPartitioningMethod == 'manual' && window.circuitModel.getElements().length > 0)) { // loadGrouping/manual partitioning description should be slightly different when the wizard is used since gen_bus and switch inputs aren't shown.
+				selectedPartitioningMethodDescription = selectedPartitioningMethod + 'Description' + 'UsedWizard';	
+				document.getElementById(selectedPartitioningMethodDescription).classList.add('active');
+			} else if (partitioningMethods.includes(selectedPartitioningMethod)) {
+				selectedPartitioningMethodDescription = selectedPartitioningMethod + 'Description';
+				document.getElementById(selectedPartitioningMethodDescription).classList.add('active');
+			} else if (selectedPartitioningMethod == '') {} // Show no description because no partition method has been selected yet.
+
+			document.getElementById('minQuantMgs').value = ''; // Clear input from bottomUp and criticalLoads partitioning.
+			if ((selectedPartitioningMethod == 'loadGrouping') || (selectedPartitioningMethod == 'manual')) {
+				$('#dropDowns').hide();
 				$('#partitionManuallyForm').show();
 				$('#makeDropdownsButton').show();
 				$('#previewPartitionsButton').hide();
@@ -866,17 +939,14 @@
 				$('#dropDowns').hide();
 				$('#previewPartitionsButton').show();
 			}
-			if ($(this).val() == 'loadGrouping') {
-				$('#switchGenbus').remove();
-			}
-			if ($(this).val() == 'bottomUp' || $(this).val() == 'criticalLoads') {
+			if (selectedPartitioningMethod == 'bottomUp' || selectedPartitioningMethod == 'criticalLoads') {
 				$('#minQuantMgsForm').show();
 				$('#makeDropdownsButton').hide();
 			}
 		})
 	}
 
-	// Grab partitioning preview.
+	/** Grab partitioning preview. */
 	function attachPartitionButtonEventHandler() {
 		$('#previewPartitionsButton').click(function() {
 			if (window.circuitIsSpecified === false) {
@@ -974,7 +1044,7 @@
 		}
 	}
 
-	// Submit everything. 
+	/** Submit everything. */
 	function submitEverything() {
 		// Do not proceed if no circuit is specified.
 		if (window.filename === '') {
@@ -987,21 +1057,21 @@
 			return
 		}
 		// Do not proceed if no partition method is specified.
-		if (($( "#partitionMethod option:selected" ).val() === '') & ($('#oldPartitionDiv').length == 0)) {
+		if (($( "#partitionMethod option:selected" ).val() === '') && ($('#oldPartitionDiv').length == 0)) {
 			alert('Please specify a partitioning method.')
 			return 
 		}
 		var form1 = new FormData(document.getElementById("modelInfoForm"));
 		var form2 = new FormData(document.getElementById("techParamForm"));
 		for (var pair of form2.entries()) {
-				form1.append(pair[0], pair[1]);
-			}
+			form1.append(pair[0], pair[1]);
+		}
 		// Specify circuit location.
-		const dss_path = $('#circuitPostCreation').val();
-		if (dss_path == undefined) {
+		const dssPath = document.getElementById('circuitPostCreation');
+		if (dssPath == undefined) {
 			form1.append('DSS_PATH','Direct to uploads folder.');
 		} else {
-			form1.append('DSS_PATH',dss_path);
+			form1.append('DSS_PATH',dssPath.value);
 		}
 		// Specify outages path if reused.
 		const outages_path = document.getElementsByName('HISTORICAL_OUTAGES')[0].value;
@@ -1024,63 +1094,48 @@
 		form1.append('MG_DEF_METHOD',method);
 
 		// Do not proceed if manual is selected and no partitions are created.
-		if ((method === 'manual' && !$('#dropDowns').is(':visible')) || (method === 'loadGrouping' && !$('#dropDowns').is(':visible'))) {
+		if (((method === 'loadGrouping' && !$('#dropDowns').is(':visible'))) || ((method === 'manual' && !$('#dropDowns').is(':visible')))) {
 			alert('Please enter a number of microgrids and press Go.')
 			return
 		}
-		// If manual or loadGrouping is selected, append a 'MICROGRIDS' value.
+		// If loadGrouping or manual is selected, append a 'MICROGRIDS' value.
 		var MICROGRIDS = {}
-		if ((method == 'manual') || (method == 'loadGrouping')) {
-			$('#dropDowns label').each( function() {
-				// Skip the Gen Buses and Switches.
+		if ((method == 'loadGrouping') || (method == 'manual')) {
+			$('#dropDowns label').each(function() {
 				if (this.hasAttribute('for')) {
-					return true
+					return true // Skip the Gen Obs Existing, Gen Buses, and Switches.
 				}
-				// console.log(this);
 				var load = $(this).text().split(' ')[1]
 				var mg = $(this).find(':selected').text()
-				if (method === 'loadGrouping') {
-					MICROGRIDS[mg] ??= [];
-					MICROGRIDS[mg].push(load);
-				}
-				else if (method === 'manual') {
-					MICROGRIDS.pairings ??= {};
-					MICROGRIDS.pairings[mg] ??= [];
-					MICROGRIDS['pairings'][mg].push(load); 
-				}
-			} )
+				MICROGRIDS.pairings ??= {};
+				MICROGRIDS.pairings[mg] ??= [];
+				MICROGRIDS['pairings'][mg].push(load); 
+			})
 			// Do not proceed if no loads are in microgrids.
-			if ('pairings' in MICROGRIDS) {
-				const pairings = MICROGRIDS.pairings;
-				if (typeof pairings === 'object' && Object.keys(pairings).length === 1 && 'None' in pairings) {
-					alert('At least one load should be placed in a microgrid. Please return to step 3.')
-					return
-				}
-			} else {
-				const keys = Object.keys(MICROGRIDS);
-				if (keys.length === 1 && keys[0] === 'None') {
-					alert('At least one load should be placed in a microgrid. Please return to step 3.')
-					return
-				}
+			const pairings = MICROGRIDS.pairings;
+			if (typeof pairings === 'object' && Object.keys(pairings).length === 1 && 'None' in pairings) {
+				alert('At least one load should be placed in a microgrid. Please return to step 3.')
+				return
 			}
-			// If manual is selected, append switch and gen_bus values.
+			// Append gen_obs_exising, switch, and gen_bus values.
 			var counter = 0;
-			$('#switchGenbus input').each( function() {
-				counter = counter + 0.5;
+			$('#switchGenBus input').each( function() {
 				var id = $(this).attr('id');
 				var val = $(this).val();
-				var mg = 'Mg' + Math.round(counter);
-				if (id.includes('Genbus')) {
+				var mg = 'Mg' + id.match(/^mg(\d+)/)[1]; // Get digits from next to 'mg' in input ID.
+				if (id.includes('GenObsExisting')) {
+					MICROGRIDS.gen_obs_existing ??= {};
+					MICROGRIDS.gen_obs_existing[mg] = val;
+				} else if (id.includes('GenBus')) {
 					MICROGRIDS.gen_bus ??= {};
 					MICROGRIDS.gen_bus[mg] = val;
-				} 
-				else {
+				} else {
 					MICROGRIDS.switch ??= {};
 					MICROGRIDS.switch[mg] = [String(val)];
 				}
 			})
 		} else if (($('#circuitPostCreation').length) && (method == '')) {
-			var MICROGRIDS = JSON.parse('{"mg0": {"critical_load_kws": [70, 90, 10], "gen_bus": "634", "gen_obs_existing": ["wind_634_existing"], "loads": ["634a_data_center", "634b_radar", "634c_atc_tower"], "switch": "632633"}, "mg1": {"critical_load_kws": [150, 200, 200, 0], "gen_bus": "675", "gen_obs_existing": ["battery_675_existing", "battery_675_2_existing"], "loads": ["675a_hospital", "675b_residential1", "675c_residential1", "692_warehouse2"], "switch": "671692"}}');
+			var MICROGRIDS = JSON.parse('{"mg0": {"critical_load_kws": [70, 90, 10], "gen_bus": "634", "gen_obs_existing": [], "loads": ["634a_data_center", "634b_radar", "634c_atc_tower"], "switch": "632633"}, "mg1": {"critical_load_kws": [150, 200, 200, 0], "gen_bus": "675", "gen_obs_existing": [], "loads": ["675a_hospital", "675b_residential1", "675c_residential1", "692_warehouse2"], "switch": "671692"}}');
 		}
 		form1.append('MICROGRIDS',JSON.stringify(MICROGRIDS));
 		// Append mgQuantity. 
@@ -1090,6 +1145,22 @@
 		// Append microgrid parameter overrides
 		const mgParameterOverrides = window.microgridParameterModel.getExportData();
 		form1.append('mgParameterOverrides', JSON.stringify(mgParameterOverrides));
+
+		// - Append data to get single phase load count and three phase load count per load
+		const existingJsCircuitModel = JSON.parse('""');
+		if (window.circuitModel.getElements().length > 0) {
+			// - The user has created a new circuit model, so use that
+			form1.append('jsCircuitModel', JSON.stringify(window.circuitModel.getElements().map(e => JSON.stringify(e.getProperties('props')))))
+		} else {
+			// - The user has not created a new circuit model
+			if (existingJsCircuitModel !== '') {
+				//  - If there is an existing circuit model (i.e. this is an "edit" run), use that
+				form1.append('jsCircuitModel', JSON.stringify(existingJsCircuitModel.map(e => JSON.stringify(e))));
+			} else {
+				//  - If there is no existing circuit model (i.e. the user is using an uploaded DSS file), do not add the "jsCircuitModel" key to the
+				//    form
+			}
+		}
 
 		// Show loading indicator.
 		$('#loading-background').show();
@@ -1194,13 +1265,64 @@
 			var test = $(this).val();
 			$("div.desc").hide();
 			$("#circuit" + test).show();
-            if (test === 'Creator') {
-                window.outageLocationInputView.updateInput();
-            } else {
-                window.outageLocationInputView.setValue("650632");
-            }
+			if (test === 'Creator') {
+				const circuitElements = [
+					{
+						name: 'substation_1',
+						namespace: 'element',
+						type: 'substation',
+						basekv: 2.4
+					},
+					{
+						name: 'feeder_1',
+						namespace: 'element',
+						type: 'feeder',
+						parent: 'element.substation_1',
+					},
+					{
+						name: 'solar_1',
+						namespace: 'element',
+						type: 'solar',
+						parent: 'element.feeder_1',
+						kw: 440
+					},
+					{
+						name: 'wind_1',
+						namespace: 'element',
+						type: 'wind',
+						parent: 'element.feeder_1',
+						kw: 200
+					},
+					{
+						name: 'fossil_1',
+						namespace: 'element',
+						type: 'fossil',
+						parent: 'element.feeder_1',
+						kw: 265
+					},
+					{
+						name: 'battery_1',
+						namespace: 'element',
+						type: 'battery',
+						parent: 'element.feeder_1',
+						kwh: 307,
+						kw: 79
+					}
+				].map(element => new window.CircuitElement(element));
+				for (const e of circuitElements) {
+					window.circuitModel.addElement(e);
+					// - The CircuitTableView is already a graph observer, so it will become an observer of every new element that is added
+					// - The CircuitUserControlsView is already a graph observer, so it will become an observer of every new element that is added
+					// - The OutageLocationInputview is already a graph observer, so it will become an observer of every new element that is added
+				}
+				window.outageLocationInputView.updateInput();
+			} else {
+				for (const e of window.circuitModel.getElements((e) => e.getProperty('type') === 'substation')) {
+					window.circuitModel.removeElement(e.fullName);
+				}
+				window.outageLocationInputView.setValue("650632");
+			}
 		});
-		
 		// If user clicked edit, show used circuit.
 		if ($('#circuitPostCreation').length) {
 			$('#circuitUpload').show();
@@ -1211,7 +1333,7 @@
 			const MODEL_DIR = document.getElementsByName('MODEL_DIR')[0].value;
 			window.on_edit_flow = true;
 			// Get allDataInputs.json params from Jinja as variables in the script.
-			var in_data = JSON.parse('{"BASE_DSS": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh2mgs/circuit.dss", "CREATION_DATE": "2024-04-03 19:51:44", "CRITICAL_LOADS": ["634a_data_center", "634b_radar", "634c_atc_tower", "675a_hospital", "675b_residential1", "675c_residential1"], "DESCRIPTION": "", "FAULTED_LINES": "650632", "INVALIDATE_CACHE": true, "LOAD_CSV": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh2mgs/loads.csv", "MICROGRIDS": {"mg0": {"critical_load_kws": [70, 90, 10], "gen_bus": "634", "gen_obs_existing": ["wind_634_existing"], "loads": ["634a_data_center", "634b_radar", "634c_atc_tower"], "switch": "632633"}, "mg1": {"critical_load_kws": [150, 200, 200, 0], "gen_bus": "675", "gen_obs_existing": ["battery_675_existing", "battery_675_2_existing"], "loads": ["675a_hospital", "675b_residential1", "675c_residential1", "692_warehouse2"], "switch": "671692"}}, "MODEL_DIR": "lehigh2mgs", "OUTAGE_CSV": null, "QSTS_STEPS": 480.0, "REOPT_INPUTS": {"analysisYears": "25", "battery": "on", "batteryCapacityCost": "420", "batteryCapacityCostReplace": "200", "batteryCapacityMax": "10000", "batteryCapacityMin": "0", "batteryCapacityReplaceYear": "10", "batteryItcPercent": "0", "batteryMacrsOptionYears": "7", "batteryPowerCost": "840", "batteryPowerCostReplace": "410", "batteryPowerMax": "10000", "batteryPowerMin": "0", "batteryPowerReplaceYear": "10", "demandCost": "20", "dieselCO2Factor": "22.4", "dieselFuelCostGal": "3", "dieselGenCost": "500", "dieselMacrsOptionYears": "0", "dieselMax": "100000", "dieselMin": "0", "dieselOMCostKw": "25", "dieselOMCostKwh": "0.02", "dieselOnlyRunsDuringOutage": true, "discountRate": "0.083", "energyCost": "0.12", "fossil": "on", "fuelAvailable": "10000", "maxRuntimeSeconds": "240", "mgParameterOverrides": {"mg0": {}, "mg1": {}}, "minGenLoading": "0.3", "omCostEscalator": "0.025", "outageDuration": "48", "single_phase_relay_cost": "300", "solar": "on", "solarCanCurtail": true, "solarCanExport": true, "solarCost": "1600", "solarItcPercent": "0.26", "solarMacrsOptionYears": "5", "solarMax": "10000", "solarMin": "0", "three_phase_relay_cost": "20000", "urdbLabel": "5b75cfe95457a3454faf0aea", "urdbLabelSwitch": "off", "value_of_lost_load": "100", "wholesaleCost": "0.034", "wind": "on", "windCost": "1500", "windItcPercent": "0.26", "windMacrsOptionYears": "5", "windMax": "10000", "windMin": "0", "year": "2017"}}');
+			var in_data = JSON.parse('{"BASE_DSS": "/Users/thomasjankovic/microgridup/data/projects/lehigh2mgs/circuit.dss", "CREATION_DATE": "2024-07-30 13:27:33", "CRITICAL_LOADS": ["634a_data_center", "634b_radar", "634c_atc_tower", "675a_hospital", "675b_residential1", "675c_residential1"], "DESCRIPTION": "", "FAULTED_LINES": "650632", "INVALIDATE_CACHE": false, "LOAD_CSV": "/Users/thomasjankovic/microgridup/data/projects/lehigh2mgs/loads.csv", "MICROGRIDS": {"mg0": {"critical_load_kws": [70, 90, 10], "gen_bus": "634", "gen_obs_existing": [], "loads": ["634a_data_center", "634b_radar", "634c_atc_tower"], "switch": "632633"}, "mg1": {"critical_load_kws": [150, 200, 200, 0], "gen_bus": "675", "gen_obs_existing": [], "loads": ["675a_hospital", "675b_residential1", "675c_residential1", "692_warehouse2"], "switch": "671692"}}, "MODEL_DIR": "lehigh2mgs", "OUTAGE_CSV": null, "QSTS_STEPS": 480, "REOPT_INPUTS": {"analysisYears": "25", "battery": "on", "batteryCapacityCost": "420", "batteryCapacityCostReplace": "200", "batteryCapacityMax": "10000", "batteryCapacityMin": 0, "batteryCapacityReplaceYear": "10", "batteryPowerCost": "840", "batteryPowerCostReplace": "410", "batteryPowerMax": "10000", "batteryPowerMin": 0, "batteryPowerReplaceYear": "10", "demandCost": "20", "dieselCO2Factor": 22.4, "dieselFuelCostGal": 3, "dieselGenCost": "500", "dieselMax": "100000", "dieselOMCostKw": 25, "dieselOMCostKwh": 0.02, "dieselOnlyRunsDuringOutage": true, "discountRate": "0.083", "energyCost": "0.12", "fossil": "on", "fuelAvailable": "10000", "maxRuntimeSeconds": "240", "mgParameterOverrides": {"mg0": {}, "mg1": {}}, "minGenLoading": "0.3", "outageDuration": "48", "single_phase_relay_cost": 300, "solar": "on", "solarCanCurtail": true, "solarCanExport": true, "solarCost": "1600", "solarMax": "10000", "solarMin": 0, "three_phase_relay_cost": 20000, "urdbLabelSwitch": "off", "value_of_lost_load": "100", "wholesaleCost": "0.034", "wind": "on", "windCost": "1500", "windMax": "10000", "windMin": 0, "year": "2017"}}');
 			var criticalLoads = in_data['CRITICAL_LOADS'];
 			var MG_MINES = in_data['MICROGRIDS'];
 			// Also populate critical load selection div.
@@ -1233,13 +1355,13 @@
 			var model_dir = $('input[name="MODEL_DIR"]').val()
 			// Do not proceed if model has no name.
 			if (model_dir === '') {
-				alert('Please specify a model name.')
+				alert('Please specify a project name.')
 				return 
 			}
 			// Do not proceed if input contains capital letters.
 			const pattern = new RegExp('[A-Z]');
 			if (pattern.test(model_dir)) {
-				alert('Model names must be entirely lowercase. Please return to Step 1 and provide Model Name with lowercase input.')
+				alert('Project names must be entirely lowercase. Please return to Step 1 and provide Project Name with lowercase input.')
 				return
 			}
 			var form_data = new FormData($('#upload-file')[0]);
@@ -1274,11 +1396,11 @@
 					}
 					if (loads.length === 0) {
 						$('#criticalLoadsSelect').append('<p>No loads to select from.</p>')
+						$('#dropDowns').append('<p>No loads to assign to microgrids.</p>')
 					}
-					// Set filename.
-					window.filename = data.filename;
-					// Make directory uneditable. 
-					$('input[name="MODEL_DIR"]').prop("readonly", true);
+					window.filename = data.filename; // Set filename.
+					$('input[name="MODEL_DIR"]').prop("readonly", true); // Make directory uneditable. 
+					document.getElementById('partitionMethod').dispatchEvent(new Event('change')); // Manually trigger dropdown select menu change to potentially refresh partition method descriptions (manual partitioning description differs dependent on wizard vs upload).
 				},
 				error: function(data) {
 					alert(data.responseJSON.error);
@@ -1334,53 +1456,12 @@
 	import { CircuitElement, CircuitModel, CircuitController, CircuitTableView, CircuitUserControlsView, CsvLoadParser, OutageLocationInputView } from '/static/js/components/circuitBuilder/circuitBuilder.js';
 	import { MicrogridParameterModel, MicrogridParameterController, MicrogridParameterView } from '/static/js/components/microgridParameterMVC/microgridParameterMVC.js'
 	// - CircuitBuilder
-	const circuitElements = [
-		{
-			name: 'substation_1',
-			namespace: 'element',
-			type: 'substation',
-			basekv: 2.4
-		},
-		{
-			name: 'feeder_1',
-			namespace: 'element',
-			type: 'feeder',
-			parent: 'element.substation_1',
-		},
-		{
-			name: 'solar_1',
-			namespace: 'element',
-			type: 'solar',
-			parent: 'element.feeder_1',
-			kw: 440
-		},
-		{
-			name: 'wind_1',
-			namespace: 'element',
-			type: 'wind',
-			parent: 'element.feeder_1',
-			kw: 200
-		},
-		{
-			name: 'fossil_1',
-			namespace: 'element',
-			type: 'fossil',
-			parent: 'element.feeder_1',
-			kw: 265
-		},
-		{
-			name: 'battery_1',
-			namespace: 'element',
-			type: 'battery',
-			parent: 'element.feeder_1',
-			kwh: 307,
-			kw: 79
-		},
-	].map(element => new CircuitElement(element));
+	window.CircuitElement = CircuitElement;
 	const model = new CircuitModel();
+	window.circuitModel = model;
 	const controller = new CircuitController(model);
 	const outageLocationInputView = new OutageLocationInputView(controller);
-    window.outageLocationInputView = outageLocationInputView;
+	window.outageLocationInputView = outageLocationInputView;
 	model.addObserver(outageLocationInputView);
 	const view = new CircuitTableView(controller);
 	model.addObserver(view);
@@ -1392,12 +1473,6 @@
 	document.getElementById('outageLocationInputInsert').append(outageLocationInputView.modal.divElement);
 	document.getElementById('circuitCreator').append(view.modal.divElement);
 	document.getElementById('circuitCreator').append(controls.modal.divElement);
-	for (const e of circuitElements) {
-		model.addElement(e);
-		// - The CircuitTableView is already a graph observer, so it will become an observer of every new element that is added
-		// - The CircuitUserControlsView is already a graph observer, so it will become an observer of every new element that is added
-		// - The OutageLocationInputview is already a graph observer, so it will become an observer of every new element that is added
-	}
 	outageLocationInputView.setValue("650632");
 	const csvLoadParserInsert = document.getElementById('csvLoadParserInsert');
 	if (csvLoadParserInsert !== null) {

@@ -8,7 +8,7 @@ from omf.solvers.opendss import dssConvert
 def test_1mg():
 	# Input data.
 	MODEL_DIR = f'{PROJ_FOLDER}/lehigh1mg'
-	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_1mg.dss'
+	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_phased.dss'
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINES = '650632' # Why this line, which is not closing off the genbus from source?
 	QSTS_STEPS = 24*20
@@ -69,12 +69,13 @@ def test_1mg():
 		# windMacrsOptionYears
 		# windItcPercent
 		"mgParameterOverrides": {"mg0":{}},
+		"maxRuntimeSeconds": "240"
 	}
 	MICROGRIDS = {
 		'mg0': {
 			'critical_load_kws': [70, 90, 10, 150, 200, 200, 400, 20, 30, 70, 0, 0],
 			'gen_bus': '670',
-			'gen_obs_existing': ['solar_634_existing','solar_675_existing','fossil_684_existing', 'fossil_646_existing', 'battery_634_existing', 'battery_684_existing'],
+			'gen_obs_existing': ['solar_634_existing','solar_675_existing', 'fossil_684_existing', 'battery_634_existing', 'battery_684_existing'],
 			'loads': ['634a_data_center', '634b_radar', '634c_atc_tower', '675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2', '684_command_center', '652_residential', '611_runway', '645_hangar', '646_office'],
 			'switch': '650632',
 		}
@@ -87,7 +88,7 @@ def test_1mg():
 def test_2mg():
 	# Input data.
 	MODEL_DIR = f'{PROJ_FOLDER}/lehigh2mgs'
-	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_2mg.dss'
+	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_phased.dss'
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINES = '650632'
 	QSTS_STEPS = 24*20
@@ -146,20 +147,21 @@ def test_2mg():
 		"windMin": 0,
 		# windMacrsOptionYears
 		# windItcPercent
-		"mgParameterOverrides": {"mg0":{}, "mg1":{}}
+		"mgParameterOverrides": {"mg0":{}, "mg1":{}},
+		"maxRuntimeSeconds": "240"
 	}
 	MICROGRIDS = {
 		'mg0': {
 			'critical_load_kws': [70, 90, 10],
 			'gen_bus': '634',
-		 	'gen_obs_existing': ['wind_634_existing'],
+		 	'gen_obs_existing': [],
 			'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'],
 			'switch': '632633'
 		},
 		'mg1': {
 			'critical_load_kws': [150, 200, 200, 0],
 			'gen_bus': '675',
-			'gen_obs_existing': ['battery_675_existing', 'battery_675_2_existing'],
+			'gen_obs_existing': [],
 			'loads': ['675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2'],
 			'switch': '671692'
 		}
@@ -172,7 +174,7 @@ def test_2mg():
 def test_3mg():
 	# Input data.
 	MODEL_DIR = f'{PROJ_FOLDER}/lehigh3mgs'
-	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_3mg.dss'
+	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_phased.dss'
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINES = '650632'
 	QSTS_STEPS = 24*20
@@ -229,7 +231,8 @@ def test_3mg():
 		"windCost" : "4989",
 		"windMax": "100000",
 		"windMin": 0,
-		"mgParameterOverrides": {"mg0":{}, "mg1":{}, "mg2":{}}
+		"mgParameterOverrides": {"mg0":{}, "mg1":{}, "mg2":{}},
+		"maxRuntimeSeconds": "240"
 	}
 	MICROGRIDS = {
 		'mg0': {
@@ -242,7 +245,7 @@ def test_3mg():
 		'mg1': {
 			'critical_load_kws': [150, 200, 200, 0],
 			'gen_bus': '675',
-			'gen_obs_existing': ['fossil_675_existing'],
+			'gen_obs_existing': [],
 			'loads': ['675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2'],
 			'switch': '671692'
 		},
@@ -262,7 +265,7 @@ def test_3mg():
 def test_4mg():
 	# Input data.
 	MODEL_DIR = f'{PROJ_FOLDER}/lehigh4mgs'
-	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_4mg.dss'
+	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_phased.dss'
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINES = '650632'
 	QSTS_STEPS = 24*20
@@ -322,7 +325,8 @@ def test_4mg():
 		"windMin": 0,
 		# windMacrsOptionYears
 		# windItcPercent
-		"mgParameterOverrides": {"mg0":{}, "mg1":{}, "mg2":{}, "mg3":{}}
+		"mgParameterOverrides": {"mg0":{}, "mg1":{}, "mg2":{}, "mg3":{}},
+		"maxRuntimeSeconds": "240"
 	}
 	MICROGRIDS = {
 		'mg0': {
@@ -349,7 +353,7 @@ def test_4mg():
 		'mg3': {
 			'critical_load_kws': [30, 70],
 			'gen_bus': '646',
-			'gen_obs_existing': ['battery_646_existing'],
+			'gen_obs_existing': [],
 			'loads': ['645_hangar','646_office'],
 			'switch': '632645',
 		}
@@ -361,10 +365,10 @@ def test_4mg():
 
 def test_auto3mg():
 	# Input data.
-	CIRC_FILE = f'{MGU_FOLDER}/testfiles/lehigh_base_3mg.dss'
+	CIRC_FILE = f'{MGU_FOLDER}/testfiles/lehigh_base_phased.dss'
 	CRITICAL_LOADS = ['645_hangar', '684_command_center', '611_runway', '675a_hospital', '634a_data_center', '634b_radar', '634c_atc_tower']
 	MODEL_DIR = f'{PROJ_FOLDER}/lehighauto_3mg'
-	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_3mg.dss'
+	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_phased.dss'
 	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
 	FAULTED_LINES = '670671'
 	QSTS_STEPS = 24*20
@@ -424,7 +428,8 @@ def test_auto3mg():
 		"windMin": 0,
 		# windMacrsOptionYears
 		# windItcPercent
-		"mgParameterOverrides": {"mg0":{}, "mg1": {}, "mg2":{}}
+		"mgParameterOverrides": {"mg0":{}, "mg1": {}, "mg2":{}},
+		"maxRuntimeSeconds": "240"
 	}
 	ALGO = 'branch' #'lukes'
 	G = dssConvert.dss_to_networkx(CIRC_FILE)

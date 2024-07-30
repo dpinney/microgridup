@@ -70,7 +70,6 @@
     span.span--sectionTitle {
         font-family: sans-serif;
         font-size: 2rem;
-        /*padding-left: 1rem;*/
     }
     div > span.span--sectionTitle:nth-child(2) {
         padding-left: .5rem;
@@ -212,6 +211,11 @@
       0%,100% { opacity: 1; }
       50% { opacity: 0; }
     }
+    /* Disabled links/spans/anchor tags when server is offline. */
+    .disabled-link, .disabled-span, .disabled-parent {
+        pointer-events: none;
+        color: gray;
+    }
     </style>
   </head>
   <body class="loading">
@@ -227,8 +231,8 @@
                 <span class="span--sectionTitle">Overview</span>
             </div>
             <div style="padding-right: 1rem; margin-left: auto;">
-                <a href="/edit/lehigh4mgs">
-                    <svg width="32px" height="32px" viewBox="0 0 24 20">
+                <a href="/edit/lehigh4mgs" style="margin-right: 2rem">
+                    <svg width="32px" height="32px" viewBox="0 0 24 21">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M21.1213 2.70705C19.9497 1.53548 18.0503 1.53547 16.8787 2.70705L15.1989
                         4.38685L7.29289 12.2928C7.16473 12.421 7.07382 12.5816 7.02986 12.7574L6.02986 16.7574C5.94466 17.0982 6.04451 17.4587 6.29289
                         17.707C6.54127 17.9554 6.90176 18.0553 7.24254 17.9701L11.2425 16.9701C11.4184 16.9261 11.5789 16.8352 11.7071 16.707L19.5556
@@ -241,6 +245,17 @@
                         4 18.9999V7.99994Z" fill="#FFFFFF"/>
                     </svg>
                     <span class="span--sectionTitle">Edit</span>
+                </a>
+                <a href="/doc" target="_blank">
+                    <svg width="32px" height="32px" viewBox="1 5 22 10">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 19.5C16.1421 19.5 19.5 16.1421 19.5 12C19.5 7.85786 16.1421 4.5 12
+                        4.5C7.85786 4.5 4.5 7.85786 4.5 12C4.5 16.1421 7.85786 19.5 12 19.5ZM12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12
+                        3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21ZM12.75 15V16.5H11.25V15H12.75ZM10.5 10.4318C10.5 9.66263 11.1497 9 12
+                        9C12.8503 9 13.5 9.66263 13.5 10.4318C13.5 10.739 13.3151 11.1031 12.9076 11.5159C12.5126 11.9161 12.0104 12.2593 11.5928
+                        12.5292L11.25 12.7509V14.25H12.75V13.5623C13.1312 13.303 13.5828 12.9671 13.9752 12.5696C14.4818 12.0564 15 11.3296 15
+                        10.4318C15 8.79103 13.6349 7.5 12 7.5C10.3651 7.5 9 8.79103 9 10.4318H10.5Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width=".5"/>
+                    </svg>
+                    <span class="span--sectionTitle">Help</span>
                 </a>
             </div>
         </nav>
@@ -727,9 +742,13 @@
                     
                     <li><a href='/rfile/lehigh4mgs/./hosting_capacity/allOutputData.json' target="_blank">./hosting_capacity/allOutputData.json</a></li>
                     
+                    <li><a href='/rfile/lehigh4mgs/./hosting_capacity/color_by_traditional.csv' target="_blank">./hosting_capacity/color_by_traditional.csv</a></li>
+                    
                     <li><a href='/rfile/lehigh4mgs/./hosting_capacity/circuit.dss.omd' target="_blank">./hosting_capacity/circuit.dss.omd</a></li>
                     
                     <li><a href='/rfile/lehigh4mgs/./hosting_capacity/traditionalGraphData.html' target="_blank">./hosting_capacity/traditionalGraphData.html</a></li>
+                    
+                    <li><a href='/rfile/lehigh4mgs/./hosting_capacity/input_mohcaCustom.csv' target="_blank">./hosting_capacity/input_mohcaCustom.csv</a></li>
                     
                     <li><a href='/rfile/lehigh4mgs/./hosting_capacity/HOSTCAP.dss' target="_blank">./hosting_capacity/HOSTCAP.dss</a></li>
                     
@@ -851,7 +870,63 @@
         }
     }
 
+    function disableLinks() {
+        const links = document.querySelectorAll('ul li a');
+        links.forEach(link => {
+            link.classList.add('disabled-link');
+        });
+        const spans = document.querySelectorAll('.span--sectionTitle');
+        spans.forEach(span => {
+            span.classList.add('disabled-span');
+            const parentLink = span.closest('a');
+            if (parentLink) {
+                parentLink.classList.add('disabled-parent');
+            }
+        });
+    }
+
+    function enableLinks() {
+        const links = document.querySelectorAll('ul li a');
+        links.forEach(link => {
+            link.classList.remove('disabled-link');
+        });
+        const spans = document.querySelectorAll('.span--sectionTitle');
+        spans.forEach(span => {
+            span.classList.remove('disabled-span');
+            const parentLink = span.closest('a');
+            if (parentLink) {
+                parentLink.classList.remove('disabled-parent');
+            }
+        });
+    }
+
+    async function checkServerStatus() {
+        try {
+            const response = await fetch('/healthcheck');
+            if (response.ok) {
+                const data = await response.json();
+                if (data.status === 'running') {
+                    enableLinks();
+                } else {
+                    console.log('Unexpected condition: data.status !== "running".');
+                    disableLinks();
+                }
+            } else {
+                console.log('Unexpected condition: !(response.ok).');
+                disableLinks();
+            }
+        } catch (error) {
+            if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                disableLinks();
+            } else {
+                console.error('Unexpected error:', error);
+            }
+        }
+    }
+
     main();
+    var checkServerStatusId = setInterval(checkServerStatus, 5000); // Stop check from frontend using `clearInterval(checkServerStatusId);`.
+    checkServerStatus();
     </script>
   </body>
 </html>

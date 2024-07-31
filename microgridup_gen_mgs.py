@@ -454,7 +454,7 @@ def _tests():
 	MG_MINES = test_params['MG_MINES']
 	algo_params = test_params['algo_params']
 	crit_loads = test_params['crit_loads']
-	lehigh_dss_path = f'{_myDir}/testfiles/lehigh_base_3mg.dss'
+	lehigh_dss_path = f'{_myDir}/testfiles/lehigh_base_phased.dss'
 	wizard_dss_path = f'{_myDir}/testfiles/wizard_base_3mg.dss'
 	# Testing microgridup_gen_mgs.mg_group().
 	for _dir in MG_MINES:

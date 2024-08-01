@@ -181,7 +181,7 @@ def nx_group_branch(G, i_branch=0, omd={}):
 	tree_root = list(topological_sort(G))[0]
 	edges_in_order = nx.DiGraph(nx.algorithms.traversal.breadth_first_search.bfs_edges(G, tree_root))
 	bbl = nx_get_branches(edges_in_order)
-	bbl_indices_to_delete = set() # Add a check to ensure branch algo does not consider item level for branching.
+	bbl_indices_to_delete = set() # Add a check to ensure branch algo does not consider item level for branching when user created circuit with wizard.
 	for idx, bbl_item in enumerate(bbl):
 		bus = bbl_item[0]
 		if bus.endswith('_end'):
@@ -196,7 +196,8 @@ def nx_group_branch(G, i_branch=0, omd={}):
 		first_branch = new_bbl[i_branch][0]
 	succs = list(G.successors(first_branch))
 	parts = [list(nx.algorithms.traversal.depth_first_search.dfs_tree(G, x).nodes()) for x in succs]
-	return parts
+	parts_no_regcontrol_mgs = [part for part in parts if not (len(part) == 1 and get_object_type_from_omd(part[0], omd) == 'regcontrol')] # regcontrol objects should not be their own microgrids alone.
+	return parts_no_regcontrol_mgs
 
 def nx_group_lukes(G, size, node_weight=None, edge_weight=None):
 	'Partition the graph using Lukes algorithm into pieces of [size] nodes.'

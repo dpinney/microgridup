@@ -2,16 +2,17 @@
 <html>
 <head>
 	<title>MicrogridUP &raquo; New</title>
-    <link rel="stylesheet" href="/static/js/components/modal.css">
-    <script type="module" src="/static/js/components/circuitBuilder/circuitBuilder.js"></script>
-    <script src="/static/js/libraries/graphology-library.js"></script>
-    <script src="/static/js/libraries/graphology.js"></script>
-    <script src="/static/js/libraries/papaparse.js"></script>
+	<link rel="stylesheet" href="/static/js/components/modal.css">
+	<link rel="stylesheet" href="/static/js/components/reoptParameters/view.css">
+	<script type="module" src="/static/js/components/circuitBuilder/circuitBuilder.js"></script>
+	<script src="/static/js/libraries/graphology-library.js"></script>
+	<script src="/static/js/libraries/graphology.js"></script>
+	<script src="/static/js/libraries/papaparse.js"></script>
 	<script src="https://kit.fontawesome.com/92028f16c4.js" crossorigin="anonymous"></script>
 	<style type="text/css">
-        :root {
-            --topNavHeight: 64px;
-        }
+		:root {
+			--topNavHeight: 64px;
+		}
 		body {
 			margin-top: 0px;
 			margin-left:0;
@@ -252,7 +253,7 @@
                 </div>
                 <div class="chunk">
                     <label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">Defines the length of the interconnection analysis in hours.</span></label>
-                    <input type="text" name="QSTS_STEPS" value="{{in_data.QSTS_STEPS}}" />
+                    <input type="text" name="QSTS_STEPS" value="{{in_data.QSTS_STEPS}}" pattern="\d*"/>
                 </div>
                 <br>
                 <div class="chunk">
@@ -678,7 +679,7 @@
                     </div>
                 </div>
                 <h3>Step 5 (Optional): Override technology parameters per-microgrid</h3>
-                <div id="microgridParameterMVC" class="chunk"></div>
+                <div id="reoptParametersMVC" class="chunk"></div>
                 <br>
             </form>
             <button id="submitEverything" type="submit">Run Project</button>
@@ -813,7 +814,7 @@
 				img.attr('src', 'data:image/gif;base64,' + data.pic_hash);
 				oldPartitionsDiv.prepend('<br>')
 				oldPartitionsDiv.prepend(img); 
-				createMicrogridParameterMVC(data.MG_MINES);
+				window.createReoptParametersMVC(data.MG_MINES);
 				{% if iframe_mode %}
 				window.disableInputs();
 				{% endif %}
@@ -908,7 +909,7 @@
 			for (let i = 0; i < numMgs; i++) {
 				mgs[`mg${i}`] = {};
 			}
-			createMicrogridParameterMVC(mgs);
+			window.createReoptParametersMVC(mgs);
 			const usedUpload = window.circuitModel.getElements().length == 0;
 			$('#switchGenBus').remove(); // Clear existing #switchGenBus if it exists already.
 			for (let idx = 0; idx < numMgs; idx++) {
@@ -1018,7 +1019,7 @@
 					critLoads : JSON.stringify(critLoads),
 					fileName : JSON.stringify(window.filename),
 					method : JSON.stringify(method),
-					mgQuantity : JSON.stringify(mgQuantity),
+					mgQuantity : mgQuantity,
 					modelDir: JSON.stringify("{{in_data['MODEL_DIR']}}")
 				},
 				success: function(data, status) {
@@ -1031,7 +1032,7 @@
 						img.attr('src', 'data:image/gif;base64,' + data.pic_hash);
 						$('#partitionsPreviewDiv').empty();
 						img.appendTo('#partitionsPreviewDiv');
-						createMicrogridParameterMVC(data.MG_MINES);
+						window.createReoptParametersMVC(data.MG_MINES);
 					}
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
@@ -1181,25 +1182,28 @@
 		form1.append('MICROGRIDS',JSON.stringify(MICROGRIDS));
 		// Append mgQuantity. 
 		var mgQuantity = $('#minQuantMgs').val() ? $('#minQuantMgs').val() : 0;
-		form1.append('mgQuantity',JSON.stringify(mgQuantity));
+		form1.append('mgQuantity',mgQuantity);
 
 		// Append microgrid parameter overrides
-		const mgParameterOverrides = window.microgridParameterModel.getExportData();
+		const mgParameterOverrides = window.reoptParameterModel.getExportData();
 		form1.append('mgParameterOverrides', JSON.stringify(mgParameterOverrides));
 
 		// - Append data to get single phase load count and three phase load count per load
-		const existingJsCircuitModel = JSON.parse('{{ in_data.REOPT_INPUTS.get("js_circuit_model", "") | tojson | safe }}');
+		const existingJsCircuitModel = JSON.parse('{{ in_data.get("js_circuit_model", "") | tojson | safe }}');
 		if (window.circuitModel.getElements().length > 0) {
+			for (const element of window.circuitModel.getElements(element => element.getProperty('type') === 'load')) {
+				element.setProperty('loadProfile', undefined);
+			}
 			// - The user has created a new circuit model, so use that
 			form1.append('jsCircuitModel', JSON.stringify(window.circuitModel.getElements().map(e => JSON.stringify(e.getProperties('props')))))
 		} else {
 			// - The user has not created a new circuit model
 			if (existingJsCircuitModel !== '') {
-				//  - If there is an existing circuit model (i.e. this is an "edit" run), use that
+				// - If there is an existing circuit model (i.e. this is an "edit" run), use that
 				form1.append('jsCircuitModel', JSON.stringify(existingJsCircuitModel.map(e => JSON.stringify(e))));
 			} else {
-				//  - If there is no existing circuit model (i.e. the user is using an uploaded DSS file), do not add the "jsCircuitModel" key to the
-				//    form
+				// - If there is no existing circuit model (i.e. the user is using an uploaded DSS file), do not add the "jsCircuitModel" key to the
+				//   form
 			}
 		}
 
@@ -1361,7 +1365,7 @@
 				for (const e of window.circuitModel.getElements((e) => e.getProperty('type') === 'substation')) {
 					window.circuitModel.removeElement(e.fullName);
 				}
-				window.outageLocationInputView.setValue("{{in_data.FAULTED_LINES}}");
+				window.outageLocationInputView.setValue("{{','.join(in_data.FAULTED_LINES)}}");
 			}
 		});
 		// If user clicked edit, show used circuit.
@@ -1495,7 +1499,10 @@
 	</script>
 	<script type='module'>
 	import { CircuitElement, CircuitModel, CircuitController, CircuitTableView, CircuitUserControlsView, CsvLoadParser, OutageLocationInputView } from '/static/js/components/circuitBuilder/circuitBuilder.js';
-	import { MicrogridParameterModel, MicrogridParameterController, MicrogridParameterView } from '/static/js/components/microgridParameterMVC/microgridParameterMVC.js'
+	import { REoptParametersModel } from '/static/js/components/reoptParameters/model.js';
+	import { REoptParametersController } from '/static/js/components/reoptParameters/controller.js';
+	import { REoptParametersView } from '/static/js/components/reoptParameters/view.js';
+
 	// - CircuitBuilder
 	window.CircuitElement = CircuitElement;
 	const model = new CircuitModel();
@@ -1514,20 +1521,29 @@
 	document.getElementById('outageLocationInputInsert').append(outageLocationInputView.modal.divElement);
 	document.getElementById('circuitCreator').append(view.modal.divElement);
 	document.getElementById('circuitCreator').append(controls.modal.divElement);
-	outageLocationInputView.setValue("{{in_data.FAULTED_LINES}}");
+    outageLocationInputView.setValue("{{','.join(in_data.FAULTED_LINES)}}");
 	const csvLoadParserInsert = document.getElementById('csvLoadParserInsert');
 	if (csvLoadParserInsert !== null) {
 		csvLoadParserInsert.replaceWith(csvLoadParser.modal.divElement);
 	} else {
 		window.csvLoadParser = csvLoadParser;
 	}
-	// - MicrogridParameterMVC
-	window.createMicrogridParameterMVC = function createMicrogridParameterMVC(MG_MINES) {
-		const model = new MicrogridParameterModel(Object.keys(MG_MINES));
-		const controller = new MicrogridParameterController(model);
-		const view = new MicrogridParameterView(controller);
-		document.getElementById('microgridParameterMVC').replaceChildren(view.modal.divElement);
-		window.microgridParameterModel = model;
+	// - reoptParameters
+	window.createReoptParametersMVC = function(MG_MINES) {
+		const model = new REoptParametersModel();
+		for (const [mgName, mg] of Object.entries(MG_MINES)) {
+			model.addReoptParametersInstance(mgName);
+			if (Object.hasOwn(mg, 'reopt_inputs')) {
+				for (const [paramName, value] of Object.entries(mg['reopt_inputs'])) {
+					const reoptParameter = model.getReoptParametersInstance(mgName).reoptParameters.filter(parameter => parameter.alias === paramName)[0];
+					reoptParameter.value = value;
+				}
+			}
+		}
+		const controller = new REoptParametersController(model);
+		const view = new REoptParametersView(controller);
+		document.getElementById('reoptParametersMVC').replaceChildren(view.modal.divElement);
+		window.reoptParameterModel = model;
 	};
 	{% if iframe_mode %}
 	window.disableInputs = function() {

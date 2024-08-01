@@ -1,6 +1,6 @@
 {
     "MODEL_DIR": "3mgs",
-    "QSTS_STEPS": 480.0,
+    "QSTS_STEPS": 480,
     "FOSSIL_BACKUP_PERCENT": 0.5,
     "FAULTED_LINES": "670671",
     "DIESEL_SAFETY_FACTOR": false,

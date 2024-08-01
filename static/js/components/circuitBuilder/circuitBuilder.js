@@ -102,26 +102,19 @@ class CircuitElement {
         if (!['meta', 'props'].includes(namespace)) {
             throw Error('The "namespace" argument must be one of "meta" or "props".');
         }
-        CircuitElement.validateProperty(property, propertyVal, namespace);
-        if (namespace === 'meta') {
-            if (propertyVal === undefined) {
+        if (propertyVal === undefined) {
+            if (namespace === 'meta') {
                 delete this.#meta[property];
             } else {
-                this.#meta[property] = propertyVal;
-            }
-        } else if (namespace === 'props') {
-            if (property === 'name') {
-                if (propertyVal.includes('.')) {
-                    throw Error('The "props.name" property must not contain the "." character.');
-                }
-            }
-            if (propertyVal === undefined) {
                 delete this.#props[property];
+            }
+        } else {
+            CircuitElement.validateProperty(property, propertyVal, namespace);
+            if (namespace === 'meta') {
+                this.#meta[property] = propertyVal;
             } else {
                 this.#props[property] = propertyVal;
             }
-        } else {
-            throw Error();
         }
     }
 
@@ -154,6 +147,11 @@ class CircuitElement {
                 if (property === 'type') {
                     if (!CircuitElement.types.includes(propertyVal)) {
                         throw Error('The "props.type" value must be one of the values in CircuitElement.types.');
+                    }
+                }
+                if (property === 'name') {
+                    if (propertyVal.includes('.')) {
+                        throw Error('The "props.name" property must not contain the "." character.');
                     }
                 }
             }

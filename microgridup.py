@@ -78,6 +78,12 @@ def main(data, invalidate_cache=True, open_results=False):
 		'singlePhaseRelayCost': data['singlePhaseRelayCost'],
 		'threePhaseRelayCost': data['threePhaseRelayCost']
 	}
+	if 'jsCircuitModel' in data:
+		inputs['jsCircuitModel'] = data['jsCircuitModel']
+	# - Set up the model directory and environment
+	# Create initial files.
+	if not os.path.isdir(absolute_model_directory):
+		os.mkdir(absolute_model_directory)
 	# HACK: work in directory because we're very picky about the current dir.
 	curr_dir = os.getcwd()
 	if curr_dir != absolute_model_directory:
@@ -89,10 +95,6 @@ def main(data, invalidate_cache=True, open_results=False):
 		json.dump(inputs, inputs_file, indent=4)
 	# - Now that the data object has been set up, we shoudn't need to change it anymore so create an immutable copy to pass around
 	immutable_data = get_immutable_dict(data)
-	# - Set up the model directory and environment
-	# Create initial files.
-	if not os.path.isdir(absolute_model_directory):
-		os.mkdir(absolute_model_directory)
 	# Setup logging.
 	log_file = f'{absolute_model_directory}/logs.log'
 	if os.path.exists(log_file):
@@ -208,11 +210,11 @@ def main(data, invalidate_cache=True, open_results=False):
 		with open(f'{MGU_DIR}/templates/template_new.html') as f:
 			view_inputs_template = j2.Template(f.read())
 		# - Encode the circuit model properly
-		if 'js_circuit_model' in in_data:
-			js_circuit_model = []
-			for s in json.loads(in_data['js_circuit_model']):
-				js_circuit_model.append(json.loads(s))
-			in_data['js_circuit_model'] = js_circuit_model
+		if 'jsCircuitModel' in in_data:
+			jsCircuitModel = []
+			for s in json.loads(in_data['jsCircuitModel']):
+				jsCircuitModel.append(json.loads(s))
+			in_data['jsCircuitModel'] = jsCircuitModel
 		view_inputs_html = view_inputs_template.render(in_data=in_data, iframe_mode=True)
 		with open('view_inputs.html', 'w') as f:
 			f.write(view_inputs_html)

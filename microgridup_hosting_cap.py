@@ -767,11 +767,11 @@ def _mg_add_cost(data, mg_name, dss_filename, logger):
 	three_phase_relay_cost = data['threePhaseRelayCost'] if 'threePhaseRelayCost' not in data['MICROGRIDS'][mg_name]['parameter_overrides'] else data['MICROGRIDS'][mg_name]['parameter_overrides']['threePhaseRelayCost']
 	tree = dssConvert.dssToTree(dss_filename)
 	load_map = {x.get('object',''):i for i, x in enumerate(tree)}
-	# - The js_circuit_model is always optional, but should exist for circuits that were built with the manual circuit editor
-	if 'js_circuit_model' in data:
-		js_circuit_model = {json.loads(s)['name'].lower(): json.loads(s) for s in json.loads(data['js_circuit_model'])}
+	# - The jsCircuitModel is always optional, but should exist for circuits that were built with the manual circuit editor
+	if 'jsCircuitModel' in data:
+		jsCircuitModel = {json.loads(s)['name'].lower(): json.loads(s) for s in json.loads(data['jsCircuitModel'])}
 	else:
-		js_circuit_model = None
+		jsCircuitModel = None
 	mg_cost_csv_filename = f'mg_add_cost_{mg_name}.csv'
 	with open(mg_cost_csv_filename, 'w', newline='') as outcsv:
 		writer = csv.writer(outcsv)
@@ -792,10 +792,10 @@ def _mg_add_cost(data, mg_name, dss_filename, logger):
 			load_phases = bus_name_list[-(len(bus_name_list)-1):]
 			# print("mg_add_cost() load_phases on bus_name: phases", load_phases, "on bus", bus_name)
 			if len(load_phases) > 1:
-				if js_circuit_model is None:
+				if jsCircuitModel is None:
 					writer.writerow([mg_name, load, "3-phase relay(s)", '1', three_phase_relay_cost])
 				else:
-					writer.writerow([mg_name, load, "3-phase relay(s)", js_circuit_model[load]['threePhaseLoadCount'], int(three_phase_relay_cost) * int(js_circuit_model[load]['threePhaseLoadCount'])])
+					writer.writerow([mg_name, load, "3-phase relay(s)", jsCircuitModel[load]['threePhaseLoadCount'], int(three_phase_relay_cost) * int(jsCircuitModel[load]['threePhaseLoadCount'])])
 				three_phase_message = 'Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.\n'
 				print(three_phase_message)
 				logger.warning(three_phase_message)
@@ -807,10 +807,10 @@ def _mg_add_cost(data, mg_name, dss_filename, logger):
 					with open("user_warnings.txt", "a") as myfile:
 						myfile.write(three_phase_message)
 			else:
-				if js_circuit_model is None:
+				if jsCircuitModel is None:
 					writer.writerow([mg_name, load, "AMI disconnect meter(s)", 1, single_phase_relay_cost])
 				else:
-					writer.writerow([mg_name, load, "AMI disconnect meter(s)", js_circuit_model[load]['singlePhaseLoadCount'], int(single_phase_relay_cost) * int(js_circuit_model[load]['singlePhaseLoadCount'])])
+					writer.writerow([mg_name, load, "AMI disconnect meter(s)", jsCircuitModel[load]['singlePhaseLoadCount'], int(single_phase_relay_cost) * int(jsCircuitModel[load]['singlePhaseLoadCount'])])
 				ami_message = 'Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.\n'
 				print(ami_message)
 				logger.warning(ami_message)

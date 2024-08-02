@@ -137,11 +137,11 @@ def edit(project):
 	except:
 		in_data = None
 	# - Encode the circuit model properly
-	if 'js_circuit_model' in in_data:
-		js_circuit_model = []
-		for s in json.loads(in_data['js_circuit_model']):
-			js_circuit_model.append(json.loads(s))
-		in_data['js_circuit_model'] = js_circuit_model
+	if 'jsCircuitModel' in in_data:
+		jsCircuitModel = []
+		for s in json.loads(in_data['jsCircuitModel']):
+			jsCircuitModel.append(json.loads(s))
+		in_data['jsCircuitModel'] = jsCircuitModel
 	return render_template('template_new.html', in_data=in_data, iframe_mode=False, editing=True)
 
 @app.route('/delete/<project>')
@@ -462,7 +462,7 @@ def has_cycles():
 
 @app.route('/run', methods=["POST"])
 def run():
-	# Make the uploads directory if it doesn't already exist.
+	# - Make the uploads directory if it doesn't already exist.
 	if not os.path.isdir(f'{microgridup.MGU_DIR}/uploads'):
 		os.mkdir(f'{microgridup.MGU_DIR}/uploads')
 	absolute_model_directory = f'{microgridup.PROJ_DIR}/{request.form["MODEL_DIR"]}'
@@ -485,11 +485,21 @@ def run():
 	data['REOPT_INPUTS'] = _get_reopt_inputs(data)
 	# - Format relevant properties for _get_microgrids()
 	data['CRITICAL_LOADS'] = json.loads(data['CRITICAL_LOADS'])
+	if len(data['CRITICAL_LOADS']) == 0:
+		# - I'm assuming that if this is true, then the front-end allowed bad data to be sent, so we should inform the user
+		err_msg = 'No critical loads were specified. The model run was aborted.'
+		print(err_msg)
+		return (err_msg, 400)
 	data['mgQuantity'] = int(data['mgQuantity'])
 	# - Format faulted lines
 	data['FAULTED_LINES'] = data['FAULTED_LINES'].split(',')
 	# - Create microgrids here and not in microgridup.main because it's easier to format the testing data
 	data['MICROGRIDS'] = _get_microgrids(data['CRITICAL_LOADS'], data['MG_DEF_METHOD'], data['mgQuantity'], data['BASE_DSS'], data['MICROGRIDS'])
+	if len(list(data['MICROGRIDS'].keys())) == 0:
+		# - I'm assuming that if this is true, then the front-end allowed bad data to be sent, so we should inform the user
+		err_msg = 'No microgrids were defined. The model run was aborted.'
+		print(err_msg)
+		return (err_msg, 400)
 	# - Each microgrid needs to store knowledge of parameter overrides to support auto-filling the parameter override wigdet during an edit of a model
 	data['mgParameterOverrides'] = json.loads(data['mgParameterOverrides'])
 	for mg_name, mg_parameter_overrides in data['mgParameterOverrides'].items():
@@ -554,6 +564,8 @@ def _get_uploaded_file_filepath(absolute_model_directory, filename, save_path, r
 			if request.form[form_key] == 'Direct to uploads folder.':
 				# - Either a circuit wizard circuit was already coverted into a DSS file and saved in /uploads or a DSS file was already saved to
 				#   /uploads
+				# - Note that DURING an EDIT run if the user "removes" their existing circuit.dss file by clicking "Remove File", this logic will just
+				#   reuse the existing file that was presumably already uploaded to /uploads
 				print(f'New "{filename}" uploaded.')
 				return save_path
 			else:

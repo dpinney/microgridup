@@ -43,6 +43,10 @@ class Observable {
         }
     }
 
+    removeObservers() {
+        this.#observers = [];
+    }
+
     notifyObserversOfChangedProperty(id, oldValue) {
         throw Error('Cannot call abstract method notifyObserversOfChangedProperty');
     }

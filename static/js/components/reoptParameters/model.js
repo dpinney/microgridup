@@ -53,7 +53,7 @@ class REoptParametersModel {
     }
 
     /**
-     * - I still need to change the schema on the back-end and get rid of the alias property, but this is fine for now
+     * - I still want to change the schema on the back-end so that I can get rid of this alias property, but this is fine for now
      */
     getExportData() {
         const parameter_overrides = {};
@@ -72,6 +72,16 @@ class REoptParametersModel {
             }
         }
         return parameter_overrides;
+    }
+
+    /**
+     * - Set the model back to it's initial state
+     */
+    reset() {
+        for (const reoptParametersInstance of Object.values(this.#reoptParametersInstances)) {
+            reoptParametersInstance.removeObservers();
+            this.#reoptParametersInstances = {};
+        }
     }
 }
 

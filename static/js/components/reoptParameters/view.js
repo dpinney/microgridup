@@ -26,7 +26,7 @@ class REoptParametersView {
         modal.divElement.id = 'reoptParametersModal';
         const microgridDropdownInstructions = document.createElement('p');
         microgridDropdownInstructions.style.fontWeight = 'bold';
-        microgridDropdownInstructions.textContent = 'Select microgrid to override parameters for';
+        microgridDropdownInstructions.textContent = 'Select microgrid to override parameters for:';
         modal.divElement.append(microgridDropdownInstructions);
         const microgridSelect = document.createElement('select');
         const option = document.createElement('option');

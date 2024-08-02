@@ -416,7 +416,7 @@
                             </fieldset>
                             <fieldset>
                                 <button id="upload-file-btn" type="button" hidden>Upload</button>
-                                <button id="remove-ciruit-button" type="button" class="remove-btn">Remove File</button>
+                                <button id="remove-circuit-button" type="button" class="remove-btn">Remove File</button>
                             </fieldset>
                         {% else %}
                             <fieldset>
@@ -1189,7 +1189,7 @@
 		form1.append('mgParameterOverrides', JSON.stringify(mgParameterOverrides));
 
 		// - Append data to get single phase load count and three phase load count per load
-		const existingJsCircuitModel = JSON.parse('{{ in_data.get("js_circuit_model", "") | tojson | safe }}');
+		const existingJsCircuitModel = JSON.parse('{{ in_data.get("jsCircuitModel", "") | tojson | safe }}');
 		if (window.circuitModel.getElements().length > 0) {
 			for (const element of window.circuitModel.getElements(element => element.getProperty('type') === 'load')) {
 				element.setProperty('loadProfile', undefined);
@@ -1198,8 +1198,10 @@
 			form1.append('jsCircuitModel', JSON.stringify(window.circuitModel.getElements().map(e => JSON.stringify(e.getProperties('props')))))
 		} else {
 			// - The user has not created a new circuit model
-			if (existingJsCircuitModel !== '') {
-				// - If there is an existing circuit model (i.e. this is an "edit" run), use that
+			const input = document.getElementById('circuitPostCreation');
+			if (existingJsCircuitModel !== '' && input !== null && input.value == 'circuit.dss') {
+				// - If there is an existing circuit model (i.e. this is an "edit" run), AND the user didn't click "Remove File", use the existing
+				//   circuit model
 				form1.append('jsCircuitModel', JSON.stringify(existingJsCircuitModel.map(e => JSON.stringify(e))));
 			} else {
 				// - If there is no existing circuit model (i.e. the user is using an uploaded DSS file), do not add the "jsCircuitModel" key to the
@@ -1259,7 +1261,7 @@
 			toggleRemoveButton(chunk, this);
 
 			// Special behavior if user removes circuit.
-			if ($(this).attr('id') == 'remove-ciruit-button') {
+			if ($(this).attr('id') == 'remove-circuit-button') {
 				$('#wizard').prop('disabled', false);
 				// Clear critical loads select and reset partitioning.
 				$('#critLoads').empty();
@@ -1530,13 +1532,31 @@
 	}
 	// - reoptParameters
 	window.createReoptParametersMVC = function(MG_MINES) {
+		// - Remove event listener from previous model if it exists
+		if (window.reoptParameterModel === undefined) {
+			// - If "Remove File" is clicked, then microgrid parameter overrides should be cleared. Don't delete or replace the model, just clear it
+			const btn = document.getElementById('remove-circuit-button');
+			if (btn !== null) {
+				btn.addEventListener('click', function() {
+					window.reoptParameterModel.reset();
+					window.reoptParameterView.renderContent();
+				});
+			}
+		}
 		const model = new REoptParametersModel();
 		for (const [mgName, mg] of Object.entries(MG_MINES)) {
 			model.addReoptParametersInstance(mgName);
-			if (Object.hasOwn(mg, 'reopt_inputs')) {
-				for (const [paramName, value] of Object.entries(mg['reopt_inputs'])) {
-					const reoptParameter = model.getReoptParametersInstance(mgName).reoptParameters.filter(parameter => parameter.alias === paramName)[0];
-					reoptParameter.value = value;
+			if (Object.hasOwn(mg, 'parameter_overrides')) {
+				for (const [paramName, value] of Object.entries(mg['parameter_overrides'])) {
+					if (paramName !== 'reopt_inputs') {
+						const reoptParameter = model.getReoptParametersInstance(mgName).reoptParameters.filter(parameter => parameter.alias === paramName)[0];
+						reoptParameter.value = value;
+					} else {
+						for (const [paramName, value] of Object.entries(mg['parameter_overrides']['reopt_inputs'])) {
+							const reoptParameter = model.getReoptParametersInstance(mgName).reoptParameters.filter(parameter => parameter.alias === paramName)[0];
+							reoptParameter.value = value;
+						}
+					}
 				}
 			}
 		}
@@ -1544,7 +1564,8 @@
 		const view = new REoptParametersView(controller);
 		document.getElementById('reoptParametersMVC').replaceChildren(view.modal.divElement);
 		window.reoptParameterModel = model;
-	};
+		window.reoptParameterView = view;
+	}
 	{% if iframe_mode %}
 	window.disableInputs = function() {
 		[...document.getElementsByTagName('input')].forEach(input => {

@@ -1,20 +1,20 @@
 {
     "MODEL_DIR": "lehigh1mg",
-    "BASE_DSS": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh1mg/circuit.dss",
-    "LOAD_CSV": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh1mg/loads.csv",
+    "BASE_DSS": "/home/austin/programming/repositories/microgridup/microgridup/data/projects/lehigh1mg/circuit.dss",
+    "LOAD_CSV": "/home/austin/programming/repositories/microgridup/microgridup/data/projects/lehigh1mg/loads.csv",
     "QSTS_STEPS": 480,
     "REOPT_INPUTS": {
         "energyCost": 0.12,
         "wholesaleCost": 0.034,
         "demandCost": 20.0,
-        "solarCanCurtail": true,
-        "solarCanExport": true,
+        "solarCanCurtail": "true",
+        "solarCanExport": "true",
         "urdbLabelSwitch": "off",
         "urdbLabel": "5b75cfe95457a3454faf0aea",
         "year": 2017,
         "analysisYears": 25,
         "outageDuration": 48,
-        "value_of_lost_load": 1,
+        "value_of_lost_load": 100.0,
         "omCostEscalator": 0.025,
         "discountRate": 0.083,
         "solar": "on",
@@ -47,7 +47,7 @@
         "dieselCO2Factor": 24.1,
         "dieselOMCostKw": 35.0,
         "dieselOMCostKwh": 0.02,
-        "dieselOnlyRunsDuringOutage": true,
+        "dieselOnlyRunsDuringOutage": "false",
         "dieselMacrsOptionYears": 0,
         "windCost": 4989.0,
         "windMax": 1000.0,
@@ -89,7 +89,7 @@
     "FAULTED_LINES": [
         "650632"
     ],
-    "OUTAGE_CSV": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh1mg/outages.csv",
+    "OUTAGE_CSV": "/home/austin/programming/repositories/microgridup/microgridup/data/projects/lehigh1mg/outages.csv",
     "CRITICAL_LOADS": [
         "684_command_center",
         "634a_data_center",
@@ -102,7 +102,7 @@
         "611_runway",
         "652_residential"
     ],
-    "CREATION_DATE": "2024-08-01 20:09:00",
+    "CREATION_DATE": "2024-08-02 00:47:10",
     "DESCRIPTION": "",
     "singlePhaseRelayCost": 300.0,
     "threePhaseRelayCost": 20000.0

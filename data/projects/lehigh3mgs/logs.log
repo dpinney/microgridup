@@ -1,797 +1,163 @@
-2024-07-30 13:27:54,459 MainProcess root Logging status updates for /Users/thomasjankovic/microgridup/data/projects/lehigh3mgs.
-2024-07-30 13:28:03,467 SpawnProcess-4 reopt_mg0 **************************************************
-2024-07-30 13:28:03,467 SpawnProcess-5 reopt_mg1 **************************************************
-2024-07-30 13:28:03,467 SpawnProcess-6 reopt_mg2 **************************************************
-2024-07-30 13:28:03,467 SpawnProcess-4 reopt_mg0 ** Using cached REopt results for reopt_mg0 **
-2024-07-30 13:28:03,467 SpawnProcess-5 reopt_mg1 ** Using cached REopt results for reopt_mg1 **
-2024-07-30 13:28:03,468 SpawnProcess-4 reopt_mg0 **************************************************
-2024-07-30 13:28:03,468 SpawnProcess-6 reopt_mg2 ** Using cached REopt results for reopt_mg2 **
-2024-07-30 13:28:03,468 SpawnProcess-5 reopt_mg1 **************************************************
-2024-07-30 13:28:03,468 SpawnProcess-6 reopt_mg2 **************************************************
-2024-07-30 13:28:04,566 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
-2024-07-30 13:28:04,569 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
-2024-07-30 13:28:04,569 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
-2024-07-30 13:28:04,593 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '634', 'phases': ['1'], 'kv': 0.27712812921102037}
-2024-07-30 13:28:04,617 MainProcess root Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
-
-2024-07-30 13:28:04,875 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:04,876 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:04,876 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:04,909 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 1663.3458, 'solar_size_existing': 440.0, 'solar_size_new': 1223.3458, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 110.03, 'fossil_size_existing': 0.0, 'fossil_size_new': 110.03, 'battery_cap_total': 371.49, 'battery_cap_existing': 307.0, 'battery_cap_new': 64.49000000000001, 'battery_pow_total': 179.33, 'battery_pow_existing': 79.0, 'battery_pow_new': 100.33000000000001}
-2024-07-30 13:28:05,028 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-07-30 13:28:05,028 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-07-30 13:28:05,028 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-07-30 13:28:05,029 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 692.1.2.3
-2024-07-30 13:28:05,130 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '675', 'phases': ['1', '2', '3'], 'kv': 2.4017771198288433}
-2024-07-30 13:28:05,237 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:28:05,238 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:28:05,238 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:28:05,238 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:28:05,271 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 2852.2285, 'solar_size_existing': 0.0, 'solar_size_new': 2852.2285, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 411.32, 'fossil_size_existing': 0.0, 'fossil_size_new': 411.32, 'battery_cap_total': 655.34, 'battery_cap_existing': 0.0, 'battery_cap_new': 655.34, 'battery_pow_total': 290.34, 'battery_pow_existing': 0.0, 'battery_pow_new': 290.34}
-2024-07-30 13:28:05,402 MainProcess root load_phases on bus_name: phases ['2'] on bus 645.2
-2024-07-30 13:28:05,403 MainProcess root load_phases on bus_name: phases ['2'] on bus 646.2
-2024-07-30 13:28:05,515 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '646', 'phases': ['2'], 'kv': 2.4017771198288433}
-2024-07-30 13:28:05,619 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:05,620 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:05,662 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 1538.416, 'solar_size_existing': 0.0, 'solar_size_new': 1538.416, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 96.31, 'fossil_size_existing': 0.0, 'fossil_size_new': 96.31, 'battery_cap_total': 443.1, 'battery_cap_existing': 0.0, 'battery_cap_new': 443.1, 'battery_pow_total': 202.57, 'battery_pow_existing': 0.0, 'battery_pow_new': 202.57}
-2024-07-30 13:28:05,942 MainProcess root QSTS with circuit_plus_mgAll.dss AND CWD IS /Users/thomasjankovic/microgridup/data/projects/lehigh3mgs
-2024-07-30 13:28:09,053 MainProcess root CONTROLLING ON {'mg0': {'critical_load_kws': [70, 90, 10], 'gen_bus': '634', 'gen_obs_existing': ['solar_634_existing', 'battery_634_existing'], 'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'switch': '632633'}, 'mg1': {'critical_load_kws': [150, 200, 200, 0], 'gen_bus': '675', 'gen_obs_existing': [], 'loads': ['675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2'], 'switch': '671692'}, 'mg2': {'critical_load_kws': [30, 70], 'gen_bus': '646', 'gen_obs_existing': [], 'loads': ['645_hangar', '646_office'], 'switch': '632645'}}
-2024-07-30 13:28:09,065 MainProcess root reduced 634a_data_center from 160 to 70
-2024-07-30 13:28:09,065 MainProcess root reduced 634b_radar from 120 to 90
-2024-07-30 13:28:09,066 MainProcess root reduced 634c_atc_tower from 120 to 10
-2024-07-30 13:28:09,097 MainProcess root reduced 675a_hospital from 485 to 150
-2024-07-30 13:28:09,097 MainProcess root reduced 675b_residential1 from 68 to 200
-2024-07-30 13:28:09,097 MainProcess root reduced 675c_residential1 from 290 to 200
-2024-07-30 13:28:09,098 MainProcess root reduced 692_warehouse2 from 170 to 0
-2024-07-30 13:28:09,127 MainProcess root reduced 645_hangar from 170 to 30
-2024-07-30 13:28:09,128 MainProcess root reduced 646_office from 230 to 70
-2024-07-30 13:28:11,860 MainProcess root Control microgrids count 3 and renewable count 0
-2024-07-30 13:28:12,618 MainProcess root Logging status updates for /Users/thomasjankovic/microgridup/data/projects/lehigh4mgs.
-2024-07-30 13:28:23,791 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
-2024-07-30 13:28:23,793 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
-2024-07-30 13:28:23,793 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
-2024-07-30 13:28:23,817 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '634', 'phases': ['1'], 'kv': 0.27712812921102037}
-2024-07-30 13:28:23,839 MainProcess root Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
-
-2024-07-30 13:28:24,001 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:24,002 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:24,003 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:24,037 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 1663.3458, 'solar_size_existing': 440.0, 'solar_size_new': 1223.3458, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 305.84, 'fossil_size_existing': 0.0, 'fossil_size_new': 305.84, 'battery_cap_total': 248.12, 'battery_cap_existing': 307.0, 'battery_cap_new': 0.0, 'battery_pow_total': 137.43, 'battery_pow_existing': 79.0, 'battery_pow_new': 58.43000000000001}
-2024-07-30 13:28:24,158 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-07-30 13:28:24,159 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-07-30 13:28:24,159 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-07-30 13:28:24,159 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 692.1.2.3
-2024-07-30 13:28:24,261 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '675', 'phases': ['1', '2', '3'], 'kv': 2.4017771198288433}
-2024-07-30 13:28:24,389 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:28:24,390 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:28:24,390 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:28:24,391 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:28:24,426 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 3652.2285, 'solar_size_existing': 800.0, 'solar_size_new': 2852.2285, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 713.06, 'fossil_size_existing': 0.0, 'fossil_size_new': 713.06, 'battery_cap_total': 479.87, 'battery_cap_existing': 0.0, 'battery_cap_new': 479.87, 'battery_pow_total': 258.07, 'battery_pow_existing': 0.0, 'battery_pow_new': 258.07}
-2024-07-30 13:28:24,569 MainProcess root load_phases on bus_name: phases ['3'] on bus 684.3
-2024-07-30 13:28:24,569 MainProcess root load_phases on bus_name: phases ['3'] on bus 652.3
-2024-07-30 13:28:24,570 MainProcess root load_phases on bus_name: phases ['3'] on bus 611.3
-2024-07-30 13:28:24,698 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '684', 'phases': ['3'], 'kv': 2.4017771198288433}
-2024-07-30 13:28:24,729 MainProcess root Pre-existing battery battery_684_existing will not be utilized to support loads in microgrid mg2.
-
-2024-07-30 13:28:24,865 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:24,865 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:24,866 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:24,908 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 3636.8696, 'solar_size_existing': 0.0, 'solar_size_new': 3636.8696, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 990.22, 'fossil_size_existing': 81.0, 'fossil_size_new': 909.22, 'battery_cap_total': 279.03, 'battery_cap_existing': 100.0, 'battery_cap_new': 179.02999999999997, 'battery_pow_total': 181.26, 'battery_pow_existing': 20.0, 'battery_pow_new': 161.26}
-2024-07-30 13:28:25,044 MainProcess root load_phases on bus_name: phases ['2'] on bus 645.2
-2024-07-30 13:28:25,044 MainProcess root load_phases on bus_name: phases ['2'] on bus 646.2
-2024-07-30 13:28:25,181 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '646', 'phases': ['2'], 'kv': 2.4017771198288433}
-2024-07-30 13:28:25,309 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:25,310 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:25,353 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 1538.416, 'solar_size_existing': 0.0, 'solar_size_new': 1538.416, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 384.6, 'fossil_size_existing': 0.0, 'fossil_size_new': 384.6, 'battery_cap_total': 213.7, 'battery_cap_existing': 0.0, 'battery_cap_new': 213.7, 'battery_pow_total': 144.5, 'battery_pow_existing': 0.0, 'battery_pow_new': 144.5}
-2024-07-30 13:28:25,595 MainProcess root QSTS with circuit_plus_mgAll.dss AND CWD IS /Users/thomasjankovic/microgridup/data/projects/lehigh4mgs
-2024-07-30 13:28:28,892 MainProcess root CONTROLLING ON {'mg0': {'critical_load_kws': [70, 90, 10], 'gen_bus': '634', 'gen_obs_existing': ['solar_634_existing', 'battery_634_existing'], 'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'switch': '632633'}, 'mg1': {'critical_load_kws': [150, 200, 200, 0], 'gen_bus': '675', 'gen_obs_existing': ['solar_675_existing'], 'loads': ['675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2'], 'switch': '671692'}, 'mg2': {'critical_load_kws': [400, 20, 0], 'gen_bus': '684', 'gen_obs_existing': ['fossil_684_existing', 'battery_684_existing'], 'loads': ['684_command_center', '652_residential', '611_runway'], 'switch': '671684'}, 'mg3': {'critical_load_kws': [30, 70], 'gen_bus': '646', 'gen_obs_existing': [], 'loads': ['645_hangar', '646_office'], 'switch': '632645'}}
-2024-07-30 13:28:28,902 MainProcess root reduced 634a_data_center from 160 to 70
-2024-07-30 13:28:28,904 MainProcess root reduced 634b_radar from 120 to 90
-2024-07-30 13:28:28,905 MainProcess root reduced 634c_atc_tower from 120 to 10
-2024-07-30 13:28:28,936 MainProcess root reduced 675a_hospital from 485 to 150
-2024-07-30 13:28:28,937 MainProcess root reduced 675b_residential1 from 68 to 200
-2024-07-30 13:28:28,937 MainProcess root reduced 675c_residential1 from 290 to 200
-2024-07-30 13:28:28,938 MainProcess root reduced 692_warehouse2 from 170 to 0
-2024-07-30 13:28:28,970 MainProcess root reduced 684_command_center from 1155 to 400
-2024-07-30 13:28:28,970 MainProcess root reduced 652_residential from 128 to 20
-2024-07-30 13:28:28,970 MainProcess root reduced 611_runway from 170 to 0
-2024-07-30 13:28:28,992 MainProcess root reduced 645_hangar from 170 to 30
-2024-07-30 13:28:28,992 MainProcess root reduced 646_office from 230 to 70
-2024-07-30 13:28:31,924 MainProcess root Control microgrids count 4 and renewable count 0
-2024-07-30 13:28:33,060 MainProcess root Logging status updates for /Users/thomasjankovic/microgridup/data/projects/lehighauto_3mg.
-2024-07-30 13:28:44,283 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
-2024-07-30 13:28:44,286 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
-2024-07-30 13:28:44,286 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
-2024-07-30 13:28:44,308 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '633', 'phases': ['1'], 'kv': 2.4017771198288433}
-2024-07-30 13:28:44,335 MainProcess root Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
-
-2024-07-30 13:28:44,504 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:44,505 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:44,506 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:44,536 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 1663.3458, 'solar_size_existing': 440.0, 'solar_size_new': 1223.3458, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 110.03, 'fossil_size_existing': 0.0, 'fossil_size_new': 110.03, 'battery_cap_total': 371.49, 'battery_cap_existing': 307.0, 'battery_cap_new': 64.49000000000001, 'battery_pow_total': 179.33, 'battery_pow_existing': 79.0, 'battery_pow_new': 100.33000000000001}
-2024-07-30 13:28:44,649 MainProcess root load_phases on bus_name: phases ['2'] on bus 645.2
-2024-07-30 13:28:44,649 MainProcess root load_phases on bus_name: phases ['2'] on bus 646.2
-2024-07-30 13:28:44,750 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '645', 'phases': ['2'], 'kv': 2.4017771198288433}
-2024-07-30 13:28:44,858 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:44,859 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:44,894 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 639.6613, 'solar_size_existing': 0.0, 'solar_size_new': 639.6613, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 29.54, 'fossil_size_existing': 0.0, 'fossil_size_new': 29.54, 'battery_cap_total': 231.29, 'battery_cap_existing': 0.0, 'battery_cap_new': 231.29, 'battery_pow_total': 120.47, 'battery_pow_existing': 0.0, 'battery_pow_new': 120.47}
-2024-07-30 13:28:45,018 MainProcess root load_phases on bus_name: phases ['3'] on bus 684.3
-2024-07-30 13:28:45,018 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 692.1.2.3
-2024-07-30 13:28:45,018 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-07-30 13:28:45,019 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-07-30 13:28:45,019 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-07-30 13:28:45,019 MainProcess root load_phases on bus_name: phases ['3'] on bus 611.3
-2024-07-30 13:28:45,020 MainProcess root load_phases on bus_name: phases ['3'] on bus 652.3
-2024-07-30 13:28:45,020 MainProcess root load_phases on bus_name: phases ['1'] on bus 670.1
-2024-07-30 13:28:45,020 MainProcess root load_phases on bus_name: phases ['2'] on bus 670.2
-2024-07-30 13:28:45,021 MainProcess root load_phases on bus_name: phases ['3'] on bus 670.3
-2024-07-30 13:28:45,021 MainProcess root More than one load voltage is specified on microgrid mg2. Check Oneline diagram to verify that phases and voltages of ['684_command_center', '692_warehouse2', '675a_hospital', '675b_residential1', '675c_residential1', '611_runway', '652_residential', '670a_residential2', '670b_residential2', '670c_residential2'] are correctly supported by gen_bus 670.
-
-2024-07-30 13:28:45,131 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '670', 'phases': ['1', '2', '3'], 'kv': 2.4017771198288433}
-2024-07-30 13:28:45,167 MainProcess root Pre-existing battery battery_684_existing will not be utilized to support loads in microgrid mg2.
-
-2024-07-30 13:28:45,282 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:45,283 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:28:45,283 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:28:45,283 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:28:45,284 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:28:45,285 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:45,285 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:45,285 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:45,286 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:45,286 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-07-30 13:28:45,326 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 3885.5623, 'solar_size_existing': 800.0, 'solar_size_new': 3085.5623, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 823.96, 'fossil_size_existing': 81.0, 'fossil_size_new': 742.96, 'battery_cap_total': 1175.84, 'battery_cap_existing': 100.0, 'battery_cap_new': 1075.84, 'battery_pow_total': 455.13, 'battery_pow_existing': 20.0, 'battery_pow_new': 435.13}
-2024-07-30 13:28:45,618 MainProcess root QSTS with circuit_plus_mgAll.dss AND CWD IS /Users/thomasjankovic/microgridup/data/projects/lehighauto_3mg
-2024-07-30 13:28:48,505 MainProcess root CONTROLLING ON {'mg0': {'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'], 'switch': '632633', 'gen_bus': '633', 'gen_obs_existing': ['solar_634_existing', 'battery_634_existing'], 'critical_load_kws': [160.0, 120.0, 120.0], 'max_potential': '700', 'max_potential_diesel': '1000000', 'battery_capacity': '10000'}, 'mg1': {'loads': ['645_hangar', '646_office'], 'switch': '632645', 'gen_bus': '645', 'gen_obs_existing': [], 'critical_load_kws': [170.0, 0.0], 'max_potential': '700', 'max_potential_diesel': '1000000', 'battery_capacity': '10000'}, 'mg2': {'loads': ['684_command_center', '692_warehouse2', '675a_hospital', '675b_residential1', '675c_residential1', '611_runway', '652_residential', '670a_residential2', '670b_residential2', '670c_residential2'], 'switch': '632670', 'gen_bus': '670', 'gen_obs_existing': ['solar_675_existing', 'fossil_684_existing', 'battery_684_existing'], 'critical_load_kws': [1155.0, 0.0, 485.0, 0.0, 0.0, 170.0, 0.0, 0.0, 0.0, 0.0], 'max_potential': '700', 'max_potential_diesel': '1000000', 'battery_capacity': '10000'}}
-2024-07-30 13:28:48,513 MainProcess root reduced 634a_data_center from 160 to 160.0
-2024-07-30 13:28:48,514 MainProcess root reduced 634b_radar from 120 to 120.0
-2024-07-30 13:28:48,514 MainProcess root reduced 634c_atc_tower from 120 to 120.0
-2024-07-30 13:28:48,538 MainProcess root reduced 645_hangar from 170 to 170.0
-2024-07-30 13:28:48,538 MainProcess root reduced 646_office from 230 to 0.0
-2024-07-30 13:28:48,557 MainProcess root reduced 684_command_center from 1155 to 1155.0
-2024-07-30 13:28:48,558 MainProcess root reduced 692_warehouse2 from 170 to 0.0
-2024-07-30 13:28:48,558 MainProcess root reduced 675a_hospital from 485 to 485.0
-2024-07-30 13:28:48,559 MainProcess root reduced 675b_residential1 from 68 to 0.0
-2024-07-30 13:28:48,559 MainProcess root reduced 675c_residential1 from 290 to 0.0
-2024-07-30 13:28:48,559 MainProcess root reduced 611_runway from 170 to 170.0
-2024-07-30 13:28:48,559 MainProcess root reduced 652_residential from 128 to 0.0
-2024-07-30 13:28:48,560 MainProcess root reduced 670a_residential2 from 17 to 0.0
-2024-07-30 13:28:48,560 MainProcess root reduced 670b_residential2 from 66 to 0.0
-2024-07-30 13:28:48,560 MainProcess root reduced 670c_residential2 from 117 to 0.0
-2024-07-30 13:28:50,913 MainProcess root Control microgrids count 3 and renewable count 0
-2024-07-30 13:28:52,051 MainProcess root Logging status updates for /Users/thomasjankovic/microgridup/data/projects/mackelroy.
-2024-07-30 13:29:39,956 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3002_l.1.2.3.0
-2024-07-30 13:29:39,959 MainProcess root load_phase_list after removal of ground phase: ['1', '2', '3']
-2024-07-30 13:29:40,041 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': 'bus3002', 'phases': ['1', '2', '3'], 'kv': 7.199557856794634}
-2024-07-30 13:29:40,910 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:40,932 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': -0.0, 'solar_size_existing': 0.0, 'solar_size_new': -0.0, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 0.0, 'fossil_size_existing': 0.0, 'fossil_size_new': 0.0, 'battery_cap_total': 0, 'battery_cap_existing': 0.0, 'battery_cap_new': 0.0, 'battery_pow_total': 0, 'battery_pow_existing': 0.0, 'battery_pow_new': 0.0}
-2024-07-30 13:29:41,083 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3004_l.1.2.3.0
-2024-07-30 13:29:41,084 MainProcess root load_phase_list after removal of ground phase: ['1', '2', '3']
-2024-07-30 13:29:41,756 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': 'bus3004', 'phases': ['1', '2', '3'], 'kv': 7.199557856794634}
-2024-07-30 13:29:42,223 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:42,257 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 52.576, 'solar_size_existing': 0.0, 'solar_size_new': 52.576, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 13.14, 'fossil_size_existing': 0.0, 'fossil_size_new': 13.14, 'battery_cap_total': 93.24, 'battery_cap_existing': 0.0, 'battery_cap_new': 93.24, 'battery_pow_total': 44.22, 'battery_pow_existing': 0.0, 'battery_pow_new': 44.22}
-2024-07-30 13:29:42,420 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus1006_l.1.2
-2024-07-30 13:29:42,421 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus1007_l.1.2
-2024-07-30 13:29:42,421 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus1011_l.1.2
-2024-07-30 13:29:42,422 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus1012_l.1.2
-2024-07-30 13:29:42,422 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus1014_l.1.2
-2024-07-30 13:29:42,422 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus1015_l.1.2
-2024-07-30 13:29:42,423 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus1016_l.1.2
-2024-07-30 13:29:42,423 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus1017_l.1.2
-2024-07-30 13:29:42,423 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus1003_l.1.2.3.0
-2024-07-30 13:29:42,424 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus1004_l.1.2.3.0
-2024-07-30 13:29:42,424 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus1005_l.1.2.3.0
-2024-07-30 13:29:42,424 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus1008_l.1.2.3.0
-2024-07-30 13:29:42,425 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus1009_l.1.2.3.0
-2024-07-30 13:29:42,425 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus1010_l.1.2.3.0
-2024-07-30 13:29:42,425 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus1013_l.1.2.3.0
-2024-07-30 13:29:42,426 MainProcess root load_phase_list after removal of ground phase: ['1', '2', '3']
-2024-07-30 13:29:43,122 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': 'bus1001', 'phases': ['1', '2', '3'], 'kv': 7.199557856794634}
-2024-07-30 13:29:43,555 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:43,555 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:43,556 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:43,556 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:43,557 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:43,557 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:43,557 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:43,557 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:43,558 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:43,558 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:43,558 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:43,559 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:43,559 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:43,560 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:43,560 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:43,593 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 760.9104, 'solar_size_existing': 0.0, 'solar_size_new': 760.9104, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 188.61, 'fossil_size_existing': 0.0, 'fossil_size_new': 188.61, 'battery_cap_total': 140.57, 'battery_cap_existing': 0.0, 'battery_cap_new': 140.57, 'battery_pow_total': 98.28, 'battery_pow_existing': 0.0, 'battery_pow_new': 98.28}
-2024-07-30 13:29:43,746 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2008_l.1.2
-2024-07-30 13:29:43,747 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2009_l.1.2
-2024-07-30 13:29:43,747 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2014_l.1.2
-2024-07-30 13:29:43,747 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2015_l.1.2
-2024-07-30 13:29:43,748 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2016_l.1.2
-2024-07-30 13:29:43,748 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2017_l.1.2
-2024-07-30 13:29:43,748 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2018_l.1.2
-2024-07-30 13:29:43,749 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2020_l.1.2
-2024-07-30 13:29:43,749 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2022_l.1.2
-2024-07-30 13:29:43,749 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2023_l.1.2
-2024-07-30 13:29:43,750 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2024_l.1.2
-2024-07-30 13:29:43,750 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2025_l.1.2
-2024-07-30 13:29:43,750 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2028_l.1.2
-2024-07-30 13:29:43,751 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2031_l.1.2
-2024-07-30 13:29:43,751 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2045_l.1.2
-2024-07-30 13:29:43,751 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2046_l.1.2
-2024-07-30 13:29:43,752 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2047_l.1.2
-2024-07-30 13:29:43,752 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2048_l.1.2
-2024-07-30 13:29:43,752 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2049_l.1.2
-2024-07-30 13:29:43,753 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2050_l.1.2
-2024-07-30 13:29:43,754 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2051_l.1.2
-2024-07-30 13:29:43,754 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2054_l.1.2
-2024-07-30 13:29:43,755 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2055_l.1.2
-2024-07-30 13:29:43,755 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2056_l.1.2
-2024-07-30 13:29:43,755 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2059_l.1.2
-2024-07-30 13:29:43,756 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus2060_l.1.2
-2024-07-30 13:29:43,756 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus2002_l.1.2.3.0
-2024-07-30 13:29:43,757 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus2003_l.1.2.3.0
-2024-07-30 13:29:43,757 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus2005_l.1.2.3.0
-2024-07-30 13:29:43,757 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus2010_l.1.2.3.0
-2024-07-30 13:29:43,757 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus2011_l.1.2.3.0
-2024-07-30 13:29:43,758 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus2029_l.1.2.3.0
-2024-07-30 13:29:43,758 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus2030_l.1.2.3.0
-2024-07-30 13:29:43,758 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus2032_l.1.2.3.0
-2024-07-30 13:29:43,758 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus2034_l.1.2.3.0
-2024-07-30 13:29:43,759 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus2035_l.1.2.3.0
-2024-07-30 13:29:43,759 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus2037_l.1.2.3.0
-2024-07-30 13:29:43,759 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus2040_l.1.2.3.0
-2024-07-30 13:29:43,759 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus2041_l.1.2.3.0
-2024-07-30 13:29:43,760 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus2042_l.1.2.3.0
-2024-07-30 13:29:43,760 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus2043_l.1.2.3.0
-2024-07-30 13:29:43,760 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus2052_l.1.2.3.0
-2024-07-30 13:29:43,760 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus2053_l.1.2.3.0
-2024-07-30 13:29:43,762 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus2058_l.1.2.3.0
-2024-07-30 13:29:43,763 MainProcess root load_phase_list after removal of ground phase: ['1', '2', '3']
-2024-07-30 13:29:44,440 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': 'bus2001', 'phases': ['1', '2', '3'], 'kv': 7.199557856794634}
-2024-07-30 13:29:44,903 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:52:54,104 MainProcess root Logging status updates for /home/austin/programming/repositories/microgridup/microgridup/data/projects/lehigh3mgs.
+2024-08-02 00:54:30,629 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
+2024-08-02 00:54:30,629 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
+2024-08-02 00:54:30,629 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
+2024-08-02 00:54:30,639 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '634', 'phases': ['1'], 'kv': 0.27712812921102037}
+2024-08-02 00:54:30,656 MainProcess root Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
 
-2024-07-30 13:29:44,903 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:54:30,755 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:44,904 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:54:30,755 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:44,904 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:54:30,755 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:44,905 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:54:30,788 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 1663.3458, 'solar_size_existing': 440.0, 'solar_size_new': 1223.3458, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 110.03, 'fossil_size_existing': 0.0, 'fossil_size_new': 110.03, 'battery_cap_total': 371.49, 'battery_cap_existing': 307.0, 'battery_cap_new': 64.49000000000001, 'battery_pow_total': 179.33, 'battery_pow_existing': 79.0, 'battery_pow_new': 100.33000000000001}
+2024-08-02 00:54:30,904 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-08-02 00:54:30,904 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-08-02 00:54:30,904 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-08-02 00:54:30,905 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 692.1.2.3
+2024-08-02 00:54:30,968 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '675', 'phases': ['1', '2', '3'], 'kv': 2.4017771198288433}
+2024-08-02 00:54:31,033 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 
-2024-07-30 13:29:44,905 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:54:31,033 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+
+2024-08-02 00:54:31,033 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+
+2024-08-02 00:54:31,033 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+
+2024-08-02 00:54:31,067 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 2852.2285, 'solar_size_existing': 0.0, 'solar_size_new': 2852.2285, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 411.32, 'fossil_size_existing': 0.0, 'fossil_size_new': 411.32, 'battery_cap_total': 655.34, 'battery_cap_existing': 0.0, 'battery_cap_new': 655.34, 'battery_pow_total': 290.34, 'battery_pow_existing': 0.0, 'battery_pow_new': 290.34}
+2024-08-02 00:54:31,184 MainProcess root load_phases on bus_name: phases ['2'] on bus 645.2
+2024-08-02 00:54:31,184 MainProcess root load_phases on bus_name: phases ['2'] on bus 646.2
+2024-08-02 00:54:31,252 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '646', 'phases': ['2'], 'kv': 2.4017771198288433}
+2024-08-02 00:54:31,319 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-08-02 00:54:31,319 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+
+2024-08-02 00:54:31,354 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 1538.416, 'solar_size_existing': 0.0, 'solar_size_new': 1538.416, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 96.31, 'fossil_size_existing': 0.0, 'fossil_size_new': 96.31, 'battery_cap_total': 443.1, 'battery_cap_existing': 0.0, 'battery_cap_new': 443.1, 'battery_pow_total': 202.57, 'battery_pow_existing': 0.0, 'battery_pow_new': 202.57}
+2024-08-02 00:54:31,616 MainProcess root QSTS with circuit_plus_mgAll.dss AND CWD IS /home/austin/programming/repositories/microgridup/microgridup/data/projects/lehigh3mgs
+2024-08-02 00:54:34,211 MainProcess root CONTROLLING ON {'mg0': mappingproxy({'gen_bus': '634', 'gen_obs_existing': ('solar_634_existing', 'battery_634_existing'), 'loads': ('634a_data_center', '634b_radar', '634c_atc_tower'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})}), 'switch': '632633'}), 'mg1': mappingproxy({'gen_bus': '675', 'gen_obs_existing': (), 'loads': ('675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})}), 'switch': '671692'}), 'mg2': mappingproxy({'gen_bus': '646', 'gen_obs_existing': (), 'loads': ('645_hangar', '646_office'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})}), 'switch': '632645'})}
+2024-08-02 00:54:34,234 MainProcess root reduced 692_warehouse2 from 170kW to 0kW.
+2024-08-02 00:54:36,354 MainProcess root Control microgrids count 3 and renewable count 0
+2024-08-02 00:55:23,365 MainProcess root Logging status updates for /home/austin/programming/repositories/microgridup/microgridup/data/projects/lehigh4mgs.
+2024-08-02 00:57:13,910 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
+2024-08-02 00:57:13,910 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
+2024-08-02 00:57:13,910 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
+2024-08-02 00:57:13,921 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '634', 'phases': ['1'], 'kv': 0.27712812921102037}
+2024-08-02 00:57:13,939 MainProcess root Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
 
-2024-07-30 13:29:44,905 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:57:14,040 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:44,906 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:57:14,041 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:44,906 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:57:14,041 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:44,906 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:57:14,076 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 1663.3458, 'solar_size_existing': 440.0, 'solar_size_new': 1223.3458, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 107.43, 'fossil_size_existing': 0.0, 'fossil_size_new': 107.43, 'battery_cap_total': 410.29, 'battery_cap_existing': 307.0, 'battery_cap_new': 103.29000000000002, 'battery_pow_total': 185.34, 'battery_pow_existing': 79.0, 'battery_pow_new': 106.34}
+2024-08-02 00:57:14,194 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-08-02 00:57:14,195 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-08-02 00:57:14,195 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-08-02 00:57:14,195 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 692.1.2.3
+2024-08-02 00:57:14,258 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '675', 'phases': ['1', '2', '3'], 'kv': 2.4017771198288433}
+2024-08-02 00:57:14,336 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 
-2024-07-30 13:29:44,906 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,907 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,907 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,907 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,908 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,908 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,909 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,910 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,911 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,912 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,912 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,913 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,914 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,914 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,915 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,915 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,916 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,916 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,916 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,917 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,917 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,917 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,918 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,919 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,919 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,920 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,920 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,921 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,921 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,921 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,922 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,922 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,922 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,923 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:44,959 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 2362.3143, 'solar_size_existing': 0.0, 'solar_size_new': 2362.3143, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 283.96, 'fossil_size_existing': 0.0, 'fossil_size_new': 283.96, 'battery_cap_total': 372.43, 'battery_cap_existing': 0.0, 'battery_cap_new': 372.43, 'battery_pow_total': 199.06, 'battery_pow_existing': 0.0, 'battery_pow_new': 199.06}
-2024-07-30 13:29:45,118 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3009_l.1.2
-2024-07-30 13:29:45,118 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3010_l.1.2
-2024-07-30 13:29:45,119 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3011_l.1.2
-2024-07-30 13:29:45,119 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3012_l.1.2
-2024-07-30 13:29:45,119 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3013_l.1.2
-2024-07-30 13:29:45,119 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3014_l.1.2
-2024-07-30 13:29:45,120 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3016_l.1.2
-2024-07-30 13:29:45,120 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3017_l.1.2
-2024-07-30 13:29:45,120 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3018_l.1.2
-2024-07-30 13:29:45,121 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3019_l.1.2
-2024-07-30 13:29:45,121 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3020_l.1.2
-2024-07-30 13:29:45,121 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3021_l.1.2
-2024-07-30 13:29:45,122 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3023_l.1.2
-2024-07-30 13:29:45,122 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3024_l.1.2
-2024-07-30 13:29:45,122 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3025_l.1.2
-2024-07-30 13:29:45,122 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3026_l.1.2
-2024-07-30 13:29:45,123 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3027_l.1.2
-2024-07-30 13:29:45,123 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3028_l.1.2
-2024-07-30 13:29:45,124 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3029_l.1.2
-2024-07-30 13:29:45,124 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3041_l.1.2
-2024-07-30 13:29:45,125 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3042_l.1.2
-2024-07-30 13:29:45,125 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3043_l.1.2
-2024-07-30 13:29:45,126 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3044_l.1.2
-2024-07-30 13:29:45,127 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3045_l.1.2
-2024-07-30 13:29:45,128 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3056_l.1.2
-2024-07-30 13:29:45,129 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3057_l.1.2
-2024-07-30 13:29:45,130 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3058_l.1.2
-2024-07-30 13:29:45,130 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3059_l.1.2
-2024-07-30 13:29:45,131 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3060_l.1.2
-2024-07-30 13:29:45,131 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3061_l.1.2
-2024-07-30 13:29:45,131 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3062_l.1.2
-2024-07-30 13:29:45,132 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3063_l.1.2
-2024-07-30 13:29:45,132 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3064_l.1.2
-2024-07-30 13:29:45,133 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3065_l.1.2
-2024-07-30 13:29:45,133 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3066_l.1.2
-2024-07-30 13:29:45,134 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3067_l.1.2
-2024-07-30 13:29:45,134 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3083_l.1.2
-2024-07-30 13:29:45,135 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3084_l.1.2
-2024-07-30 13:29:45,135 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3085_l.1.2
-2024-07-30 13:29:45,136 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3086_l.1.2
-2024-07-30 13:29:45,137 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3087_l.1.2
-2024-07-30 13:29:45,137 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3088_l.1.2
-2024-07-30 13:29:45,138 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3089_l.1.2
-2024-07-30 13:29:45,138 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3090_l.1.2
-2024-07-30 13:29:45,139 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3091_l.1.2
-2024-07-30 13:29:45,140 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3093_l.1.2
-2024-07-30 13:29:45,140 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3094_l.1.2
-2024-07-30 13:29:45,141 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3095_l.1.2
-2024-07-30 13:29:45,141 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3096_l.1.2
-2024-07-30 13:29:45,141 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3097_l.1.2
-2024-07-30 13:29:45,142 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3098_l.1.2
-2024-07-30 13:29:45,142 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3099_l.1.2
-2024-07-30 13:29:45,142 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3101_l.1.2
-2024-07-30 13:29:45,143 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3102_l.1.2
-2024-07-30 13:29:45,143 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3103_l.1.2
-2024-07-30 13:29:45,144 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3104_l.1.2
-2024-07-30 13:29:45,144 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3105_l.1.2
-2024-07-30 13:29:45,145 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3106_l.1.2
-2024-07-30 13:29:45,147 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3108_l.1.2
-2024-07-30 13:29:45,147 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3109_l.1.2
-2024-07-30 13:29:45,148 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3110_l.1.2
-2024-07-30 13:29:45,148 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3111_l.1.2
-2024-07-30 13:29:45,149 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3112_l.1.2
-2024-07-30 13:29:45,149 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3114_l.1.2
-2024-07-30 13:29:45,150 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3115_l.1.2
-2024-07-30 13:29:45,150 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3116_l.1.2
-2024-07-30 13:29:45,151 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3117_l.1.2
-2024-07-30 13:29:45,152 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3120_l.1.2
-2024-07-30 13:29:45,152 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3121_l.1.2
-2024-07-30 13:29:45,153 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3122_l.1.2
-2024-07-30 13:29:45,153 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3123_l.1.2
-2024-07-30 13:29:45,154 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3124_l.1.2
-2024-07-30 13:29:45,154 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3125_l.1.2
-2024-07-30 13:29:45,155 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3126_l.1.2
-2024-07-30 13:29:45,155 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3127_l.1.2
-2024-07-30 13:29:45,156 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3128_l.1.2
-2024-07-30 13:29:45,156 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3129_l.1.2
-2024-07-30 13:29:45,157 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3130_l.1.2
-2024-07-30 13:29:45,157 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3131_l.1.2
-2024-07-30 13:29:45,157 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3132_l.1.2
-2024-07-30 13:29:45,158 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3134_l.1.2
-2024-07-30 13:29:45,158 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3135_l.1.2
-2024-07-30 13:29:45,159 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3136_l.1.2
-2024-07-30 13:29:45,159 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3137_l.1.2
-2024-07-30 13:29:45,159 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3138_l.1.2
-2024-07-30 13:29:45,160 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3139_l.1.2
-2024-07-30 13:29:45,160 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3141_l.1.2
-2024-07-30 13:29:45,160 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3142_l.1.2
-2024-07-30 13:29:45,160 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3143_l.1.2
-2024-07-30 13:29:45,161 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3144_l.1.2
-2024-07-30 13:29:45,161 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3145_l.1.2
-2024-07-30 13:29:45,162 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3146_l.1.2
-2024-07-30 13:29:45,162 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3147_l.1.2
-2024-07-30 13:29:45,163 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3148_l.1.2
-2024-07-30 13:29:45,164 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3149_l.1.2
-2024-07-30 13:29:45,165 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3150_l.1.2
-2024-07-30 13:29:45,165 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3151_l.1.2
-2024-07-30 13:29:45,166 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3152_l.1.2
-2024-07-30 13:29:45,166 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3153_l.1.2
-2024-07-30 13:29:45,166 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3154_l.1.2
-2024-07-30 13:29:45,167 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3155_l.1.2
-2024-07-30 13:29:45,167 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3157_l.1.2
-2024-07-30 13:29:45,167 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3158_l.1.2
-2024-07-30 13:29:45,168 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3159_l.1.2
-2024-07-30 13:29:45,168 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3160_l.1.2
-2024-07-30 13:29:45,168 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3161_l.1.2
-2024-07-30 13:29:45,169 MainProcess root load_phases on bus_name: phases ['1', '2'] on bus t_bus3162_l.1.2
-2024-07-30 13:29:45,169 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3006_l.1.2.3.0
-2024-07-30 13:29:45,170 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3007_l.1.2.3.0
-2024-07-30 13:29:45,171 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3031_l.1.2.3.0
-2024-07-30 13:29:45,171 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3032_l.1.2.3.0
-2024-07-30 13:29:45,172 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3033_l.1.2.3.0
-2024-07-30 13:29:45,172 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3034_l.1.2.3.0
-2024-07-30 13:29:45,172 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3035_l.1.2.3.0
-2024-07-30 13:29:45,173 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3036_l.1.2.3.0
-2024-07-30 13:29:45,173 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3037_l.1.2.3.0
-2024-07-30 13:29:45,173 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3038_l.1.2.3.0
-2024-07-30 13:29:45,174 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3039_l.1.2.3.0
-2024-07-30 13:29:45,174 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3047_l.1.2.3.0
-2024-07-30 13:29:45,174 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3048_l.1.2.3.0
-2024-07-30 13:29:45,175 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3049_l.1.2.3.0
-2024-07-30 13:29:45,175 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3050_l.1.2.3.0
-2024-07-30 13:29:45,176 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3051_l.1.2.3.0
-2024-07-30 13:29:45,176 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3052_l.1.2.3.0
-2024-07-30 13:29:45,176 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3054_l.1.2.3.0
-2024-07-30 13:29:45,177 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3070_l.1.2.3.0
-2024-07-30 13:29:45,177 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3071_l.1.2.3.0
-2024-07-30 13:29:45,178 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3072_l.1.2.3.0
-2024-07-30 13:29:45,178 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3073_l.1.2.3.0
-2024-07-30 13:29:45,179 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3074_l.1.2.3.0
-2024-07-30 13:29:45,180 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3077_l.1.2.3.0
-2024-07-30 13:29:45,180 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3078_l.1.2.3.0
-2024-07-30 13:29:45,180 MainProcess root load_phases on bus_name: phases ['1', '2', '3', '0'] on bus t_bus3081_l.1.2.3.0
-2024-07-30 13:29:45,181 MainProcess root load_phase_list after removal of ground phase: ['1', '2', '3']
-2024-07-30 13:29:45,866 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': 'bus3005', 'phases': ['1', '2', '3'], 'kv': 7.199557856794634}
-2024-07-30 13:29:46,292 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,293 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,294 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,294 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:57:14,336 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 
-2024-07-30 13:29:46,295 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:57:14,337 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 
-2024-07-30 13:29:46,295 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:57:14,337 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 
-2024-07-30 13:29:46,295 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:57:14,372 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 3177.6562, 'solar_size_existing': 800.0, 'solar_size_new': 2377.6562, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 404.78, 'fossil_size_existing': 0.0, 'fossil_size_new': 404.78, 'battery_cap_total': 757.91, 'battery_cap_existing': 0.0, 'battery_cap_new': 757.91, 'battery_pow_total': 343.17, 'battery_pow_existing': 0.0, 'battery_pow_new': 343.17}
+2024-08-02 00:57:14,488 MainProcess root load_phases on bus_name: phases ['3'] on bus 684.3
+2024-08-02 00:57:14,488 MainProcess root load_phases on bus_name: phases ['3'] on bus 652.3
+2024-08-02 00:57:14,488 MainProcess root load_phases on bus_name: phases ['3'] on bus 611.3
+2024-08-02 00:57:14,558 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '684', 'phases': ['3'], 'kv': 2.4017771198288433}
+2024-08-02 00:57:14,579 MainProcess root Pre-existing battery battery_684_existing will not be utilized to support loads in microgrid mg2.
 
-2024-07-30 13:29:46,296 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:57:14,635 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:46,296 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:57:14,636 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:46,297 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:57:14,636 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:46,297 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:57:14,670 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 3227.3835, 'solar_size_existing': 0.0, 'solar_size_new': 3227.3835, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 526.01, 'fossil_size_existing': 81.0, 'fossil_size_new': 445.01, 'battery_cap_total': 779.04, 'battery_cap_existing': 100.0, 'battery_cap_new': 679.04, 'battery_pow_total': 353.31, 'battery_pow_existing': 20.0, 'battery_pow_new': 333.31}
+2024-08-02 00:57:14,786 MainProcess root load_phases on bus_name: phases ['2'] on bus 645.2
+2024-08-02 00:57:14,786 MainProcess root load_phases on bus_name: phases ['2'] on bus 646.2
+2024-08-02 00:57:14,859 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '646', 'phases': ['2'], 'kv': 2.4017771198288433}
+2024-08-02 00:57:14,927 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:46,298 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:57:14,927 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:46,298 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:57:14,961 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 1538.416, 'solar_size_existing': 0.0, 'solar_size_new': 1538.416, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 96.31, 'fossil_size_existing': 0.0, 'fossil_size_new': 96.31, 'battery_cap_total': 443.1, 'battery_cap_existing': 0.0, 'battery_cap_new': 443.1, 'battery_pow_total': 202.57, 'battery_pow_existing': 0.0, 'battery_pow_new': 202.57}
+2024-08-02 00:57:15,228 MainProcess root QSTS with circuit_plus_mgAll.dss AND CWD IS /home/austin/programming/repositories/microgridup/microgridup/data/projects/lehigh4mgs
+2024-08-02 00:57:17,949 MainProcess root CONTROLLING ON {'mg0': mappingproxy({'gen_bus': '634', 'gen_obs_existing': ('solar_634_existing', 'battery_634_existing'), 'loads': ('634a_data_center', '634b_radar', '634c_atc_tower'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})}), 'switch': '632633'}), 'mg1': mappingproxy({'gen_bus': '675', 'gen_obs_existing': ('solar_675_existing',), 'loads': ('675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})}), 'switch': '671692'}), 'mg2': mappingproxy({'gen_bus': '684', 'gen_obs_existing': ('fossil_684_existing', 'battery_684_existing'), 'loads': ('684_command_center', '652_residential', '611_runway'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})}), 'switch': '671684'}), 'mg3': mappingproxy({'gen_bus': '646', 'gen_obs_existing': (), 'loads': ('645_hangar', '646_office'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})}), 'switch': '632645'})}
+2024-08-02 00:57:17,972 MainProcess root reduced 692_warehouse2 from 170kW to 0kW.
+2024-08-02 00:57:17,991 MainProcess root reduced 611_runway from 170kW to 0kW.
+2024-08-02 00:57:20,240 MainProcess root Control microgrids count 4 and renewable count 0
+2024-08-02 00:58:02,810 MainProcess root Logging status updates for /home/austin/programming/repositories/microgridup/microgridup/data/projects/lehighauto_3mg.
+2024-08-02 00:59:29,286 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
+2024-08-02 00:59:29,286 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
+2024-08-02 00:59:29,286 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
+2024-08-02 00:59:29,297 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '633', 'phases': ['1'], 'kv': 2.4017771198288433}
+2024-08-02 00:59:29,314 MainProcess root Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
 
-2024-07-30 13:29:46,299 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:59:29,414 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:46,299 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:59:29,414 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:46,300 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:59:29,414 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:46,301 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:59:29,449 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 1663.3458, 'solar_size_existing': 440.0, 'solar_size_new': 1223.3458, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 110.03, 'fossil_size_existing': 0.0, 'fossil_size_new': 110.03, 'battery_cap_total': 371.49, 'battery_cap_existing': 307.0, 'battery_cap_new': 64.49000000000001, 'battery_pow_total': 179.33, 'battery_pow_existing': 79.0, 'battery_pow_new': 100.33000000000001}
+2024-08-02 00:59:29,568 MainProcess root load_phases on bus_name: phases ['2'] on bus 645.2
+2024-08-02 00:59:29,568 MainProcess root load_phases on bus_name: phases ['2'] on bus 646.2
+2024-08-02 00:59:29,632 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '645', 'phases': ['2'], 'kv': 2.4017771198288433}
+2024-08-02 00:59:29,698 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:46,302 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:59:29,698 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:46,302 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:59:29,733 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 639.6613, 'solar_size_existing': 0.0, 'solar_size_new': 639.6613, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 29.54, 'fossil_size_existing': 0.0, 'fossil_size_new': 29.54, 'battery_cap_total': 231.29, 'battery_cap_existing': 0.0, 'battery_cap_new': 231.29, 'battery_pow_total': 120.47, 'battery_pow_existing': 0.0, 'battery_pow_new': 120.47}
+2024-08-02 00:59:29,850 MainProcess root load_phases on bus_name: phases ['3'] on bus 684.3
+2024-08-02 00:59:29,850 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 692.1.2.3
+2024-08-02 00:59:29,850 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-08-02 00:59:29,851 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-08-02 00:59:29,851 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-08-02 00:59:29,851 MainProcess root load_phases on bus_name: phases ['3'] on bus 611.3
+2024-08-02 00:59:29,851 MainProcess root load_phases on bus_name: phases ['3'] on bus 652.3
+2024-08-02 00:59:29,851 MainProcess root load_phases on bus_name: phases ['1'] on bus 670.1
+2024-08-02 00:59:29,851 MainProcess root load_phases on bus_name: phases ['2'] on bus 670.2
+2024-08-02 00:59:29,851 MainProcess root load_phases on bus_name: phases ['3'] on bus 670.3
+2024-08-02 00:59:29,852 MainProcess root More than one load voltage is specified on microgrid mg2. Check Oneline diagram to verify that phases and voltages of ('684_command_center', '692_warehouse2', '675a_hospital', '675b_residential1', '675c_residential1', '611_runway', '652_residential', '670a_residential2', '670b_residential2', '670c_residential2') are correctly supported by gen_bus 670.
 
-2024-07-30 13:29:46,303 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:59:29,922 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '670', 'phases': ['1', '2', '3'], 'kv': 2.4017771198288433}
+2024-08-02 00:59:29,948 MainProcess root Pre-existing battery battery_684_existing will not be utilized to support loads in microgrid mg2.
 
-2024-07-30 13:29:46,304 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:59:30,017 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:46,304 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:59:30,017 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 
-2024-07-30 13:29:46,305 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:59:30,017 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 
-2024-07-30 13:29:46,305 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:59:30,017 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 
-2024-07-30 13:29:46,306 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:59:30,017 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 
-2024-07-30 13:29:46,306 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:59:30,018 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:46,306 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:59:30,018 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:46,306 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:59:30,018 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:46,307 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:59:30,018 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:46,307 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-02 00:59:30,018 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-07-30 13:29:46,307 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,308 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,308 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,309 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,309 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,309 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,309 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,310 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,310 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,310 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,311 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,311 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,312 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,312 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,313 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,314 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,315 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,315 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,316 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,316 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,316 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,317 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,317 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,318 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,318 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,318 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,319 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,319 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,320 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,321 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,321 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,321 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,322 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,322 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,322 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,323 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,323 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,324 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,324 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,325 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,325 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,325 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,326 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,326 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,326 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,327 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,327 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,327 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,328 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,328 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,329 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,330 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,331 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,331 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,331 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,332 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,332 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,333 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,333 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,333 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,334 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,334 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,334 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,334 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,335 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,336 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,336 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,337 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,337 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,338 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,338 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,338 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,339 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,339 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,339 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,340 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,340 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,341 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,341 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,341 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,342 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,342 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,343 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,343 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,343 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,343 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,344 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,344 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,345 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,345 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,346 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,347 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,348 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,348 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,348 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,348 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,349 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,349 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,349 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,350 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,350 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,350 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,351 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-07-30 13:29:46,387 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 3553.2015, 'solar_size_existing': 0.0, 'solar_size_new': 3553.2015, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 686.22, 'fossil_size_existing': 0.0, 'fossil_size_new': 686.22, 'battery_cap_total': 1319.08, 'battery_cap_existing': 0.0, 'battery_cap_new': 1319.08, 'battery_pow_total': 478.18, 'battery_pow_existing': 0.0, 'battery_pow_new': 478.18}
-2024-07-30 13:29:47,240 MainProcess root QSTS with circuit_plus_mgAll.dss AND CWD IS /Users/thomasjankovic/microgridup/data/projects/mackelroy
-2024-07-30 13:30:19,183 MainProcess root The provided outage location is not in the provided circuit. Control simulation skipped.
+2024-08-02 00:59:30,052 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 3885.5623, 'solar_size_existing': 800.0, 'solar_size_new': 3085.5623, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 823.96, 'fossil_size_existing': 81.0, 'fossil_size_new': 742.96, 'battery_cap_total': 1175.84, 'battery_cap_existing': 100.0, 'battery_cap_new': 1075.84, 'battery_pow_total': 455.13, 'battery_pow_existing': 20.0, 'battery_pow_new': 435.13}
+2024-08-02 00:59:30,316 MainProcess root QSTS with circuit_plus_mgAll.dss AND CWD IS /home/austin/programming/repositories/microgridup/microgridup/data/projects/lehighauto_3mg
+2024-08-02 00:59:32,879 MainProcess root CONTROLLING ON {'mg0': mappingproxy({'loads': ('634a_data_center', '634b_radar', '634c_atc_tower'), 'switch': '632633', 'gen_bus': '633', 'gen_obs_existing': ('solar_634_existing', 'battery_634_existing'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})})}), 'mg1': mappingproxy({'loads': ('645_hangar', '646_office'), 'switch': '632645', 'gen_bus': '645', 'gen_obs_existing': (), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})})}), 'mg2': mappingproxy({'loads': ('684_command_center', '692_warehouse2', '675a_hospital', '675b_residential1', '675c_residential1', '611_runway', '652_residential', '670a_residential2', '670b_residential2', '670c_residential2'), 'switch': '632670', 'gen_bus': '670', 'gen_obs_existing': ('solar_675_existing', 'fossil_684_existing', 'battery_684_existing'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})})})}
+2024-08-02 00:59:32,900 MainProcess root reduced 646_office from 230kW to 0kW.
+2024-08-02 00:59:32,912 MainProcess root reduced 692_warehouse2 from 170kW to 0kW.
+2024-08-02 00:59:32,912 MainProcess root reduced 675b_residential1 from 68kW to 0kW.
+2024-08-02 00:59:32,913 MainProcess root reduced 675c_residential1 from 290kW to 0kW.
+2024-08-02 00:59:32,913 MainProcess root reduced 652_residential from 128kW to 0kW.
+2024-08-02 00:59:32,913 MainProcess root reduced 670a_residential2 from 17kW to 0kW.
+2024-08-02 00:59:32,913 MainProcess root reduced 670b_residential2 from 66kW to 0kW.
+2024-08-02 00:59:32,913 MainProcess root reduced 670c_residential2 from 117kW to 0kW.
+2024-08-02 00:59:34,973 MainProcess root Control microgrids count 3 and renewable count 0

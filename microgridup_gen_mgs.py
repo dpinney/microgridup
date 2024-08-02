@@ -175,17 +175,30 @@ def merge_mgs(G, mgs):
 			del mgs[k]
 	return mgs
 
-def nx_group_branch(G, i_branch=0):
+def nx_group_branch(G, i_branch=0, omd={}):
 	'Create graph subgroups at branch point i_branch (topological order).'
 	if not nx.is_tree(G):
 		G = remove_loops(G)
 	tree_root = list(topological_sort(G))[0]
 	edges_in_order = nx.DiGraph(nx.algorithms.traversal.breadth_first_search.bfs_edges(G, tree_root))
 	bbl = nx_get_branches(edges_in_order)
-	first_branch = bbl[i_branch][0]
+	bbl_indices_to_delete = set() # Add a check to ensure branch algo does not consider item level for branching when user created circuit with wizard.
+	for idx, bbl_item in enumerate(bbl):
+		bus = bbl_item[0]
+		if bus.endswith('_end'):
+			feeder_name = bus[0:-4]
+			ob_type = get_object_type_from_omd(feeder_name, omd)
+			if ob_type == 'line':
+				bbl_indices_to_delete.add(idx)
+	new_bbl = [item for idx, item in enumerate(bbl) if idx not in bbl_indices_to_delete]
+	if len(new_bbl) == 0:
+		first_branch = list(topological_sort(G))[0] # Consider all but the substation as a microgrid if there are no branching points.
+	else:
+		first_branch = new_bbl[i_branch][0]
 	succs = list(G.successors(first_branch))
 	parts = [list(nx.algorithms.traversal.depth_first_search.dfs_tree(G, x).nodes()) for x in succs]
-	return parts
+	parts_no_regcontrol_mgs = [part for part in parts if not (len(part) == 1 and get_object_type_from_omd(part[0], omd) == 'regcontrol')] # regcontrol objects should not be their own microgrids alone.
+	return parts_no_regcontrol_mgs
 
 def nx_group_lukes(G, size, node_weight=None, edge_weight=None):
 	'Partition the graph using Lukes algorithm into pieces of [size] nodes.'
@@ -413,28 +426,28 @@ def form_mg_groups(G, CRITICAL_LOADS, algo, algo_params={}):
 	lukes algo params is 'size':int giving size of each mg.
 	branch algo params is 'i_branch': giving which branch in the tree to split on.
 	'''
-	# Generate microgrids
-	all_trees = get_all_trees(G)
-	all_trees_pruned = [tree for tree in all_trees if len(tree.nodes()) > 1]
-	num_trees_pruned = len(all_trees_pruned)
 	MG_GROUPS = []
-	for tree in all_trees_pruned:
-		if algo == 'lukes':
-			default_size = int(len(tree.nodes())/3)
-			MG_GROUPS.extend(nx_group_lukes(tree, algo_params.get('size',default_size)))
-		elif algo == 'branch':
-			MG_GROUPS.extend(nx_group_branch(tree, i_branch=algo_params.get('i_branch',0)))
-		elif algo == 'bottomUp':
-			MG_GROUPS.extend(nx_bottom_up_branch(tree, num_mgs=algo_params.get('num_mgs',3)/num_trees_pruned, large_or_small='large', omd=algo_params.get('omd',{}), cannot_be_mg=algo_params.get('cannot_be_mg',[])))
-		elif algo == 'criticalLoads':
-			MG_GROUPS.extend(nx_critical_load_branch(tree, CRITICAL_LOADS, num_mgs=algo_params.get('num_mgs',3)/num_trees_pruned, large_or_small='large'))
-		elif algo == 'loadGrouping':
-			MG_GROUPS.extend(load_grouping(tree, algo_params['pairings']))
-		elif algo == 'manual':
-			MG_GROUPS.extend(manual(algo_params['pairings'], algo_params['gen_obs_existing']))
-		else:
-			print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", or "criticalLoads". No mgs generated.')
-			return {}
+	if algo == 'manual': # Manual partitioning bypasses networkx completely.
+		MG_GROUPS = manual(algo_params['pairings'], algo_params['gen_obs_existing'])
+	else:
+		all_trees = get_all_trees(G)
+		all_trees_pruned = [tree for tree in all_trees if len(tree.nodes()) > 1]
+		num_trees_pruned = len(all_trees_pruned)
+		for tree in all_trees_pruned:
+			if algo == 'lukes':
+				default_size = int(len(tree.nodes())/3)
+				MG_GROUPS.extend(nx_group_lukes(tree, algo_params.get('size',default_size)))
+			elif algo == 'branch':
+				MG_GROUPS.extend(nx_group_branch(tree, i_branch=algo_params.get('i_branch',0), omd=algo_params.get('omd',{})))
+			elif algo == 'bottomUp':
+				MG_GROUPS.extend(nx_bottom_up_branch(tree, num_mgs=algo_params.get('num_mgs',3)/num_trees_pruned, large_or_small='large', omd=algo_params.get('omd',{}), cannot_be_mg=algo_params.get('cannot_be_mg',[])))
+			elif algo == 'criticalLoads':
+				MG_GROUPS.extend(nx_critical_load_branch(tree, CRITICAL_LOADS, num_mgs=algo_params.get('num_mgs',3)/num_trees_pruned, large_or_small='large'))
+			elif algo == 'loadGrouping':
+				MG_GROUPS.extend(load_grouping(tree, algo_params['pairings']))
+			else:
+				print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", "criticalLoads", "loadGrouping", or "manual". No mgs generated.')
+				return {}
 	return MG_GROUPS
 
 def _tests():
@@ -443,7 +456,7 @@ def _tests():
 	MG_MINES = test_params['MG_MINES']
 	algo_params = test_params['algo_params']
 	crit_loads = test_params['crit_loads']
-	lehigh_dss_path = f'{microgridup.MGU_DIR}/testfiles/lehigh_base_3mg.dss'
+	lehigh_dss_path = f'{microgridup.MGU_DIR}/testfiles/lehigh_base_phased.dss'
 	wizard_dss_path = f'{microgridup.MGU_DIR}/testfiles/wizard_base_3mg.dss'
 	# Testing microgridup_gen_mgs.mg_group().
 	for _dir in MG_MINES:

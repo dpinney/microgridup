@@ -12,7 +12,7 @@ import microgridup
 def test_1mg():
 	data = {
 		'MODEL_DIR': 'lehigh1mg',
-		'BASE_DSS': f'{microgridup.MGU_DIR}/testfiles/lehigh_base_1mg.dss',
+		'BASE_DSS': f'{microgridup.MGU_DIR}/testfiles/lehigh_base_phased.dss',
 		'LOAD_CSV': f'{microgridup.MGU_DIR}/testfiles/lehigh_load.csv',
 		'QSTS_STEPS': 480,
 		'REOPT_INPUTS': {
@@ -75,7 +75,6 @@ def test_1mg():
 					'solar_634_existing',
 					'solar_675_existing',
 					'fossil_684_existing',
-					'fossil_646_existing',
 					'battery_634_existing',
 					'battery_684_existing'
 				],
@@ -126,7 +125,7 @@ def test_1mg():
 def test_2mg():
 	data = {
 		'MODEL_DIR': 'lehigh2mgs',
-		'BASE_DSS': f'{microgridup.MGU_DIR}/testfiles/lehigh_base_2mg.dss',
+		'BASE_DSS': f'{microgridup.MGU_DIR}/testfiles/lehigh_base_phased.dss',
 		'LOAD_CSV': f'{microgridup.MGU_DIR}/testfiles/lehigh_load.csv',
 		'QSTS_STEPS': 480,
 		'REOPT_INPUTS': {
@@ -185,9 +184,7 @@ def test_2mg():
 		'MICROGRIDS': {
 			'mg0': {
 				'gen_bus': '634',
-				'gen_obs_existing': [
-					'wind_634_existing'
-				],
+				'gen_obs_existing': [],
 				'loads': [
 					'634a_data_center',
 					'634b_radar',
@@ -200,10 +197,7 @@ def test_2mg():
 			},
 			'mg1': {
 				'gen_bus': '675',
-				'gen_obs_existing': [
-					'battery_675_existing',
-					'battery_675_2_existing'
-				],
+				'gen_obs_existing': [],
 				'loads': [
 					'675a_hospital',
 					'675b_residential1',
@@ -239,7 +233,7 @@ def test_2mg():
 def test_3mg():
 	data = {
 		'MODEL_DIR': 'lehigh3mgs',
-		'BASE_DSS': f'{microgridup.MGU_DIR}/testfiles/lehigh_base_3mg.dss',
+		'BASE_DSS': f'{microgridup.MGU_DIR}/testfiles/lehigh_base_phased.dss',
 		'LOAD_CSV': f'{microgridup.MGU_DIR}/testfiles/lehigh_load.csv',
 		'QSTS_STEPS': 480,
 		'REOPT_INPUTS': {
@@ -314,9 +308,7 @@ def test_3mg():
 			},
 			'mg1': {
 				'gen_bus': '675',
-				'gen_obs_existing': [
-					'fossil_675_existing'
-				],
+				'gen_obs_existing': [],
 				'loads': [
 					'675a_hospital',
 					'675b_residential1',
@@ -366,7 +358,7 @@ def test_3mg():
 def test_4mg():
 	data = {
 		'MODEL_DIR': 'lehigh4mgs',
-		'BASE_DSS': f'{microgridup.MGU_DIR}/testfiles/lehigh_base_4mg.dss',
+		'BASE_DSS': f'{microgridup.MGU_DIR}/testfiles/lehigh_base_phased.dss',
 		'LOAD_CSV': f'{microgridup.MGU_DIR}/testfiles/lehigh_load.csv',
 		'QSTS_STEPS': 480,
 		'REOPT_INPUTS': {
@@ -473,9 +465,7 @@ def test_4mg():
 			},
 			'mg3': {
 				'gen_bus': '646',
-				'gen_obs_existing': [
-					'battery_646_existing'
-				],
+				'gen_obs_existing': [],
 				'loads': [
 					'645_hangar',
 					'646_office'
@@ -511,8 +501,7 @@ def test_4mg():
 
 
 def test_auto3mg():
-    # - Test microgrid generation
-	CIRC_FILE = f'{microgridup.MGU_DIR}/testfiles/lehigh_base_3mg.dss'
+	CIRC_FILE = f'{microgridup.MGU_DIR}/testfiles/lehigh_base_phased.dss'
 	G = dssConvert.dss_to_networkx(CIRC_FILE)
 	CRITICAL_LOADS = ['645_hangar', '684_command_center', '611_runway', '675a_hospital', '634a_data_center', '634b_radar', '634c_atc_tower']
 	ALGO = 'branch' #'lukes'
@@ -525,7 +514,7 @@ def test_auto3mg():
 		}
 	data = {
 		'MODEL_DIR': 'lehighauto_3mg',
-		'BASE_DSS': f'{microgridup.MGU_DIR}/testfiles/lehigh_base_3mg.dss',
+		'BASE_DSS': f'{microgridup.MGU_DIR}/testfiles/lehigh_base_phased.dss',
 		'LOAD_CSV': f'{microgridup.MGU_DIR}/testfiles/lehigh_load.csv',
 		'QSTS_STEPS': 480,
 		'REOPT_INPUTS': {

@@ -14,7 +14,7 @@
         "year": 2017,
         "analysisYears": 25,
         "outageDuration": 48,
-        "value_of_lost_load": 100.0,
+        "value_of_lost_load": 1,
         "omCostEscalator": 0.025,
         "discountRate": 0.083,
         "solar": "on",
@@ -59,9 +59,7 @@
     "MICROGRIDS": {
         "mg0": {
             "gen_bus": "634",
-            "gen_obs_existing": [
-                "wind_634_existing"
-            ],
+            "gen_obs_existing": [],
             "loads": [
                 "634a_data_center",
                 "634b_radar",
@@ -74,10 +72,7 @@
         },
         "mg1": {
             "gen_bus": "675",
-            "gen_obs_existing": [
-                "battery_675_existing",
-                "battery_675_2_existing"
-            ],
+            "gen_obs_existing": [],
             "loads": [
                 "675a_hospital",
                 "675b_residential1",
@@ -102,7 +97,7 @@
         "675b_residential1",
         "675c_residential1"
     ],
-    "CREATION_DATE": "2024-08-01 18:21:22",
+    "CREATION_DATE": "2024-08-01 20:02:53",
     "DESCRIPTION": "",
     "singlePhaseRelayCost": 300.0,
     "threePhaseRelayCost": 20000.0

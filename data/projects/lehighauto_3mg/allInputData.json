@@ -14,7 +14,7 @@
         "year": 2017,
         "analysisYears": 25,
         "outageDuration": 48,
-        "value_of_lost_load": 100.0,
+        "value_of_lost_load": 1,
         "omCostEscalator": 0.025,
         "discountRate": 0.083,
         "solar": "on",
@@ -101,7 +101,9 @@
             "switch": "632670",
             "gen_bus": "670",
             "gen_obs_existing": [
-                "fossil_675_existing"
+                "solar_675_existing",
+                "fossil_684_existing",
+                "battery_684_existing"
             ],
             "parameter_overrides": {
                 "reopt_inputs": {}
@@ -121,7 +123,7 @@
         "675a_hospital",
         "611_runway"
     ],
-    "CREATION_DATE": "2024-08-01 18:21:40",
+    "CREATION_DATE": "2024-08-01 20:03:12",
     "DESCRIPTION": "",
     "singlePhaseRelayCost": 300.0,
     "threePhaseRelayCost": 20000.0

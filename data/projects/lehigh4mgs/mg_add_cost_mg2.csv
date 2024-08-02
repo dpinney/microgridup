@@ -1,7 +1,7 @@
-Microgrid,Location,Recommended Upgrade,Cost Estimate ($)
-mg2,mg2,Microgrid Design,100000
-mg2,mg2,Microgrid Controls,100000
-mg2,671684,SCADA disconnect switch,50000
-mg2,684_command_center,AMI disconnect meter,300
-mg2,652_residential,AMI disconnect meter,300
-mg2,611_runway,AMI disconnect meter,300
+Microgrid,Location,Recommended Upgrade,Component Count,Cost Estimate ($)
+mg2,mg2,Microgrid Design,1,100000
+mg2,mg2,Microgrid Controls,1,100000
+mg2,671684,SCADA disconnect switch,1,50000
+mg2,684_command_center,AMI disconnect meter(s),1,300
+mg2,652_residential,AMI disconnect meter(s),1,300
+mg2,611_runway,AMI disconnect meter(s),1,300

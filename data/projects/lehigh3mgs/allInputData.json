@@ -14,7 +14,7 @@
         "year": 2017,
         "analysisYears": 25,
         "outageDuration": 48,
-        "value_of_lost_load": 100.0,
+        "value_of_lost_load": 1,
         "omCostEscalator": 0.025,
         "discountRate": 0.083,
         "solar": "on",
@@ -75,9 +75,7 @@
         },
         "mg1": {
             "gen_bus": "675",
-            "gen_obs_existing": [
-                "fossil_675_existing"
-            ],
+            "gen_obs_existing": [],
             "loads": [
                 "675a_hospital",
                 "675b_residential1",
@@ -116,7 +114,7 @@
         "675b_residential1",
         "675c_residential1"
     ],
-    "CREATION_DATE": "2024-08-01 18:21:28",
+    "CREATION_DATE": "2024-08-01 20:02:59",
     "DESCRIPTION": "",
     "singlePhaseRelayCost": 300.0,
     "threePhaseRelayCost": 20000.0

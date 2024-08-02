@@ -1,3 +1,5 @@
 Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
 Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+More than one load voltage is specified on microgrid mg2. Check Oneline diagram to verify that phases and voltages of ['684_command_center', '692_warehouse2', '675a_hospital', '675b_residential1', '675c_residential1', '611_runway', '652_residential', '670a_residential2', '670b_residential2', '670c_residential2'] are correctly supported by gen_bus 670.
+Pre-existing battery battery_684_existing will not be utilized to support loads in microgrid mg2.
 Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.

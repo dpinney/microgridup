@@ -1,7 +1,7 @@
 {
     "MODEL_DIR": "lehigh4mgs",
-    "BASE_DSS": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh4mgs/circuit.dss",
-    "LOAD_CSV": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh4mgs/loads.csv",
+    "BASE_DSS": "/home/austin/programming/repositories/microgridup/microgridup/data/projects/lehigh4mgs/circuit.dss",
+    "LOAD_CSV": "/home/austin/programming/repositories/microgridup/microgridup/data/projects/lehigh4mgs/loads.csv",
     "QSTS_STEPS": 480,
     "REOPT_INPUTS": {
         "energyCost": 0.12,
@@ -14,7 +14,7 @@
         "year": 2017,
         "analysisYears": 25,
         "outageDuration": 48,
-        "value_of_lost_load": 1,
+        "value_of_lost_load": 100.0,
         "omCostEscalator": 0.025,
         "discountRate": 0.083,
         "solar": "on",
@@ -121,7 +121,7 @@
     "FAULTED_LINES": [
         "650632"
     ],
-    "OUTAGE_CSV": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehigh4mgs/outages.csv",
+    "OUTAGE_CSV": "/home/austin/programming/repositories/microgridup/microgridup/data/projects/lehigh4mgs/outages.csv",
     "CRITICAL_LOADS": [
         "684_command_center",
         "634a_data_center",
@@ -134,7 +134,7 @@
         "675c_residential1",
         "652_residential"
     ],
-    "CREATION_DATE": "2024-08-01 20:03:05",
+    "CREATION_DATE": "2024-08-02 00:55:23",
     "DESCRIPTION": "",
     "singlePhaseRelayCost": 300.0,
     "threePhaseRelayCost": 20000.0

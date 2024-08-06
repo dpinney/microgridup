@@ -1,5 +1,5 @@
 redirect "circuit_control.dss"
-set datapath="/Users/thomasjankovic/microgridup/data/projects/lehigh4mgs"
+set datapath="/home/austin/programming/repositories/microgridup/microgridup/data/projects/lehigh4mgs"
 set maxcontroliter=1000
 calcvoltagebases
 new object=monitor.monvsource-source element=vsource.source terminal=1 mode=0

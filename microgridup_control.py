@@ -1,11 +1,10 @@
-import os, csv, math, json
+import os, csv, math, json, logging
+from types import MappingProxyType
 import pandas as pd
 import numpy as np
 import networkx as nx
 from collections import defaultdict
 from plotly import graph_objects, offline, subplots
-
-# OMF imports
 from omf.solvers.opendss import dssConvert, _getByName, newQstsPlot
 import microgridup
 
@@ -738,35 +737,56 @@ def make_glc_plots(csvName, chart_name, y_axis_name, glc_traces, outage_start, o
 	fig.add_vline(x=end_time, line=outage_line_style)
 	offline.plot(fig, filename=f'{csvName}.plot.html', auto_open=False)
 
-def faulted_lines_in_graph(path_to_dss, faulted_lines):
-	omd = dssConvert.dssToOmd(path_to_dss, '', write_out=False)
-	for key in omd:
-		if omd[key].get('name','') == faulted_lines:
-			return True
-	return False
 
-def play(path_to_dss, work_dir, microgrids, faulted_lines, outage_start, outage_length, logger):
-	# First run a check to ensure faulted_lines is in graph.
+def faulted_lines_in_graph(path_to_dss, faulted_lines):
+	'''
+	Return whether all of the faulted lines exist in the DSS file
+
+	:param path_to_dss: the path to the dss file that has had all of the REopt-recommended generation objects added to it
+	:type path_to_dss: str
+	:param faulted_lines: the names of the lines that are acting as switches to island the microgrid
+	:type faulted_lines: list
+	:return: True if the number of lines in faulted_lines is equal to the number of lines in faulted lines that were found in the omd, else False
+	:rtype: bool
+	'''
+	assert isinstance(path_to_dss, str)
+	assert isinstance(faulted_lines, tuple)
+	omd = dssConvert.dssToOmd(path_to_dss, '', write_out=False)
+	return len([[key for key in omd if omd[key].get('name', '') == line_name] for line_name in faulted_lines]) == len(faulted_lines)
+
+
+def play(data, outage_start, outage_length, logger):
+	'''
+	Run a control simulation on circuit_plug_mgAll.dss
+	'''
+	assert isinstance(data, MappingProxyType)
+	assert isinstance(outage_start, int)
+	assert isinstance(outage_length, int)
+	assert isinstance(logger, logging.Logger)
+	path_to_dss = 'circuit_plus_mgAll.dss'
+	faulted_lines = data['FAULTED_LINES']
 	if not faulted_lines_in_graph(path_to_dss, faulted_lines):
-		raise ValueError("The provided outage location is not in the provided circuit. Control simulation skipped.")
-	# It seems like the only way to send fewer steps to newQstsPlot (outage_length + 48 steps) is to revise the timestamps fed to actions. Rather than giving actions the hours of year that represent outage start and outage end, feed actions 25 for the outage start and 25 + outage_length for the outage end.
-	actions_outage_start = 25
-	actions_outage_end = actions_outage_start + outage_length
-	assert isinstance(faulted_lines, str)
-	actions = {}
+		raise ValueError(f'One or more of the provided outage location(s) named "{faulted_lines}" are not in the provided circuit. Control simulation skipped.')
+	microgrids = data['MICROGRIDS']
 	print('CONTROLLING ON', microgrids)
 	logger.warning(f'CONTROLLING ON {microgrids}')
-	# microgridup.py changes our directory to the one containing the currently running analysis. This is to help opendss run. If we're running this function by itself, we need to chdir into the work_dir argument.
+	# - microgridup.py changes our directory to the one containing the currently running analysis. This is to help opendss run. If we're running this
+	#   function by itself, we need to chdir into the work_dir argument.
+	absolute_model_directory = f'{microgridup.PROJ_DIR}/{data["MODEL_DIR"]}'
 	curr_dir = os.getcwd()
-	work_dir = os.path.abspath(work_dir)
-	if curr_dir != work_dir:
-		os.chdir(work_dir)
+	if curr_dir != absolute_model_directory:
+		os.chdir(absolute_model_directory)
 	# Read in inputs.
 	outage_end = outage_start + outage_length
 	# Read in the circuit information.
 	dssTree = dssConvert.dssToTree(path_to_dss)
+	# - It seems like the only way to send fewer steps to newQstsPlot (outage_length + 48 steps) is to revise the timestamps fed to actions. Rather
+	#   than giving actions the hours of year that represent outage start and outage end, feed actions 25 for the outage start and 25 + outage_length
+	#   for the outage end.
+	actions_outage_start = 25
+	actions_outage_end = actions_outage_start + outage_length
+	actions = {}
 	# Add the fault, modeled as a 3 phase open, to the actions.
-	faulted_lines = faulted_lines.split(',')
 	open_line_actions = ''
 	close_line_actions = ''
 	for faulted_line in faulted_lines:
@@ -790,22 +810,20 @@ def play(path_to_dss, work_dir, microgrids, faulted_lines, outage_start, outage_
 	# Keep track of any renewable-only microgrids.
 	rengen_fnames = []
 	# Add per-microgrid objects, edits and actions.
-	for mg_key, mg_values in microgrids.items():
-		# Add load shed.
-		load_list = mg_values['loads']
-		crit_list = mg_values['critical_load_kws']
-		load_crit_pairs = zip(load_list, crit_list)
-		for load_name, load_kw in load_crit_pairs:
-			try:
-				this_load = _getByName(dssTree, load_name)
-				old_kw = this_load['kw']
-				this_load['kw'] = str(load_kw)
-				print(f'reduced {load_name} from {old_kw} to {load_kw}')
-				logger.warning(f'reduced {load_name} from {old_kw} to {load_kw}')
-			except:
-				pass
-		# Have all microgrids switch out of the circuit during fault.
-		switch_name = mg_values['switch']
+	for mg_name, mg in microgrids.items():
+		# - We get rid of every non-critical load to load shed
+		for load_name in mg['loads']:
+			if load_name not in data['CRITICAL_LOADS']:
+				try:
+					load = _getByName(dssTree, load_name)
+					old_kw = load['kw']
+					load['kw'] = '0'
+					print(f'reduced {load_name} from {old_kw}kW to 0kW.')
+					logger.warning(f'reduced {load_name} from {old_kw}kW to 0kW.')
+				except:
+					pass
+		# - Have all microgrids switch out of the circuit during fault.
+		switch_name = mg['switch']
 		# HACK: we don't store whether the switch is a line or transformer in the microgrid dict, so make a best guess
 		switch_type = _getByName(dssTree, switch_name)['object'].split('.')[0]
 		actions[actions_outage_start] += f'''
@@ -819,7 +837,7 @@ def play(path_to_dss, work_dir, microgrids, faulted_lines, outage_start, outage_
 			close object={switch_type}.{switch_name} term=3
 		'''
 		# Get all microgrid fossil units, sorted by size
-		gen_bus = mg_values['gen_bus']
+		gen_bus = mg['gen_bus']
 		all_mg_fossil = [
 			ob for ob in dssTree
 			if ob.get('bus1','x.x').split('.')[0] == gen_bus
@@ -870,12 +888,12 @@ def play(path_to_dss, work_dir, microgrids, faulted_lines, outage_start, outage_
 		else:
 			manual_balance_approach = True
 		# Manually construct battery loadshapes for outage.
-		new_dss_tree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw = do_manual_balance_approach(outage_start, outage_end, mg_values, dssTree, logger)
+		new_dss_tree, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw = do_manual_balance_approach(outage_start, outage_end, mg, dssTree, logger)
 		# Manual Balance Approach plotting call.
 		if manual_balance_approach == True:
-			fname = plot_manual_balance_approach(mg_key, 2019, outage_start, outage_end, outage_length, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw)
+			fname = plot_manual_balance_approach(mg_name, 2019, outage_start, outage_end, outage_length, new_batt_loadshape, cumulative_existing_batt_shapes, all_rengen_shapes, total_surplus, all_loads_shapes_kw)
 			rengen_fnames.append(fname)
-			rengen_mgs[mg_key] = {"All loads loadshapes during outage (kw)":list(all_loads_shapes_kw[outage_start:outage_end]),
+			rengen_mgs[mg_name] = {"All loads loadshapes during outage (kw)":list(all_loads_shapes_kw[outage_start:outage_end]),
 			"All rengen loadshapes during outage (kw)":list(all_rengen_shapes[outage_start:outage_end]),
 			"Cumulative battery loadshape during outage (kw)":list(new_batt_loadshape),
 			"Surplus rengen":total_surplus}
@@ -932,7 +950,7 @@ def play(path_to_dss, work_dir, microgrids, faulted_lines, outage_start, outage_
 		make_chart(f'{FPREFIX}_source_and_gen.csv', ['P1(kW)','P2(kW)','P3(kW)'], 2019, microgrids, "Generator Output", "Average Hourly kW", outage_start, outage_end, outage_length, batt_kwh_ratings, fossil_kw_ratings, vsource_ratings=big_gen_ratings, rengen_kw_ratings=rengen_kw_ratings, rengen_mgs=rengen_mgs)
 	if os.path.exists(f'{FPREFIX}_load.csv'):
 		make_chart(f'{FPREFIX}_load.csv', ['V1(PU)','V2(PU)','V3(PU)'], 2019, microgrids, "Load Voltage", "PU", outage_start, outage_end, outage_length, batt_kwh_ratings, fossil_kw_ratings, rengen_kw_ratings=rengen_kw_ratings, rengen_mgs=rengen_mgs)
-	if os.path.exists(f'{work_dir}/{FPREFIX}_control.csv'):
+	if os.path.exists(f'{absolute_model_directory}/{FPREFIX}_control.csv'):
 		make_chart(f'{FPREFIX}_control.csv', ['Tap(pu)'], 2019, microgrids, "Tap Position", "PU", outage_start, outage_end, outage_length, batt_kwh_ratings, fossil_kw_ratings)
 	plot_inrush_data(path_to_dss, microgrids, f'{FPREFIX}_inrush_plot.html', outage_start, outage_end, outage_length, logger, vsourceRatings=big_gen_ratings)
 	# Write final output file.
@@ -977,32 +995,24 @@ def play(path_to_dss, work_dir, microgrids, faulted_lines, outage_start, outage_
 	os.chdir(curr_dir)
 
 def _tests():
-	# - This is needed because these files are in the root of the Docker container and paths like "//" are invalid
-	_myDir = os.path.abspath(os.path.dirname(__file__))
-	if _myDir == '/':
-		_myDir = ''
-	FAULTED_LINES = '670671'
-	with open('testfiles/test_params.json') as file:
-		test_params = json.load(file)
-	control_test_args = test_params['control_test_args']
-	# Testing microgridup_control.play() (End-to-end test of module).
-	logger = microgridup.setup_logging(f'{_myDir}/logs.txt')
-	for _dir in control_test_args:
-		model_dir = f'{_myDir}/data/projects/{_dir}'
-		curr_dir = os.getcwd()
-		work_dir = os.path.abspath(model_dir)
-		if curr_dir != work_dir:
-			os.chdir(work_dir)
-		if 'lukes' in _dir:
-			continue # NOTE: Remove this statement if support for lukes (multiple points of connection) is added.
-		final_run_count = len(control_test_args[_dir]) - 1 # FULL_NAME is based on the count of the microgrid in the final run.
-		print(f'---------------------------------------------------------\nRunning test of microgridup_control.play() on {_dir}.\n---------------------------------------------------------')
-		with open(f'reopt_mg{final_run_count}/allInputData.json') as file:
-			allInputData = json.load(file)
-		outage_start = int(allInputData['outage_start_hour'])
-		outage_length = int(allInputData['outageDuration'])
-		play(f'circuit_plus_mgAll.dss', f'{_myDir}/data/projects/{_dir}', control_test_args[_dir], FAULTED_LINES, outage_start, outage_length, logger)
-		os.chdir(curr_dir)
+	# Load lehigh4mg to use as test input
+	test_model = 'lehigh4mgs'
+	absolute_model_directory = f'{microgridup.PROJ_DIR}/{test_model}'
+	# HACK: work in directory because we're very picky about the current dir.
+	curr_dir = os.getcwd()
+	if curr_dir != absolute_model_directory:
+		os.chdir(absolute_model_directory)
+	with open('allInputData.json') as file:
+		immutable_data = microgridup.get_immutable_dict(json.load(file))
+	mg_name = list(immutable_data['MICROGRIDS'].keys())[0]
+	with open(f'reopt_{mg_name}/allInputData.json') as file:
+		allInputData = json.load(file)
+	outage_start = int(allInputData['outage_start_hour'])
+	outage_length = int(allInputData['outageDuration'])
+	print(f'----------microgridup_control.py testing {test_model}----------')
+	logger = microgridup.setup_logging('logs.log')
+	play(immutable_data, outage_start, outage_length, logger)
+	os.chdir(curr_dir)
 	return print('Ran all tests for microgridup_control.py.')
 
 if __name__ == '__main__':

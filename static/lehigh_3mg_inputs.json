@@ -1,43 +1,58 @@
 {
     "MODEL_DIR": "3mgs",
-    "QSTS_STEPS": 480.0,
-    "FOSSIL_BACKUP_PERCENT": 0.5,
-    "FAULTED_LINES": "670671",
-    "DIESEL_SAFETY_FACTOR": false,
+    "QSTS_STEPS": 480,
     "REOPT_INPUTS": {
-        "solar": "on",
-        "wind": "off",
-        "battery": "on",
-        "year": "2017",
-        "energyCost": "0.12",
-        "demandCost": "20",
-        "wholesaleCost": "0.034",
-        "solarCost": "1600",
-        "windCost": "4989",
-        "batteryPowerCost": "840",
-        "batteryCapacityCost": "420",
-        "dieselGenCost": "500",
-        "solarMin": 0,
-        "windMin": 0,
-        "batteryPowerMin": 0,
-        "batteryCapacityMin": 0,
-        "solarMax": "1000000000",
-        "windMax": "1000000000",
-        "batteryPowerMax": "1000000000",
-        "batteryCapacityMax": "1000000",
-        "dieselMax": "1000000000",
-        "solarExisting": 0,
-        "criticalLoadFactor": "1",
-        "outageDuration": "48",
-        "fuelAvailable": "50000",
-        "genExisting": 0,
-        "minGenLoading": "0.3",
-        "batteryKwExisting": 0,
-        "batteryKwhExisting": 0,
-        "windExisting": 0,
-        "value_of_lost_load": "1",
+        "energyCost": 0.12,
+        "wholesaleCost": 0.034,
+        "demandCost": 20.0,
         "solarCanCurtail": true,
-        "solarCanExport": true
+        "solarCanExport": true,
+        "urdbLabelSwitch": "off",
+        "urdbLabel": "5b75cfe95457a3454faf0aea",
+        "year": 2017,
+        "analysisYears": 25,
+        "outageDuration": 48,
+        "value_of_lost_load": 1,
+        "omCostEscalator": 0.025,
+        "discountRate": 0.083,
+        "solar": "on",
+        "battery": "on",
+        "fossil": "on",
+        "wind": "off",
+        "solarCost": 1600.0,
+        "solarMax": 10000.0,
+        "solarMin": 0.0,
+        "solarMacrsOptionYears": 0,
+        "solarItcPercent": 0.26,
+        "batteryCapacityCost": 420.0,
+        "batteryCapacityMax": 100000.0,
+        "batteryCapacityMin": 0.0,
+        "batteryPowerCost": 840.0,
+        "batteryPowerMax": 10000.0,
+        "batteryPowerMin": 0.0,
+        "batteryMacrsOptionYears": 0,
+        "batteryItcPercent": 0.0,
+        "batteryPowerCostReplace": 410.0,
+        "batteryCapacityCostReplace": 200.0,
+        "batteryPowerReplaceYear": 10,
+        "batteryCapacityReplaceYear": 10,
+        "dieselGenCost": 1000.0,
+        "dieselMax": 10000.0,
+        "dieselMin": 0.0,
+        "fuelAvailable": 150000.0,
+        "minGenLoading": 0.0,
+        "dieselFuelCostGal": 1.5,
+        "dieselCO2Factor": 24.1,
+        "dieselOMCostKw": 35.0,
+        "dieselOMCostKwh": 0.02,
+        "dieselOnlyRunsDuringOutage": true,
+        "dieselMacrsOptionYears": 0,
+        "windCost": 4989.0,
+        "windMax": 1000.0,
+        "windMin": 0.0,
+        "windMacrsOptionYears": 0,
+        "windItcPercent": 0.26,
+        "maxRuntimeSeconds": 240
     },
     "MICROGRIDS": {
         "mg0": {
@@ -52,14 +67,9 @@
                 "solar_634_existing",
                 "battery_634_existing"
             ],
-            "critical_load_kws": [
-                70,
-                90,
-                10
-            ],
-            "max_potential_battery": "700",
-            "max_potential_diesel": "1000000",
-            "battery_capacity": "10000"
+            "parameter_overrides": {
+                "reopt_inputs": {}
+            }
         },
         "mg1": {
             "loads": [
@@ -72,14 +82,9 @@
             "gen_obs_existing": [
                 "solar_675_existing"
             ],
-            "critical_load_kws": [
-                150,
-                200,
-                200
-            ],
-            "max_potential_battery": "100",
-            "max_potential_diesel": "900",
-            "battery_capacity": "2000"
+            "parameter_overrides": {
+                "reopt_inputs": {}
+            }
         },
         "mg2": {
             "loads": [
@@ -89,13 +94,26 @@
             "switch": "632645",
             "gen_bus": "646",
             "gen_obs_existing": [],
-            "critical_load_kws": [
-                30,
-                70
-            ],
-            "max_potential_battery": "800",
-            "max_potential_diesel": "1000000",
-            "battery_capacity": "10000"
+            "parameter_overrides": {
+                "reopt_inputs": {}
+            }
         }
-    }
+    },
+    "FAULTED_LINES": [
+        "670671"
+    ],
+    "OUTAGE_CSV": null,
+    "CRITICAL_LOADS": [
+        "634a_data_center",
+        "634b_radar",
+        "634c_atc_tower",
+        "675a_hospital",
+        "675b_residential1",
+        "675c_residential1",
+        "645_hangar",
+        "646_office"
+    ],
+    "DESCRIPTION": "",
+    "singlePhaseRelayCost": 300.0,
+    "threePhaseRelayCost": 20000.0
 }

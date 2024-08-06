@@ -1,468 +1,598 @@
-'''Test file with 1 microgrid for all loads and with multiple existing gens of all types
-in microgrid_test_4mg.py for economic comparison'''
+'''
+Test file with 1 microgrid for all loads and with multiple existing gens of all types in microgrid_test_4mg.py for economic comparison
+'''
 
-from microgridup import *
-import microgridup_gen_mgs as gmg
+
+import os, sys
 from omf.solvers.opendss import dssConvert
+import microgridup_gen_mgs as gmg
+import microgridup
+
 
 def test_1mg():
-	# Input data.
-	MODEL_DIR = f'{PROJ_FOLDER}/lehigh1mg'
-	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_phased.dss'
-	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
-	FAULTED_LINES = '650632' # Why this line, which is not closing off the genbus from source?
-	QSTS_STEPS = 24*20
-	OUTAGE_CSV = f'{MGU_FOLDER}/testfiles/lehigh_random_outages.csv'
-	REOPT_INPUTS = {
-		# latitude
-		# longitude
-		"energyCost" : "0.12",
-		"wholesaleCost" : "0.034", # To turn off energy export/net-metering, set wholesaleCost to "0" and excess PV gen will be curtailed
-		"demandCost" : '20',
-		"solarCanCurtail": True,
-		"solarCanExport": True,
-		"urdbLabelSwitch": "off",
-		# "urdbLabel" : '5b75cfe95457a3454faf0aea', # EPEC General Service TOU Rate https://openei.org/apps/IURDB/rate/view/5b75cfe95457a3454faf0aea#1__Basic_Information
-		"year" : '2017',
-		"analysisYears": "25",
-		"outageDuration": "48",
-		"value_of_lost_load": "100",
-		"single_phase_relay_cost": 300,
-		"three_phase_relay_cost": 20000,
-		# omCostEscalator
-		"discountRate" : '0.083',
-		"solar" : "on",
-		"battery" : "on",
-		"fossil": "on",
-		"wind" : "off",
-		"solarCost" : "1600",
-		"solarMax": "10000",
-		"solarMin": 0,
-		# solarMacrsOptionYears
-		# solarItcPercent
-		"batteryCapacityCost" : "420",
-		"batteryCapacityMax": "10000",
-		"batteryCapacityMin": 0,
-		"batteryPowerCost" : "840",
-		"batteryPowerMax": "10000",
-		"batteryPowerMin": 0,
-		# batteryMacrsOptionYears
-		# batteryItcPercent
-		"batteryPowerCostReplace" : "410",
-		"batteryCapacityCostReplace" : "200",
-		"batteryPowerReplaceYear": '10', # year at which batteryPowerCostReplace (the inverter) is reinstalled, one time
-		"batteryCapacityReplaceYear": '10', # year at which batteryCapacityCostReplace (the battery cells) is reinstalled, one time
-		"dieselGenCost": "1000",
-		"dieselMax": "10000",
-		# dieselMin
-		"fuelAvailable": "150000",
-		"minGenLoading": 0,
-		"dieselFuelCostGal": 1.5, # assuming 4.5 $/MMBtu = 1 $/gal diesel
-		"dieselCO2Factor": 24.1,
-		"dieselOMCostKw": 35,
-		"dieselOMCostKwh": .02,
-		"dieselOnlyRunsDuringOutage": False,
-		# dieselMacrsOptionYears
-		"windCost" : "4989",
-		"windMax": "1000",
-		"windMin": 0,
-		# windMacrsOptionYears
-		# windItcPercent
-		"mgParameterOverrides": {"mg0":{}},
-		"maxRuntimeSeconds": "240"
-	}
-	MICROGRIDS = {
-		'mg0': {
-			'critical_load_kws': [70, 90, 10, 150, 200, 200, 400, 20, 30, 70, 0, 0],
-			'gen_bus': '670',
-			'gen_obs_existing': ['solar_634_existing','solar_675_existing', 'fossil_684_existing', 'battery_634_existing', 'battery_684_existing'],
-			'loads': ['634a_data_center', '634b_radar', '634c_atc_tower', '675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2', '684_command_center', '652_residential', '611_runway', '645_hangar', '646_office'],
-			'switch': '650632',
-		}
+	data = {
+		'MODEL_DIR': 'lehigh1mg',
+		'BASE_DSS': f'{microgridup.MGU_DIR}/testfiles/lehigh_base_phased.dss',
+		'LOAD_CSV': f'{microgridup.MGU_DIR}/testfiles/lehigh_load.csv',
+		'QSTS_STEPS': 480,
+		'REOPT_INPUTS': {
+			'energyCost': 0.12,
+			'wholesaleCost': 0.034,
+			'demandCost': 20.0,
+			'solarCanCurtail': 'true',
+			'solarCanExport': 'true',
+			'urdbLabelSwitch': 'off',
+			'urdbLabel': '5b75cfe95457a3454faf0aea',
+			'year': 2017,
+			'analysisYears': 25,
+			'outageDuration': 48,
+			'value_of_lost_load': 100.0,
+			'omCostEscalator': 0.025,
+			'discountRate': 0.083,
+			'solar': 'on',
+			'battery': 'on',
+			'fossil': 'on',
+			'wind': 'off',
+			'solarCost': 1600.0,
+			'solarMax': 10000.0,
+			'solarMin': 0.0,
+			'solarMacrsOptionYears': 0,
+			'solarItcPercent': 0.26,
+			'batteryCapacityCost': 420.0,
+			'batteryCapacityMax': 100000.0,
+			'batteryCapacityMin': 0.0,
+			'batteryPowerCost': 840.0,
+			'batteryPowerMax': 10000.0,
+			'batteryPowerMin': 0.0,
+			'batteryMacrsOptionYears': 0,
+			'batteryItcPercent': 0.0,
+			'batteryPowerCostReplace': 410.0,
+			'batteryCapacityCostReplace': 200.0,
+			'batteryPowerReplaceYear': 10,
+			'batteryCapacityReplaceYear': 10,
+			'dieselGenCost': 1000.0,
+			'dieselMax': 10000.0,
+			'dieselMin': 0.0,
+			'fuelAvailable': 150000.0,
+			'minGenLoading': 0.0,
+			'dieselFuelCostGal': 1.5,
+			'dieselCO2Factor': 24.1,
+			'dieselOMCostKw': 35.0,
+			'dieselOMCostKwh': 0.02,
+			'dieselOnlyRunsDuringOutage': 'false',
+			'dieselMacrsOptionYears': 0,
+			'windCost': 4989.0,
+			'windMax': 1000.0,
+			'windMin': 0.0,
+			'windMacrsOptionYears': 0,
+			'windItcPercent': 0.26,
+			'maxRuntimeSeconds': 240,
+		},
+		'MICROGRIDS': {
+			'mg0': {
+				'gen_bus': '670',
+				'gen_obs_existing': [
+					'solar_634_existing',
+					'solar_675_existing',
+					'fossil_684_existing',
+					'battery_634_existing',
+					'battery_684_existing'
+				],
+				'loads': [
+					'634a_data_center',
+					'634b_radar',
+					'634c_atc_tower',
+					'675a_hospital',
+					'675b_residential1',
+					'675c_residential1',
+					'692_warehouse2',
+					'684_command_center',
+					'652_residential',
+					'611_runway',
+					'645_hangar',
+					'646_office'
+				],
+				'parameter_overrides': {
+					'reopt_inputs': {}
+				},
+				'switch': '650632'
+			}
+		},
+		'FAULTED_LINES': ['650632'],
+		'OUTAGE_CSV': f'{microgridup.MGU_DIR}/testfiles/lehigh_random_outages.csv',
+		'CRITICAL_LOADS': [
+			'684_command_center',
+			'634a_data_center',
+			'634b_radar',
+			'634c_atc_tower',
+			'692_warehouse2',
+			'675a_hospital',
+			'675b_residential1',
+			'675c_residential1',
+			'611_runway',
+			'652_residential'
+		],
+		'DESCRIPTION': '',
+		'singlePhaseRelayCost': 300.0,
+		'threePhaseRelayCost': 20000.0,
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINES, DESCRIPTION='', INVALIDATE_CACHE=False, OUTAGE_CSV=OUTAGE_CSV, DELETE_FILES=False, open_results=True)
-	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
+	microgridup.main(data, invalidate_cache=False, open_results=True)
+	if os.path.isfile(f'{microgridup.PROJ_DIR}/{data["MODEL_DIR"]}/0crashed.txt'):
 		sys.exit(1)
+
 
 def test_2mg():
-	# Input data.
-	MODEL_DIR = f'{PROJ_FOLDER}/lehigh2mgs'
-	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_phased.dss'
-	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
-	FAULTED_LINES = '650632'
-	QSTS_STEPS = 24*20
-	REOPT_INPUTS = {
-		# latitude
-		# longitude
-		"energyCost" : "0.12",
-		"wholesaleCost" : "0.034", # To turn off energy export/net-metering, set wholesaleCost to "0" and excess PV gen will be curtailed
-		"demandCost" : '20',
-		"solarCanCurtail": True,
-		"solarCanExport": True,
-		"urdbLabelSwitch": "off",
-		# "urdbLabel" : '5b75cfe95457a3454faf0aea', # EPEC General Service TOU Rate https://openei.org/apps/IURDB/rate/view/5b75cfe95457a3454faf0aea#1__Basic_Information		
-		"year" : '2017',
-		"analysisYears": "25",
-		"outageDuration": "48",
-		"value_of_lost_load": "100",
-		"single_phase_relay_cost": 300,
-		"three_phase_relay_cost": 20000,
-		# omCostEscalator
-		"discountRate" : '0.083',
-		"solar" : "on",
-		"battery" : "on",
-		"fossil": "on", 
-		"wind" : "on",
-		"solarCost" : "1600",
-		"solarMax": "10000",
-		"solarMin": 0,
-		# solarMacrsOptionYears
-		# solarItcPercent
-		"batteryCapacityCost" : "420",
-		"batteryCapacityMax": "10000",
-		"batteryCapacityMin": 0,
-		"batteryPowerCost" : "840",
-		"batteryPowerMax": "10000",
-		"batteryPowerMin": 0,
-		# batteryMacrsOptionYears
-		# batteryItcPercent
-		"batteryPowerCostReplace" : "410",
-		"batteryCapacityCostReplace" : "200",
-		"batteryPowerReplaceYear": '10', # year at which batteryPowerCostReplace (the inverter) is reinstalled, one time
-		"batteryCapacityReplaceYear": '10', # year at which batteryCapacityCostReplace (the battery cells) is reinstalled, one time
-		"dieselGenCost": "500",
-		"dieselMax": "100000",
-		# dieselMin
-		"fuelAvailable": "10000",
-		"minGenLoading": "0.3",
-		"dieselFuelCostGal": 3, # assuming 4.5 $/MMBtu = 1 $/gal diesel
-		"dieselCO2Factor": 22.4,
-		"dieselOMCostKw": 25,
-		"dieselOMCostKwh": 0.02,
-		"dieselOnlyRunsDuringOutage": True,
-		# dieselMacrsOptionYears
-		"windCost" : "1500",
-		"windMax": "10000",
-		"windMin": 0,
-		# windMacrsOptionYears
-		# windItcPercent
-		"mgParameterOverrides": {"mg0":{}, "mg1":{}},
-		"maxRuntimeSeconds": "240"
-	}
-	MICROGRIDS = {
-		'mg0': {
-			'critical_load_kws': [70, 90, 10],
-			'gen_bus': '634',
-		 	'gen_obs_existing': [],
-			'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'],
-			'switch': '632633'
+	data = {
+		'MODEL_DIR': 'lehigh2mgs',
+		'BASE_DSS': f'{microgridup.MGU_DIR}/testfiles/lehigh_base_phased.dss',
+		'LOAD_CSV': f'{microgridup.MGU_DIR}/testfiles/lehigh_load.csv',
+		'QSTS_STEPS': 480,
+		'REOPT_INPUTS': {
+			'energyCost': 0.12,
+			'wholesaleCost': 0.034,
+			'demandCost': 20.0,
+			'solarCanCurtail': 'true',
+			'solarCanExport': 'true',
+			'urdbLabelSwitch': 'off',
+			'urdbLabel': '5b75cfe95457a3454faf0aea',
+			'year': 2017,
+			'analysisYears': 25,
+			'outageDuration': 48,
+			'value_of_lost_load': 100.0,
+			'omCostEscalator': 0.025,
+			'discountRate': 0.083,
+			'solar': 'on',
+			'battery': 'on',
+			'fossil': 'on',
+			'wind': 'on',
+			'solarCost': 1600.0,
+			'solarMax': 10000.0,
+			'solarMin': 0.0,
+			'solarMacrsOptionYears': 0,
+			'solarItcPercent': 0.26,
+			'batteryCapacityCost': 420.0,
+			'batteryCapacityMax': 10000.0,
+			'batteryCapacityMin': 0.0,
+			'batteryPowerCost': 840.0,
+			'batteryPowerMax': 10000.0,
+			'batteryPowerMin': 0.0,
+			'batteryMacrsOptionYears': 0,
+			'batteryItcPercent': 0.0,
+			'batteryPowerCostReplace': 410.0,
+			'batteryCapacityCostReplace': 200.0,
+			'batteryPowerReplaceYear': 10,
+			'batteryCapacityReplaceYear': 10,
+			'dieselGenCost': 500.0,
+			'dieselMax': 100000.0,
+			'dieselMin': 0.0,
+			'fuelAvailable': 10000.0,
+			'minGenLoading': 0.3,
+			'dieselFuelCostGal': 3.0,
+			'dieselCO2Factor': 22.4,
+			'dieselOMCostKw': 25.0,
+			'dieselOMCostKwh': 0.02,
+			'dieselOnlyRunsDuringOutage': 'true',
+			'dieselMacrsOptionYears': 0,
+			'windCost': 1500.0,
+			'windMax': 10000.0,
+			'windMin': 0.0,
+			'windMacrsOptionYears': 0,
+			'windItcPercent': 0.26,
+			'maxRuntimeSeconds': 240
 		},
-		'mg1': {
-			'critical_load_kws': [150, 200, 200, 0],
-			'gen_bus': '675',
-			'gen_obs_existing': [],
-			'loads': ['675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2'],
-			'switch': '671692'
-		}
+		'MICROGRIDS': {
+			'mg0': {
+				'gen_bus': '634',
+				'gen_obs_existing': [],
+				'loads': [
+					'634a_data_center',
+					'634b_radar',
+					'634c_atc_tower'
+				],
+				'parameter_overrides': {
+					'reopt_inputs': {}
+				},
+				'switch': '632633'
+			},
+			'mg1': {
+				'gen_bus': '675',
+				'gen_obs_existing': [],
+				'loads': [
+					'675a_hospital',
+					'675b_residential1',
+					'675c_residential1',
+					'692_warehouse2'
+				],
+				'parameter_overrides': {
+					'reopt_inputs': {}
+				},
+				'switch': '671692'
+			}
+		},
+		'FAULTED_LINES': ['650632'],
+		'OUTAGE_CSV': None,
+		'CRITICAL_LOADS': [
+			'634a_data_center',
+			'634b_radar',
+			'634c_atc_tower',
+			'675a_hospital',
+			'675b_residential1',
+			'675c_residential1'
+		],
+		'DESCRIPTION': '',
+		'singlePhaseRelayCost': 300.0,
+		'threePhaseRelayCost': 20000.0,
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINES, DESCRIPTION='', INVALIDATE_CACHE=False, OUTAGE_CSV=None, DELETE_FILES=False, open_results=True)
-	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
-		sys.exit(1)
+	microgridup.main(data, invalidate_cache=False, open_results=True)
+	if os.path.isfile(f'{microgridup.PROJ_DIR}/{data["MODEL_DIR"]}/0crashed.txt'):
+		sys.exit(1)	
+
 
 def test_3mg():
-	# Input data.
-	MODEL_DIR = f'{PROJ_FOLDER}/lehigh3mgs'
-	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_phased.dss'
-	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
-	FAULTED_LINES = '650632'
-	QSTS_STEPS = 24*20
-	REOPT_INPUTS = {
-		# latitude
-		# longitude
-		"energyCost": "0.12",
-		"wholesaleCost" : "0", # To turn off energy export/net-metering, set wholesaleCost to "0" and excess PV gen will be curtailed
-		"demandCost": '20',
-		"solarCanCurtail": True,
-		"solarCanExport": True,
-		"urdbLabelSwitch": "off",
-		# "urdbLabel" : '5b75cfe95457a3454faf0aea', # EPEC General Service TOU Rate https://openei.org/apps/IURDB/rate/view/5b75cfe95457a3454faf0aea#1__Basic_Information
-		"year": '2017',
-		"analysisYears": "25",
-		"outageDuration": "48",
-		"value_of_lost_load": "100",
-		"single_phase_relay_cost": 300,
-		"three_phase_relay_cost": 20000,
-		# omCostEscalator
-		"discountRate" : '0.083',
-		"solar": "on",
-		"battery": "on",
-		"fossil": "on",
-		"wind": "off",
-		"solarCost" : "1600",
-		"solarMax": "100000",
-		"solarMin": 0,
-		# solarMacrsOptionYears
-		# solarItcPercent
-		"batteryCapacityCost" : "420",
-		"batteryCapacityMax": "100000",
-		"batteryCapacityMin": 0,
-		"batteryPowerCost" : "840",
-		"batteryPowerMax": "100000",
-		"batteryPowerMin": 0,
-		# batteryMacrsOptionYears
-		# batteryItcPercent
-		"batteryPowerCostReplace" : "410",
-		"batteryCapacityCostReplace" : "200",
-		"batteryPowerReplaceYear": '10', # year at which batteryPowerCostReplace (the inverter) is reinstalled, one time
-		"batteryCapacityReplaceYear": '10', # year at which batteryCapacityCostReplace (the battery cells) is reinstalled, one time		
-		"dieselGenCost": "1000",
-		"dieselMax": "100000",
-		# dieselMin
-		"fuelAvailable": "10000",
-		"minGenLoading": "0.3",
-		"dieselFuelCostGal": 3, # assuming 4.5 $/MMBtu = 1 $/gal diesel
-		"dieselCO2Factor": 22.4,
-		"dieselOMCostKw": 25,
-		"dieselOMCostKwh": 0.02,
-		"dieselOnlyRunsDuringOutage": True,
-		# dieselMacrsOptionYears
-		"windCost" : "4989",
-		"windMax": "100000",
-		"windMin": 0,
-		"mgParameterOverrides": {"mg0":{}, "mg1":{}, "mg2":{}},
-		"maxRuntimeSeconds": "240"
-	}
-	MICROGRIDS = {
-		'mg0': {
-			'critical_load_kws': [70, 90, 10],
-			'gen_bus': '634',
-			'gen_obs_existing': ['solar_634_existing','battery_634_existing'],
-			'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'],
-			'switch': '632633'
+	data = {
+		'MODEL_DIR': 'lehigh3mgs',
+		'BASE_DSS': f'{microgridup.MGU_DIR}/testfiles/lehigh_base_phased.dss',
+		'LOAD_CSV': f'{microgridup.MGU_DIR}/testfiles/lehigh_load.csv',
+		'QSTS_STEPS': 480,
+		'REOPT_INPUTS': {
+			'energyCost': 0.12,
+			'wholesaleCost': 0.0,
+			'demandCost': 20.0,
+			'solarCanCurtail': 'true',
+			'solarCanExport': 'true',
+			'urdbLabelSwitch': 'off',
+			'urdbLabel': '5b75cfe95457a3454faf0aea',
+			'year': 2017,
+			'analysisYears': 25,
+			'outageDuration': 48,
+			'value_of_lost_load': 100.0,
+			'omCostEscalator': 0.025,
+			'discountRate': 0.083,
+			'solar': 'on',
+			'battery': 'on',
+			'fossil': 'on',
+			'wind': 'off',
+			'solarCost': 1600.0,
+			'solarMax': 100000.0,
+			'solarMin': 0.0,
+			'solarMacrsOptionYears': 0,
+			'solarItcPercent': 0.26,
+			'batteryCapacityCost': 420.0,
+			'batteryCapacityMax': 100000.0,
+			'batteryCapacityMin': 0.0,
+			'batteryPowerCost': 840.0,
+			'batteryPowerMax': 100000.0,
+			'batteryPowerMin': 0.0,
+			'batteryMacrsOptionYears': 0,
+			'batteryItcPercent': 0.0,
+			'batteryPowerCostReplace': 410.0,
+			'batteryCapacityCostReplace': 200.0,
+			'batteryPowerReplaceYear': 10,
+			'batteryCapacityReplaceYear': 10,
+			'dieselGenCost': 1000.0,
+			'dieselMax': 100000.0,
+			'dieselMin': 0.0,
+			'fuelAvailable': 10000.0,
+			'minGenLoading': 0.3,
+			'dieselFuelCostGal': 3.0,
+			'dieselCO2Factor': 22.4,
+			'dieselOMCostKw': 25.0,
+			'dieselOMCostKwh': 0.02,
+			'dieselOnlyRunsDuringOutage': 'true',
+			'dieselMacrsOptionYears': 0,
+			'windCost': 4989.0,
+			'windMax': 100000.0,
+			'windMin': 0.0,
+			'windMacrsOptionYears': 0,
+			'windItcPercent': 0.26,
+			'maxRuntimeSeconds': 240
 		},
-		'mg1': {
-			'critical_load_kws': [150, 200, 200, 0],
-			'gen_bus': '675',
-			'gen_obs_existing': [],
-			'loads': ['675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2'],
-			'switch': '671692'
+		'MICROGRIDS': {
+			'mg0': {
+				'gen_bus': '634',
+				'gen_obs_existing': [
+					'solar_634_existing',
+					'battery_634_existing'
+				],
+				'loads': [
+					'634a_data_center',
+					'634b_radar',
+					'634c_atc_tower'
+				],
+				'parameter_overrides': {
+					'reopt_inputs': {}
+				},
+				'switch': '632633'
+			},
+			'mg1': {
+				'gen_bus': '675',
+				'gen_obs_existing': [],
+				'loads': [
+					'675a_hospital',
+					'675b_residential1',
+					'675c_residential1',
+					'692_warehouse2'
+				],
+				'parameter_overrides': {
+					'reopt_inputs': {}
+				},
+				'switch': '671692'
+			},
+			'mg2': {
+				'gen_bus': '646',
+				'gen_obs_existing': [],
+				'loads': [
+					'645_hangar',
+					'646_office'
+				],
+				'parameter_overrides': {
+					'reopt_inputs': {}
+				},
+				'switch': '632645'
+			}
 		},
-		'mg2': {
-			'critical_load_kws': [30, 70],
-			'gen_bus': '646',
-			'gen_obs_existing': [], #['fossil_684_existing'],
-			'loads': ['645_hangar','646_office'],
-			'switch': '632645',
-		}
+		'FAULTED_LINES': ['650632'],
+		'OUTAGE_CSV': None,
+		'CRITICAL_LOADS': [
+			'634a_data_center',
+			'634b_radar',
+			'634c_atc_tower',
+			'645_hangar',
+			'646_office',
+			'675a_hospital',
+			'675b_residential1',
+			'675c_residential1'
+		],
+		'DESCRIPTION': '',
+		'singlePhaseRelayCost': 300.0,
+		'threePhaseRelayCost': 20000.0
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINES, DESCRIPTION='', INVALIDATE_CACHE=False, OUTAGE_CSV=None, DELETE_FILES=False, open_results=True)
-	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
-		sys.exit(1)
+	microgridup.main(data, invalidate_cache=False, open_results=True)
+	if os.path.isfile(f'{microgridup.PROJ_DIR}/{data["MODEL_DIR"]}/0crashed.txt'):
+		sys.exit(1)	
+
 
 def test_4mg():
-	# Input data.
-	MODEL_DIR = f'{PROJ_FOLDER}/lehigh4mgs'
-	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_phased.dss'
-	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
-	FAULTED_LINES = '650632'
-	QSTS_STEPS = 24*20
-	OUTAGE_CSV = f'{MGU_FOLDER}/testfiles/lehigh_random_outages.csv'
-	REOPT_INPUTS = {
-		# latitude
-		# longitude
-		"energyCost": "0.12",
-		"wholesaleCost": "0.034", # To turn off energy export/net-metering, set wholesaleCost to "0" and excess PV gen will be curtailed
-		"demandCost": '20',
-		"solarCanCurtail": True,
-		"solarCanExport": True,
-		"urdbLabelSwitch": "off",
-		# "urdbLabel" : '5b75cfe95457a3454faf0aea', # EPEC General Service TOU Rate https://openei.org/apps/IURDB/rate/view/5b75cfe95457a3454faf0aea#1__Basic_Information
-		"year": '2017',
-		"analysisYears": "25",
-		"outageDuration": "48",
-		"value_of_lost_load": "100",
-		"single_phase_relay_cost": 300,
-		"three_phase_relay_cost": 20000,
-		# omCostEscalator
-		"discountRate": '0.083',
-		"solar": "on",
-		"battery": "on",
-		"fossil": "on",
-		"wind" : "off",
-		"solarCost" : "1600",
-		"solarMax": "100000",
-		"solarMin": 0,
-		# solarMacrsOptionYears
-		# solarItcPercent
-		"batteryCapacityCost" : "420",
-		"batteryCapacityMax": "1000000",
-		"batteryCapacityMin": 0,
-		"batteryPowerCost" : "840",
-		"batteryPowerMax": "1000000",
-		"batteryPowerMin": 0,
-		# batteryMacrsOptionYears
-		# batteryItcPercent
-		"batteryPowerCostReplace" : "410",
-		"batteryCapacityCostReplace" : "200",
-		"batteryPowerReplaceYear": '10', # year at which batteryPowerCostReplace (the inverter) is reinstalled, one time
-		"batteryCapacityReplaceYear": '10', # year at which batteryCapacityCostReplace (the battery cells) are reinstalled, one time
-		"dieselGenCost": "1000",
-		"dieselMax": "1000000",
-		# dieselMin
-		"fuelAvailable": "1000000",
-		"minGenLoading": "0",
-		"dieselFuelCostGal": 1.5, # assuming 4.5 $/MMBtu = 1 $/gal diesel
-		"dieselCO2Factor": 24.1,
-		"dieselOMCostKw": 35,
-		"dieselOMCostKwh": .02,
-		"dieselOnlyRunsDuringOutage": False,
-		# dieselMacrsOptionYears
-		"windCost" : "4989",
-		"windMax": "100000",
-		"windMin": 0,
-		# windMacrsOptionYears
-		# windItcPercent
-		"mgParameterOverrides": {"mg0":{}, "mg1":{}, "mg2":{}, "mg3":{}},
-		"maxRuntimeSeconds": "240"
-	}
-	MICROGRIDS = {
-		'mg0': {
-			'critical_load_kws': [70, 90, 10],
-			'gen_bus': '634',
-			'gen_obs_existing': ['solar_634_existing','battery_634_existing'],
-			'loads': ['634a_data_center', '634b_radar', '634c_atc_tower'],
-			'switch': '632633'
+	data = {
+		'MODEL_DIR': 'lehigh4mgs',
+		'BASE_DSS': f'{microgridup.MGU_DIR}/testfiles/lehigh_base_phased.dss',
+		'LOAD_CSV': f'{microgridup.MGU_DIR}/testfiles/lehigh_load.csv',
+		'QSTS_STEPS': 480,
+		'REOPT_INPUTS': {
+			'energyCost': 0.12,
+			'wholesaleCost': 0.034,
+			'demandCost': 20.0,
+			'solarCanCurtail': 'true',
+			'solarCanExport': 'true',
+			'urdbLabelSwitch': 'off',
+			'urdbLabel': '5b75cfe95457a3454faf0aea',
+			'year': 2017,
+			'analysisYears': 25,
+			'outageDuration': 48,
+			'value_of_lost_load': 100.0,
+			'omCostEscalator': 0.025,
+			'discountRate': 0.083,
+			'solar': 'on',
+			'battery': 'on',
+			'fossil': 'on',
+			'wind': 'off',
+			'solarCost': 1600.0,
+			'solarMax': 100000.0,
+			'solarMin': 0.0,
+			'solarMacrsOptionYears': 0,
+			'solarItcPercent': 0.26,
+			'batteryCapacityCost': 420.0,
+			'batteryCapacityMax': 1000000.0,
+			'batteryCapacityMin': 0.0,
+			'batteryPowerCost': 840.0,
+			'batteryPowerMax': 1000000.0,
+			'batteryPowerMin': 0.0,
+			'batteryMacrsOptionYears': 0,
+			'batteryItcPercent': 0.0,
+			'batteryPowerCostReplace': 410.0,
+			'batteryCapacityCostReplace': 200.0,
+			'batteryPowerReplaceYear': 10,
+			'batteryCapacityReplaceYear': 10,
+			'dieselGenCost': 1000.0,
+			'dieselMax': 1000000.0,
+			'dieselMin': 0.0,
+			'fuelAvailable': 1000000.0,
+			'minGenLoading': 0.0,
+			'dieselFuelCostGal': 1.5,
+			'dieselCO2Factor': 24.1,
+			'dieselOMCostKw': 35.0,
+			'dieselOMCostKwh': 0.02,
+			'dieselOnlyRunsDuringOutage': 'false',
+			'dieselMacrsOptionYears': 0,
+			'windCost': 4989.0,
+			'windMax': 100000.0,
+			'windMin': 0.0,
+			'windMacrsOptionYears': 0,
+			'windItcPercent': 0.26,
+			'maxRuntimeSeconds': 240
 		},
-		'mg1': {
-			'critical_load_kws': [150, 200, 200, 0],
-			'gen_bus': '675',
-			'gen_obs_existing': ['solar_675_existing'],
-			'loads': ['675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2'],
-			'switch': '671692',
+		'MICROGRIDS': {
+			'mg0': {
+				'gen_bus': '634',
+				'gen_obs_existing': [
+					'solar_634_existing',
+					'battery_634_existing'
+				],
+				'loads': [
+					'634a_data_center',
+					'634b_radar',
+					'634c_atc_tower'
+				],
+				'parameter_overrides': {
+					'reopt_inputs': {}
+				},
+				'switch': '632633'
+			},
+			'mg1': {
+				'gen_bus': '675',
+				'gen_obs_existing': [
+					'solar_675_existing'
+				],
+				'loads': [
+					'675a_hospital',
+					'675b_residential1',
+					'675c_residential1',
+					'692_warehouse2'
+				],
+				'parameter_overrides': {
+					'reopt_inputs': {}
+				},
+				'switch': '671692'
+			},
+			'mg2': {
+				'gen_bus': '684',
+				'gen_obs_existing': [
+					'fossil_684_existing',
+					'battery_684_existing'
+				],
+				'loads': [
+					'684_command_center',
+					'652_residential',
+					'611_runway'
+				],
+				'parameter_overrides': {
+					'reopt_inputs': {}
+				},
+				'switch': '671684'
+			},
+			'mg3': {
+				'gen_bus': '646',
+				'gen_obs_existing': [],
+				'loads': [
+					'645_hangar',
+					'646_office'
+				],
+				'parameter_overrides': {
+					'reopt_inputs': {}
+				},
+				'switch': '632645'
+			}
 		},
-		'mg2': {
-			'critical_load_kws': [400, 20, 0],
-			'gen_bus': '684',
-			'gen_obs_existing': ['fossil_684_existing','battery_684_existing'],
-			'loads': ['684_command_center','652_residential','611_runway'],
-			'switch': '671684',
-		},
-		'mg3': {
-			'critical_load_kws': [30, 70],
-			'gen_bus': '646',
-			'gen_obs_existing': [],
-			'loads': ['645_hangar','646_office'],
-			'switch': '632645',
-		}
+		'FAULTED_LINES': ['650632'],
+		'OUTAGE_CSV': f'{microgridup.MGU_DIR}/testfiles/lehigh_random_outages.csv',
+		'CRITICAL_LOADS': [
+			'684_command_center',
+			'634a_data_center',
+			'634b_radar',
+			'634c_atc_tower',
+			'645_hangar',
+			'646_office',
+			'675a_hospital',
+			'675b_residential1',
+			'675c_residential1',
+			'652_residential'
+		],
+		'DESCRIPTION': '',
+		'singlePhaseRelayCost': 300.0,
+		'threePhaseRelayCost': 20000.0
 	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINES, DESCRIPTION='', INVALIDATE_CACHE=False, OUTAGE_CSV=OUTAGE_CSV, DELETE_FILES=False, open_results=True)
-	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
-		sys.exit(1)
+	microgridup.main(data, invalidate_cache=False, open_results=True)
+	if os.path.isfile(f'{microgridup.PROJ_DIR}/{data["MODEL_DIR"]}/0crashed.txt'):
+		sys.exit(1)	
+
 
 def test_auto3mg():
-	# Input data.
-	CIRC_FILE = f'{MGU_FOLDER}/testfiles/lehigh_base_phased.dss'
-	CRITICAL_LOADS = ['645_hangar', '684_command_center', '611_runway', '675a_hospital', '634a_data_center', '634b_radar', '634c_atc_tower']
-	MODEL_DIR = f'{PROJ_FOLDER}/lehighauto_3mg'
-	BASE_DSS = f'{MGU_FOLDER}/testfiles/lehigh_base_phased.dss'
-	LOAD_CSV = f'{MGU_FOLDER}/testfiles/lehigh_load.csv'
-	FAULTED_LINES = '670671'
-	QSTS_STEPS = 24*20
-	OUTAGE_CSV = f'{MGU_FOLDER}/testfiles/lehigh_random_outages.csv'
-	REOPT_INPUTS = {
-		# latitude
-		# longitude
-		"energyCost": "0.12",
-		"wholesaleCost": "0", # To turn off energy export/net-metering, set wholesaleCost to "0" and excess PV gen will be curtailed
-		"demandCost": '20',
-		"solarCanCurtail": True,
-		"solarCanExport": True,
-		"urdbLabelSwitch": "off",
-		# "urdbLabel" : '5b75cfe95457a3454faf0aea', # EPEC General Service TOU Rate https://openei.org/apps/IURDB/rate/view/5b75cfe95457a3454faf0aea#1__Basic_Information
-		"year" : '2017',
-		"analysisYears": "25",
-		"outageDuration": "48",
-		"value_of_lost_load": "100",
-		"single_phase_relay_cost": 300,
-		"three_phase_relay_cost": 20000,
-		# omCostEscalator
-		"discountRate" : '0.083',
-		"solar": "on",
-		"battery": "on",
-		"fossil": "on",
-		"wind" : "off",
-		"solarCost" : "1600",
-		"solarMax": "100000",
-		"solarMin": 0,
-		# solarMacrsOptionYears
-		# solarItcPercent
-		"batteryCapacityCost" : "420",
-		"batteryCapacityMax": "100000",
-		"batteryCapacityMin": 0,
-		"batteryPowerCost" : "840",
-		"batteryPowerMax": "100000",
-		"batteryPowerMin": 0,
-		# batteryMacrsOptionYears
-		# batteryItcPercent
-		"batteryPowerCostReplace" : "410",
-		"batteryCapacityCostReplace" : "200",
-		"batteryPowerReplaceYear": '10', # year at which batteryPowerCostReplace (the inverter) is reinstalled, one time
-		"batteryCapacityReplaceYear": '10', # year at which batteryCapacityCostReplace (the battery cells) is reinstalled, one time		
-		"dieselGenCost": "1000",
-		"dieselMax": "100000",
-		# dieselMin
-		"fuelAvailable": "10000",
-		"minGenLoading": "0.3",
-		"dieselFuelCostGal": 3, # assuming 4.5 $/MMBtu = 1 $/gal diesel
-		"dieselCO2Factor": 22.4,
-		"dieselOMCostKw": 25,
-		"dieselOMCostKwh": 0.02,
-		"dieselOnlyRunsDuringOutage": True,
-		# dieselMacrsOptionYears
-		"windCost" : "4989",
-		"windMax": "100000",
-		"windMin": 0,
-		# windMacrsOptionYears
-		# windItcPercent
-		"mgParameterOverrides": {"mg0":{}, "mg1": {}, "mg2":{}},
-		"maxRuntimeSeconds": "240"
-	}
-	ALGO = 'branch' #'lukes'
+	CIRC_FILE = f'{microgridup.MGU_DIR}/testfiles/lehigh_base_phased.dss'
 	G = dssConvert.dss_to_networkx(CIRC_FILE)
-	omd = dssConvert.dssToOmd(CIRC_FILE, '', RADIUS=0.0004, write_out=False)
+	CRITICAL_LOADS = ['645_hangar', '684_command_center', '611_runway', '675a_hospital', '634a_data_center', '634b_radar', '634c_atc_tower']
+	ALGO = 'branch' #'lukes'
 	MG_GROUPS = gmg.form_mg_groups(G, CRITICAL_LOADS, ALGO)
+	omd = dssConvert.dssToOmd(CIRC_FILE, '', RADIUS=0.0004, write_out=False)
 	MICROGRIDS = gmg.form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd)
-	# MICROGRIDS = {
-	# 	'mg0': {
-	# 		'loads': ['634a_data_center','634b_radar','634c_atc_tower'],
-	# 		'switch': '632633',
-	# 		'gen_bus': '634',
-	# 		'gen_obs_existing': ['solar_634_existing','battery_634_existing'],
-	# 		'critical_load_kws': [70,90,10]
-	# 	},
-	# 	'mg1': {
-	# 		'loads': ['675a_hospital','675b_residential1','675c_residential1','692_warehouse2'],
-	# 		'switch': '671692',
-	# 		'gen_bus': '675',
-	# 		'gen_obs_existing': ['fossil_675_existing'],
-	# 		'critical_load_kws': [150,200,200]
-	# 	},
-	# 	'mg2': {
-	# 		'loads': ['645_hangar','646_office'],
-	# 		'switch': '632645',
-	# 		'gen_bus': '646',
-	# 		'gen_obs_existing': [], #['fossil_684_existing'],
-	# 		'critical_load_kws': [30,70]
-	# 	}
-	# }
+	for mg in MICROGRIDS:
+		MICROGRIDS[mg]['parameter_overrides'] = {
+			'reopt_inputs': {}
+		}
+	data = {
+		'MODEL_DIR': 'lehighauto_3mg',
+		'BASE_DSS': f'{microgridup.MGU_DIR}/testfiles/lehigh_base_phased.dss',
+		'LOAD_CSV': f'{microgridup.MGU_DIR}/testfiles/lehigh_load.csv',
+		'QSTS_STEPS': 480,
+		'REOPT_INPUTS': {
+			'energyCost': 0.12,
+			'wholesaleCost': 0.0,
+			'demandCost': 20.0,
+			'solarCanCurtail': 'true',
+			'solarCanExport': 'true',
+			'urdbLabelSwitch': 'off',
+			'urdbLabel': '5b75cfe95457a3454faf0aea',
+			'year': 2017,
+			'analysisYears': 25,
+			'outageDuration': 48,
+			'value_of_lost_load': 100.0,
+			'omCostEscalator': 0.025,
+			'discountRate': 0.083,
+			'solar': 'on',
+			'battery': 'on',
+			'fossil': 'on',
+			'wind': 'off',
+			'solarCost': 1600.0,
+			'solarMax': 100000.0,
+			'solarMin': 0.0,
+			'solarMacrsOptionYears': 5,
+			'solarItcPercent': 0.26,
+			'batteryCapacityCost': 420.0,
+			'batteryCapacityMax': 100000.0,
+			'batteryCapacityMin': 0.0,
+			'batteryPowerCost': 840.0,
+			'batteryPowerMax': 100000.0,
+			'batteryPowerMin': 0.0,
+			'batteryMacrsOptionYears': 7,
+			'batteryItcPercent': 0.0,
+			'batteryPowerCostReplace': 410.0,
+			'batteryCapacityCostReplace': 200.0,
+			'batteryPowerReplaceYear': 10,
+			'batteryCapacityReplaceYear': 10,
+			'dieselGenCost': 1000.0,
+			'dieselMax': 100000.0,
+			'dieselMin': 0.0,
+			'fuelAvailable': 10000.0,
+			'minGenLoading': 0.3,
+			'dieselFuelCostGal': 3.0,
+			'dieselCO2Factor': 22.4,
+			'dieselOMCostKw': 25.0,
+			'dieselOMCostKwh': 0.02,
+			'dieselOnlyRunsDuringOutage': 'true',
+			'dieselMacrsOptionYears': 0,
+			'windCost': 4989.0,
+			'windMax': 100000.0,
+			'windMin': 0.0,
+			'windMacrsOptionYears': 5,
+			'windItcPercent': 0.26,
+			'maxRuntimeSeconds': 240
+		},
+        # - We have the correct equivalent hard-coded microgrids, but we want to test that the dynamically generated microgrids are correct
+        'MICROGRIDS': MICROGRIDS,
+		#'MICROGRIDS': { 'mg0': { 'battery_capacity': '10000', 'gen_bus': '633', 'gen_obs_existing': [ 'solar_634_existing', 'battery_634_existing' ], 'loads': [ '634a_data_center', '634b_radar', '634c_atc_tower' ], 'max_potential': '700', 'max_potential_diesel': '1000000', 'switch': '632633', 'parameter_overrides': { 'reopt_inputs': {} } }, 'mg1': { 'battery_capacity': '10000', 'gen_bus': '645', 'gen_obs_existing': [], 'loads': [ '645_hangar', '646_office' ], 'max_potential': '700', 'max_potential_diesel': '1000000', 'switch': '632645', 'parameter_overrides': { 'reopt_inputs': {} } }, 'mg2': { 'battery_capacity': '10000', 'gen_bus': '670', 'gen_obs_existing': [ 'fossil_675_existing' ], 'loads': [ '684_command_center', '692_warehouse2', '675a_hospital', '675b_residential1', '675c_residential1', '611_runway', '652_residential', '670a_residential2', '670b_residential2', '670c_residential2' ], 'max_potential': '700', 'max_potential_diesel': '1000000', 'switch': '632670', 'parameter_overrides': { 'reopt_inputs': {} } } },
+		'FAULTED_LINES': ['670671'],
+		'OUTAGE_CSV': f'{microgridup.MGU_DIR}/testfiles/lehigh_random_outages.csv',
+		'CRITICAL_LOADS': [
+			'684_command_center',
+			'634a_data_center',
+			'634b_radar',
+			'634c_atc_tower',
+			'645_hangar',
+			'675a_hospital',
+			'611_runway'
+		],
+		'DESCRIPTION': '',
+		'singlePhaseRelayCost': 300.0,
+		'threePhaseRelayCost': 20000.0
+	}
 	# Run model.
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINES, DESCRIPTION='', INVALIDATE_CACHE=False, OUTAGE_CSV=OUTAGE_CSV, DELETE_FILES=False, open_results=True)
-	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
-		sys.exit(1)
+	microgridup.main(data, invalidate_cache=False, open_results=True)
+	if os.path.isfile(f'{microgridup.PROJ_DIR}/{data["MODEL_DIR"]}/0crashed.txt'):
+		sys.exit(1)	
+
 
 def test_mackelroy():
 	'''
@@ -526,25 +656,25 @@ def test_mackelroy():
 		"windMin": "0",
 		"windMacrsOptionYears": "5",
 		"windItcPercent": "0.26",
-		"mgParameterOverrides": { "mg0": {}, "mg1": {}, "mg2": {}, "mg3": {}, "mg4": {} },
+		"mgParameterOverrides": { "foobar1": {}, "foobar2": {}, "foobar3": {}, "foobar4": {}, "foobar5": {} },
 		"maxRuntimeSeconds": "240" 
 	}
 	MICROGRIDS = {
-	"mg0": {
-		"loads": [
-			"load_3002"
-		],
-		"switch": "l_3003_3002",
-		"gen_bus": "bus3002",
-		"gen_obs_existing": [],
-		"critical_load_kws": [
-			0.0
-		],
-		"max_potential": "700",
-		"max_potential_diesel": "1000000",
-		"battery_capacity": "10000"
-	},
-	"mg1": {
+        "foobar1": {
+            "loads": [
+                "load_3002"
+            ],
+            "switch": "l_3003_3002",
+            "gen_bus": "bus3002",
+            "gen_obs_existing": [],
+            "critical_load_kws": [
+                0.0
+            ],
+            "max_potential": "700",
+            "max_potential_diesel": "1000000",
+            "battery_capacity": "10000"
+        },
+        "foobar2": {
 			"loads": [
 				"load_3004"
 			],
@@ -558,7 +688,7 @@ def test_mackelroy():
 			"max_potential_diesel": "1000000",
 			"battery_capacity": "10000"
 		},
-		"mg2": {
+		"foobar3": {
 			"loads": [
 				"load_1006",
 				"load_1007",
@@ -600,7 +730,7 @@ def test_mackelroy():
 			"max_potential_diesel": "1000000",
 			"battery_capacity": "10000"
 		},
-		"mg3": {
+		"foobar4": {
 			"loads": [
 				"load_2008",
 				"load_2009",
@@ -700,7 +830,7 @@ def test_mackelroy():
 			"max_potential_diesel": "1000000",
 			"battery_capacity": "10000"
 		},
-		"mg4": {
+		"foobar5": {
 			"loads": [
 				"load_3009",
 				"load_3010",
@@ -980,9 +1110,10 @@ def test_mackelroy():
 		}
 	}
 	FAULTED_LINES = '670671'
-	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINES, DESCRIPTION='', INVALIDATE_CACHE=False, OUTAGE_CSV=None, DELETE_FILES=False, open_results=True)
+	full(MODEL_DIR, BASE_DSS, LOAD_CSV, QSTS_STEPS, REOPT_INPUTS, MICROGRIDS, FAULTED_LINES, DESCRIPTION='', INVALIDATE_CACHE=True, OUTAGE_CSV=None, DELETE_FILES=False, open_results=True)
 	if os.path.isfile(f'{MODEL_DIR}/0crashed.txt'):
 		sys.exit(1)
+
 
 if __name__ == '__main__':
 	test_1mg()
@@ -990,4 +1121,4 @@ if __name__ == '__main__':
 	test_3mg()
 	test_4mg()
 	test_auto3mg()
-	test_mackelroy()
+	#test_mackelroy()

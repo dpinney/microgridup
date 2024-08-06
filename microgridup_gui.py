@@ -1,21 +1,15 @@
 import base64, io, json, multiprocessing, os, platform, shutil, datetime, time, markdown, re
-import re
-import networkx as nx
+from pathlib import Path
+from subprocess import Popen
 from collections import OrderedDict
 from matplotlib import pyplot as plt
-from flask import Flask, request, redirect, render_template, jsonify, url_for, send_from_directory, Blueprint
-from omf.solvers.opendss import dssConvert
-from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_mg_mines, form_mg_groups, topological_sort, SwitchNotFoundError
-from microgridup import full
-from subprocess import Popen
-from pathlib import Path
+import networkx as nx
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
-
-_mguDir = os.path.abspath(os.path.dirname(__file__))
-if _mguDir == '/':
-	_mguDir = '' #workaround for rooted installs through e.g. docker.
-_projectDir = f'{_mguDir}/data/projects'
+from flask import Flask, Request, request, redirect, render_template, jsonify, url_for, send_from_directory, Blueprint
+from omf.solvers.opendss import dssConvert
+from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_mg_mines, form_mg_groups, topological_sort, SwitchNotFoundError
+import microgridup
 
 app = Flask(__name__)
 
@@ -53,7 +47,7 @@ app.register_blueprint(data_dir_blueprint)
 doc_blueprint = Blueprint('doc_blueprint', __name__, static_folder='docs/microgridup-playbook/media')
 @doc_blueprint.route('/doc', methods=['GET'])
 def doc():
-	with (Path(_mguDir) / 'docs' / 'microgridup-playbook' / 'README.md').open() as f:
+	with (Path(microgridup.MGU_DIR) / 'docs' / 'microgridup-playbook' / 'README.md').open() as f:
 		readme = f.read()
 	regex = re.compile(r'(?<=^## Table of Contents\n\n).*(?=\n\n^## Overview)', re.MULTILINE | re.DOTALL)
 	md_with_html_toc = regex.sub('[TOC]', readme)
@@ -65,7 +59,7 @@ def doc():
 app.register_blueprint(doc_blueprint)
 
 users = {} # if blank then no authentication.
-users_path = f'{_mguDir}/data/static/users.json'
+users_path = f'{microgridup.MGU_DIR}/data/static/users.json'
 if os.path.exists(users_path):
 	user_json = json.load(open(users_path))
 	users = {k:generate_password_hash(user_json[k]) for k in user_json}
@@ -98,12 +92,12 @@ def get_logs(model_name):
     return jsonify({"logs": logs})
 
 def list_projects():
-	projects = [x for x in os.listdir(_projectDir) if os.path.isdir(f'{_projectDir}/{x}')]
+	projects = [x for x in os.listdir(microgridup.PROJ_DIR) if os.path.isdir(f'{microgridup.PROJ_DIR}/{x}')]
 	project_timestamps = {}
 	project_descriptions = {}
 	
 	for project in projects:
-		input_data_path = os.path.join(_projectDir, project, 'allInputData.json')
+		input_data_path = os.path.join(microgridup.PROJ_DIR, project, 'allInputData.json')
 		if os.path.exists(input_data_path):
 			with open(input_data_path) as json_file:
 				data = json.load(json_file)
@@ -125,16 +119,16 @@ def healthcheck():
 
 @app.route('/rfile/<project>/<filename>')
 def rfile(project, filename):
-	return send_from_directory(os.path.join(_projectDir, project), filename)
+	return send_from_directory(os.path.join(microgridup.PROJ_DIR, project), filename)
 	
 @app.route('/rfile/<project>/<subfolder>/<filename>')
 def rnested_file(project, subfolder, filename):
-	return send_from_directory(os.path.join(_projectDir, project, subfolder), filename)
+	return send_from_directory(os.path.join(microgridup.PROJ_DIR, project, subfolder), filename)
 
 @app.route('/load/<project>')
 def load(project):
-	ana_files = os.listdir(f'{_projectDir}/{project}')
-	input_data_path = os.path.join(_projectDir, project, 'allInputData.json')
+	ana_files = os.listdir(f'{microgridup.PROJ_DIR}/{project}')
+	input_data_path = os.path.join(microgridup.PROJ_DIR, project, 'allInputData.json')
 	if os.path.exists(input_data_path):
 		with open(input_data_path) as json_file:
 			data = json.load(json_file)
@@ -152,7 +146,7 @@ def load(project):
 @app.route('/check_status/<project>')
 def check_status(project):
 	'''Used by template_in_progress.html to redirect to output_final.html once it exists. Used by template_home.html to update status in boxes.'''
-	files = os.listdir(f'{_projectDir}/{project}')
+	files = os.listdir(f'{microgridup.PROJ_DIR}/{project}')
 	if 'output_final.html' in files and '0running.txt' not in files and '0crashed.txt' not in files:
 		return jsonify(status='complete', url=f'/data/projects/{project}/output_final.html')
 	elif '0crashed.txt' in files:
@@ -163,22 +157,21 @@ def check_status(project):
 @app.route('/edit/<project>')
 def edit(project):
 	try:
-		with open(f'{_projectDir}/{project}/allInputData.json') as in_data_file:
+		with open(f'{microgridup.PROJ_DIR}/{project}/allInputData.json') as in_data_file:
 			in_data = json.load(in_data_file)
-			in_data['MODEL_DIR'] = in_data['MODEL_DIR'].split('/')[-1]
 	except:
 		in_data = None
 	# - Encode the circuit model properly
-	if 'js_circuit_model' in in_data['REOPT_INPUTS']:
-		js_circuit_model = []
-		for s in json.loads(in_data['REOPT_INPUTS']['js_circuit_model']):
-			js_circuit_model.append(json.loads(s))
-		in_data['REOPT_INPUTS']['js_circuit_model'] = js_circuit_model
+	if 'jsCircuitModel' in in_data:
+		jsCircuitModel = []
+		for s in json.loads(in_data['jsCircuitModel']):
+			jsCircuitModel.append(json.loads(s))
+		in_data['jsCircuitModel'] = jsCircuitModel
 	return render_template('template_new.html', in_data=in_data, iframe_mode=False, editing=True)
 
 @app.route('/delete/<project>')
 def delete(project):
-	full_path = f'{_projectDir}/{project}'
+	full_path = f'{microgridup.PROJ_DIR}/{project}'
 	if os.path.exists(full_path) and os.path.isdir(full_path):
 		shutil.rmtree(full_path)
 	else:
@@ -187,32 +180,33 @@ def delete(project):
 
 @app.route('/new')
 def new_gui():
-	with open(f'{_mguDir}/static/lehigh_3mg_inputs.json') as default_in_file:
+	with open(f'{microgridup.MGU_DIR}/static/lehigh_3mg_inputs.json') as default_in_file:
 		default_in = json.load(default_in_file)
 	return render_template('template_new.html', in_data=default_in, iframe_mode=False, editing=False)
 
 @app.route('/duplicate', methods=["POST"])
 def duplicate():
-	project = request.json.get('project', None)
+	model_name = request.json.get('project', None)
 	new_name = request.json.get('new_name', None)
 	projects, project_timestamps, project_descriptions = list_projects()
-	if (project not in projects) or (new_name in projects):
+	if (model_name not in projects) or (new_name in projects):
 		return 'Duplication failed. Project does not exist or the new name is invalid.'
 	else:
-		shutil.copytree(os.path.join(_projectDir, project), os.path.join(_projectDir, new_name))
-		with open(os.path.join('data', 'projects', new_name, 'allInputData.json')) as file:
+		shutil.copytree(f'{microgridup.PROJ_DIR}/{model_name}', f'{microgridup.PROJ_DIR}/{new_name}')
+		with open(f'{microgridup.PROJ_DIR}/{new_name}/allInputData.json') as file:
 			inputs = json.load(file)
-		inputs['MODEL_DIR'] = inputs['MODEL_DIR'].replace(project, new_name)
-		inputs['BASE_DSS'] = inputs['BASE_DSS'].replace(project, new_name)
-		inputs['LOAD_CSV'] = inputs['LOAD_CSV'].replace(project, new_name)
-		with open(os.path.join('data', 'projects', new_name, 'allInputData.json'), 'w') as file:
+		inputs['MODEL_DIR'] = inputs['MODEL_DIR'].replace(model_name, new_name)
+		inputs['BASE_DSS'] = inputs['BASE_DSS'].replace(model_name, new_name)
+		inputs['LOAD_CSV'] = inputs['LOAD_CSV'].replace(model_name, new_name)
+		inputs['OUTAGE_CSV'] = inputs['OUTAGE_CSV'].replace(model_name, new_name)
+		with open(f'{microgridup.PROJ_DIR}/{new_name}/allInputData.json', 'w') as file:
 			json.dump(inputs, file, indent=4)
-		with open(os.path.join('data', 'projects', new_name, 'output_final.html')) as file:
-		# with open(f'data/projects/{new_name}/output_final.html') as file:
+		with open(f'{microgridup.PROJ_DIR}/{new_name}/output_final.html') as file:
 			html_content = file.read()
 		patterns = [
-			(r'<title>MicrogridUP &raquo; ' + project + '</title>', r'<title>MicrogridUP &raquo; ' + new_name + r'</title>'),
-			(r'<span class="span--sectionTitle">MicrogridUp &raquo; '+ project +' &raquo;</span>', r'<span class="span--sectionTitle">MicrogridUp &raquo; ' + new_name + r' &raquo;</span>')
+			(r'<title>MicrogridUP &raquo; ' + model_name + '</title>', r'<title>MicrogridUP &raquo; ' + new_name + r'</title>'),
+			(r'<span class="span--sectionTitle">MicrogridUp &raquo; '+ model_name +' &raquo;</span>', r'<span class="span--sectionTitle">MicrogridUp &raquo; ' + new_name + r' &raquo;</span>'),
+			(r'<a href="/edit/' + model_name + '"', r'<a href="/edit/' + new_name + '"', )
 		]
 		for pattern, repl in patterns:
 			html_content = re.sub(pattern, repl, html_content)
@@ -220,13 +214,13 @@ def duplicate():
 
 		def replace_in_ul(match):
 			ul_content = match.group(1)
-			ul_content = re.sub(r'(/rfile/' + re.escape(project) + r'/)', r'/rfile/' + new_name + r'/', ul_content)
+			ul_content = re.sub(r'(/rfile/' + re.escape(model_name) + r'/)', r'/rfile/' + new_name + r'/', ul_content)
 			return ul_content
 
 		html_content = ul_pattern.sub(replace_in_ul, html_content)
-		with open(os.path.join('data', 'projects', new_name, 'output_final.html'), 'w', encoding='utf-8') as file:
+		with open(f'{microgridup.PROJ_DIR}/{new_name}/output_final.html', 'w', encoding='utf-8') as file:
 			file.write(html_content)
-		return f'Successfully duplicated {project} as {new_name}.'
+		return f'Successfully duplicated {model_name} as {new_name}.'
 
 @app.route('/wizard_to_dss', methods=['GET','POST'])
 def wizard_to_dss(model_dir=None, lat=None, lon=None, elements=None, test_run=False, on_edit_flow=None):
@@ -241,7 +235,7 @@ def wizard_to_dss(model_dir=None, lat=None, lon=None, elements=None, test_run=Fa
 	if not on_edit_flow:
 		on_edit_flow = request.form['on_edit_flow']
 	if on_edit_flow == 'false':
-		if os.path.isdir(f'{_mguDir}/data/projects/{model_dir}'):
+		if os.path.isdir(f'{microgridup.PROJ_DIR}/{model_dir}'):
 			print('Invalid Model Name.')
 			return jsonify(error=f'A model named "{model_dir}" already exists. Please choose a different Model Name.'), 400 # Name was already taken.
 	# Convert to DSS and return loads.
@@ -291,9 +285,9 @@ def wizard_to_dss(model_dir=None, lat=None, lon=None, elements=None, test_run=Fa
 		new_pos_bus = bus.lower()
 		dssString += f'setbusxy bus={bus} y={new_pos[new_pos_bus][1]} x={new_pos[new_pos_bus][0]} \n'
 	dssString += 'set voltagebases=[115,4.16,0.48]\ncalcvoltagebases'
-	if not os.path.isdir(f'{_mguDir}/uploads'):
-		os.mkdir(f'{_mguDir}/uploads')
-	dssFilePath = f'{_mguDir}/uploads/BASE_DSS_{model_dir}'
+	if not os.path.isdir(f'{microgridup.MGU_DIR}/uploads'):
+		os.mkdir(f'{microgridup.MGU_DIR}/uploads')
+	dssFilePath = f'{microgridup.MGU_DIR}/uploads/BASE_DSS_{model_dir}'
 	with open(dssFilePath, "w") as outFile:
 		outFile.writelines(dssString)
 	loads = getLoads(dssFilePath)
@@ -310,7 +304,7 @@ def uploadDss():
 	# Check to see if user is on edit flow. If user is not on edit flow, ensure that model_dir is not already in data/projects.
 	on_edit_flow = request.form['on_edit_flow']
 	if on_edit_flow == 'false':
-		if os.path.isdir(f'{_mguDir}/data/projects/{model_dir}'):
+		if os.path.isdir(f'{microgridup.PROJ_DIR}/{model_dir}'):
 			return jsonify(error=f'A model named "{model_dir}" already exists. Please choose a different Model Name.'), 400 # Name was already taken.
 	# Check if the post request has the file part.
 	if 'BASE_DSS_NAME' not in request.files:
@@ -320,18 +314,18 @@ def uploadDss():
 	if file.filename == '':
 		return jsonify(error='No selected file'), 400  # Return a JSON response with 400 Bad Request status.
 	if file and allowed_file(file.filename):
-		if not os.path.isdir(f'{_mguDir}/uploads'):
-			os.mkdir(f'{_mguDir}/uploads')
-		file.save(f'{_mguDir}/uploads/BASE_DSS_{model_dir}')
-		loads = getLoads(f'{_mguDir}/uploads/BASE_DSS_{model_dir}')
-		return jsonify(loads=loads, filename=f'{_mguDir}/uploads/BASE_DSS_{model_dir}')
+		if not os.path.isdir(f'{microgridup.MGU_DIR}/uploads'):
+			os.mkdir(f'{microgridup.MGU_DIR}/uploads')
+		file.save(f'{microgridup.MGU_DIR}/uploads/BASE_DSS_{model_dir}')
+		loads = getLoads(f'{microgridup.MGU_DIR}/uploads/BASE_DSS_{model_dir}')
+		return jsonify(loads=loads, filename=f'{microgridup.MGU_DIR}/uploads/BASE_DSS_{model_dir}')
 	return jsonify(error='Invalid file'), 400  # Return a JSON response with 400 Bad Request status for invalid files.
 
 @app.route('/getLoadsFromExistingFile', methods=['POST'])
 def getLoadsFromExistingFile():
 	# path = request.form.get('path')
 	model_dir = request.form['MODEL_DIR']
-	path = f'{_mguDir}/data/projects/{model_dir}/circuit.dss'
+	path = f'{microgridup.PROJ_DIR}/{model_dir}/circuit.dss'
 	loads = getLoads(path)
 	return jsonify(loads=loads)
 
@@ -339,7 +333,7 @@ def getLoadsFromExistingFile():
 def previewOldPartitions():
 	data = request.get_json()
 	model_dir = data['MODEL_DIR']
-	filename = f'{_mguDir}/data/projects/{model_dir}/circuit.dss'
+	filename = f'{microgridup.PROJ_DIR}/{model_dir}/circuit.dss'
 	MG_MINES = data['MG_MINES']
 	omd = dssConvert.dssToOmd(filename, '', RADIUS=0.0004, write_out=False)
 	G = dssConvert.dss_to_networkx(filename, omd=omd)
@@ -421,7 +415,7 @@ def remove_nodes_without_edges(G):
 def previewPartitions():
 	CIRC_FILE = json.loads(request.form['fileName'])
 	if not CIRC_FILE.startswith('/'):
-		CIRC_FILE = str(Path(_projectDir).resolve(True) / json.loads(request.form['modelDir']) / CIRC_FILE)
+		CIRC_FILE = str(Path(microgridup.PROJ_DIR).resolve(True) / json.loads(request.form['modelDir']) / CIRC_FILE)
 	CRITICAL_LOADS = json.loads(request.form['critLoads'])
 	METHOD = json.loads(request.form['method'])
 	MGQUANT = int(json.loads(request.form['mgQuantity']))
@@ -484,9 +478,9 @@ def has_cycles():
 	model_dir = request.json['MODEL_DIR']
 	dss_path_indicator = request.json['DSS_PATH_INDICATOR']
 	if dss_path_indicator == 'DIRECT TO UPLOADS FOLDER':
-		dss_path = f'{_mguDir}/uploads/BASE_DSS_{model_dir}' # New circuit uploaded/created.
+		dss_path = f'{microgridup.MGU_DIR}/uploads/BASE_DSS_{model_dir}' # New circuit uploaded/created.
 	elif dss_path_indicator == 'circuit.dss':
-		dss_path = f'{_mguDir}/data/projects/{model_dir}/circuit.dss' # Reusing circuit.dss in project directory.
+		dss_path = f'{microgridup.PROJ_DIR}/{model_dir}/circuit.dss' # Reusing circuit.dss in project directory.
 	else:
 		print(f'Unexpected dss_path_indicator: {dss_path_indicator}.')
 	G = dssConvert.dss_to_networkx(dss_path)
@@ -498,167 +492,234 @@ def has_cycles():
 
 @app.route('/run', methods=["POST"])
 def run():
-	# Make the uploads directory if it doesn't already exist.
-	if not os.path.isdir(f'{_mguDir}/uploads'):
-		os.mkdir(f'{_mguDir}/uploads')
-	# Get directory, get files, and print status.
-	model_dir = request.form['MODEL_DIR']
-	all_files = request.files
-	print(f'-------------------------------Running {model_dir}.-------------------------------')
-
-	# Check to see if new loads were uploaded. If so, add those to uploads folder. Set path to uploads folder.
-	if all_files.get('LOAD_CSV'):
-		print('New loads uploaded.')
-		csv_file = all_files['LOAD_CSV']
-		csv_file.save(f'{_mguDir}/uploads/LOAD_CSV_{model_dir}')
-		csv_path = f'{_mguDir}/uploads/LOAD_CSV_{model_dir}'
-	elif request.form['LOAD_CSV_NAME']:
-		# If we're reusing an old loads or dss file, set path to project directory.
-		print('Reusing loads.csv in project directory.')
-		csv_path = f'{_mguDir}/data/projects/{model_dir}/loads.csv'
-	else:
-		print('Error: unable to set path to loads csv.')
-	
-	# Check to see if new dss was uploaded. If so, add to uploads folder. Set path to uploads folder. If reusing a circuit, set dss path to circuit.dss in project directory.
-	dss_indicator = request.form['DSS_PATH']
-	if dss_indicator == 'Direct to uploads folder.':
-		dss_path = f'{_mguDir}/uploads/BASE_DSS_{model_dir}'
-		print('New circuit uploaded.')
-	else:
-		dss_path = f'{_mguDir}/data/projects/{model_dir}/circuit.dss'
-		print('Reusing circuit.dss in project directory.')
-
-	# Check to see if user uploaded new outages. If so, add to upload folder. Set path to uploads folder.
-	outages_indicator = request.form['OUTAGES_PATH']
-	if outages_indicator == 'Check files':
-		# No file is being reused.
-		outages_filename = all_files['HISTORICAL_OUTAGES'].filename
-		if outages_filename != '':
-			# New outages file that must be saved.
-			all_files['HISTORICAL_OUTAGES'].save(f'{_mguDir}/uploads/HISTORICAL_OUTAGES_{model_dir}')
-			outages_path = f'{_mguDir}/uploads/HISTORICAL_OUTAGES_{model_dir}'
-			have_outages = True
-			print('New outages uploaded.')
-		else:
-			# No outages file.
-			print('No outages uploaded.')
-			have_outages = False
-	else:
-		# If we're reusing an old outages file, set path to project directory.
-		outages_path = f'{_mguDir}/{model_dir}/outages.csv'
-		have_outages = True
-		print('Reusing outages.csv in project directory.')
-
-	# Handle arguments to our main function.
-	crit_loads = json.loads(request.form['CRITICAL_LOADS'])
-	mg_method = request.form['MG_DEF_METHOD']
-	MGQUANT = int(json.loads(request.form['mgQuantity']))
-	G = dssConvert.dss_to_networkx(dss_path)
-	omd = dssConvert.dssToOmd(dss_path, '', RADIUS=0.0004, write_out=False)
-	if mg_method == 'lukes':
-		mg_groups = form_mg_groups(G, crit_loads, 'lukes', algo_params)
-		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
-	elif mg_method == 'branch':
-		mg_groups = form_mg_groups(G, crit_loads, 'branch')
-		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
-	elif mg_method == 'bottomUp':
-		mg_groups = form_mg_groups(G, crit_loads, 'bottomUp', algo_params={'num_mgs':MGQUANT, 'omd':omd, 'cannot_be_mg':['regcontrol']})
-		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
-	elif mg_method == 'criticalLoads':
-		mg_groups = form_mg_groups(G, crit_loads, 'criticalLoads', algo_params={'num_mgs':MGQUANT})
-		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd)
-	elif mg_method == 'loadGrouping':
-		algo_params = json.loads(request.form['MICROGRIDS'])
-		mg_groups = form_mg_groups(G, crit_loads, 'loadGrouping', algo_params)
-		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd, switch=algo_params.get('switch', None), gen_bus=algo_params.get('gen_bus', None))
-	elif mg_method == 'manual':
-		algo_params = json.loads(request.form['MICROGRIDS'])
-		mg_groups = form_mg_groups(G, crit_loads, 'manual', algo_params)
-		microgrids = form_mg_mines(G, mg_groups, crit_loads, omd, switch=algo_params.get('switch', None), gen_bus=algo_params.get('gen_bus', None))
-	elif mg_method == '': 
-		microgrids = json.loads(request.form['MICROGRIDS'])
-	# Form REOPT_INPUTS. 
-	REOPT_INPUTS = {
-		'energyCost':request.form['energyCost'],
-		'wholesaleCost':request.form['wholesaleCost'],
-		'demandCost':request.form['demandCost'],
-		'solarCanCurtail':(request.form['solarCanCurtail'] == 'true'),
-		'solarCanExport':(request.form['solarCanExport'] == 'true'),
-		'urdbLabelSwitch':request.form['urdbLabelSwitch'],
-		'urdbLabel':request.form['urdbLabel'],
-		'year':request.form['year'],
-		'analysisYears':request.form['analysisYears'],
-		'outageDuration':request.form['outageDuration'],
-		'value_of_lost_load':request.form['value_of_lost_load'],
-		'single_phase_relay_cost':request.form['singlePhaseRelayCost'],
-		'three_phase_relay_cost':request.form['threePhaseRelayCost'],
-		'omCostEscalator':request.form['omCostEscalator'],
-		'discountRate':request.form['discountRate'],
-		'solar':request.form['solar'],
-		'battery':request.form['battery'],
-		'fossil':request.form['fossil'],
-		'wind':request.form['wind'],
-		'solarCost':request.form['solarCost'],
-		'solarMax':request.form['solarMax'],
-		'solarMin':request.form['solarMin'],
-		'solarMacrsOptionYears':request.form['solarMacrsOptionYears'],
-		'solarItcPercent':request.form['solarItcPercent'],
-		'batteryCapacityCost':request.form['batteryCapacityCost'],
-		'batteryCapacityMax':request.form['batteryCapacityMax'],
-		'batteryCapacityMin':request.form['batteryCapacityMin'],
-		'batteryPowerCost':request.form['batteryPowerCost'],
-		'batteryPowerMax':request.form['batteryPowerMax'],
-		'batteryPowerMin':request.form['batteryPowerMin'],
-		'batteryMacrsOptionYears':request.form['batteryMacrsOptionYears'],
-		'batteryItcPercent':request.form['batteryItcPercent'],
-		'batteryPowerCostReplace':request.form['batteryPowerCostReplace'],
-		'batteryCapacityCostReplace':request.form['batteryCapacityCostReplace'],
-		'batteryPowerReplaceYear':request.form['batteryPowerReplaceYear'],
-		'batteryCapacityReplaceYear':request.form['batteryCapacityReplaceYear'],
-		'dieselGenCost':request.form['dieselGenCost'],
-		'dieselMax':request.form['dieselMax'],
-		'dieselMin':request.form['dieselMin'],
-		'fuelAvailable':request.form['fuelAvailable'],
-		'minGenLoading':request.form['minGenLoading'],
-		'dieselFuelCostGal':request.form['dieselFuelCostGal'],
-		'dieselCO2Factor':request.form['dieselCO2Factor'],
-		'dieselOMCostKw':request.form['dieselOMCostKw'],
-		'dieselOMCostKwh':request.form['dieselOMCostKwh'],
-		'dieselOnlyRunsDuringOutage':(request.form['dieselOnlyRunsDuringOutage'] == 'true'),
-		'dieselMacrsOptionYears':request.form['dieselMacrsOptionYears'],
-		'windCost':request.form['windCost'],
-		'windMax':request.form['windMax'],
-		'windMin':request.form['windMin'],
-		'windMacrsOptionYears':request.form['windMacrsOptionYears'],
-		'windItcPercent':request.form['windItcPercent'],
-		'mgParameterOverrides': json.loads(request.form['mgParameterOverrides']),
-		'maxRuntimeSeconds': request.form['maxRuntimeSeconds']
-	}
-	# - The js_circuit_model is always optional, but should exist for circuits that were built with the manual circuit editor
-	if 'jsCircuitModel' in request.form:
-		REOPT_INPUTS['js_circuit_model'] = request.form['jsCircuitModel']
-	mgu_args = [
-		f'{_projectDir}/{request.form["MODEL_DIR"]}',
-		dss_path,
-		csv_path,
-		float(request.form['QSTS_STEPS']),
-		REOPT_INPUTS,
-		microgrids,
-		request.form['FAULTED_LINES'],
-		request.form['DESCRIPTION'],
-		True,
-		outages_path if have_outages else None
-	]
+	# - Make the uploads directory if it doesn't already exist.
+	if not os.path.isdir(f'{microgridup.MGU_DIR}/uploads'):
+		os.mkdir(f'{microgridup.MGU_DIR}/uploads')
+	absolute_model_directory = f'{microgridup.PROJ_DIR}/{request.form["MODEL_DIR"]}'
+	model_name = request.form['MODEL_DIR']
+	print(f'-------------------------------Running {model_name}.-------------------------------')
+	data = {**request.form}
+	# - Save uploaded files and get paths to files
+	data['OUTAGE_CSV'] = _get_uploaded_file_filepath(absolute_model_directory, 'outages.csv', f'{microgridup.MGU_DIR}/uploads/HISTORICAL_OUTAGES_{model_name}', request, 'HISTORICAL_OUTAGES', 'OUTAGES_PATH')
+	data['LOAD_CSV'] = _get_uploaded_file_filepath(absolute_model_directory, 'loads.csv', f'{microgridup.MGU_DIR}/uploads/LOAD_CSV_{model_name}', request, 'LOAD_CSV', 'LOAD_CSV_NAME')
+	data['BASE_DSS'] = _get_uploaded_file_filepath(absolute_model_directory, 'circuit.dss', f'{microgridup.MGU_DIR}/uploads/BASE_DSS_{model_name}', request, None, 'DSS_PATH')
+	# - Delete form keys that are not currently used past this point
+	del data['DSS_PATH']
+	del data['OUTAGES_PATH']
+	if 'LOAD_CSV_NAME' in data:
+		del data['LOAD_CSV_NAME']
+	if 'HISTORICAL_OUTAGES' in data:
+		del data['HISTORICAL_OUTAGES']
+	# - Format the REopt inputs into the schema we want. This formatting needs to be done here (and not in microgridup.main) because otherwise
+	#   invocations of microgridup.main() would require REopt keys to be at the top level of the user's input dict, which would be really annoying
+	data['REOPT_INPUTS'] = _get_reopt_inputs(data)
+	# - Format relevant properties for _get_microgrids()
+	data['CRITICAL_LOADS'] = json.loads(data['CRITICAL_LOADS'])
+	if len(data['CRITICAL_LOADS']) == 0:
+		# - I'm assuming that if this is true, then the front-end allowed bad data to be sent, so we should inform the user
+		err_msg = 'No critical loads were specified. The model run was aborted.'
+		print(err_msg)
+		return (err_msg, 400)
+	data['mgQuantity'] = int(data['mgQuantity'])
+	# - Format faulted lines
+	data['FAULTED_LINES'] = data['FAULTED_LINES'].split(',')
+	# - Create microgrids here and not in microgridup.main because it's easier to format the testing data
+	data['MICROGRIDS'] = _get_microgrids(data['CRITICAL_LOADS'], data['MG_DEF_METHOD'], data['mgQuantity'], data['BASE_DSS'], data['MICROGRIDS'])
+	if len(list(data['MICROGRIDS'].keys())) == 0:
+		# - I'm assuming that if this is true, then the front-end allowed bad data to be sent, so we should inform the user
+		err_msg = 'No microgrids were defined. The model run was aborted.'
+		print(err_msg)
+		return (err_msg, 400)
+	# - Each microgrid needs to store knowledge of parameter overrides to support auto-filling the parameter override wigdet during an edit of a model
+	data['mgParameterOverrides'] = json.loads(data['mgParameterOverrides'])
+	for mg_name, mg_parameter_overrides in data['mgParameterOverrides'].items():
+		data['MICROGRIDS'][mg_name]['parameter_overrides'] = mg_parameter_overrides
+	# - Remove form keys that are not needed past this point
+	del data['MG_DEF_METHOD']
+	del data['mgQuantity']
+	del data['mgParameterOverrides']
 	# Kickoff the run
-	new_proc = multiprocessing.Process(target=full, args=mgu_args)
+	new_proc = multiprocessing.Process(target=microgridup.main, args=(data,))
 	new_proc.start()
 	# Redirect to home after waiting a little for the file creation to happen.
 	time.sleep(5)
 	return redirect(f'/')
 
+def _get_uploaded_file_filepath(absolute_model_directory, filename, save_path, request, files_key, form_key):
+	'''
+    Save the uploaded file and get the path to the file. The file upload workflow should be the same for the load CSV, the outages CSV, and the DSS
+	file, but the DSS workflow is actually different. FileStorage objects cannot be passed as arguments to a multiprocessing Process object because
+	FileStorage objects cannot be copied. Therefore, all work with FileStorage objects must occur before the Process is created. This function is
+	complicated because our front-end file-handling logic is also complicated
+
+	:param absolute_model_directory: the directory of the model
+	:type absolute_model_directory: str
+	:param filename: the filename used for this file
+		E.g. outage CSVs are always named "outages.csv"
+	:type filename: str
+	:param save_path: the path to save the uploaded file if there was one
+	:type save_path: str
+	:param request: the Flask request object
+	:type request: Request
+	:param files_key: the key to use to look up the uploaded file in request.files
+	:type files_key: str
+	:return: the path to the uploaded file, or the path to the previously existing file that the user wants to use, or None
+	:rtype: str or None
+	'''
+	assert isinstance(absolute_model_directory, str)
+	assert isinstance(filename, str)
+	assert isinstance(save_path, str)
+	assert isinstance(request, Request)
+	assert isinstance(files_key, str) or files_key is None
+	assert isinstance(form_key, str)
+	if request.files.get(files_key) is not None:
+		if request.files[files_key].filename == '':
+			# - No file was uploaded at all AND either 1) there was no previously uploaded file or 2) the user does not want to use their previously
+			#   uploaded file
+			# - E.g. request.files['HISTORICAL_OUTAGES'] = <FileStorage>
+			# - E.g. request.form['OUTAGES_PATH'] = 'Check files'
+			print(f'No "{filename}" uploaded.')
+			return None
+		else:
+			# - A new file was uploaded, so save it
+			# - E.g. request.files['HISTORICAL_OUTAGES'] == <FileStorage>
+			# - E.g. request.form['OUTAGES_PATH'] = 'Check files'
+			request.files[files_key].save(save_path)
+			print(f'New "{filename}" uploaded.')
+			return save_path
+	else:
+		# - For some reason, DSS file uploads do not follow the same workflow as load CSVs or outage CSVs. If they did, then this entire inner
+		#   if-statement could be deleted
+		if form_key == 'DSS_PATH':
+			if request.form[form_key] == 'Direct to uploads folder.':
+				# - Either a circuit wizard circuit was already coverted into a DSS file and saved in /uploads or a DSS file was already saved to
+				#   /uploads
+				# - Note that DURING an EDIT run if the user "removes" their existing circuit.dss file by clicking "Remove File", this logic will just
+				#   reuse the existing file that was presumably already uploaded to /uploads
+				print(f'New "{filename}" uploaded.')
+				return save_path
+			else:
+				print(f'Reusing "{filename}" in project directory.')
+				return f'{absolute_model_directory}/{filename}'
+		else:
+			# - No file was uploaded at all and there WAS a previously uploaded file
+			# - E.g. request.files['HISTORICAL_OUTAGES'] == Nothing
+			# - E.g. request.form['OUTAGES_PATH'] = 'outages.csv'
+			print(f'Reusing "{filename}" in project directory.')
+			return f'{absolute_model_directory}/{filename}'
+
+def _get_reopt_inputs(data):
+	'''
+	:param data: the dict of data
+	:type data: dict
+	:rtype: None
+	'''
+	assert isinstance(data, dict)
+	reopt_inputs = {
+		'energyCost':                   float(data['energyCost']),
+		'wholesaleCost':                float(data['wholesaleCost']),
+		'demandCost':                   float(data['demandCost']),
+		'solarCanCurtail':              (data['solarCanCurtail'] == 'true'),
+		'solarCanExport':               (data['solarCanExport'] == 'true'),
+		'urdbLabelSwitch':              data['urdbLabelSwitch'],
+		'urdbLabel':                    data['urdbLabel'],
+		'year':                         int(data['year']),
+		'analysisYears':                int(data['analysisYears']),
+		'outageDuration':               int(data['outageDuration']),
+		'value_of_lost_load':           float(data['value_of_lost_load']),
+		'omCostEscalator':              float(data['omCostEscalator']),
+		'discountRate':                 float(data['discountRate']),
+		'solar':                        data['solar'],
+		'battery':                      data['battery'],
+		'fossil':                       data['fossil'],
+		'wind':                         data['wind'],
+		'solarCost':                    float(data['solarCost']),
+		'solarMax':                     float(data['solarMax']),
+		'solarMin':                     float(data['solarMin']),
+		'solarMacrsOptionYears':        int(data['solarMacrsOptionYears']),
+		'solarItcPercent':              float(data['solarItcPercent']),
+		'batteryCapacityCost':          float(data['batteryCapacityCost']),
+		'batteryCapacityMax':           float(data['batteryCapacityMax']),
+		'batteryCapacityMin':           float(data['batteryCapacityMin']),
+		'batteryPowerCost':             float(data['batteryPowerCost']),
+		'batteryPowerMax':              float(data['batteryPowerMax']),
+		'batteryPowerMin':              float(data['batteryPowerMin']),
+		'batteryMacrsOptionYears':      int(data['batteryMacrsOptionYears']),
+		'batteryItcPercent':            float(data['batteryItcPercent']),
+		'batteryPowerCostReplace':      float(data['batteryPowerCostReplace']),
+		'batteryCapacityCostReplace':   float(data['batteryCapacityCostReplace']),
+		'batteryPowerReplaceYear':      int(data['batteryPowerReplaceYear']),
+		'batteryCapacityReplaceYear':   int(data['batteryCapacityReplaceYear']),
+		'dieselGenCost':                float(data['dieselGenCost']),
+		'dieselMax':                    float(data['dieselMax']),
+		'dieselMin':                    float(data['dieselMin']),
+		'fuelAvailable':                float(data['fuelAvailable']),
+		'minGenLoading':                float(data['minGenLoading']),
+		'dieselFuelCostGal':            float(data['dieselFuelCostGal']),
+		'dieselCO2Factor':              float(data['dieselCO2Factor']),
+		'dieselOMCostKw':               float(data['dieselOMCostKw']),
+		'dieselOMCostKwh':              float(data['dieselOMCostKwh']),
+		'dieselOnlyRunsDuringOutage':   (data['dieselOnlyRunsDuringOutage'] == 'true'),
+		'dieselMacrsOptionYears':       int(data['dieselMacrsOptionYears']),
+		'windCost':                     float(data['windCost']),
+		'windMax':                      float(data['windMax']),
+		'windMin':                      float(data['windMin']),
+		'windMacrsOptionYears':         int(data['windMacrsOptionYears']),
+		'windItcPercent':               float(data['windItcPercent']),
+		'maxRuntimeSeconds':            int(data['maxRuntimeSeconds'])}
+	for k in reopt_inputs:
+		del data[k]
+	return reopt_inputs
+
+def _get_microgrids(critical_loads, partition_method, quantity, dss_path, microgrids):
+	'''
+	:param critical_loads: a list of critical loads
+	:type critical_loads: list
+	:param partition_method: the partition method to use to create the microgrids
+	:type partition_method: str
+	:param quantity: the number of microgrids to create
+	:type quantity: int
+	:param dss_path: the path to the DSS file
+	:type dss_path: str
+	:param microgrids: a str of microgrids
+	:type microgrids: str
+	:return: a dict of microgrids
+	:rtype: dict
+	'''
+	assert isinstance(critical_loads, list)
+	assert isinstance(partition_method, str)
+	assert isinstance(quantity, int)
+	assert isinstance(dss_path, str)
+	assert isinstance(microgrids, str)
+	G = dssConvert.dss_to_networkx(dss_path)
+	omd = dssConvert.dssToOmd(dss_path, '', RADIUS=0.0004, write_out=False)
+	if partition_method == 'lukes':
+		mg_groups = form_mg_groups(G, critical_loads, 'lukes', algo_params)
+		microgrids = form_mg_mines(G, mg_groups, critical_loads, omd)
+	elif partition_method == 'branch':
+		mg_groups = form_mg_groups(G, critical_loads, 'branch')
+		microgrids = form_mg_mines(G, mg_groups, critical_loads, omd)
+	elif partition_method == 'bottomUp':
+		mg_groups = form_mg_groups(G, critical_loads, 'bottomUp', algo_params={'num_mgs':quantity, 'omd':omd, 'cannot_be_mg':['regcontrol']})
+		microgrids = form_mg_mines(G, mg_groups, critical_loads, omd)
+	elif partition_method == 'criticalLoads':
+		mg_groups = form_mg_groups(G, critical_loads, 'criticalLoads', algo_params={'num_mgs':quantity})
+		microgrids = form_mg_mines(G, mg_groups, critical_loads, omd)
+	elif partition_method == 'loadGrouping':
+		algo_params = json.loads(microgrids)
+		mg_groups = form_mg_groups(G, critical_loads, 'loadGrouping', algo_params)
+		microgrids = form_mg_mines(G, mg_groups, critical_loads, omd, switch=algo_params.get('switch', None), gen_bus=algo_params.get('gen_bus', None))
+	elif partition_method == 'manual':
+		algo_params = json.loads(microgrids)
+		mg_groups = form_mg_groups(G, critical_loads, 'manual', algo_params)
+		microgrids = form_mg_mines(G, mg_groups, critical_loads, omd, switch=algo_params.get('switch', None), gen_bus=algo_params.get('gen_bus', None))
+	elif partition_method == '':
+		microgrids = json.loads(microgrids)
+	return microgrids
+
 def allowed_file(filename):
-    ALLOWED_EXTENSIONS = {'dss'}
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+	ALLOWED_EXTENSIONS = {'dss'}
+	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def gen_col_map(item_ob, map_dict, default_col):
 	'''generate a color map for nodes or edges'''
@@ -724,7 +785,7 @@ def before_request():
 			filename = request.url.split('/')[-1]
 		except:
 			filename = 'none'
-		return send_from_directory(f'{_mguDir}.well-known/acme-challenge', filename)
+		return send_from_directory(f'{microgridup.MGU_DIR}.well-known/acme-challenge', filename)
 	# Redirect http -> https
 	elif request.url.startswith("http://"):
 		url = request.url.replace("http://", "https://", 1)
@@ -735,7 +796,7 @@ if __name__ == "__main__":
 		os.environ['NO_PROXY'] = '*' # Workaround for macOS proxy behavior
 		multiprocessing.set_start_method('forkserver') # Workaround for Catalina exec/fork behavior
 	gunicorn_args = ['gunicorn', '-w', '5', '--reload', 'microgridup_gui:app','--worker-class=sync', '--timeout=100']
-	mguPath = Path(_mguDir)
+	mguPath = Path(microgridup.MGU_DIR)
 	if (mguPath/'ssl').exists() and (mguPath/'logs').exists():
 		# if production directories, run in prod mode with logging and ssl.
 		gunicorn_args.extend(['--access-logfile', mguPath / 'logs/mgu.access.log', '--error-logfile', mguPath / 'logs/mgu.error.log', '--capture-output'])

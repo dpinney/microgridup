@@ -3,6 +3,7 @@ from omf.solvers import opendss
 import networkx as nx
 from pprint import pprint as pp
 from collections import defaultdict, deque
+import microgridup
 
 # Auto gen some microgrid descriptions.
 # See experiments with networkx here: https://colab.research.google.com/drive/1RZyD6pRIdRAT-V2sBB0nPKVIvZP_RGHw
@@ -415,10 +416,14 @@ def form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd, switch=None, gen_bus=None):
 			'switch': this_switch, 
 			'gen_bus': this_gen_bus,
 			'gen_obs_existing': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') in ('generator','storage')],
-			'critical_load_kws': [0.0 if ob.get('name') not in CRITICAL_LOADS else float(ob.get('kw','0')) for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
-			'max_potential': '700', #TODO: this and other vars, how to set? Ask Matt.
-			'max_potential_diesel': '1000000',
-			'battery_capacity': '10000'
+			# - Austin (8/1/2024): David said he wants "critical_load_kws" to be removed entirely from the codebase. Also, I have not seen
+			#   "max_potential", "max_potential_diesel", or "battery_capacity" used anywhere in the codebase, so I think they should also be removed.
+			#   I'm not sure if these four properties are used elsewhere, so I'm leaving this comment without deleting them while also recommending
+			#   that they be deleted
+			#'critical_load_kws': [0.0 if ob.get('name') not in CRITICAL_LOADS else float(ob.get('kw','0')) for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
+			#'max_potential': '700', #TODO: this and other vars, how to set? Ask Matt.
+			#'max_potential_diesel': '1000000',
+			#'battery_capacity': '10000'
 		}
 	return MG_MINES
 
@@ -453,17 +458,13 @@ def form_mg_groups(G, CRITICAL_LOADS, algo, algo_params={}):
 	return MG_GROUPS
 
 def _tests():
-	_myDir = os.path.abspath(os.path.dirname(__file__))
-	# - This is needed because these files are in the root of the Docker container and paths like "//" are invalid
-	if _myDir == '/':
-		_myDir = ''
-	with open('testfiles/test_params.json') as file:
+	with open(f'{microgridup.MGU_DIR}/testfiles/test_params.json') as file:
 		test_params = json.load(file)
 	MG_MINES = test_params['MG_MINES']
 	algo_params = test_params['algo_params']
 	crit_loads = test_params['crit_loads']
-	lehigh_dss_path = f'{_myDir}/testfiles/lehigh_base_phased.dss'
-	wizard_dss_path = f'{_myDir}/testfiles/wizard_base_3mg.dss'
+	lehigh_dss_path = f'{microgridup.MGU_DIR}/testfiles/lehigh_base_phased.dss'
+	wizard_dss_path = f'{microgridup.MGU_DIR}/testfiles/wizard_base_3mg.dss'
 	# Testing microgridup_gen_mgs.mg_group().
 	for _dir in MG_MINES:
 		partitioning_method = MG_MINES[_dir][1]
@@ -486,6 +487,14 @@ def _tests():
 			omd = opendss.dssConvert.dssToOmd(lehigh_dss_path, '', RADIUS=0.0004, write_out=False)
 			MG_GROUPS_TEST = form_mg_groups(G, crit_loads, partitioning_method, params)
 			MINES_TEST = form_mg_mines(G, MG_GROUPS_TEST, crit_loads, omd, params.get('switch'), params.get('gen_bus'))
+		# - Austin (8/1/2024): the "parameter_overrides" key is now a part of the schema for microgrid dicts. The "parameter_overrides" key is
+		#   only used to store information about REopt parameters that are overridden on a per-microgrid basis by the user through the front-end
+		#   GUI or through Python. I add the "parameter_overrides" key here so that these tests pass, but the key could be added to the microgrid
+		#   generation code in this module if desired, in which case these lines of code could be removed
+		for mg in MINES_TEST.values():
+			mg['parameter_overrides'] = {
+				'reopt_inputs': {}
+			}
 		# Lukes algorithm outputs different configuration each time. Not repeatable. Also errors out later in the MgUP run.
 		if partitioning_method != 'lukes':
 			assert MINES_TEST == MG_MINES[_dir][0], f'MGU_MINES_{_dir} did not match expected output.\nExpected output: {MG_MINES[_dir][0]}.\nReceived output: {MINES_TEST}.'

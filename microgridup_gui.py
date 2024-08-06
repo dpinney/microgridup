@@ -456,8 +456,8 @@ def previewPartitions():
 	MG_MINES = form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd)
 	for mg in MG_MINES:
 		if not MG_MINES[mg]['switch']:
-			print(f'Selected partitioning method produced invalid results. Please choose a different partitioning method.')
-			raise SwitchNotFoundError(f'Selected partitioning method produced invalid results. Please choose a different partitioning method.')
+			print(f'Selected partitioning method produced invalid results. Please change partitioning parameter(s).')
+			raise SwitchNotFoundError(f'Selected partitioning method produced invalid results. Please change partitioning parameter(s).')
 	plt.switch_backend('Agg')
 	plt.figure(figsize=(14,12), dpi=350)
 	n_color_map = node_group_map(G, MG_GROUPS)

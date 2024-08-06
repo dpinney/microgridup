@@ -373,7 +373,7 @@ def get_edge_name(fr, to, omd_list):
 	'Get an edge name using (fr,to) in the omd_list'
 	edges = [ob.get('name') for ob in omd_list if ob.get('from') == fr and ob.get('to') == to]
 	if len(edges) == 0:
-		raise SwitchNotFoundError(f'Selected partitioning method produced invalid results. No valid switch found between {fr} and {to}. Please choose a different partitioning method.')
+		raise SwitchNotFoundError(f'Selected partitioning method produced invalid results. No valid switch found between {fr} and {to}. Please change partitioning parameter(s).')
 	else:
 		return edges[0]
 

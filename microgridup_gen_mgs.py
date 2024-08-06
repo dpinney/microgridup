@@ -13,6 +13,10 @@ from collections import defaultdict, deque
 # CRITICAL_LOADS = ['645_hangar','684_command_center', '611_runway','675a_hospital','634a_data_center', '634b_radar', '634c_atc_tower']
 # ALGO = 'lukes' #'branch'
 
+class SwitchNotFoundError(Exception):
+	'''Used by get_edge_name() and passed to GUI to be caught by custom Flask errorhandler.'''
+	pass
+
 # Networkx helper functions
 def nx_get_branches(G):
 	'All branchy boys'
@@ -367,7 +371,10 @@ def nx_out_edges(G, sub_nodes):
 def get_edge_name(fr, to, omd_list):
 	'Get an edge name using (fr,to) in the omd_list'
 	edges = [ob.get('name') for ob in omd_list if ob.get('from') == fr and ob.get('to') == to]
-	return None if len(edges) == 0 else edges[0]
+	if len(edges) == 0:
+		raise SwitchNotFoundError(f'Selected partitioning method produced invalid results. No valid switch found between {fr} and {to}. Please choose a different partitioning method.')
+	else:
+		return edges[0]
 
 def topological_sort(G):
 	'Standardizes topological sort across networkx versions.'

@@ -1034,9 +1034,10 @@
 						createMicrogridParameterMVC(data.MG_MINES);
 					}
 				},
-				error: function(jqXHR, textStatus, errorThrown) {
+				error: function(xhr, status, error) {
 					document.body.style.cursor = 'default';
-					console.log(textStatus + ' : ' + errorThrown)
+					const errorJson = JSON.parse(xhr.responseText);
+					alert(errorJson.error);
 				}
 			});
 		});

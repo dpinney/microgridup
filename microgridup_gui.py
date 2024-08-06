@@ -5,7 +5,7 @@ from collections import OrderedDict
 from matplotlib import pyplot as plt
 from flask import Flask, request, redirect, render_template, jsonify, url_for, send_from_directory, Blueprint
 from omf.solvers.opendss import dssConvert
-from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_mg_mines, form_mg_groups, topological_sort
+from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_mg_mines, form_mg_groups, topological_sort, SwitchNotFoundError
 from microgridup import full
 from subprocess import Popen
 from pathlib import Path
@@ -18,6 +18,31 @@ if _mguDir == '/':
 _projectDir = f'{_mguDir}/data/projects'
 
 app = Flask(__name__)
+
+'''Set error handlers.'''
+@app.errorhandler(SwitchNotFoundError)
+def handle_switch_not_found_error(error):
+	response = jsonify({'message': str(error), 'error': f'SwitchNotFoundError: {str(error)}'})
+	response.status_code = 422
+	return response
+	
+@app.errorhandler(400)
+def bad_request(error):
+    response = jsonify({'message': 'Bad Request', 'error': str(error)})
+    response.status_code = 400
+    return response
+
+@app.errorhandler(404)
+def not_found(error):
+    response = jsonify({'message': 'Not Found', 'error': str(error)})
+    response.status_code = 404
+    return response
+
+@app.errorhandler(500)
+def internal_server_error(error):
+	response = jsonify({'message': 'Internal Server Error', 'error': str(error)})
+	response.status_code = 500
+	return response
 
 # - Use blueprints to add additional static directories
 # - data_dir_blueprint is needed to access our model results from the data/ folder
@@ -418,6 +443,7 @@ def previewPartitions():
 	all_trees_pruned = [tree for tree in all_trees if len(tree.nodes()) > 1]
 	num_trees_pruned = len(all_trees_pruned)
 	MG_GROUPS = []
+	has_more_branches = False
 	try:
 		for tree in all_trees_pruned:
 			if METHOD == 'lukes':
@@ -425,6 +451,9 @@ def previewPartitions():
 				MG_GROUPS.extend(nx_group_lukes(tree, algo_params.get('size',default_size)))
 			elif METHOD == 'branch':
 				MG_GROUPS.extend(nx_group_branch(tree, i_branch=algo_params.get('i_branch',0), omd=omd))
+				condition = False
+				if condition:
+					has_more_branches = True
 			elif METHOD == 'bottomUp':
 				MG_GROUPS.extend(nx_bottom_up_branch(tree, num_mgs=MGQUANT/num_trees_pruned, large_or_small='large', omd=omd, cannot_be_mg=['regcontrol']))
 			elif METHOD == 'criticalLoads':
@@ -438,7 +467,7 @@ def previewPartitions():
 	for mg in MG_MINES:
 		if not MG_MINES[mg]['switch']:
 			print(f'Selected partitioning method produced invalid results. Please choose a different partitioning method.')
-			return jsonify('Invalid partitioning method')
+			raise SwitchNotFoundError(f'Selected partitioning method produced invalid results. Please choose a different partitioning method.')
 	plt.switch_backend('Agg')
 	plt.figure(figsize=(14,12), dpi=350)
 	n_color_map = node_group_map(G, MG_GROUPS)
@@ -447,7 +476,8 @@ def previewPartitions():
 	plt.savefig(pic_IObytes,  format='png')
 	pic_IObytes.seek(0)
 	pic_hash = base64.b64encode(pic_IObytes.read()).decode('ascii')
-	return jsonify({'pic_hash': pic_hash, 'MG_MINES': MG_MINES})
+	# return jsonify({'pic_hash': pic_hash, 'MG_MINES': MG_MINES})
+	return jsonify({'pic_hash': pic_hash, 'MG_MINES': MG_MINES, 'has_more_branches': has_more_branches})
 
 @app.route('/has_cycles', methods=['GET','POST'])
 def has_cycles():

@@ -363,8 +363,8 @@ def nx_out_edges(G, sub_nodes):
 	out_edges = []
 	for n in mg1.nodes():
 		out_preds = [(x,n) for x in G.predecessors(n) if x not in mg1]
-		out_succ = [(n,x) for x in G.successors(n) if x not in mg1]
-		out_edges.extend(out_succ)
+		# out_succ = [(n,x) for x in G.successors(n) if x not in mg1] # Thomas 8/9/24: our current partitioning algos operate on the assumption that a single point of connection to the rest of the circuit exists 'before' the mg when sorted topologically. Out edges may exist 'after' the mg, but should only be considered in the control module.
+		# out_edges.extend(out_succ)
 		out_edges.extend(out_preds)
 	out_edges.sort()
 	return out_edges
@@ -415,15 +415,7 @@ def form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd, switch=None, gen_bus=None):
 			'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
 			'switch': this_switch, 
 			'gen_bus': this_gen_bus,
-			'gen_obs_existing': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') in ('generator','storage')],
-			# - Austin (8/1/2024): David said he wants "critical_load_kws" to be removed entirely from the codebase. Also, I have not seen
-			#   "max_potential", "max_potential_diesel", or "battery_capacity" used anywhere in the codebase, so I think they should also be removed.
-			#   I'm not sure if these four properties are used elsewhere, so I'm leaving this comment without deleting them while also recommending
-			#   that they be deleted
-			#'critical_load_kws': [0.0 if ob.get('name') not in CRITICAL_LOADS else float(ob.get('kw','0')) for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
-			#'max_potential': '700', #TODO: this and other vars, how to set? Ask Matt.
-			#'max_potential_diesel': '1000000',
-			#'battery_capacity': '10000'
+			'gen_obs_existing': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') in ('generator','storage')]
 		}
 	return MG_MINES
 
@@ -496,8 +488,7 @@ def _tests():
 				'reopt_inputs': {}
 			}
 		# Lukes algorithm outputs different configuration each time. Not repeatable. Also errors out later in the MgUP run.
-		if partitioning_method != 'lukes':
-			assert MINES_TEST == MG_MINES[_dir][0], f'MGU_MINES_{_dir} did not match expected output.\nExpected output: {MG_MINES[_dir][0]}.\nReceived output: {MINES_TEST}.'
+		assert MINES_TEST == MG_MINES[_dir][0], f'MGU_MINES_{_dir} did not match expected output.\nExpected output: {MG_MINES[_dir][0]}.\nReceived output: {MINES_TEST}.'
 	return print('Ran all tests for microgridup_gen_mgs.py.')
 
 if __name__ == '__main__':

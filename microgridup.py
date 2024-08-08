@@ -93,7 +93,7 @@ def main(data, invalidate_cache=True, open_results=False):
 	# - Dump the inputs for future reference. MappingProxyObjects can't be seralized, so use the original mutable data
 	with open('allInputData.json', 'w') as inputs_file:
 		json.dump(inputs, inputs_file, indent=4)
-	# - Now that the data object has been set up, we shoudn't need to change it anymore so create an immutable copy to pass around
+	# - Now that the data object has been set up, we shouldn't need to change it anymore, so create an immutable copy to pass around
 	immutable_data = get_immutable_dict(data)
 	# Setup logging.
 	log_file = f'{absolute_model_directory}/logs.log'

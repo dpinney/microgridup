@@ -307,7 +307,7 @@
                 <h5>Load Profile</h5>
                 <div class="chunk">
                     {% if in_data.get('LOAD_CSV') %}
-                        <label class="tooltip" for="LOAD_CSV_NAME">Load Data (.csv)<span class="classic">Please upload a .csv file representing the hourly load shape. See <a href="https://github.com/dpinney/microgridup/blob/main/docs/input_formats.md">input_formats.md</a> for formatting details.</span></label>
+                        <label class="tooltip" for="LOAD_CSV_NAME">Load Data (.csv)<span class="classic">Please upload a .csv file representing the hourly load shape. See Appendix A in the help for formatting details.</span></label>
 						{% set load_path_as_list = in_data.get('LOAD_CSV').split('/') %}
                         <input type="text" name="LOAD_CSV_NAME" value="{{ load_path_as_list[-1] }}" class="file-input" readonly>
                         <button type="button" class="remove-btn">Remove File</button>
@@ -339,12 +339,12 @@
                 </div>
 				<div class="chunk">
                     {% if in_data.get('OUTAGE_CSV') %}
-                        <label class="tooltip" for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)<span class="classic">Please upload a .csv file representing historical outages. See <a href="https://github.com/dpinney/microgridup/blob/main/docs/input_formats.md">input_formats.md</a> for formatting details.</span></label>
+                        <label class="tooltip" for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)<span class="classic">Please upload a .csv file representing historical outages. See Appendix A in the help for formatting details.</span></label>
 						{% set outages_path_as_list = in_data.get('OUTAGE_CSV').split('/') %}
                         <input type="text" name="HISTORICAL_OUTAGES" value="{{ outages_path_as_list[-1] }}" class="file-input" readonly>
                         <button type="button" class="remove-btn">Remove File</button>
                     {% else %}
-                        <label class="tooltip" for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)<span class="classic">Please upload a .csv file representing historical outages. See <a href="https://github.com/dpinney/microgridup/blob/main/docs/input_formats.md">input_formats.md</a> for formatting details.</span></label>
+                        <label class="tooltip" for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)<span class="classic">Please upload a .csv file representing historical outages. See Appendix A in the help for formatting details.</span></label>
                         <input type="file" name="HISTORICAL_OUTAGES" class="file-input" accept=".csv">
                         <button type="button" class="remove-btn">Remove File</button>
                     {% endif %}

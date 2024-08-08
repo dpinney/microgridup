@@ -1,15 +1,15 @@
 {
     "modelType": "hostingCapacity",
     "algorithm": "sandia1",
-    "AMIDataFileName": "mohcaInputCustom.csv",
-    "userAMIDisplayFileName": "mohcaInputCustom.csv",
+    "AMIDataFileName": "input_mohcaCustom.csv",
+    "userAMIDisplayFileName": "input_mohcaCustom.csv",
     "feederName1": "circuit.dss",
     "optionalCircuitFile": "on",
     "traditionalHCMaxTestkw": 22877.87424864,
     "runAmiAlgorithm": "off",
     "runDownlineAlgorithm": "off",
-    "created": "2024-06-19 13:28:40.925605",
-    "runStartTime": "2024-06-19T13:28:41.035736",
+    "created": "2024-08-08 15:37:26.793105",
+    "runStartTime": "2024-08-08T15:37:27.640358",
     "runtimeEst_min": 1.0,
-    "runTime": "0:00:17"
+    "runTime": "0:00:22"
 }

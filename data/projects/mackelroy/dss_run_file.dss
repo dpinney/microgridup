@@ -1,5 +1,5 @@
-redirect "circuit_plus_mgAll.dss"
-set datapath="/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/mackelroy"
+redirect "circuit_control.dss"
+set datapath="/home/austin/programming/repositories/microgridup/microgridup/data/projects/mackelroy"
 set maxcontroliter=1000
 calcvoltagebases
 new object=monitor.monvsource-source element=vsource.source terminal=1 mode=0
@@ -203,19 +203,216 @@ new object=monitor.monregcontrol-reg_contr_c element=transformer.sub_regulator_c
 new object=monitor.moncapacitor-cap_201 element=capacitor.cap_201 terminal=1 mode=6
 new object=monitor.moncapacitor-cap_301 element=capacitor.cap_301 terminal=1 mode=6
 new object=monitor.mongenerator-battery_bus3004 element=storage.battery_bus3004 terminal=1 mode=1 ppolar=no
-new object=monitor.mongenerator-fossil_bus3004 element=generator.fossil_bus3004 terminal=1 mode=1 ppolar=no
+new object=monitor.monvsource-lead_gen_bus3004 element=vsource.lead_gen_bus3004 terminal=1 mode=0
 new object=monitor.mongenerator-solar_bus3004 element=generator.solar_bus3004 terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-battery_bus1001 element=storage.battery_bus1001 terminal=1 mode=1 ppolar=no
-new object=monitor.mongenerator-fossil_bus1001 element=generator.fossil_bus1001 terminal=1 mode=1 ppolar=no
+new object=monitor.monvsource-lead_gen_bus1001 element=vsource.lead_gen_bus1001 terminal=1 mode=0
 new object=monitor.mongenerator-solar_bus1001 element=generator.solar_bus1001 terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-battery_bus2001 element=storage.battery_bus2001 terminal=1 mode=1 ppolar=no
-new object=monitor.mongenerator-fossil_bus2001 element=generator.fossil_bus2001 terminal=1 mode=1 ppolar=no
+new object=monitor.monvsource-lead_gen_bus2001 element=vsource.lead_gen_bus2001 terminal=1 mode=0
 new object=monitor.mongenerator-solar_bus2001 element=generator.solar_bus2001 terminal=1 mode=1 ppolar=no
 new object=monitor.mongenerator-battery_bus3005 element=storage.battery_bus3005 terminal=1 mode=1 ppolar=no
-new object=monitor.mongenerator-fossil_bus3005 element=generator.fossil_bus3005 terminal=1 mode=1 ppolar=no
+new object=monitor.monvsource-lead_gen_bus3005 element=vsource.lead_gen_bus3005 terminal=1 mode=0
 new object=monitor.mongenerator-solar_bus3005 element=generator.solar_bus3005 terminal=1 mode=1 ppolar=no
 set mode=yearly stepsize=60m 
-set number=480
+set number=1
+
+				open line.line_for_lead_gen_bus3004
+				calcv
+			
+				open line.line_for_lead_gen_bus1001
+				calcv
+			
+				open line.line_for_lead_gen_bus2001
+				calcv
+			
+				open line.line_for_lead_gen_bus3005
+				calcv
+			solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+
+			open object=line.cb_201 term=1
+			open object=line.cb_201 term=2
+			open object=line.cb_201 term=3
+		
+			open object=line.cb_101 term=1
+			open object=line.cb_101 term=2
+			open object=line.cb_101 term=3
+		
+			open object=line.cb_301 term=1
+			open object=line.cb_301 term=2
+			open object=line.cb_301 term=3
+		
+			open object=line.l_3003_3002 term=1
+			open object=line.l_3003_3002 term=2
+			open object=line.l_3003_3002 term=3
+		
+			open object=line.l_3003_3004 term=1
+			open object=line.l_3003_3004 term=2
+			open object=line.l_3003_3004 term=3
+		
+				close line.line_for_lead_gen_bus3004
+				calcv
+			
+			open object=line.cb_101 term=1
+			open object=line.cb_101 term=2
+			open object=line.cb_101 term=3
+		
+				close line.line_for_lead_gen_bus1001
+				calcv
+			
+			open object=line.cb_201 term=1
+			open object=line.cb_201 term=2
+			open object=line.cb_201 term=3
+		
+				close line.line_for_lead_gen_bus2001
+				calcv
+			
+			open object=line.l_3003_3005 term=1
+			open object=line.l_3003_3005 term=2
+			open object=line.l_3003_3005 term=3
+		
+				close line.line_for_lead_gen_bus3005
+				calcv
+			calcv
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+
+			close object=line.cb_201 term=1
+			close object=line.cb_201 term=2
+			close object=line.cb_201 term=3
+		
+			close object=line.cb_101 term=1
+			close object=line.cb_101 term=2
+			close object=line.cb_101 term=3
+		
+			close object=line.cb_301 term=1
+			close object=line.cb_301 term=2
+			close object=line.cb_301 term=3
+		
+			close object=line.l_3003_3002 term=1
+			close object=line.l_3003_3002 term=2
+			close object=line.l_3003_3002 term=3
+		
+			close object=line.l_3003_3004 term=1
+			close object=line.l_3003_3004 term=2
+			close object=line.l_3003_3004 term=3
+		
+				open line.line_for_lead_gen_bus3004
+				calcv
+			
+			close object=line.cb_101 term=1
+			close object=line.cb_101 term=2
+			close object=line.cb_101 term=3
+		
+				open line.line_for_lead_gen_bus1001
+				calcv
+			
+			close object=line.cb_201 term=1
+			close object=line.cb_201 term=2
+			close object=line.cb_201 term=3
+		
+				open line.line_for_lead_gen_bus2001
+				calcv
+			
+			close object=line.l_3003_3005 term=1
+			close object=line.l_3003_3005 term=2
+			close object=line.l_3003_3005 term=3
+		
+				open line.line_for_lead_gen_bus3005
+				calcv
+			calcv
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
+solve
 solve
 export monitors monitorname=monvsource-source
 export monitors monitorname=monload-load_1006
@@ -418,14 +615,14 @@ export monitors monitorname=monregcontrol-reg_contr_c
 export monitors monitorname=moncapacitor-cap_201
 export monitors monitorname=moncapacitor-cap_301
 export monitors monitorname=mongenerator-battery_bus3004
-export monitors monitorname=mongenerator-fossil_bus3004
+export monitors monitorname=monvsource-lead_gen_bus3004
 export monitors monitorname=mongenerator-solar_bus3004
 export monitors monitorname=mongenerator-battery_bus1001
-export monitors monitorname=mongenerator-fossil_bus1001
+export monitors monitorname=monvsource-lead_gen_bus1001
 export monitors monitorname=mongenerator-solar_bus1001
 export monitors monitorname=mongenerator-battery_bus2001
-export monitors monitorname=mongenerator-fossil_bus2001
+export monitors monitorname=monvsource-lead_gen_bus2001
 export monitors monitorname=mongenerator-solar_bus2001
 export monitors monitorname=mongenerator-battery_bus3005
-export monitors monitorname=mongenerator-fossil_bus3005
+export monitors monitorname=monvsource-lead_gen_bus3005
 export monitors monitorname=mongenerator-solar_bus3005

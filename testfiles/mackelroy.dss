@@ -272,14 +272,14 @@ new object=line.l_3160_3161 phases=1 bus1=bus3160.3 bus2=bus3161.3 length=237 un
 new object=line.l_3161_3162 phases=1 bus1=bus3161.3 bus2=bus3162.3 length=176 units=ft linecode=ug_1p_type2 normamps=400 emergamps=600
 new object=line.cb_1 phases=3 bus1=bus1.1.2.3 bus2=bus_fault.1.2.3 switch=true r1=0.0001 r0=0.0001 x1=0 x0=0 c1=0 c0=0
 new object=line.cb_101 phases=3 bus1=bus_fault.1.2.3 bus2=bus1001.1.2.3 switch=true r1=0.0001 r0=0.0001 x1=0 x0=0 c1=0 c0=0
-new object=line.cb_102 phases=3 bus1=bus1010.1.2.3 bus2=bus1010.4.5.6 switch=true r1=0.0001 r0=0.0001 x1=0 x0=0 c1=0 c0=0
+! new object=line.cb_102 phases=3 bus1=bus1010.1.2.3 bus2=bus1010.4.5.6 switch=true r1=0.0001 r0=0.0001 x1=0 x0=0 c1=0 c0=0
 new object=line.cb_201 phases=3 bus1=bus_fault.1.2.3 bus2=bus2001.1.2.3 switch=true r1=0.0001 r0=0.0001 x1=0 x0=0 c1=0 c0=0
 new object=line.cb_202 phases=3 bus1=bus2012.1.2.3 bus2=bus2013.1.2.3 switch=true r1=0.0001 r0=0.0001 x1=0 x0=0 c1=0 c0=0
 new object=line.cb_203 phases=3 bus1=bus2021.1.2.3 bus2=bus2026.1.2.3 switch=true r1=0.0001 r0=0.0001 x1=0 x0=0 c1=0 c0=0
-new object=line.cb_204 phases=3 bus1=bus2013.1.2.3 bus2=bus2013.4.5.6 switch=true r1=0.0001 r0=0.0001 x1=0 x0=0 c1=0 c0=0
+! new object=line.cb_204 phases=3 bus1=bus2013.1.2.3 bus2=bus2013.4.5.6 switch=true r1=0.0001 r0=0.0001 x1=0 x0=0 c1=0 c0=0
 new object=line.cb_301 phases=3 bus1=bus_fault.1.2.3 bus2=bus3001.1.2.3 switch=true r1=0.0001 r0=0.0001 x1=0 x0=0 c1=0 c0=0
 new object=line.cb_302 phases=3 bus1=bus3075.1.2.3 bus2=bus3076.1.2.3 switch=true r1=0.0001 r0=0.0001 x1=0 x0=0 c1=0 c0=0
-new object=line.cb_303 phases=3 bus1=bus3081.1.2.3 bus2=bus3081.4.5.6 switch=true r1=0.0001 r0=0.0001 x1=0 x0=0 c1=0 c0=0
+! new object=line.cb_303 phases=3 bus1=bus3081.1.2.3 bus2=bus3081.4.5.6 switch=true r1=0.0001 r0=0.0001 x1=0 x0=0 c1=0 c0=0
 ! redirect load.dss
 new object=load.load_1006 phases=1 conn=delta bus1=t_bus1006_l.1.2 kv=0.120 kw=5.04 kvar=2.29629183968801
 new object=load.load_1007 phases=1 conn=delta bus1=t_bus1007_l.1.2 kv=0.120 kw=4.163 kvar=2.01623292243998

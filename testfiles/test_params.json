@@ -548,60 +548,6 @@
         }
     ],
     "MG_MINES": {
-        "3mgs_wizard_lukes": [
-            {
-                "mg0": {
-                    "loads": [
-                        "634a_data_center",
-                        "634b_radar",
-                        "634c_atc_tower",
-                        "645_hangar",
-                        "646_office"
-                    ],
-                    "switch": "reg1",
-                    "gen_bus": "battery_634_existing",
-                    "gen_obs_existing": [
-                        "solar_634_existing"
-                    ],
-                    "parameter_overrides": {
-                        "reopt_inputs": {}
-                    }
-                },
-                "mg1": {
-                    "loads": [
-                        "675a_hospital",
-                        "675b_residential1",
-                        "675c_residential1"
-                    ],
-                    "switch": "reg1",
-                    "gen_bus": "reg1_end",
-                    "gen_obs_existing": [
-                        "fossil_675_existing"
-                    ],
-                    "parameter_overrides": {
-                        "reopt_inputs": {}
-                    }
-                },
-                "mg2": {
-                    "loads": [
-                        "684_command_center",
-                        "692_warehouse2",
-                        "611_runway",
-                        "652_residential",
-                        "670a_residential2",
-                        "670b_residential2",
-                        "670c_residential2"
-                    ],
-                    "switch": "regnone",
-                    "gen_bus": "670a_residential2",
-                    "gen_obs_existing": [],
-                    "parameter_overrides": {
-                        "reopt_inputs": {}
-                    }
-                }
-            },
-            "lukes"
-        ],
         "3mgs_wizard_branch": [
             {
                 "mg0": {
@@ -870,50 +816,6 @@
                 }
             },
             "manual"
-        ],
-        "3mgs_lehigh_lukes": [
-            {
-                "mg0": {
-                    "loads": [
-                        "634a_data_center",
-                        "634b_radar",
-                        "634c_atc_tower",
-                        "645_hangar",
-                        "646_office",
-                        "670a_residential2",
-                        "670b_residential2",
-                        "670c_residential2"
-                    ],
-                    "switch": "670671",
-                    "gen_bus": "650",
-                    "gen_obs_existing": [
-                        "solar_634_existing"
-                    ],
-                    "parameter_overrides": {
-                        "reopt_inputs": {}
-                    }
-                },
-                "mg1": {
-                    "loads": [
-                        "684_command_center",
-                        "692_warehouse2",
-                        "675a_hospital",
-                        "675b_residential1",
-                        "675c_residential1",
-                        "611_runway",
-                        "652_residential"
-                    ],
-                    "switch": "670671",
-                    "gen_bus": "680",
-                    "gen_obs_existing": [
-                        "fossil_675_existing"
-                    ],
-                    "parameter_overrides": {
-                        "reopt_inputs": {}
-                    }
-                }
-            },
-            "lukes"
         ],
         "3mgs_lehigh_branch": [
             {

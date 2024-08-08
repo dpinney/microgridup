@@ -8,10 +8,35 @@ from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, Request, request, redirect, render_template, jsonify, url_for, send_from_directory, Blueprint
 from omf.solvers.opendss import dssConvert
-from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_mg_mines, form_mg_groups, topological_sort
+from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_mg_mines, form_mg_groups, topological_sort, SwitchNotFoundError
 import microgridup
 
 app = Flask(__name__)
+
+'''Set error handlers.'''
+@app.errorhandler(SwitchNotFoundError)
+def handle_switch_not_found_error(error):
+	response = jsonify({'message': str(error), 'error': f'SwitchNotFoundError: {str(error)}'})
+	response.status_code = 422
+	return response
+	
+@app.errorhandler(400)
+def bad_request(error):
+    response = jsonify({'message': 'Bad Request', 'error': str(error)})
+    response.status_code = 400
+    return response
+
+@app.errorhandler(404)
+def not_found(error):
+    response = jsonify({'message': 'Not Found', 'error': str(error)})
+    response.status_code = 404
+    return response
+
+@app.errorhandler(500)
+def internal_server_error(error):
+	response = jsonify({'message': 'Internal Server Error', 'error': str(error)})
+	response.status_code = 500
+	return response
 
 # - Use blueprints to add additional static directories
 # - data_dir_blueprint is needed to access our model results from the data/ folder
@@ -431,8 +456,8 @@ def previewPartitions():
 	MG_MINES = form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd)
 	for mg in MG_MINES:
 		if not MG_MINES[mg]['switch']:
-			print(f'Selected partitioning method produced invalid results. Please choose a different partitioning method.')
-			return jsonify('Invalid partitioning method')
+			print(f'Selected partitioning method produced invalid results. Please change partitioning parameter(s).')
+			raise SwitchNotFoundError(f'Selected partitioning method produced invalid results. Please change partitioning parameter(s).')
 	plt.switch_backend('Agg')
 	plt.figure(figsize=(14,12), dpi=350)
 	n_color_map = node_group_map(G, MG_GROUPS)

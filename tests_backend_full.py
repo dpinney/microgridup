@@ -507,7 +507,7 @@ def test_auto3mg():
 	ALGO = 'branch' #'lukes'
 	MG_GROUPS = gmg.form_mg_groups(G, CRITICAL_LOADS, ALGO)
 	omd = dssConvert.dssToOmd(CIRC_FILE, '', RADIUS=0.0004, write_out=False)
-	MICROGRIDS = gmg.form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd)
+	MICROGRIDS = gmg.form_mg_mines(G, MG_GROUPS, omd)
 	for mg in MICROGRIDS:
 		MICROGRIDS[mg]['parameter_overrides'] = {
 			'reopt_inputs': {}

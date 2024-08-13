@@ -18,6 +18,10 @@ class SwitchNotFoundError(Exception):
 	'''Used by get_edge_name() and passed to GUI to be caught by custom Flask errorhandler.'''
 	pass
 
+class CycleDetectedError(Exception):
+	'''Used by topological_sort() and passed to GUI to be caught by custom Flask errorhandler.'''
+	pass
+
 # Networkx helper functions
 def nx_get_branches(G):
 	'All branchy boys'
@@ -233,7 +237,8 @@ def nx_bottom_up_branch(G, num_mgs=3, large_or_small='large', omd={}, cannot_be_
 	'Form all microgrid combinations starting with leaves and working up to source maintaining single points of connection for each.'
 	try:
 		list(topological_sort(G))
-	except ValueError:
+	# except ValueError:
+	except CycleDetectedError:
 		G = remove_loops(G)
 	# Find leaves.
 	end_nodes = get_end_nodes(G, omd, cannot_be_mg)
@@ -377,26 +382,49 @@ def get_edge_name(fr, to, omd_list):
 	else:
 		return edges[0]
 
+def detect_cycle_dfs(G, node, visited, stack, cycle_nodes):
+	'Used by topological_sort function to identify cycles using dfs.'
+	if node in stack: # Cycle detected.
+		cycle_start_index = stack.index(node)
+		cycle_nodes.extend(stack[cycle_start_index:])
+		return True
+	if node in visited:
+		return False # In the event that a node has multiple parents.
+	visited.add(node)
+	stack.append(node)
+	for child in G[node]:
+		if detect_cycle_dfs(G, child, visited, stack, cycle_nodes):
+			return True
+	stack.pop()
+	return False
+
 def topological_sort(G):
 	'Standardizes topological sort across networkx versions.'
-	in_degree = {v: 0 for v in G}
-	for u in G:
-		for v in G[u]:
-			in_degree[v] += 1
-	queue = deque([u for u in in_degree if in_degree[u] == 0])
+	in_degree = {node: 0 for node in G}
+	for node in G:
+		for child in G[node]:
+			in_degree[child] += 1
+	queue = deque([node for node in in_degree if in_degree[node] == 0])
 	result = []
+	visited = set()
+	stack = []
+	cycle_nodes = []
+	for node in G:
+		if node not in visited:
+			if detect_cycle_dfs(G, node, visited, stack, cycle_nodes):
+				raise CycleDetectedError(f'Graph contains a cycle: {cycle_nodes}')
 	while queue:
-		u = queue.popleft()
-		result.append(u)
-		for v in G[u]:
-			in_degree[v] -= 1
-			if in_degree[v] == 0:
-				queue.append(v)
+		node = queue.popleft()
+		result.append(node)
+		for child in G[node]:
+			in_degree[child] -= 1
+			if in_degree[child] == 0:
+				queue.append(child)
 	if len(result) != len(G):
-		raise ValueError("Graph contains a cycle")
+		raise CycleDetectedError('Graph contains a cycle, but it could not be fully identified')
 	return result
 
-def form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd, switch=None, gen_bus=None):
+def form_mg_mines(G, MG_GROUPS, omd, switch=None, gen_bus=None):
 	'''Generate microgrid data structure from a networkx graph, group of mgs, and omd. 
 	Optional parameters switch and gen_bus may be supplied when loadGrouping or manual partitioning is used.'''
 	omd_list = list(omd.values())
@@ -473,12 +501,12 @@ def _tests():
 			G = opendss.dssConvert.dss_to_networkx(wizard_dss_path)
 			omd = opendss.dssConvert.dssToOmd(wizard_dss_path, '', RADIUS=0.0004, write_out=False)
 			MG_GROUPS_TEST = form_mg_groups(G, crit_loads, partitioning_method, params)
-			MINES_TEST = form_mg_mines(G, MG_GROUPS_TEST, crit_loads, omd) if partitioning_method != 'manual' else form_mg_mines(G, MG_GROUPS_TEST, crit_loads, omd, params.get('switch'), params.get('gen_bus')) # No valid gen_bus in MG_GROUPS_TEST. When using manual partitioning, the user should specify gen_bus and switch.
+			MINES_TEST = form_mg_mines(G, MG_GROUPS_TEST, omd) if partitioning_method != 'manual' else form_mg_mines(G, MG_GROUPS_TEST, omd, params.get('switch'), params.get('gen_bus')) # No valid gen_bus in MG_GROUPS_TEST. When using manual partitioning, the user should specify gen_bus and switch.
 		except ValueError:
 			G = opendss.dssConvert.dss_to_networkx(lehigh_dss_path)
 			omd = opendss.dssConvert.dssToOmd(lehigh_dss_path, '', RADIUS=0.0004, write_out=False)
 			MG_GROUPS_TEST = form_mg_groups(G, crit_loads, partitioning_method, params)
-			MINES_TEST = form_mg_mines(G, MG_GROUPS_TEST, crit_loads, omd, params.get('switch'), params.get('gen_bus'))
+			MINES_TEST = form_mg_mines(G, MG_GROUPS_TEST, omd, params.get('switch'), params.get('gen_bus'))
 		# - Austin (8/1/2024): the "parameter_overrides" key is now a part of the schema for microgrid dicts. The "parameter_overrides" key is
 		#   only used to store information about REopt parameters that are overridden on a per-microgrid basis by the user through the front-end
 		#   GUI or through Python. I add the "parameter_overrides" key here so that these tests pass, but the key could be added to the microgrid

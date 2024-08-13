@@ -8,7 +8,7 @@ from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, Request, request, redirect, render_template, jsonify, url_for, send_from_directory, Blueprint
 from omf.solvers.opendss import dssConvert
-from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_mg_mines, form_mg_groups, topological_sort, SwitchNotFoundError
+from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_mg_mines, form_mg_groups, topological_sort, SwitchNotFoundError, CycleDetectedError
 import microgridup
 
 app = Flask(__name__)
@@ -16,25 +16,31 @@ app = Flask(__name__)
 '''Set error handlers.'''
 @app.errorhandler(SwitchNotFoundError)
 def handle_switch_not_found_error(error):
-	response = jsonify({'message': str(error), 'error': f'SwitchNotFoundError: {str(error)}'})
+	response = jsonify(message=str(error), error=error.__class__.__name__)
+	response.status_code = 422
+	return response
+
+@app.errorhandler(CycleDetectedError)
+def handle_cycle_detected_error(error):
+	response = jsonify(message=str(error), error=error.__class__.__name__)
 	response.status_code = 422
 	return response
 	
 @app.errorhandler(400)
 def bad_request(error):
-    response = jsonify({'message': 'Bad Request', 'error': str(error)})
-    response.status_code = 400
-    return response
+	response = jsonify(message=str(error), error=error.__class__.__name__)
+	response.status_code = 400
+	return response
 
 @app.errorhandler(404)
 def not_found(error):
-    response = jsonify({'message': 'Not Found', 'error': str(error)})
+    response = jsonify(message=str(error), error=error.__class__.__name__)
     response.status_code = 404
     return response
 
 @app.errorhandler(500)
 def internal_server_error(error):
-	response = jsonify({'message': 'Internal Server Error', 'error': str(error)})
+	response = jsonify(message=str(error), error=error.__class__.__name__)
 	response.status_code = 500
 	return response
 
@@ -453,7 +459,7 @@ def previewPartitions():
 				return {}
 	except:
 		return jsonify('Invalid partitioning method')
-	MG_MINES = form_mg_mines(G, MG_GROUPS, CRITICAL_LOADS, omd)
+	MG_MINES = form_mg_mines(G, MG_GROUPS, omd)
 	for mg in MG_MINES:
 		if not MG_MINES[mg]['switch']:
 			print(f'Selected partitioning method produced invalid results. Please change partitioning parameter(s).')
@@ -482,8 +488,8 @@ def has_cycles():
 	try:
 		list(topological_sort(G))
 		return jsonify(result=False)
-	except ValueError:
-		return jsonify(result=True)
+	except CycleDetectedError as error:
+		raise error
 
 @app.route('/run', methods=["POST"])
 def run():
@@ -690,24 +696,24 @@ def _get_microgrids(critical_loads, partition_method, quantity, dss_path, microg
 	omd = dssConvert.dssToOmd(dss_path, '', RADIUS=0.0004, write_out=False)
 	if partition_method == 'lukes':
 		mg_groups = form_mg_groups(G, critical_loads, 'lukes', algo_params)
-		microgrids = form_mg_mines(G, mg_groups, critical_loads, omd)
+		microgrids = form_mg_mines(G, mg_groups, omd)
 	elif partition_method == 'branch':
 		mg_groups = form_mg_groups(G, critical_loads, 'branch')
-		microgrids = form_mg_mines(G, mg_groups, critical_loads, omd)
+		microgrids = form_mg_mines(G, mg_groups, omd)
 	elif partition_method == 'bottomUp':
 		mg_groups = form_mg_groups(G, critical_loads, 'bottomUp', algo_params={'num_mgs':quantity, 'omd':omd, 'cannot_be_mg':['regcontrol']})
-		microgrids = form_mg_mines(G, mg_groups, critical_loads, omd)
+		microgrids = form_mg_mines(G, mg_groups, omd)
 	elif partition_method == 'criticalLoads':
 		mg_groups = form_mg_groups(G, critical_loads, 'criticalLoads', algo_params={'num_mgs':quantity})
-		microgrids = form_mg_mines(G, mg_groups, critical_loads, omd)
+		microgrids = form_mg_mines(G, mg_groups, omd)
 	elif partition_method == 'loadGrouping':
 		algo_params = json.loads(microgrids)
 		mg_groups = form_mg_groups(G, critical_loads, 'loadGrouping', algo_params)
-		microgrids = form_mg_mines(G, mg_groups, critical_loads, omd, switch=algo_params.get('switch', None), gen_bus=algo_params.get('gen_bus', None))
+		microgrids = form_mg_mines(G, mg_groups, omd, switch=algo_params.get('switch', None), gen_bus=algo_params.get('gen_bus', None))
 	elif partition_method == 'manual':
 		algo_params = json.loads(microgrids)
 		mg_groups = form_mg_groups(G, critical_loads, 'manual', algo_params)
-		microgrids = form_mg_mines(G, mg_groups, critical_loads, omd, switch=algo_params.get('switch', None), gen_bus=algo_params.get('gen_bus', None))
+		microgrids = form_mg_mines(G, mg_groups, omd, switch=algo_params.get('switch', None), gen_bus=algo_params.get('gen_bus', None))
 	elif partition_method == '':
 		microgrids = json.loads(microgrids)
 	return microgrids

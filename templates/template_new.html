@@ -691,6 +691,16 @@
     </main>
 	<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 	<script>
+	/** Custom error class for detecting cycles.*/
+	class CycleDetectedError extends Error {
+		constructor(error, message, status) {
+			super(error);
+			this.name = 'CycleDetectedError';
+			this.message = message;
+			this.status = status;
+		}
+	}
+
 	/** Check if a .file-input (can be a file input or read-only text input) has a value and show/hide the associated Remove File button. */
 	function toggleRemoveButton(chunk, btnElement) {
 		const fileInput = $(chunk).find('input.file-input');
@@ -857,14 +867,18 @@
 					'Content-type': 'application/json; charset=UTF-8'
 				}
 			})
-			const data = await response.json();
-			if (data.result == true) {
-				return true;
-			} else if (data.result == false) {
-				return false;
+			if (!response.ok) {
+				const errorData = await response.json();
+				if (response.status == 422 & errorData.error == 'CycleDetectedError') {
+					throw new CycleDetectedError(errorData.error, errorData.message, response.status);
+				} else {
+					throw new Error(errorData.message);	
+				}
 			}
+			const data = await response.json();
+			return false;
 		} catch(error) {
-			console.warn('Unexpected error:', error);
+			return error;
 		}
 	}
 
@@ -890,10 +904,14 @@
 				return
 			}
 			const selectedPartitioningMethod = document.getElementById('partitionMethod').value;
-			if (selectedPartitioningMethod == 'loadGrouping') {
-				const circuit_has_cycle = await has_cycle(); // loadGrouping relies on networkx and networkx breaks when the circuit has a cycle.
-				if (circuit_has_cycle == true) {
-					alert('Circuit contains a cycle. Please remove cycle from circuit or choose a different partitioning method.')
+			if (selectedPartitioningMethod == 'loadGrouping') { // loadGrouping relies on networkx and networkx breaks when the circuit has a cycle.
+				const cycleDetected = await has_cycle(); 
+				if (cycleDetected) {
+					if (cycleDetected instanceof CycleDetectedError) { 
+						alert(`${cycleDetected}. Please remove cycle from circuit or choose a different partitioning method.`);
+					} else {
+						alert(cycleDetected);
+					}
 					return
 				}
 			}

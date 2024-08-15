@@ -237,7 +237,6 @@ def nx_bottom_up_branch(G, num_mgs=3, large_or_small='large', omd={}, cannot_be_
 	'Form all microgrid combinations starting with leaves and working up to source maintaining single points of connection for each.'
 	try:
 		list(topological_sort(G))
-	# except ValueError:
 	except CycleDetectedError:
 		G = remove_loops(G)
 	# Find leaves.
@@ -271,7 +270,7 @@ def nx_critical_load_branch(G, criticalLoads, num_mgs=3, large_or_small='large')
 	critical_nodes = [[x] for x in G.nodes() if x in criticalLoads]
 	try:
 		top_down = list(topological_sort(G))
-	except ValueError:
+	except CycleDetectedError:
 		G = remove_loops(G)
 		top_down = list(topological_sort(G))
 	mgs = defaultdict(list)

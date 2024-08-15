@@ -14,6 +14,12 @@ import microgridup
 app = Flask(__name__)
 
 '''Set error handlers.'''
+# @app.errorhandler(ValueError) # Helpful for unexpected Python function errors.
+# def handle_value_error(error):
+# 	response = jsonify(message=str(error), error=error.__class__.__name__)
+# 	response.status = 400
+# 	return response
+
 @app.errorhandler(SwitchNotFoundError)
 def handle_switch_not_found_error(error):
 	response = jsonify(message=str(error), error=error.__class__.__name__)
@@ -226,7 +232,7 @@ def duplicate():
 		html_content = ul_pattern.sub(replace_in_ul, html_content)
 		with open(f'{microgridup.PROJ_DIR}/{new_name}/output_final.html', 'w', encoding='utf-8') as file:
 			file.write(html_content)
-		return f'Successfully duplicated {model_name} as {new_name}.'
+		return jsonify(f'Successfully duplicated {model_name} as {new_name}.')
 
 @app.route('/wizard_to_dss', methods=['GET','POST'])
 def wizard_to_dss(model_dir=None, lat=None, lon=None, elements=None, test_run=False, on_edit_flow=None):

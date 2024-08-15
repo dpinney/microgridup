@@ -796,9 +796,8 @@
 				// Make directory uneditable. 
 				$('input[name="MODEL_DIR"]').prop("readonly", true);
 			},
-			error: function(xhr, status, error) {
-				// Handle errors, if any.
-				console.error(error);
+			error: function(data) {
+				alert(data.responseJSON.message);
 			}
 		});
 	}
@@ -829,9 +828,9 @@
 				window.disableInputs();
 				{% endif %}
 			},
-			error: function(jqXHR, textStatus, errorThrown) {
+			error: function(data) {
 				document.body.style.cursor = 'default';
-				console.log(textStatus + ' : ' + errorThrown);
+				alert(data.responseJSON.message);
 			}
 		})
 		$('#partitionPreviewerContainer').append(oldPartitionsDiv);
@@ -1053,10 +1052,9 @@
 						window.createReoptParametersMVC(data.MG_MINES);
 					}
 				},
-				error: function(xhr, status, error) {
+				error: function(data) {
 					document.body.style.cursor = 'default';
-					const errorJson = JSON.parse(xhr.responseText);
-					alert(errorJson.error);
+					alert(data.responseJSON.message);
 				}
 			});
 		});
@@ -1244,11 +1242,11 @@
 					window.location.href = `/load/${model_dir}`;
 				}, 5000); // Delay relocation so files are created first.
 			},
-			error: function(jqXHR, textStatus, errorThrown) {
+			error: function(data) {
 				// Hide loading indicator if server fails.
 				$('#loading-background').hide();
 				$("#loading-indicator").hide();
-				console.log(textStatus + ' : ' + errorThrown)
+				alert(data.responseJSON.message);
 			}
 		})
 	}
@@ -1469,7 +1467,7 @@
 					document.getElementById('partitionMethod').dispatchEvent(new Event('change')); // Manually trigger dropdown select menu change to potentially refresh partition method descriptions (manual partitioning description differs dependent on wizard vs upload).
 				},
 				error: function(data) {
-					alert(data.responseJSON.error);
+					alert(data.responseJSON.message);
 				}
 			});
 		});

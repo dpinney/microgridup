@@ -772,29 +772,57 @@
 			success: function(response) {
 				window.circuitIsSpecified = true;
 				const loads = response.loads;
-				$('#critLoads').empty();
-				$('#critLoads').append('<p>Please select all critical loads:</p>')
-				$('#dropDowns').empty();
-				$('#dropDowns').hide();
-				jQuery('<form>', {
-					id: 'criticalLoadsSelect',
-					class: 'chunk'
-				}).appendTo('#critLoads');
-				for (let i=0; i<loads.length; i++) {
-					var checkbox = $('<input>').attr('type', 'checkbox');
+				const critLoadsContainer = document.getElementById('critLoads');
+				const dropDownsContainer = document.getElementById('dropDowns');
+				// Clear contents of critLoads and dropDowns.
+				critLoadsContainer.innerHTML = '';
+				dropDownsContainer.innerHTML = '';
+				// Instructions for critLoads.
+				const critLoadsParagraph = document.createElement('p');
+				critLoadsParagraph.textContent = 'Please select all critical loads:';
+				critLoadsContainer.appendChild(critLoadsParagraph);
+				// Hide dropDowns.
+				dropDownsContainer.style.display = 'none';
+				// Create a form to house checkboxes.
+				const criticalLoadsSelect = document.createElement('form');
+				criticalLoadsSelect.id = 'criticalLoadsSelect';
+				criticalLoadsSelect.classList.add('chunk');
+				critLoadsContainer.appendChild(criticalLoadsSelect);
+				// Create checkboxes and labels for each load.
+				for (let i = 0; i < loads.length; i++) {
+					const checkbox = document.createElement('input');
+					checkbox.type = 'checkbox';
 					if (criticalLoads.includes(loads[i])) {
-						checkbox.prop('checked', true);
+						checkbox.checked = true;
 					}
-					var label = $('<label>').append(checkbox).append(loads[i]);
-					$('#criticalLoadsSelect').append(label)
-					$('#dropDowns').append('<label><select></select> '+loads[i]+'</label><br>')
+					const label = document.createElement('label');
+					label.style.display = 'block';
+					label.appendChild(checkbox);
+					label.appendChild(document.createTextNode(loads[i]));
+					criticalLoadsSelect.appendChild(label);
+					// Add a dropdown to dropDowns.
+					const dropdownLabel = document.createElement('label');
+					const dropdown = document.createElement('select');
+					dropdownLabel.appendChild(dropdown);
+					dropdownLabel.appendChild(document.createTextNode(' ' + loads[i]));
+					dropDownsContainer.appendChild(dropdownLabel);
+					dropDownsContainer.appendChild(document.createElement('br'));
 				}
+				// Handle case where there are no loads.
 				if (loads.length === 0) {
-					$('#criticalLoadsSelect').append('<p>No loads to select from.</p>')
-					$('#dropDowns').append('<p>No loads to assign to microgrids.</p>')
+					const noLoadsMessage1 = document.createElement('p');
+					noLoadsMessage1.textContent = 'No loads to select from.';
+					criticalLoadsSelect.appendChild(noLoadsMessage1);
+					
+					const noLoadsMessage2 = document.createElement('p');
+					noLoadsMessage2.textContent = 'No loads to assign to microgrids.';
+					dropDownsContainer.appendChild(noLoadsMessage2);
 				}
-				// Make directory uneditable. 
-				$('input[name="MODEL_DIR"]').prop("readonly", true);
+				// Make directory uneditable.
+				const modelDirInput = document.querySelector('input[name="MODEL_DIR"]');
+				if (modelDirInput) {
+					modelDirInput.readOnly = true;
+				}
 			},
 			error: function(data) {
 				alert(data.responseJSON.message);
@@ -1441,29 +1469,58 @@
 				processData: false,
 				success: function(data) {
 					// Enable partition selector.
-					$('#previewPartitionsButton').prop('disabled', false);
-					$('#partitionMethod').prop('disabled', false);
+					document.getElementById('previewPartitionsButton').disabled = false;
+					document.getElementById('partitionMethod').disabled = false;
 					window.circuitIsSpecified = true;
 					const loads = data.loads;
-					$('#critLoads').empty();
-					$('#critLoads').append('<p>Please select all critical loads:</p>')
-					// Clear previous content and add loads to dropdowns (shown if user chooses manual partitioning.)
-					$('#dropDowns').empty();
-					$('#dropDowns').hide();
-					jQuery('<form>', {
-						id: 'criticalLoadsSelect',
-						class: 'chunk'
-					}).appendTo('#critLoads');
-					for (let i=0; i<loads.length; i++) {
-						$('#criticalLoadsSelect').append('<label><input type="checkbox">'+loads[i]+'</label>')
-						$('#dropDowns').append('<label><select></select> '+loads[i]+'</label><br>')
+					// Clear critLoads.
+					const critLoadsContainer = document.getElementById('critLoads');
+					critLoadsContainer.innerHTML = '';
+					// Instructions for critLoads.
+					const critLoadsParagraph = document.createElement('p');
+					critLoadsParagraph.textContent = 'Please select all critical loads:';
+					critLoadsContainer.appendChild(critLoadsParagraph);
+					// Clear previous content and add loads to dropdowns (shown if user chooses manual partitioning).
+					const dropDownsContainer = document.getElementById('dropDowns');
+					dropDownsContainer.innerHTML = '';
+					dropDownsContainer.style.display = 'none';
+					// Form element for checkboxes.
+					const criticalLoadsSelect = document.createElement('form');
+					criticalLoadsSelect.id = 'criticalLoadsSelect';
+					criticalLoadsSelect.classList.add('chunk');
+					critLoadsContainer.appendChild(criticalLoadsSelect);
+					// Create checkboxes and labels for each load.
+					for (let i = 0; i < loads.length; i++) {
+						const label = document.createElement('label');
+						label.style.display = 'block';
+						const checkbox = document.createElement('input');
+						checkbox.type = 'checkbox';
+						label.appendChild(checkbox);
+						label.appendChild(document.createTextNode(loads[i]));
+						criticalLoadsSelect.appendChild(label);
+						// Add a dropdown to dropDowns.
+						const dropdownLabel = document.createElement('label');
+						const dropdown = document.createElement('select');
+						dropdownLabel.appendChild(dropdown);
+						dropdownLabel.appendChild(document.createTextNode(' ' + loads[i]));
+						dropDownsContainer.appendChild(dropdownLabel);
+						dropDownsContainer.appendChild(document.createElement('br'));
 					}
+					// Handle the case where there are no loads.
 					if (loads.length === 0) {
-						$('#criticalLoadsSelect').append('<p>No loads to select from.</p>')
-						$('#dropDowns').append('<p>No loads to assign to microgrids.</p>')
+						const noLoadsMessage1 = document.createElement('p');
+						noLoadsMessage1.textContent = 'No loads to select from.';
+						criticalLoadsSelect.appendChild(noLoadsMessage1);
+
+						const noLoadsMessage2 = document.createElement('p');
+						noLoadsMessage2.textContent = 'No loads to assign to microgrids.';
+						dropDownsContainer.appendChild(noLoadsMessage2);
 					}
 					window.filename = data.filename; // Set filename.
-					$('input[name="MODEL_DIR"]').prop("readonly", true); // Make directory uneditable. 
+					const modelDirInput = document.querySelector('input[name="MODEL_DIR"]');
+					if (modelDirInput) {
+						modelDirInput.readOnly = true; // Make the directory input uneditable.
+					}
 					document.getElementById('partitionMethod').dispatchEvent(new Event('change')); // Manually trigger dropdown select menu change to potentially refresh partition method descriptions (manual partitioning description differs dependent on wizard vs upload).
 				},
 				error: function(data) {

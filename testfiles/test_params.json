@@ -547,7 +547,7 @@
             "!CMD": "calcvoltagebases"
         }
     ],
-    "MG_MINES": {
+    "MICROGRIDS": {
         "3mgs_wizard_branch": [
             {
                 "mg0": {

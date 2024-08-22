@@ -423,7 +423,7 @@ def topological_sort(G):
 		raise CycleDetectedError('Graph contains a cycle, but it could not be fully identified')
 	return result
 
-def form_mg_mines(G, MG_GROUPS, omd, switch=None, gen_bus=None):
+def form_microgrids(G, MG_GROUPS, omd, switch=None, gen_bus=None):
 	'''Generate microgrid data structure from a networkx graph, group of mgs, and omd. 
 	Optional parameters switch and gen_bus may be supplied when loadGrouping or manual partitioning is used.'''
 	omd_list = list(omd.values())
@@ -431,20 +431,20 @@ def form_mg_mines(G, MG_GROUPS, omd, switch=None, gen_bus=None):
 		(M_ID, MG_GROUP, MG_GROUP[0], nx_out_edges(G, MG_GROUP))
 		for (M_ID, MG_GROUP) in enumerate([list(x) for x in MG_GROUPS])
 	]
-	MG_MINES = {}
+	MICROGRIDS = {}
 	for idx in range(len(all_mgs)):
 		M_ID, MG_GROUP, TREE_ROOT, BORDERS = all_mgs[idx]
 		this_switch = switch[f'Mg{M_ID}'] if switch and switch[f'Mg{M_ID}'] != [''] else [get_edge_name(swedge[0], swedge[1], omd_list) for swedge in BORDERS]
 		if this_switch and type(this_switch) == list:
 			this_switch = this_switch[-1] if this_switch[-1] else this_switch[0] # TODO: Why is this_switch a list? Which value do we use? 
 		this_gen_bus = gen_bus[f'Mg{M_ID}'] if gen_bus and gen_bus[f'Mg{M_ID}'] != '' else TREE_ROOT
-		MG_MINES[f'mg{M_ID}'] = {
+		MICROGRIDS[f'mg{M_ID}'] = {
 			'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
 			'switch': this_switch, 
 			'gen_bus': this_gen_bus,
 			'gen_obs_existing': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') in ('generator','storage')]
 		}
-	return MG_MINES
+	return MICROGRIDS
 
 def form_mg_groups(G, CRITICAL_LOADS, algo, algo_params={}):
 	'''Generate a group of mgs from networkx graph and crit_loads
@@ -479,14 +479,14 @@ def form_mg_groups(G, CRITICAL_LOADS, algo, algo_params={}):
 def _tests():
 	with open(f'{microgridup.MGU_DIR}/testfiles/test_params.json') as file:
 		test_params = json.load(file)
-	MG_MINES = test_params['MG_MINES']
+	MICROGRIDS = test_params['MICROGRIDS']
 	algo_params = test_params['algo_params']
 	crit_loads = test_params['crit_loads']
 	lehigh_dss_path = f'{microgridup.MGU_DIR}/testfiles/lehigh_base_phased.dss'
 	wizard_dss_path = f'{microgridup.MGU_DIR}/testfiles/wizard_base_3mg.dss'
 	# Testing microgridup_gen_mgs.mg_group().
-	for _dir in MG_MINES:
-		partitioning_method = MG_MINES[_dir][1]
+	for _dir in MICROGRIDS:
+		partitioning_method = MICROGRIDS[_dir][1]
 		# HACK: loadGrouping accepts pairings but not gen_obs_existing. manual accepts both. Other algos accept neither. 
 		if partitioning_method == 'loadGrouping': 
 			params = algo_params.copy()
@@ -500,22 +500,22 @@ def _tests():
 			G = opendss.dssConvert.dss_to_networkx(wizard_dss_path)
 			omd = opendss.dssConvert.dssToOmd(wizard_dss_path, '', RADIUS=0.0004, write_out=False)
 			MG_GROUPS_TEST = form_mg_groups(G, crit_loads, partitioning_method, params)
-			MINES_TEST = form_mg_mines(G, MG_GROUPS_TEST, omd) if partitioning_method != 'manual' else form_mg_mines(G, MG_GROUPS_TEST, omd, params.get('switch'), params.get('gen_bus')) # No valid gen_bus in MG_GROUPS_TEST. When using manual partitioning, the user should specify gen_bus and switch.
+			MICROGRIDS_TEST = form_microgrids(G, MG_GROUPS_TEST, omd) if partitioning_method != 'manual' else form_microgrids(G, MG_GROUPS_TEST, omd, params.get('switch'), params.get('gen_bus')) # No valid gen_bus in MG_GROUPS_TEST. When using manual partitioning, the user should specify gen_bus and switch.
 		except ValueError:
 			G = opendss.dssConvert.dss_to_networkx(lehigh_dss_path)
 			omd = opendss.dssConvert.dssToOmd(lehigh_dss_path, '', RADIUS=0.0004, write_out=False)
 			MG_GROUPS_TEST = form_mg_groups(G, crit_loads, partitioning_method, params)
-			MINES_TEST = form_mg_mines(G, MG_GROUPS_TEST, omd, params.get('switch'), params.get('gen_bus'))
+			MICROGRIDS_TEST = form_microgrids(G, MG_GROUPS_TEST, omd, params.get('switch'), params.get('gen_bus'))
 		# - Austin (8/1/2024): the "parameter_overrides" key is now a part of the schema for microgrid dicts. The "parameter_overrides" key is
 		#   only used to store information about REopt parameters that are overridden on a per-microgrid basis by the user through the front-end
 		#   GUI or through Python. I add the "parameter_overrides" key here so that these tests pass, but the key could be added to the microgrid
 		#   generation code in this module if desired, in which case these lines of code could be removed
-		for mg in MINES_TEST.values():
+		for mg in MICROGRIDS_TEST.values():
 			mg['parameter_overrides'] = {
 				'reopt_inputs': {}
 			}
 		# Lukes algorithm outputs different configuration each time. Not repeatable. Also errors out later in the MgUP run.
-		assert MINES_TEST == MG_MINES[_dir][0], f'MGU_MINES_{_dir} did not match expected output.\nExpected output: {MG_MINES[_dir][0]}.\nReceived output: {MINES_TEST}.'
+		assert MICROGRIDS_TEST == MICROGRIDS[_dir][0], f'MGU_MICROGRIDS_{_dir} did not match expected output.\nExpected output: {MICROGRIDS[_dir][0]}.\nReceived output: {MICROGRIDS_TEST}.'
 	return print('Ran all tests for microgridup_gen_mgs.py.')
 
 if __name__ == '__main__':

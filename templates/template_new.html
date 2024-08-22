@@ -803,13 +803,13 @@
 	}
 
 	/** Show previously selected partitions on edit flow. */
-	function showOldPartitions(MODEL_DIR, MG_MINES) {
+	function showOldPartitions(MODEL_DIR, MICROGRIDS) {
 		$('#stepThree').hide();
 		var oldPartitionsDiv = $('<div>').attr('id','oldPartitionDiv').addClass('chunk');
 		// Grab a NetworkX diagram of current partition layout.
 		var data = {
 			MODEL_DIR: MODEL_DIR,
-			MG_MINES: MG_MINES
+			MICROGRIDS: MICROGRIDS
 		};
 		document.body.style.cursor = 'progress';
 		$.ajax({
@@ -823,7 +823,7 @@
 				img.attr('src', 'data:image/gif;base64,' + data.pic_hash);
 				oldPartitionsDiv.prepend('<br>')
 				oldPartitionsDiv.prepend(img); 
-				window.createReoptParametersMVC(data.MG_MINES);
+				window.createReoptParametersMVC(data.MICROGRIDS);
 				{% if iframe_mode %}
 				window.disableInputs();
 				{% endif %}
@@ -1049,7 +1049,7 @@
 						img.attr('src', 'data:image/gif;base64,' + data.pic_hash);
 						$('#partitionsPreviewDiv').empty();
 						img.appendTo('#partitionsPreviewDiv');
-						window.createReoptParametersMVC(data.MG_MINES);
+						window.createReoptParametersMVC(data.MICROGRIDS);
 					}
 				},
 				error: function(data) {
@@ -1399,11 +1399,11 @@
 			// Get allDataInputs.json params from Jinja as variables in the script.
 			var in_data = JSON.parse('{{ in_data | tojson | safe }}');
 			var criticalLoads = in_data['CRITICAL_LOADS'];
-			var MG_MINES = in_data['MICROGRIDS'];
+			var MICROGRIDS = in_data['MICROGRIDS'];
 			// Also populate critical load selection div.
 			getLoadsFromExistingFile(MODEL_DIR, criticalLoads);
 			// Also populate partitioning preview div from original run.
-			showOldPartitions(MODEL_DIR, MG_MINES);
+			showOldPartitions(MODEL_DIR, MICROGRIDS);
 		}
 
 		// Add tooltip handler to partitioning dropdown.
@@ -1548,7 +1548,7 @@
 		window.csvLoadParser = csvLoadParser;
 	}
 	// - reoptParameters
-	window.createReoptParametersMVC = function(MG_MINES) {
+	window.createReoptParametersMVC = function(MICROGRIDS) {
 		// - Remove event listener from previous model if it exists
 		if (window.reoptParameterModel === undefined) {
 			// - If "Remove File" is clicked, then microgrid parameter overrides should be cleared. Don't delete or replace the model, just clear it
@@ -1561,7 +1561,7 @@
 			}
 		}
 		const model = new REoptParametersModel();
-		for (const [mgName, mg] of Object.entries(MG_MINES)) {
+		for (const [mgName, mg] of Object.entries(MICROGRIDS)) {
 			model.addReoptParametersInstance(mgName);
 			if (Object.hasOwn(mg, 'parameter_overrides')) {
 				for (const [paramName, value] of Object.entries(mg['parameter_overrides'])) {

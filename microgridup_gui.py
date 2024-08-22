@@ -8,7 +8,7 @@ from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, Request, request, redirect, render_template, jsonify, url_for, send_from_directory, Blueprint
 from omf.solvers.opendss import dssConvert
-from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_mg_mines, form_mg_groups, topological_sort, SwitchNotFoundError, CycleDetectedError
+from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_microgrids, form_mg_groups, topological_sort, SwitchNotFoundError, CycleDetectedError
 import microgridup
 
 app = Flask(__name__)
@@ -346,21 +346,21 @@ def previewOldPartitions():
 	data = request.get_json()
 	model_dir = data['MODEL_DIR']
 	filename = f'{microgridup.PROJ_DIR}/{model_dir}/circuit.dss'
-	MG_MINES = data['MG_MINES']
+	MICROGRIDS = data['MICROGRIDS']
 	omd = dssConvert.dssToOmd(filename, '', RADIUS=0.0004, write_out=False)
 	G = dssConvert.dss_to_networkx(filename, omd=omd)
 	parts = []
-	for mg in MG_MINES:
+	for mg in MICROGRIDS:
 		cur_mg = []
-		cur_mg.append(MG_MINES[mg].get('gen_bus'))
+		cur_mg.append(MICROGRIDS[mg].get('gen_bus'))
 		try:
 			# Try to extend mg by all elements topographically downstream from gen_bus.
-			all_descendants = list(nx.descendants(G, MG_MINES[mg].get('gen_bus')))
+			all_descendants = list(nx.descendants(G, MICROGRIDS[mg].get('gen_bus')))
 			cur_mg.extend(all_descendants)
 		except:
 			# If that didn't work, use old method.
-			cur_mg.extend([load for load in MG_MINES[mg].get('gen_obs_existing')])
-			cur_mg.extend([load for load in MG_MINES[mg].get('loads')])
+			cur_mg.extend([load for load in MICROGRIDS[mg].get('gen_obs_existing')])
+			cur_mg.extend([load for load in MICROGRIDS[mg].get('loads')])
 		parts.append(cur_mg)
 	# Check to see if omd contains coordinates for each important node.
 	if has_full_coords(omd):
@@ -374,14 +374,14 @@ def previewOldPartitions():
 	# Make and save plot, convert to base64 hash, send to frontend.
 	plt.switch_backend('Agg')
 	plt.figure(figsize=(14,12), dpi=350)
-	# Add here later: function to convert MG_MINES to algo_params[pairings] for passing to manual_groups(). Would be more accurate when passed to node_group_map() than parts.
+	# Add here later: function to convert MICROGRIDS to algo_params[pairings] for passing to manual_groups(). Would be more accurate when passed to node_group_map() than parts.
 	n_color_map = node_group_map(G, parts)
 	nx.draw(G, with_labels=True, pos=pos, node_color=n_color_map)
 	pic_IObytes = io.BytesIO()
 	plt.savefig(pic_IObytes,  format='png')
 	pic_IObytes.seek(0)
 	pic_hash = base64.b64encode(pic_IObytes.getvalue()).decode('utf-8')
-	return jsonify({'pic_hash': pic_hash, 'MG_MINES': MG_MINES})
+	return jsonify({'pic_hash': pic_hash, 'MICROGRIDS': MICROGRIDS})
 
 def build_pos_from_omd(omd):
 	'''
@@ -465,9 +465,9 @@ def previewPartitions():
 				return {}
 	except:
 		return jsonify('Invalid partitioning method')
-	MG_MINES = form_mg_mines(G, MG_GROUPS, omd)
-	for mg in MG_MINES:
-		if not MG_MINES[mg]['switch']:
+	MICROGRIDS = form_microgrids(G, MG_GROUPS, omd)
+	for mg in MICROGRIDS:
+		if not MICROGRIDS[mg]['switch']:
 			print(f'Selected partitioning method produced invalid results. Please change partitioning parameter(s).')
 			raise SwitchNotFoundError(f'Selected partitioning method produced invalid results. Please change partitioning parameter(s).')
 	plt.switch_backend('Agg')
@@ -478,7 +478,7 @@ def previewPartitions():
 	plt.savefig(pic_IObytes,  format='png')
 	pic_IObytes.seek(0)
 	pic_hash = base64.b64encode(pic_IObytes.read()).decode('ascii')
-	return jsonify({'pic_hash': pic_hash, 'MG_MINES': MG_MINES})
+	return jsonify({'pic_hash': pic_hash, 'MICROGRIDS': MICROGRIDS})
 
 @app.route('/has_cycles', methods=['GET','POST'])
 def has_cycles():
@@ -702,24 +702,24 @@ def _get_microgrids(critical_loads, partition_method, quantity, dss_path, microg
 	omd = dssConvert.dssToOmd(dss_path, '', RADIUS=0.0004, write_out=False)
 	if partition_method == 'lukes':
 		mg_groups = form_mg_groups(G, critical_loads, 'lukes', algo_params)
-		microgrids = form_mg_mines(G, mg_groups, omd)
+		microgrids = form_microgrids(G, mg_groups, omd)
 	elif partition_method == 'branch':
 		mg_groups = form_mg_groups(G, critical_loads, 'branch')
-		microgrids = form_mg_mines(G, mg_groups, omd)
+		microgrids = form_microgrids(G, mg_groups, omd)
 	elif partition_method == 'bottomUp':
 		mg_groups = form_mg_groups(G, critical_loads, 'bottomUp', algo_params={'num_mgs':quantity, 'omd':omd, 'cannot_be_mg':['regcontrol']})
-		microgrids = form_mg_mines(G, mg_groups, omd)
+		microgrids = form_microgrids(G, mg_groups, omd)
 	elif partition_method == 'criticalLoads':
 		mg_groups = form_mg_groups(G, critical_loads, 'criticalLoads', algo_params={'num_mgs':quantity})
-		microgrids = form_mg_mines(G, mg_groups, omd)
+		microgrids = form_microgrids(G, mg_groups, omd)
 	elif partition_method == 'loadGrouping':
 		algo_params = json.loads(microgrids)
 		mg_groups = form_mg_groups(G, critical_loads, 'loadGrouping', algo_params)
-		microgrids = form_mg_mines(G, mg_groups, omd, switch=algo_params.get('switch', None), gen_bus=algo_params.get('gen_bus', None))
+		microgrids = form_microgrids(G, mg_groups, omd, switch=algo_params.get('switch', None), gen_bus=algo_params.get('gen_bus', None))
 	elif partition_method == 'manual':
 		algo_params = json.loads(microgrids)
 		mg_groups = form_mg_groups(G, critical_loads, 'manual', algo_params)
-		microgrids = form_mg_mines(G, mg_groups, omd, switch=algo_params.get('switch', None), gen_bus=algo_params.get('gen_bus', None))
+		microgrids = form_microgrids(G, mg_groups, omd, switch=algo_params.get('switch', None), gen_bus=algo_params.get('gen_bus', None))
 	elif partition_method == '':
 		microgrids = json.loads(microgrids)
 	return microgrids
@@ -758,8 +758,8 @@ def _tests():
 	lon = -89.6501
 	with open('testfiles/test_params.json') as file:
 		test_params = json.load(file)
-	MG_MINES = test_params['MG_MINES']
-	wizard_dir = [_dir for _dir in MG_MINES if 'wizard' in _dir]
+	MICROGRIDS = test_params['MICROGRIDS']
+	wizard_dir = [_dir for _dir in MICROGRIDS if 'wizard' in _dir]
 	elements = test_params['elements']
 	for e in elements:
 		e['type'] = e['class']

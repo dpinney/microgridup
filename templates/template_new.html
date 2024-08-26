@@ -1492,7 +1492,8 @@
 					// Create checkboxes and labels for each load.
 					for (let i = 0; i < loads.length; i++) {
 						const label = document.createElement('label');
-						label.style.display = 'block';
+						label.style.display = 'inline-block';
+						label.style.paddingRight = '5px';
 						const checkbox = document.createElement('input');
 						checkbox.type = 'checkbox';
 						label.appendChild(checkbox);
@@ -1500,11 +1501,13 @@
 						criticalLoadsSelect.appendChild(label);
 						// Add a dropdown to dropDowns.
 						const dropdownLabel = document.createElement('label');
+						dropdownLabel.style.display = 'inline-block';
+						dropdownLabel.style.paddingRight = '8px';
 						const dropdown = document.createElement('select');
+						dropdown.style.marginRight = '3px';
 						dropdownLabel.appendChild(dropdown);
-						dropdownLabel.appendChild(document.createTextNode(' ' + loads[i]));
+						dropdownLabel.appendChild(document.createTextNode(loads[i]));
 						dropDownsContainer.appendChild(dropdownLabel);
-						dropDownsContainer.appendChild(document.createElement('br'));
 					}
 					// Handle the case where there are no loads.
 					if (loads.length === 0) {

@@ -796,17 +796,20 @@
 						checkbox.checked = true;
 					}
 					const label = document.createElement('label');
-					label.style.display = 'block';
+					label.style.display = 'inline-block';
+					label.style.paddingRight = '5px';
 					label.appendChild(checkbox);
 					label.appendChild(document.createTextNode(loads[i]));
 					criticalLoadsSelect.appendChild(label);
 					// Add a dropdown to dropDowns.
 					const dropdownLabel = document.createElement('label');
+					dropdownLabel.style.display = 'inline-block';
+					dropdownLabel.style.paddingRight = '8px';
 					const dropdown = document.createElement('select');
+					dropdown.style.marginRight = '3px';
 					dropdownLabel.appendChild(dropdown);
-					dropdownLabel.appendChild(document.createTextNode(' ' + loads[i]));
+					dropdownLabel.appendChild(document.createTextNode(loads[i]));
 					dropDownsContainer.appendChild(dropdownLabel);
-					dropDownsContainer.appendChild(document.createElement('br'));
 				}
 				// Handle case where there are no loads.
 				if (loads.length === 0) {

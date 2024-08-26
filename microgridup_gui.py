@@ -343,10 +343,10 @@ def getLoadsFromExistingFile():
 
 @app.route('/previewOldPartitions', methods=['POST'])
 def previewOldPartitions():
-	data = request.get_json()
-	model_dir = data['MODEL_DIR']
+	request_json = request.get_json()
+	model_dir = request_json['MODEL_DIR']
 	filename = f'{microgridup.PROJ_DIR}/{model_dir}/circuit.dss'
-	MICROGRIDS = data['MICROGRIDS']
+	MICROGRIDS = request_json['MICROGRIDS']
 	omd = dssConvert.dssToOmd(filename, '', RADIUS=0.0004, write_out=False)
 	G = dssConvert.dss_to_networkx(filename, omd=omd)
 	parts = []
@@ -425,12 +425,13 @@ def remove_nodes_without_edges(G):
 @app.route('/previewPartitions', methods = ['GET','POST'])
 @app.route('/edit/previewPartitions', methods = ['GET','POST'])
 def previewPartitions():
-	CIRC_FILE = json.loads(request.form['fileName'])
+	request_json = request.get_json()
+	CIRC_FILE = request_json['fileName']
 	if not CIRC_FILE.startswith('/'):
-		CIRC_FILE = str(Path(microgridup.PROJ_DIR).resolve(True) / json.loads(request.form['modelDir']) / CIRC_FILE)
-	CRITICAL_LOADS = json.loads(request.form['critLoads'])
-	METHOD = json.loads(request.form['method'])
-	MGQUANT = int(json.loads(request.form['mgQuantity']))
+		CIRC_FILE = str(Path(microgridup.PROJ_DIR).resolve(True) / request_json['modelDir'] / CIRC_FILE)
+	CRITICAL_LOADS = request_json['critLoads']
+	METHOD = request_json['method']
+	MGQUANT = int(request_json['mgQuantity'])
 	# Convert to omd to give coordinates to important grid items.
 	omd = dssConvert.dssToOmd(CIRC_FILE, '', RADIUS=0.0004, write_out=False)
 	# Convert omd to NetworkX graph because omd has full coordinates.

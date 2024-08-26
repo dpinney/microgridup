@@ -834,44 +834,55 @@
 	}
 
 	/** Show previously selected partitions on edit flow. */
-	function showOldPartitions(MODEL_DIR, MICROGRIDS) {
-		$('#stepThree').hide();
-		var oldPartitionsDiv = $('<div>').attr('id','oldPartitionDiv').addClass('chunk');
+	async function showOldPartitions(MODEL_DIR, MICROGRIDS) {
+		document.getElementById('stepThree').style.display = 'none';
+		const oldPartitionsDiv = document.createElement('div');
+		oldPartitionsDiv.id = 'oldPartitionDiv';
+		oldPartitionsDiv.classList.add('chunk');
 		// Grab a NetworkX diagram of current partition layout.
-		var data = {
+		const data = {
 			MODEL_DIR: MODEL_DIR,
 			MICROGRIDS: MICROGRIDS
 		};
 		document.body.style.cursor = 'progress';
-		$.ajax({
-			type: 'POST',
-			url: '/previewOldPartitions',
-			data: JSON.stringify(data),
-			contentType: 'application/json',
-			success: function(data, status) {
-				document.body.style.cursor = 'default';
-				var img = $('<img id="oldPartitionPreview">');
-				img.attr('src', 'data:image/gif;base64,' + data.pic_hash);
-				oldPartitionsDiv.prepend('<br>')
-				oldPartitionsDiv.prepend(img); 
-				window.createReoptParametersMVC(data.MICROGRIDS);
+		try {
+			const response = await fetch('/previewOldPartitions', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(data)
+			});
+			const responseJson = await response.json();
+			document.body.style.cursor = 'default';
+			if (response.ok) {
+				const img = document.createElement('img');
+				img.id = 'oldPartitionPreview';
+				img.src = 'data:image/gif;base64,' + responseJson.pic_hash;
+				const description = document.createElement('p');
+				description.textContent = 'Colors represent microgrid boundaries.';
+				oldPartitionsDiv.prepend(description);
+				oldPartitionsDiv.prepend(img);
+				window.createReoptParametersMVC(responseJson.MICROGRIDS);
 				{% if iframe_mode %}
 				window.disableInputs();
 				{% endif %}
-			},
-			error: function(data) {
-				document.body.style.cursor = 'default';
-				alert(data.responseJSON.message);
+			} else {
+				throw new Error(responseJson.message);
 			}
-		})
-		$('#partitionPreviewerContainer').append(oldPartitionsDiv);
-		var partitionButton = $('<button>').text('Partition circuit differently');
-		oldPartitionsDiv.append(partitionButton);
-		partitionButton.on('click', function() {
-			$('#stepThree').show();
-			oldPartitionsDiv.hide();
-			$('#previewPartitionsButton').prop('disabled', false);
-			$('#partitionMethod').prop('disabled', false);
+		} catch (error) {
+			document.body.style.cursor = 'default';
+			alert(error);
+		}
+		document.getElementById('partitionPreviewerContainer').appendChild(oldPartitionsDiv);
+		const partitionButton = document.createElement('button');
+		partitionButton.textContent = 'Partition circuit differently';
+		oldPartitionsDiv.appendChild(partitionButton);
+		partitionButton.addEventListener('click', function() {
+			document.getElementById('stepThree').style.display = 'block';
+			oldPartitionsDiv.style.display = 'none';
+			document.getElementById('previewPartitionsButton').disabled = false;
+			document.getElementById('partitionMethod').disabled = false;
 		});
 	}
 
@@ -1037,63 +1048,74 @@
 	}
 
 	/** Grab partitioning preview. */
-	function attachPartitionButtonEventHandler() {
-		$('#previewPartitionsButton').click(function() {
+	async function attachPartitionButtonEventHandler() {
+		document.getElementById('previewPartitionsButton').addEventListener('click', async function() {
 			if (window.circuitIsSpecified === false) {
-				alert('Please complete step 2.')
-				return
+				alert('Please complete step 2.');
+				return;
 			}
 			// Get critical loads, if any.
-			critLoads = new Array();
-			$('#criticalLoadsSelect label').each(function() {
-				if ($(this).find('input')[0].checked) {
-					var element = $(this).text();
+			const critLoads = [];
+			document.querySelectorAll('#criticalLoadsSelect label').forEach(function(label) {
+	            if (label.querySelector('input').checked) {
+					const element = label.textContent.trim();
 					critLoads.push(element);
 				}
 			});
 			// Get partitioning method.
-			var method = $( "#partitionMethod option:selected" ).val();
+			const method = document.querySelector('#partitionMethod option:checked').value;
 			if (method === "") {
 				alert('Please ensure you have chosen a partition method.');
-				return
+				return;
 			}
 			// Get mgQuantity, if applicable. 
-			var mgQuantity = $('#minQuantMgs').val() ? $('#minQuantMgs').val() : 0;
+			const mgQuantity = document.getElementById('minQuantMgs').value || 0;
 			document.body.style.cursor = 'progress';
-			$.ajax({
-				url: 'previewPartitions',
-				type: 'POST',
-				data: {
-					critLoads : JSON.stringify(critLoads),
-					fileName : JSON.stringify(window.filename),
-					method : JSON.stringify(method),
-					mgQuantity : mgQuantity,
-					modelDir: JSON.stringify("{{in_data['MODEL_DIR']}}")
-				},
-				success: function(data, status) {
-					document.body.style.cursor = 'default';
-					if (data === 'Invalid partitioning method') {
+			try {
+				const response = await fetch('previewPartitions', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						critLoads: critLoads,
+						fileName: window.filename,
+						method: method,
+						mgQuantity: mgQuantity,
+						modelDir: "{{in_data['MODEL_DIR']}}"
+					})
+				});
+				const responseJson = await response.json();
+				document.body.style.cursor = 'default';
+				if (response.ok) {
+					if (responseJson === 'Invalid partitioning method') {
 						alert('Selected partitioning method produced invalid results. Please choose a different partitioning method.');
 					} else {
 						// Create image.
-						var img = $('<img id="previewImage">');
-						img.attr('src', 'data:image/gif;base64,' + data.pic_hash);
-						$('#partitionsPreviewDiv').empty();
-						img.appendTo('#partitionsPreviewDiv');
-						window.createReoptParametersMVC(data.MICROGRIDS);
+						const img = document.createElement('img');
+						img.id = 'previewImage';
+						img.src = 'data:image/gif;base64,' + responseJson.pic_hash;
+						const description = document.createElement('p');
+						description.textContent = 'Colors represent microgrid boundaries.';
+						const previewDiv = document.getElementById('partitionsPreviewDiv');
+						previewDiv.innerHTML = '';
+						previewDiv.appendChild(img);
+						previewDiv.appendChild(description);
+						window.createReoptParametersMVC(responseJson.MICROGRIDS);
 					}
-				},
-				error: function(data) {
-					document.body.style.cursor = 'default';
-					alert(data.responseJSON.message);
+				} else {
+					throw new Error(responseJson.message);
 				}
-			});
+			} catch (error) {
+				document.body.style.cursor = 'default';
+				alert(error);
+			}
 		});
 		// Also call above function if user presses enter.
-		$('#minQuantMgs').keypress(function(e) {
+		document.getElementById('minQuantMgs').addEventListener('keypress', function(e) {
 			if (e.which === 13) {
 				e.preventDefault();
-				$('#previewPartitionsButton').click();
+				document.getElementById('previewPartitionsButton').click();
 			}
 		});
 	}

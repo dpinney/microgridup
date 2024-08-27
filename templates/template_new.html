@@ -834,7 +834,7 @@
 	}
 
 	/** Show previously selected partitions on edit flow. */
-	async function showOldPartitions(MODEL_DIR, MICROGRIDS) {
+	async function showOldPartitions(MODEL_DIR, MICROGRIDS, CRITICAL_LOADS) {
 		document.getElementById('stepThree').style.display = 'none';
 		const oldPartitionsDiv = document.createElement('div');
 		oldPartitionsDiv.id = 'oldPartitionDiv';
@@ -842,7 +842,8 @@
 		// Grab a NetworkX diagram of current partition layout.
 		const data = {
 			MODEL_DIR: MODEL_DIR,
-			MICROGRIDS: MICROGRIDS
+			MICROGRIDS: MICROGRIDS,
+			CRITICAL_LOADS: CRITICAL_LOADS
 		};
 		document.body.style.cursor = 'progress';
 		try {
@@ -860,7 +861,7 @@
 				img.id = 'oldPartitionPreview';
 				img.src = 'data:image/gif;base64,' + responseJson.pic_hash;
 				const description = document.createElement('p');
-				description.textContent = 'Colors represent microgrid boundaries.';
+				description.textContent = 'Colors represent microgrid boundaries. Black borders represent critical loads.';
 				oldPartitionsDiv.prepend(description);
 				oldPartitionsDiv.prepend(img);
 				window.createReoptParametersMVC(responseJson.MICROGRIDS);
@@ -1096,7 +1097,7 @@
 						img.id = 'previewImage';
 						img.src = 'data:image/gif;base64,' + responseJson.pic_hash;
 						const description = document.createElement('p');
-						description.textContent = 'Colors represent microgrid boundaries.';
+						description.textContent = 'Colors represent microgrid boundaries. Black borders represent critical loads.';
 						const previewDiv = document.getElementById('partitionsPreviewDiv');
 						previewDiv.innerHTML = '';
 						previewDiv.appendChild(img);
@@ -1441,22 +1442,22 @@
 			}
 		});
 		// If user clicked edit, show used circuit.
-		if ($('#circuitPostCreation').length) {
-			$('#circuitUpload').show();
-			$('#upload').prop('checked', true);
-			$('#wizard').attr('disabled', true);
+		if (document.getElementById('circuitPostCreation')) {
+			document.getElementById('circuitUpload').style.display = 'block';
+			document.getElementById('upload').checked = true;
+			document.getElementById('wizard').disabled = true;
 			window.circuitIsSpecified = true;
-			window.filename = $('#circuitPostCreation').val();
+			window.filename = document.getElementById('circuitPostCreation').value;
 			const MODEL_DIR = document.getElementsByName('MODEL_DIR')[0].value;
 			window.on_edit_flow = true;
 			// Get allDataInputs.json params from Jinja as variables in the script.
-			var in_data = JSON.parse('{{ in_data | tojson | safe }}');
-			var criticalLoads = in_data['CRITICAL_LOADS'];
-			var MICROGRIDS = in_data['MICROGRIDS'];
+			const inData = JSON.parse('{{ in_data | tojson | safe }}');
+			const CRITICAL_LOADS = inData['CRITICAL_LOADS'];
+			const MICROGRIDS = inData['MICROGRIDS'];
 			// Also populate critical load selection div.
-			getLoadsFromExistingFile(MODEL_DIR, criticalLoads);
+			getLoadsFromExistingFile(MODEL_DIR, CRITICAL_LOADS);
 			// Also populate partitioning preview div from original run.
-			showOldPartitions(MODEL_DIR, MICROGRIDS);
+			showOldPartitions(MODEL_DIR, MICROGRIDS, CRITICAL_LOADS);
 		}
 
 		// Add tooltip handler to partitioning dropdown.

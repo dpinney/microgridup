@@ -347,6 +347,7 @@ def previewOldPartitions():
 	model_dir = request_json['MODEL_DIR']
 	filename = f'{microgridup.PROJ_DIR}/{model_dir}/circuit.dss'
 	MICROGRIDS = request_json['MICROGRIDS']
+	CRITICAL_LOADS = request_json['CRITICAL_LOADS']
 	omd = dssConvert.dssToOmd(filename, '', RADIUS=0.0004, write_out=False)
 	G = dssConvert.dss_to_networkx(filename, omd=omd)
 	parts = []
@@ -376,7 +377,9 @@ def previewOldPartitions():
 	plt.figure(figsize=(14,12), dpi=350)
 	# Add here later: function to convert MICROGRIDS to algo_params[pairings] for passing to manual_groups(). Would be more accurate when passed to node_group_map() than parts.
 	n_color_map = node_group_map(G, parts)
-	nx.draw(G, with_labels=True, pos=pos, node_color=n_color_map)
+	edge_color_map = ['black' if node in CRITICAL_LOADS else 'none' for node in G.nodes()]
+	nx.draw(G, with_labels=True, pos=pos, node_color=n_color_map, edgecolors=edge_color_map, linewidths=2)
+	# nx.draw(G, with_labels=True, pos=pos, node_color=n_color_map)
 	pic_IObytes = io.BytesIO()
 	plt.savefig(pic_IObytes,  format='png')
 	pic_IObytes.seek(0)
@@ -474,7 +477,8 @@ def previewPartitions():
 	plt.switch_backend('Agg')
 	plt.figure(figsize=(14,12), dpi=350)
 	n_color_map = node_group_map(G, MG_GROUPS)
-	nx.draw(G, with_labels=True, pos=pos, node_color=n_color_map)
+	edge_color_map = ['black' if node in CRITICAL_LOADS else 'none' for node in G.nodes()]
+	nx.draw(G, with_labels=True, pos=pos, node_color=n_color_map, edgecolors=edge_color_map, linewidths=2)
 	pic_IObytes = io.BytesIO()
 	plt.savefig(pic_IObytes,  format='png')
 	pic_IObytes.seek(0)

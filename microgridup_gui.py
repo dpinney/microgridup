@@ -245,7 +245,7 @@ def wizard_to_dss(model_dir=None, lat=None, lon=None, elements=None, test_run=Fa
 	if not elements:
 		elements = json.loads(request.form['json'])
 	if not on_edit_flow:
-		on_edit_flow = request.form['on_edit_flow']
+		on_edit_flow = request.form['onEditFlow']
 	if on_edit_flow == 'false':
 		if os.path.isdir(f'{microgridup.PROJ_DIR}/{model_dir}'):
 			print('Invalid Model Name.')
@@ -314,7 +314,7 @@ def wizard_to_dss(model_dir=None, lat=None, lon=None, elements=None, test_run=Fa
 def uploadDss():
 	model_dir = request.form['MODEL_DIR']
 	# Check to see if user is on edit flow. If user is not on edit flow, ensure that model_dir is not already in data/projects.
-	on_edit_flow = request.form['on_edit_flow']
+	on_edit_flow = request.form['onEditFlow']
 	if on_edit_flow == 'false':
 		if os.path.isdir(f'{microgridup.PROJ_DIR}/{model_dir}'):
 			return jsonify(error=f'A model named "{model_dir}" already exists. Please choose a different Model Name.'), 400 # Name was already taken.
@@ -335,8 +335,8 @@ def uploadDss():
 
 @app.route('/getLoadsFromExistingFile', methods=['POST'])
 def getLoadsFromExistingFile():
-	# path = request.form.get('path')
-	model_dir = request.form['MODEL_DIR']
+	request_json = request.get_json()
+	model_dir = request_json['MODEL_DIR']
 	path = f'{microgridup.PROJ_DIR}/{model_dir}/circuit.dss'
 	loads = getLoads(path)
 	return jsonify(loads=loads)

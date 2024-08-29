@@ -243,7 +243,7 @@ def wizard_to_dss(model_dir=None, lat=None, lon=None, elements=None, test_run=Fa
 	if on_edit_flow == 'false':
 		if os.path.isdir(f'{microgridup.PROJ_DIR}/{model_dir}'):
 			print('Invalid Model Name.')
-			return jsonify(error=f'A model named "{model_dir}" already exists. Please choose a different Model Name.'), 400 # Name was already taken.
+			return jsonify(error=f'A project named "{model_dir}" already exists. Please choose a different project name.'), 400 # Name was already taken.
 	# Convert to DSS and return loads.
 	dssString = f'clear \nset defaultbasefrequency=60 \nnew object=circuit.{model_dir} \n'
 	busList = []
@@ -620,9 +620,9 @@ def _get_reopt_inputs(data):
 		'energyCost':                   float(data['energyCost']),
 		'wholesaleCost':                float(data['wholesaleCost']),
 		'demandCost':                   float(data['demandCost']),
-		'solarCanCurtail':              (data['solarCanCurtail'] == 'true'),
-		'solarCanExport':               (data['solarCanExport'] == 'true'),
-		'urdbLabelSwitch':              data['urdbLabelSwitch'],
+		'solarCanCurtail':              data['solarCanCurtail'] == 'true',
+		'solarCanExport':               data['solarCanExport'] == 'true',
+		'urdbLabelSwitch':              data['urdbLabelSwitch'] == 'true',
 		'urdbLabel':                    data['urdbLabel'],
 		'year':                         int(data['year']),
 		'analysisYears':                int(data['analysisYears']),
@@ -630,10 +630,10 @@ def _get_reopt_inputs(data):
 		'value_of_lost_load':           float(data['value_of_lost_load']),
 		'omCostEscalator':              float(data['omCostEscalator']),
 		'discountRate':                 float(data['discountRate']),
-		'solar':                        data['solar'],
-		'battery':                      data['battery'],
-		'fossil':                       data['fossil'],
-		'wind':                         data['wind'],
+		'solar':                        data['solar'] == 'true',
+		'battery':                      data['battery'] == 'true',
+		'fossil':                       data['fossil'] == 'true',
+		'wind':                         data['wind'] == 'true',
 		'solarCost':                    float(data['solarCost']),
 		'solarMax':                     float(data['solarMax']),
 		'solarMin':                     float(data['solarMin']),
@@ -660,7 +660,7 @@ def _get_reopt_inputs(data):
 		'dieselCO2Factor':              float(data['dieselCO2Factor']),
 		'dieselOMCostKw':               float(data['dieselOMCostKw']),
 		'dieselOMCostKwh':              float(data['dieselOMCostKwh']),
-		'dieselOnlyRunsDuringOutage':   (data['dieselOnlyRunsDuringOutage'] == 'true'),
+		'dieselOnlyRunsDuringOutage':   data['dieselOnlyRunsDuringOutage'] == 'true',
 		'dieselMacrsOptionYears':       int(data['dieselMacrsOptionYears']),
 		'windCost':                     float(data['windCost']),
 		'windMax':                      float(data['windMax']),

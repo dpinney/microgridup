@@ -3,11 +3,12 @@
 <head>
 	<title>MicrogridUP &raquo; New</title>
 	<link rel="stylesheet" href="/static/js/components/modal.css">
+	<link rel="stylesheet" href="/static/js/components/circuitBuilder/circuitBuilder.css">
 	<link rel="stylesheet" href="/static/js/components/reoptParameters/view.css">
-	<script type="module" src="/static/js/components/circuitBuilder/circuitBuilder.js"></script>
 	<script src="/static/js/libraries/graphology-library.js"></script>
 	<script src="/static/js/libraries/graphology.js"></script>
 	<script src="/static/js/libraries/papaparse.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 	<script src="https://kit.fontawesome.com/92028f16c4.js" crossorigin="anonymous"></script>
 	<style type="text/css">
 		:root {
@@ -30,6 +31,10 @@
 			padding: 6px;
 			border-radius: 4px;
 			margin: 4px 2px 4px 2px;
+		}
+		/* Only style inputs in chunks, not inputs in tables */
+		.chunk > input:last-child, .chunk > select:last-child {
+			margin-left: .5rem;
 		}
 		#stepThree {
 			margin-left: 5px;
@@ -247,14 +252,8 @@
             <h3>Step 1: Input project information</h3>
             <form id="modelInfoForm" enctype="multipart/form-data">
                 <h5>Site and Energy Provider</h5>
-                <div class="chunk">
-                    <label class="tooltip" for="MODEL_DIR">Project Name<span class="classic">Project names must be entirely lowercase.</span></label>
-                    <input type="text" name="MODEL_DIR" value="{{in_data.MODEL_DIR}}" pattern="[a-z0-9_\-]+" required/>
-                </div>
-                <div class="chunk">
-                    <label class="tooltip" for="QSTS_STEPS">Interconn. Time Steps (hours)<span class="classic">Defines the length of the interconnection analysis in hours.</span></label>
-                    <input type="text" name="QSTS_STEPS" value="{{in_data.QSTS_STEPS}}" pattern="\d*"/>
-                </div>
+                <div id='MODEL_DIR'></div>
+                <div id='QSTS_STEPS'></div>
                 <br>
                 <div class="chunk">
                     <label class="tooltip" for="DESCRIPTION">Description<span class="classic">Include an optional description of the project. Max 140 characters.</span></label>
@@ -265,43 +264,13 @@
                     <i class="fa fa-plus-square"></i>
                     <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
                     <div style="display:none">
-                        <div class="chunk">
-                            <label class="tooltip" for="energyCost">Energy Cost ($/kWh)<span class="classic">Specify the energy cost. Format 0.XX</span></label>
-                            <input type="text" name="energyCost" value="{{ in_data.REOPT_INPUTS.get('energyCost','0.12') }}" pattern="^\d+\.?\d*?$"/>
-                        </div>
-                        <div class="chunk">
-                            <label class="tooltip" for="wholesaleCost">Wholesale Cost ($/kWh)<span class="classic">Specify wholesale price for selling excess electricity back to the grid operator. Format 0.XX</span></label>
-                            <input type="text" name="wholesaleCost" value="{{ in_data.REOPT_INPUTS.get('wholesaleCost','0.034') }}" pattern="^\d+\.?\d*?$"/>
-                        </div>
-                        <div class="chunk">
-                            <label class="tooltip" for="demandCost">Demand Cost ($/kW)<span class="classic">Specify the demand cost in $/kW. Format 0.XX</span></label>
-                            <input type="text" name="demandCost" value="{{ in_data.REOPT_INPUTS.get('demandCost','20') }}" pattern="^\d+\.?\d*?$"/>
-                        </div>
-                        <div class="chunk">
-                            <label class="tooltip" for="solarCanCurtail">DG Can Curtail<span class="classic">Allows for excess distributed generation to be automatically curtailed.</span></label>
-                            <select id="solarCanCurtail" name="solarCanCurtail">
-                                <option {% if in_data.REOPT_INPUTS.solarCanCurtail == True %}selected{% endif %} value="true">Yes</option>
-                                <option {% if in_data.REOPT_INPUTS.solarCanCurtail == False %}selected{% endif %} value="false">No</option>
-                            </select>
-                        </div>
-                        <div class="chunk">
-                            <label class="tooltip" for="solarCanExport">DG Can Export<span class="classic">Allows for excess distributed generation to be sold back to the grid.</span></label>
-                            <select id="solarCanExport" name="solarCanExport">
-                                <option {% if in_data.REOPT_INPUTS.solarCanExport == True %}selected{% endif %} value="true">Yes</option>
-                                <option {% if in_data.REOPT_INPUTS.solarCanExport == False %}selected{% endif %} value="false">No</option>
-                            </select>
-                        </div>
-                        <div class="chunk">
-                            <label class="tooltip" for="urdbLabelSwitch">Use URDB Rate?<span class="classic">Utilizing a rate from the Utility Rate Database overrides Cost of Energy and Cost of Demand rates above. See <a href="https://openei.org/services/doc/rest/util_rates/">OpenEI</a> for more information.</span></label>
-                            <select id="urdbLabelSwitch" name="urdbLabelSwitch">
-                                <option {% if in_data.REOPT_INPUTS.urdbLabelSwitch == "on" %}selected{% endif %} value="on">Yes</option>
-                                <option {% if 'urdbLabelSwitch' not in in_data.REOPT_INPUTS or in_data.REOPT_INPUTS.urdbLabelSwitch == "off" %}selected{% endif %} value="off">No</option>
-                            </select>
-                        </div>
-                        <div class="chunk">
-                            <label class="tooltip" for="urdbLabel">URDB Label<span class="classic">Input the string found at the end of the URDB Rate URL, For example <a href="https://openei.org/apps/IURDB/rate/view/5b75cfe95457a3454faf0aea">this rate data entry</a> would be "5b75cfe95457a3454faf0aea"</span></label>
-                            <input type="text" name="urdbLabel" value="{{ in_data.REOPT_INPUTS.get('urdbLabel','5b75cfe95457a3454faf0aea') }}"/>
-                        </div>
+                        <div id="energyCost"></div>
+                        <div id="wholesaleCost"></div>
+                        <div id="demandCost"></div>
+                        <div id="solarCanCurtail"></div>
+                        <div id="solarCanExport"></div>
+                        <div id="urdbLabelSwitch"></div>
+                        <div id="urdbLabel"></div>
                     </div>
                 </div>
                 <h5>Load Profile</h5>
@@ -315,28 +284,19 @@
                         <div id='csvLoadParserInsert'></div>
                     {% endif %}
                 </div>
-				<div class="chunk">
-					<label class="tooltip" for="analysisYears">Analysis Period (years)<span class="classic">Please enter a number 2-75 to specify the length of financial analysis in years.</span></label>
-					<input type="text" name="analysisYears" value="{{ in_data.REOPT_INPUTS.get('analysisYears','25') }}" step="1" min="2" max="75"/>
-				</div>
+                <div id="analysisYears"></div>
                 <div>
                     <i class="fa fa-plus-square"></i>
                     <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
                     <div style="display:none">
-						<div class="chunk">
-							<label class="tooltip" for="year">Year<span class="classic">Specify the year to which the load shape values correspond.</span></label>
-							<input type="text" name="year" value="{{ in_data.REOPT_INPUTS.get('year','2017') }}" pattern="^\d{4}$"/>
-						</div>
+                        <div id="year"></div>
                     </div>
                 </div>
                 <h5>Resilience</h5>
                 <div class="chunk">
                     <div id='outageLocationInputInsert'></div>
                 </div>
-                <div class="chunk">
-                    <label class="tooltip" for="outageDuration">Outage Duration (hours)<span class="classic">Please enter a number 1-8760 to specify the duration of the added major outage in hours.</span></label>
-                    <input type="text" name="outageDuration" value="{{ in_data.REOPT_INPUTS.get('outageDuration','48') }}" min="1" max="8760"/>
-                </div>
+                <div id="outageDuration"></div>
 				<div class="chunk">
                     {% if in_data.get('OUTAGE_CSV') %}
                         <label class="tooltip" for="HISTORICAL_OUTAGES">Historical Outage Data (.csv)<span class="classic">Please upload a .csv file representing historical outages. See Appendix A in the help for formatting details.</span></label>
@@ -353,37 +313,19 @@
                     <i class="fa fa-plus-square"></i>
                     <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
                     <div style="display:none;">
-                        <div class="chunk">
-                            <label class="tooltip" for="maxRuntimeSeconds">Maximum REopt Run-time (seconds)<span class="classic">Please enter a number 30-86400. A greater maximum REopt run-time could result in more precise REopt results. A maximum REopt run-time that is too short could result in an error.</span></label>
-                            <input type="text" name="maxRuntimeSeconds" value="{{ in_data.REOPT_INPUTS.get('maxRuntimeSeconds', '240') }}" min="30" max="86400"/>
-                        </div>
+                        <div id='maxRuntimeSeconds'></div>
                     </div>
                 </div>
                 <h5>Financial</h5>
-                <div class="chunk">
-                    <label class="tooltip" for="value_of_lost_load">Value of Lost Load ($/kWh)<span class="classic">Specify the value of lost load during a power outage in $/kWh.</span></label>
-                    <input type="text" name="value_of_lost_load" value="{{ in_data.REOPT_INPUTS.get('value_of_lost_load','1') }}" pattern="^\d+\.?\d*?$"/>
-                </div>
-                <div class="chunk">
-                    <label class="tooltip" for="singlePhaseRelayCost">Single-Phase Relay Cost ($)<span class="classic">Specify the cost of a single-phase relay in $.</span></label>
-                    <input type="text" name="singlePhaseRelayCost" value="{{ in_data.REOPT_INPUTS.get('singlePhaseRelayCost','300') }}" pattern="^\d+$"/>
-                </div>
-                <div class="chunk">
-                    <label class="tooltip" for="threePhaseRelayCost">Three-Phase Relay Cost ($)<span class="classic">Specify the cost of a three-phase relay in $.</span></label>
-                    <input type="text" name="threePhaseRelayCost" value="{{ in_data.REOPT_INPUTS.get('threePhaseRelayCost','20000') }}" pattern="^\d+\.?\d*?$"/>
-                </div>
+                <div id="value_of_lost_load"></div>
+                <div id="singlePhaseRelayCost"></div>
+                <div id="threePhaseRelayCost"></div>
                 <div>
                     <i class="fa fa-plus-square"></i>
                     <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
                     <div style="display:none">
-                        <div class="chunk">
-                            <label class="tooltip" for="omCostEscalator">O+M Escalation (% per year)<span class="classic">Please enter a number 0-1 for the Annual nominal O&M cost escalation rate. Format 0.XXX</span></label>
-                            <input type="text" name="omCostEscalator" value="{{ in_data.REOPT_INPUTS.get('omCostEscalator','0.025') }}" step="0.001" min="0.0" max="1.0"/>
-                        </div>
-                        <div class="chunk">
-                            <label class="tooltip" for="discountRate">Discount Rate (% per year)<span class="classic">Please enter a number 0-1 for the rate used to discount future cash flows in a net present value analysis. In single ownership model the offtaker is also the generation owner. Format 0.XXX</span></label>
-                            <input type="text" name="discountRate" value="{{ in_data.REOPT_INPUTS.get('discountRate','0.083') }}" step="0.001" min="0.0" max="1.0"/>
-                        </div>
+                        <div id="omCostEscalator"></div>
+                        <div id='discountRate'></div>
                     </div>
                 </div>
             </form>
@@ -396,14 +338,8 @@
             <label for="upload">Upload circuit from file</label><br>
 
 			<div id="circuitCreator" class="desc">
-				<div class="chunk">
-                    <label class="tooltip" for="latitude">Latitude<span class="classic">Specify the latitude of the load/grid as a decimal.</span></label>
-                    <input type="text" name="latitude" pattern="-?\d+\.?\d*" min="-90" max="90" value="{{ in_data.REOPT_INPUTS.get('latitude','39.7817') }}"/>
-                </div>
-                <div class="chunk">
-                    <label class="tooltip" for="longitude">Longitude<span class="classic">Specify the longitude of the load/grid as a decimal.</span></label>
-                    <input type="text" name="longitude" pattern="-?\d+\.?\d*" min="-180" max="180" value="{{ in_data.REOPT_INPUTS.get('longitude','-89.6501') }}"/>
-                </div>
+                <div id='latitude'></div>
+                <div id='longitude'></div>
 			</div>
             <div id="circuitUpload" class="desc" style="margin-top:10px">
                 <div class="chunk">
@@ -494,189 +430,54 @@
         <div id='techSelect' class='step'>
             <h3>Step 4: Select technologies to be used in microgrids</h3>
             <form id="techParamForm" enctype="multipart/form-data">
-                <div class="chunk">
-                    <label for="solar">Solar</label>
-                    <input type="checkbox" name="solar" value="on" id="solar" {% if in_data.REOPT_INPUTS.solar == 'on' %}checked{% endif %}/>
-                    <input type="hidden" name="solar" value="off">
-                </div>
-                <div class="chunk">
-                    <label for="battery">Battery</label>
-                    <input type="checkbox" name="battery" value="on" id="battery" {% if in_data.REOPT_INPUTS.battery == 'on' %}checked{% endif %}/>
-                    <input type="hidden" name="battery" value="off">
-                </div>
-                <div class="chunk">
-                    <label for="fossil">Fossil</label>
-                    <input type="checkbox" name="fossil" value="on" id="fossil" {% if in_data.REOPT_INPUTS.fossil == 'on' %}checked{% endif %}/>
-                    <input type="hidden" name="fossil" value="off">
-                </div>
-                <div class="chunk">
-                    <label for="wind">Wind</label>
-                    <input type="checkbox" name="wind" value="on" id="wind" {% if in_data.REOPT_INPUTS.wind == 'on' %}checked{% endif %}/>
-                    <input type="hidden" name="wind" value="off">
-                </div>
-
+                <div id='solar'></div>
+                <div id='battery'></div>
+                <div id='fossil'></div>
+                <div id='wind'></div>
                 <div id="solarDiv" style="display:none">
                     <h5>Solar</h5>
-                    <div class="chunk">
-                        <label class="tooltip" for="solarCost">Solar Cost ($/kW-DC)<span class="classic">Specify the cost in $/kW-DC.</span></label>
-                        <input type="text" name="solarCost" value="{{ in_data.REOPT_INPUTS.get('solarCost','1600') }}" pattern="^\d+\.?\d*?$"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="solarMax">Solar Power Max (kW-DC)<span class="classic">Specify the maximum desired generation in kW-DC. Leave at default for full optimization on solar power.</span></label>
-                        <input type="text" name="solarMax" value="{{ in_data.REOPT_INPUTS.get('solarMax','100000')}}" required/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="solarMin">Solar Power Min (kW-DC)<span class="classic">Specify the minimum desired generation in kW-DC.</span></label>
-                        <input type="text" name="solarMin" value="{{ in_data.REOPT_INPUTS.get('solarMin','0') }}"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="solarMacrsOptionYears">Solar MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 5 and 7 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
-                        <select id="solarMacrsOptionYears" name="solarMacrsOptionYears">
-                            <option {% if in_data.REOPT_INPUTS.solarMacrsOptionYears == "0" %}selected{% endif %} value="0">0</option>
-                            <option {% if 'solarMacrsOptionYears' not in in_data.REOPT_INPUTS or in_data.REOPT_INPUTS.solarMacrsOptionYears == "5" %}selected{% endif %} value="5">5</option>
-                            <option {% if in_data.REOPT_INPUTS.solarMacrsOptionYears == "7" %}selected{% endif %} value="7">7</option>
-                        </select>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="solarItcPercent">Solar ITC (% as decimal)<span class="classic">Please enter a number 0-1 for the solar investment tax credit. Format 0.XX</span></label>
-                        <input type="text" name="solarItcPercent" value="{{ in_data.REOPT_INPUTS.get('solarItcPercent','0.26') }}" step="0.01" min="0.0" max="1.0"/>
-                    </div>
+                    <div id='solarCost'></div>
+                    <div id="solarMax"></div>
+                    <div id="solarMin"></div>
+                    <div id='solarMacrsOptionYears'></div>
+                    <div id='solarItcPercent'></div>
                 </div>
                 <div id="batteryDiv" style="display:none">
                     <h5>Battery</h5>
-                    <div class="chunk">
-                        <label class="tooltip" for="batteryCapacityCost">Battery Capacity Cost ($/kWh-AC)<span class="classic">Specify the cost in $/kWh.</span></label>
-                        <input type="text" name="batteryCapacityCost" value="{{ in_data.REOPT_INPUTS.get('batteryCapacityCost','420') }}" pattern="^\d+\.?\d*?$"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="batteryCapacityMax">Battery Capacity Max (kWh-AC)<span class="classic">Specify the maximum desired battery capacity in kWh.</span></label>
-                        <input type="text" name="batteryCapacityMax" value="{{ in_data.REOPT_INPUTS.get('batteryCapacityMax','1000000') }}"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="batteryCapacityMin">Battery Capacity Min (kWh-AC)<span class="classic">Specify the minimum desired battery capacity in kWh.</span></label>
-                        <input type="text" name="batteryCapacityMin" value="{{ in_data.REOPT_INPUTS.get('batteryCapacityMin','0') }}"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="batteryPowerCost">Battery Power Cost ($/kW-AC)<span class="classic">Specify the cost in $/kW.</span></label>
-                        <input type="text" name="batteryPowerCost" value="{{ in_data.REOPT_INPUTS.get('batteryPowerCost','840') }}"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="batteryPowerMax">Battery Power Max (kW-AC)<span class="classic">Specify the maximum desired battery power in kW.</span></label>
-                        <input type="text" name="batteryPowerMax" value="{{ in_data.REOPT_INPUTS.get('batteryPowerMax','1000000') }}"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="batteryPowerMin">Battery Power Min (kW-AC)<span class="classic">Specify the minimum desired battery power in kW.</span></label>
-                        <input type="text" name="batteryPowerMin" value="{{ in_data.REOPT_INPUTS.get('batteryPowerMin','0') }}"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="batteryMacrsOptionYears">Battery MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 5 and 7 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
-                        <select id="batteryMacrsOptionYears" name="batteryMacrsOptionYears">
-                            <option {% if in_data.REOPT_INPUTS.batteryMacrsOptionYears == "0" %}selected{% endif %} value="0">0</option>
-                            <option {% if in_data.REOPT_INPUTS.batteryMacrsOptionYears == "5" %}selected{% endif %} value="5">5</option>
-                            <option {% if 'batteryMacrsOptionYears' not in in_data.REOPT_INPUTS or in_data.REOPT_INPUTS.batteryMacrsOptionYears == "7" %}selected{% endif %} value="7">7</option>
-                        </select>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="batteryItcPercent">Battery ITC (% as decimal)<span class="classic">Please enter a number 0-1 for the battery investment tax credit. Format 0.XX</span></label>
-                        <input type="text" name="batteryItcPercent" value="{{ in_data.REOPT_INPUTS.get('batteryItcPercent','0') }}" step="0.01" min="0.0" max="1.0"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="batteryPowerCostReplace">Battery Replacement Power Cost ($/kW-AC)<span class="classic">Specify the cost of replacing the battery inverter at the specified year in $/kW.</span></label>
-                        <input type="text" name="batteryPowerCostReplace" value="{{ in_data.REOPT_INPUTS.get('batteryPowerCostReplace','410') }}" pattern="^\d+\.?\d*?$"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="batteryCapacityCostReplace">Battery Replacement Capacity Cost ($/kWh-AC)<span class="classic">Specify the cost of replacing the battery capacity at the specified year in $/kWh.</span></label>
-                        <input type="text" name="batteryCapacityCostReplace" value="200" value="{{ in_data.REOPT_INPUTS.get('batteryCapacityCostReplace','200') }}" pattern="^\d+\.?\d*?$"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="batteryPowerReplaceYear">Battery Power Replacement (years)<span class="classic">Specify a year in which the battery power will be replaced at the cost specified in Battery Replacement Power Cost. Input is an integer less than or equal to the project period in years.</span></label>
-                        <input type="text" name="batteryPowerReplaceYear" value="{{ in_data.REOPT_INPUTS.get('batteryPowerReplaceYear','10') }}"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="batteryCapacityReplaceYear">Battery Capacity Replacement (years)<span class="classic">Specify a year in which the battery cells will be replaced at the cost specified in Battery Replacement Capacity Cost. Input is an integer less than or equal to the project period in years.</span></label>
-                        <input type="text" name="batteryCapacityReplaceYear" value="{{ in_data.REOPT_INPUTS.get('batteryCapacityReplaceYear','10') }}"/>
-                    </div>
+                    <div id='batteryCapacityCost'></div>
+                    <div id='batteryCapacityMax'></div>
+                    <div id='batteryCapacityMin'></div>
+                    <div id='batteryPowerCost'></div>
+                    <div id="batteryPowerMax"></div>
+                    <div id="batteryPowerMin"></div>
+                    <div id='batteryMacrsOptionYears'></div>
+                    <div id="batteryItcPercent"></div>
+                    <div id="batteryPowerCostReplace"></div>
+                    <div id='batteryCapacityCostReplace'></div>
+                    <div id="batteryPowerReplaceYear"></div>
+                    <div id='batteryCapacityReplaceYear'></div>
                 </div>
                 <div id=fossilDiv style="display:none">
                     <h5>Fossil</h5>
-                    <div class="chunk">
-                        <label class="tooltip" for="dieselGenCost">Genset Cost ($/kW)<span class="classic">Specify the cost in $/kWh.</span></label>
-                        <input type="text" name="dieselGenCost" value="{{ in_data.REOPT_INPUTS.get('dieselGenCost','500') }}" pattern="^\d+\.?\d*?$" required/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="dieselMax">Genset Max (kW)<span class="classic">Specify max fossil generation in kW. Only specify if needed, as the optimization runs best if left unedited.</span></label>
-                        <input type="text" name="dieselMax" value="{{ in_data.REOPT_INPUTS.get('dieselMax','1000000') }}" pattern="^\d+\.?\d*?$"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="dieselMin">Genset Min (kW)<span class="classic">Specify minimum fossil generation in kW. Only specify if needed, as the optimization runs best if left unedited.</span></label>
-                        <input type="text" name="dieselMin" value="{{ in_data.REOPT_INPUTS.get('dieselMin','0') }}" pattern="^\d+\.?\d*?$"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="fuelAvailable">Fuel Available (Gal)<span class="classic">Specify the amount of fuel available for all new and pre-existing generators in gallons.</span></label>
-                        <input type="text" name="fuelAvailable" value="{{ in_data.REOPT_INPUTS.get('fuelAvailable','50000') }}"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="minGenLoading">Min Gen Loading (% as decimal)<span class="classic">Please enter a number 0-1 for the the minimum fraction of rated total kVA load that must be maintained by the generator. >/= 0.3 recommended for extended diesel operation. Set to 0 for highest likelihood of success in solving optimization. Format 0.XX</span></label>
-                        <input type="text" name="minGenLoading" value="{{ in_data.REOPT_INPUTS.get('minGenLoading','0.3') }}"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="dieselFuelCostGal">Fuel Cost (diesel gal equiv)<span class="classic">Specify cost of fuel in $ per gallon. To convert $/MMBTU of Natural gas to gallons of diesel, divide $/MMBTU market rate by 4.85 to account for 50% lower efficiency of natural gas reciprocating engines and lower fuel density as compared to diesel. Format X.XX</span></label>
-                        <input type="text" name="dieselFuelCostGal" value="{{ in_data.REOPT_INPUTS.get('dieselFuelCostGal','3') }}" pattern="^\d+\.?\d*?$"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="dieselCO2Factor">Genset Emissions Factor (lb CO2/gal)<span class="classic">Specify fossil emissions factor in pounds of carbon dioxide per gallon. Default 22.4 is for diesel. Natural gas can be modeled using 24.1</span></label>
-                        <input type="text" name="dieselCO2Factor" value="{{ in_data.REOPT_INPUTS.get('dieselCO2Factor','22.4') }}" pattern="^\d+\.?\d*?$"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="dieselOMCostKw">Genset Annual O+M Cost ($/kW/year)<span class="classic">Specify annual operations and maintenance cost per kilowatt per year.</span></label>
-                        <input type="text" name="dieselOMCostKw" value="{{ in_data.REOPT_INPUTS.get('dieselOMCostKw','10') }}" pattern="^\d+\.?\d*?$"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="dieselOMCostKwh">Genset Hourly O+M Cost ($/kWh/year)<span class="classic">Specify annual operations and maintenance cost per kilowatt-hour per year. Format "X.XX"</span></label>
-                        <input type="text" name="dieselOMCostKwh" value="{{ in_data.REOPT_INPUTS.get('dieselOMCostKwh','0') }}" pattern="^\d+\.?\d*?$"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="dieselOnlyRunsDuringOutage">Genset only runs during outage?<span class="classic">"No" signifies that fossil generator is enabled to run at any point in the year.</span></label>
-                        <select id="dieselOnlyRunsDuringOutage" name="dieselOnlyRunsDuringOutage">
-                            <option {% if in_data.REOPT_INPUTS.dieselOnlyRunsDuringOutage == True %}selected{% endif %} value="true">Yes</option>
-                            <option {% if 'dieselOnlyRunsDuringOutage' not in in_data.REOPT_INPUTS or in_data.REOPT_INPUTS.dieselOnlyRunsDuringOutage == False %}selected{% endif %} value="false">No</option>
-                        </select>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="dieselMacrsOptionYears">Fossil MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 15 and 20 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
-                        <select id="dieselMacrsOptionYears" name="dieselMacrsOptionYears">
-                            <option {% if 'dieselMacrsOptionYears' not in in_data.REOPT_INPUTS or in_data.REOPT_INPUTS.dieselMacrsOptionYears == "0" %}selected{% endif %} value="0">0</option>
-                            <option {% if in_data.REOPT_INPUTS.dieselMacrsOptionYears == "15" %}selected{% endif %} value="15">15</option>
-                            <option {% if in_data.REOPT_INPUTS.dieselMacrsOptionYears == "20" %}selected{% endif %} value="20">20</option>
-                        </select>
-                    </div>
+                    <div id='dieselGenCost'></div>
+                    <div id='dieselMax'></div>
+                    <div id='dieselMin'></div>
+                    <div id='fuelAvailable'></div>
+                    <div id='minGenLoading'></div>
+                    <div id='dieselFuelCostGal'></div>
+                    <div id='dieselCO2Factor'></div>
+                    <div id='dieselOMCostKw'></div>
+                    <div id='dieselOMCostKwh'></div>
+                    <div id='dieselOnlyRunsDuringOutage'></div>
+                    <div id='dieselMacrsOptionYears'></div>
                 </div>
                 <div id="windDiv" style="display:none">
                     <h5>Wind</h5>
-                    <div class="chunk">
-                        <label class="tooltip" for="windCost">Wind Cost ($/kW)<span class="classic">Specify the cost in $/kW.</span></label>
-                        <input type="text" name="windCost" value="{{ in_data.REOPT_INPUTS.get('windCost','4989') }}" pattern="^\d+\.?\d*?$"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="windMax">Wind Power Max (kW)<span class="classic">Specify the maximum desired generation in kW. Leave at default for full optimization on wind power.</span></label>
-                        <input type="text" name="windMax" value="{{ in_data.REOPT_INPUTS.get('windMax','100000') }}"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="windMin">Wind Power Min (kW)<span class="classic">Specify the minimum desired generation in kW.</span></label>
-                        <input type="text" name="windMin" value="{{ in_data.REOPT_INPUTS.get('windMin','0') }}"/>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="windMacrsOptionYears">Wind MACRS Years<span class="classic">MACRS schedule for financial analysis. Possible inputs are 0, 5 and 7 years. Set to zero to disable accelerated depreciation accounting for solar.</span></label>
-                        <select id="windMacrsOptionYears" name="windMacrsOptionYears">
-                            <option {% if in_data.REOPT_INPUTS.windMacrsOptionYears == "0" %}selected{% endif %} value="0">0</option>
-                            <option {% if 'windMacrsOptionYears' not in in_data.REOPT_INPUTS or in_data.REOPT_INPUTS.windMacrsOptionYears == "5" %}selected{% endif %} value="5">5</option>
-                            <option {% if in_data.REOPT_INPUTS.windMacrsOptionYears == "7" %}selected{% endif %} value="7">7</option>
-                        </select>
-                    </div>
-                    <div class="chunk">
-                        <label class="tooltip" for="windItcPercent">Wind ITC (% as deimal)<span class="classic">Please enter a number 0-1 for the wind investment tax credit. Format 0.XX</span></label>
-                        <input type="text" name="windItcPercent" value="{{ in_data.REOPT_INPUTS.get('windItcPercent','0.26') }}" step="0.01" min="0.0" max="1.0"/>
-                    </div>
+                    <div id='windCost'></div>
+                    <div id='windMax'></div>
+                    <div id='windMin'></div>
+                    <div id='windMacrsOptionYears'></div>
+                    <div id='windItcPercent'></div>
                 </div>
                 <h3>Step 5 (Optional): Override technology parameters per-microgrid</h3>
                 <div id="reoptParametersMVC" class="chunk"></div>
@@ -689,7 +490,7 @@
             <span>Loading...</span>
         </div>
     </main>
-	<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+
 	<script>
 	/** Custom error class for detecting cycles.*/
 	class CycleDetectedError extends Error {
@@ -754,6 +555,7 @@
 
 	/** Toggle technology checkboxes. */
 	function toggleDivVisibility(checkboxId, divId) {
+		// - TODO: use actual checkboxes again
 		const checkbox = $(`#${checkboxId}`);
 		const div = $(`#${divId}`);
 		if (checkbox.is(':checked')) {
@@ -1056,7 +858,7 @@
 				error: function(xhr, status, error) {
 					document.body.style.cursor = 'default';
 					const errorJson = JSON.parse(xhr.responseText);
-					alert(errorJson.error);
+					alert(errorJson.error + '. Partitioning failed, please change the inputs to create a different microgrid.');
 				}
 			});
 		});
@@ -1069,31 +871,6 @@
 		});
 	}
 
-	function validateForm(form) {
-		var inputs = form.querySelectorAll("input");
-		var valid = true;
-		for (var i = 0; i < inputs.length; i++) {
-			var input = inputs[i];
-			if (!input.checkValidity()) {
-				valid = false;
-				input.style.border = "1px solid red";
-			} else if ( (input.hasAttribute('min') && !(Number(input.value) >= Number(input.min))) || (input.hasAttribute('max') && !(Number(input.value) <= Number(input.max))) ) {
-				valid = false;
-				input.style.border = "1px solid red";
-			} else if (input.hasAttribute('step')) {
-				const step = Number(input.step);
-				const val = Number(input.value);
-				const tolerance = 1e-3; // Need to justify close enough to 0 because of floating point division oddities.
-				if (step > 0 && val % step != 0 && Math.abs(val % step) > tolerance) {
-					valid = false;
-					input.style.border = "1px solid red";
-				}
-			} else {
-				input.style.border = "";
-			}
-		}
-		return valid;
-	}
 
 	function highlightIncorrectFields(form) {
 		var inputs = form.querySelectorAll("input");
@@ -1109,7 +886,7 @@
 	function submitEverything() {
 		// Do not proceed if no circuit is specified.
 		if (window.filename === '') {
-			alert('Please specify a circuit.')
+			alert('Please submit a circuit.')
 			return 
 		}
 		// Do not proceed if no loads are specified.
@@ -1121,6 +898,11 @@
 		if (($( "#partitionMethod option:selected" ).val() === '') && ($('#oldPartitionDiv').length == 0)) {
 			alert('Please specify a partitioning method.')
 			return 
+		}
+		// Do not proceed if the partitions haven't been previewed
+		if (window.reoptParametersModel === undefined) {
+			alert('Please preview your microgrid partitions.');
+			return;
 		}
 		var form1 = new FormData(document.getElementById("modelInfoForm"));
 		var form2 = new FormData(document.getElementById("techParamForm"));
@@ -1204,7 +986,7 @@
 		form1.append('mgQuantity',mgQuantity);
 
 		// Append microgrid parameter overrides
-		const mgParameterOverrides = window.reoptParameterModel.getExportData();
+		const mgParameterOverrides = window.reoptParametersModel.getExportData();
 		form1.append('mgParameterOverrides', JSON.stringify(mgParameterOverrides));
 
 		// - Append data to get single phase load count and three phase load count per load
@@ -1249,6 +1031,12 @@
 				$('#loading-background').hide();
 				$("#loading-indicator").hide();
 				console.log(textStatus + ' : ' + errorThrown)
+				if (jqXHR.responseText !== undefined) {
+					alert(jqXHR.responseText);
+				}
+				if (jqXHR.responseJSON !== undefined) {
+					alert(jqXHR.responseJSON);
+				}
 			}
 		})
 	}
@@ -1494,96 +1282,168 @@
 
 		// Validate forms.
 		$('#submitEverything').click(function() {
-			var form1 = document.getElementById("modelInfoForm");
-			var form2 = document.getElementById("techParamForm");
-
-			// Validate form inputs
-			var form1Valid = validateForm(form1);
-			var form2Valid = validateForm(form2);
-
-			if (form1Valid && form2Valid) {
-				// Submit the forms
-				submitEverything();
-				// console.log('Submitting form.')
-			} else {
-				// Show alert and highlight incorrect fields
-				if (!form1Valid) {
-				highlightIncorrectFields(form1);
-				}
-				if (!form2Valid) {
-				highlightIncorrectFields(form2);
-				}
-				alert('Please correct the input fields higlighted with red borders.');
-			}
+            if ([...document.getElementsByClassName('caution')].length > 0) {
+                alert('Please correct any erroneous inputs with a highlighted error message before submitting your data.');
+            } else {
+                submitEverything();
+            }
 		});
 	});
 	</script>
 	<script type='module'>
 	import { CircuitElement, CircuitModel, CircuitController, CircuitTableView, CircuitUserControlsView, CsvLoadParser, OutageLocationInputView } from '/static/js/components/circuitBuilder/circuitBuilder.js';
-	import { REoptParametersModel } from '/static/js/components/reoptParameters/model.js';
+	import { REoptParametersModel, REoptParameters, REoptIntParameter, REoptFloatParameter, REoptStringParameter } from '/static/js/components/reoptParameters/model.js';
 	import { REoptParametersController } from '/static/js/components/reoptParameters/controller.js';
-	import { REoptParametersView } from '/static/js/components/reoptParameters/view.js';
+	import { REoptParametersView, REoptInputView } from '/static/js/components/reoptParameters/view.js';
 
 	// - CircuitBuilder
 	window.CircuitElement = CircuitElement;
-	const model = new CircuitModel();
-	window.circuitModel = model;
-	const controller = new CircuitController(model);
-	const outageLocationInputView = new OutageLocationInputView(controller);
+	const circuitModel = new CircuitModel();
+	window.circuitModel = circuitModel;
+	const circuitController = new CircuitController(circuitModel);
+	const outageLocationInputView = new OutageLocationInputView(circuitController);
 	window.outageLocationInputView = outageLocationInputView;
-	model.addObserver(outageLocationInputView);
-	const view = new CircuitTableView(controller);
-	model.addObserver(view);
+	circuitModel.addObserver(outageLocationInputView);
+	const view = new CircuitTableView(circuitController);
+	circuitModel.addObserver(view);
 	const csvLoadParser = new CsvLoadParser();
-	const controls = new CircuitUserControlsView(controller, csvLoadParser);
+	const controls = new CircuitUserControlsView(circuitController, csvLoadParser);
 	csvLoadParser.addObserver(controls);
-	model.addObserver(controls);
+	circuitModel.addObserver(controls);
 	// - The modal div elements must be appended to the DOM before elements are added to the model in order for the modals to update propertly
 	document.getElementById('outageLocationInputInsert').append(outageLocationInputView.modal.divElement);
 	document.getElementById('circuitCreator').append(view.modal.divElement);
 	document.getElementById('circuitCreator').append(controls.modal.divElement);
-    outageLocationInputView.setValue("{{','.join(in_data.FAULTED_LINES)}}");
+	outageLocationInputView.setValue("{{','.join(in_data.FAULTED_LINES)}}");
 	const csvLoadParserInsert = document.getElementById('csvLoadParserInsert');
 	if (csvLoadParserInsert !== null) {
 		csvLoadParserInsert.replaceWith(csvLoadParser.modal.divElement);
 	} else {
 		window.csvLoadParser = csvLoadParser;
 	}
-	// - reoptParameters
+	// - Create microgrid-specific REopt parameters widget
+	const reoptParametersModel = new REoptParametersModel();
+	const reoptParametersController = new REoptParametersController(reoptParametersModel);
+	const reoptParametersView = new REoptParametersView(reoptParametersController)
+	document.getElementById('reoptParametersMVC').replaceChildren(reoptParametersView.modal.divElement);
+
 	window.createReoptParametersMVC = function(MG_MINES) {
 		// - Remove event listener from previous model if it exists
-		if (window.reoptParameterModel === undefined) {
+		if (window.reoptParametersModel === undefined) {
 			// - If "Remove File" is clicked, then microgrid parameter overrides should be cleared. Don't delete or replace the model, just clear it
 			const btn = document.getElementById('remove-circuit-button');
 			if (btn !== null) {
 				btn.addEventListener('click', function() {
-					window.reoptParameterModel.reset();
-					window.reoptParameterView.renderContent();
+					window.reoptParametersModel.reset();
+					window.reoptParametersView.renderContent();
 				});
 			}
 		}
-		const model = new REoptParametersModel();
 		for (const [mgName, mg] of Object.entries(MG_MINES)) {
-			model.addReoptParametersInstance(mgName);
+			// - If the user clicks "Preview partitions" multiple times, each time should reset any existing parameter overrides first
+			if (reoptParametersModel.hasReoptParametersInstance(mgName)) {
+				reoptParametersModel.removeReoptParametersInstance(mgName);
+			}
+			reoptParametersModel.addReoptParametersInstance(mgName);
+			// - If this is an edit run, it's possible that there are existing overrides that should populate the widget
 			if (Object.hasOwn(mg, 'parameter_overrides')) {
 				for (const [paramName, value] of Object.entries(mg['parameter_overrides'])) {
 					if (paramName !== 'reopt_inputs') {
-						const reoptParameter = model.getReoptParametersInstance(mgName).reoptParameters.filter(parameter => parameter.alias === paramName)[0];
+						const reoptParameter = reoptParametersModel.getReoptParametersInstance(mgName).reoptParameters.filter(parameter => parameter.alias === paramName)[0];
 						reoptParameter.value = value;
 					} else {
 						for (const [paramName, value] of Object.entries(mg['parameter_overrides']['reopt_inputs'])) {
-							const reoptParameter = model.getReoptParametersInstance(mgName).reoptParameters.filter(parameter => parameter.alias === paramName)[0];
+							const reoptParameter = reoptParametersModel.getReoptParametersInstance(mgName).reoptParameters.filter(parameter => parameter.alias === paramName)[0];
 							reoptParameter.value = value;
 						}
 					}
 				}
 			}
 		}
-		const controller = new REoptParametersController(model);
-		const view = new REoptParametersView(controller);
-		document.getElementById('reoptParametersMVC').replaceChildren(view.modal.divElement);
-		window.reoptParameterModel = model;
-		window.reoptParameterView = view;
+		// - Need to re-render the view so that the microgrids show up in the select
+		reoptParametersView.renderContent();
+		window.reoptParametersModel = reoptParametersModel;
+		window.reoptParametersView = reoptParametersView;
+	}
+	// - Create the validation model
+	const in_data = JSON.parse('{{ in_data | tojson | safe }}');
+	const reoptValidationModel = new REoptParametersModel();
+	reoptValidationModel.addReoptParametersInstance('validationMg');
+	const validationMg = reoptValidationModel.getReoptParametersInstance('validationMg')
+	// - I only add these parameters to the validation model because users shouldn't be able to override these on a per-microgrid basis
+	validationMg.addReoptParameter(
+		'MicrogridUp:outageDuration',
+		new REoptIntParameter(
+			'Outage Duration (hours)',
+			'MicrogridUp:outageDuration',
+			'outageDuration',
+			'Please enter a number 1-8760 to specify the duration of the added major outage in hours.',
+			8760,
+			1));
+	validationMg.addReoptParameter(
+		'MicrogridUp:maxRuntimeSeconds',
+		// - This is a Microgridup-specific variable that is added to the actual ElectricUtility:outage_start_time_step parameter to set the
+		//   ElectricUtility:outage_end_time_step parameter in our back-end
+		new REoptIntParameter(
+			'Maximum REopt Run-time (seconds)',
+			'MicrogridUp:maxRuntimeSeconds',
+			'maxRuntimeSeconds',
+			'Please enter a number 30-86400. A greater maximum REopt run-time could result in more precise REopt results. A maximum REopt run-time that is too short could result in an error.',
+			86400,
+			30));
+	validationMg.addReoptParameter(
+		'MicrogridUp:QSTS_STEPS',
+		new REoptIntParameter(
+			'Interconn. Time Steps (hours)',
+			'MicrogridUp:QSTS_STEPS',
+			'QSTS_STEPS',
+			'Defines the length of the interconnection analysis in hours.',
+			480,
+			0));
+	validationMg.addReoptParameter(
+		'MicrogridUp:latitude',
+		// - REopt does have a Site:latitude property, but we treat latitude as separate from other REopt inputs from a input perspective
+		new REoptFloatParameter(
+			'Latitude',
+			'MicrogridUp:latitude',
+			'latitude',
+			'Specify the latitude of the load/grid as a decimal.',
+			90,
+			-90));
+	validationMg.addReoptParameter(
+		'MicrogridUp:longitude',
+		// - REopt does have a Site:longitude property, but we treat latitude as separate from other REopt inputs from a input perspective
+		new REoptFloatParameter(
+			'Longitude',
+			'MicrogridUp:longitude',
+			'longitude',
+			'Specify the longitude of the load/grid as a decimal.',
+			180,
+			-180));
+	validationMg.addReoptParameter(
+		'MicrogridUp:MODEL_DIR',
+		new REoptStringParameter(
+			'Project Name',
+			'MicrogridUp:MODEL_DIR',
+			'MODEL_DIR',
+			'A project name must be unique and can only include (1) lowercase alphanumeric characters, (2) "-", and (3) "_". ',
+			/^[a-z0-9\-_]+$/));
+	const reoptValidationController = new REoptParametersController(reoptValidationModel);
+	// - Get the actual parameter values from allInputData.json and use them to set the values of the dynamically inputs
+	const parameters = Object.entries(in_data.REOPT_INPUTS);
+	parameters.push(
+		['singlePhaseRelayCost', in_data.singlePhaseRelayCost],
+		['threePhaseRelayCost', in_data.threePhaseRelayCost],
+		['QSTS_STEPS', in_data.QSTS_STEPS],
+		['latitude', 39.7817],
+		['longitude', -89.6501],
+        ['MODEL_DIR', in_data.MODEL_DIR])
+	for (const [key, value] of parameters) {
+		const reoptParameter = reoptValidationModel.getReoptParametersInstance('validationMg').reoptParameters.filter(parameter => parameter.alias === key)[0];
+		reoptParameter.value = value;
+		const reoptInputView = new REoptInputView(reoptValidationController, `validationMg:${reoptParameter.parameterName}`);
+		const replacementDiv = document.getElementById(reoptParameter.alias);
+		replacementDiv.replaceWith(reoptInputView.modal.divElement);
 	}
 	{% if iframe_mode %}
 	window.disableInputs = function() {

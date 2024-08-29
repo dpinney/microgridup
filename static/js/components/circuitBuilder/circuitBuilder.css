@@ -1,0 +1,74 @@
+/* IDs */
+
+#circuitTableView div.div--modal table {
+    table-layout: fixed;
+}
+
+/* Set a good width for the circuit creator that accounts for the element add row and error messages */
+#circuitCreator {
+    width: 1000px;
+}
+
+/* Classes */
+
+/* Nicely format the circuit creator add element row */
+div.div--modal div.div--modalUserInputRow {
+    padding-top: 1rem;
+    display: flex;
+}
+div.div--modal div.div--modalUserInputRow span {
+    padding: 0 .5rem 0 .5rem;
+}
+div.div--modal div.div--modalUserInputRow div:first-child span:first-child {
+    padding: 0 .5rem 0 0;
+}
+
+/* Set a width for the circuit editor add and submit buttons */
+div.div--modal div.div--singleButtonDiv {
+    width: 200px;
+    padding: 1rem 0 0 0;
+}
+
+/* Make the circuit creator rows a little tighter */
+div#circuitTableView div.div--modal table td {
+    padding: 0;
+}
+
+/* Positional table styling */
+
+/* Make all rows with and without delete butttons have the same width */
+div#circuitTableView div.div--modal table td:first-child {
+    width: 48px;
+}
+/* Make all rows with long and short parameter names have the same width */
+div#circuitTableView div.div--modal table td:nth-child(2) {
+    width: 250px;
+}
+/* Indent feeder rows by one level */
+div#circuitTableView div.div--modal.indent-level-1 td:nth-child(2) {
+    padding-left: 1rem;
+}
+/* Indent all feeder child rows by the same amount */
+div#circuitTableView div.div--modal.indent-level-2 td:nth-child(2) {
+    padding-left: 2rem;
+}
+/* Make all property rows have the same indented alignment */
+div#circuitTableView div.div--modal.indent-level-3 td:nth-child(2) {
+    padding-left: 4rem;
+}
+/* Give each indent level a background color */
+div.div--modal.indent-level-0 {
+    background-color: #e6e6e6;
+    margin: .25rem 0 0 0;
+}
+div.div--modal.indent-level-1 {
+    background-color: #e6e6e6;
+    margin: .25rem 0 0 0;
+}
+div.div--modal.indent-level-2 {
+    background-color: #e6e6e6;
+    margin: .25rem 0 0 0;
+}
+div.div--modal.indent-level-3 {
+    background-color: #e6e6e6;
+}

@@ -1,7 +1,7 @@
 {
     "MODEL_DIR": "lehighauto_3mg",
-    "BASE_DSS": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehighauto_3mg/circuit.dss",
-    "LOAD_CSV": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehighauto_3mg/loads.csv",
+    "BASE_DSS": "/home/austin/programming/repositories/microgridup/microgridup/data/projects/lehighauto_3mg/circuit.dss",
+    "LOAD_CSV": "/home/austin/programming/repositories/microgridup/microgridup/data/projects/lehighauto_3mg/loads.csv",
     "QSTS_STEPS": 480,
     "REOPT_INPUTS": {
         "energyCost": 0.12,
@@ -58,34 +58,40 @@
     },
     "MICROGRIDS": {
         "mg0": {
-            "loads": [
-                "634a_data_center",
-                "634b_radar",
-                "634c_atc_tower"
-            ],
-            "switch": "632633",
             "gen_bus": "633",
             "gen_obs_existing": [
                 "solar_634_existing",
                 "battery_634_existing"
             ],
+            "loads": [
+                "634a_data_center",
+                "634b_radar",
+                "634c_atc_tower"
+            ],
             "parameter_overrides": {
                 "reopt_inputs": {}
-            }
+            },
+            "switch": "632633"
         },
         "mg1": {
+            "gen_bus": "645",
+            "gen_obs_existing": [],
             "loads": [
                 "645_hangar",
                 "646_office"
             ],
-            "switch": "632645",
-            "gen_bus": "645",
-            "gen_obs_existing": [],
             "parameter_overrides": {
                 "reopt_inputs": {}
-            }
+            },
+            "switch": "632645"
         },
         "mg2": {
+            "gen_bus": "670",
+            "gen_obs_existing": [
+                "solar_675_existing",
+                "fossil_684_existing",
+                "battery_684_existing"
+            ],
             "loads": [
                 "684_command_center",
                 "692_warehouse2",
@@ -98,22 +104,16 @@
                 "670b_residential2",
                 "670c_residential2"
             ],
-            "switch": "632670",
-            "gen_bus": "670",
-            "gen_obs_existing": [
-                "solar_675_existing",
-                "fossil_684_existing",
-                "battery_684_existing"
-            ],
             "parameter_overrides": {
                 "reopt_inputs": {}
-            }
+            },
+            "switch": "632670"
         }
     },
     "FAULTED_LINES": [
         "670671"
     ],
-    "OUTAGE_CSV": "/Users/austinchang/programming/repositories/microgridup/microgridup/data/projects/lehighauto_3mg/outages.csv",
+    "OUTAGE_CSV": "/home/austin/programming/repositories/microgridup/microgridup/data/projects/lehighauto_3mg/outages.csv",
     "CRITICAL_LOADS": [
         "684_command_center",
         "634a_data_center",
@@ -123,7 +123,7 @@
         "675a_hospital",
         "611_runway"
     ],
-    "CREATION_DATE": "2024-08-09 13:15:23",
+    "CREATION_DATE": "2024-08-30 18:36:24",
     "DESCRIPTION": "",
     "singlePhaseRelayCost": 300.0,
     "threePhaseRelayCost": 20000.0

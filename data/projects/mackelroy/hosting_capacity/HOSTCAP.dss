@@ -668,7 +668,7 @@ new object=regcontrol.reg_contr_b bus=bus1.2 transformer=sub_regulator_b winding
 new object=regcontrol.reg_contr_c bus=bus1.3 transformer=sub_regulator_c winding=2 tapwinding=2 vreg=123.00000 r=0.00000 x=0.00000 band=2 ptratio=66.395279 vlimit=129.00000
 new object=capacitor.cap_201 bus1=bus2038.1.2.3 phases=3 kv=13.80000 kvar=[50] enabled=true
 new object=capacitor.cap_301 bus1=bus3079.1.2.3 phases=3 kv=13.80000 kvar=[50] enabled=true
-new object=generator.hostcap_t_bus3077_l bus1=t_bus3077_l.1.2.3 kw=1 pf=1.0 conn=wye phases=3 kv=0.12008885599144216 model=1
+new object=generator.hostcap_t_bus2050_l bus1=t_bus2050_l.1.2.3 kw=1 pf=1.0 conn=wye phases=3 kv=0.12008885599144216 model=1
 makebuslist
 calcvoltagebases
 setbusxy bus=eq_source_bus x=-93.64690 y=42.02755

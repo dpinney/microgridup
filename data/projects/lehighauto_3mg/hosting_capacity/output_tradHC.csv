@@ -1,0 +1,10 @@
+,bus,max_kw,reached_max,thermal_violation,voltage_violation
+0,611,1,True,True,False
+3,634,1,True,True,False
+2,645,1,True,True,False
+5,646,1,True,True,False
+7,652,1,True,True,False
+4,670,1,True,True,False
+6,675,1,True,True,False
+1,684,1,True,True,False
+8,692,1,True,True,False

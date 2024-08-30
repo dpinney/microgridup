@@ -199,9 +199,9 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 6,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 7,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 8,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
-9,0.0,-206.099,-0.0110476,-207.441,-0.00193809,-211.426,mongenerator-battery_675,0.0810405,0.0,0.0
-10,0.0,87.1421,6.23079e-05,88.898,-0.00239238,91.949,mongenerator-battery_675,-0.0010989,0.0,0.0
-11,0.0,362.862,-0.000591426,375.328,0.00203287,389.924,mongenerator-battery_675,-0.0129118,0.0,0.0
+9,0.0,-81.0872,0.000381168,-80.6546,0.00113708,-79.9302,mongenerator-battery_675,0.00850335,0.0,0.0
+10,0.0,16.2175,-7.37064e-06,16.5438,3.99103e-06,17.1121,mongenerator-battery_675,6.93283e-05,0.0,0.0
+11,0.0,192.866,-0.000689487,198.438,-0.00309895,211.101,mongenerator-battery_675,0.00136914,0.0,0.0
 12,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 13,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 14,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
@@ -232,7 +232,7 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 39,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 40,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 41,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
-42,0.0,-20.9364,-8.88178e-19,-20.9364,1.81899e-15,-20.9364,mongenerator-battery_675,0.0,0.0,0.0
+42,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 43,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 44,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 45,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
@@ -251,7 +251,7 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 58,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 59,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 60,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
-61,0.0,9.80248,2.60929e-11,9.80248,3.13157e-11,9.80248,mongenerator-battery_675,2.658e-11,0.0,0.0
+61,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 62,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 63,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 64,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
@@ -280,7 +280,7 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 87,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 88,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 89,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
-90,0.0,-78.1148,0.001014,-75.0686,0.00194326,-67.9817,mongenerator-battery_675,-0.0205607,0.0,0.0
+90,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 91,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 92,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
 93,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-battery_675,0.0,0.0,0.0
@@ -294,10 +294,10 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 5,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 6,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 7,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
-8,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
-9,0.0,,0.086791,,0.0,-221.531,mongenerator-battery_684,,,
-10,0.0,,-0.00130291,,0.0,109.204,mongenerator-battery_684,,,
-11,0.0,,-0.0134034,,0.0,399.719,mongenerator-battery_684,,,
+8,0.0,,0.000416606,,0.0,-48.9036,mongenerator-battery_684,,,
+9,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
+10,0.0,,6.29474e-05,,0.0,12.9075,mongenerator-battery_684,,,
+11,0.0,,0.000943343,,0.0,151.467,mongenerator-battery_684,,,
 12,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 13,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 14,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
@@ -328,7 +328,7 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 39,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 40,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 41,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
-42,0.0,,-2590960000000000.0,,0.0,1.02487e+16,mongenerator-battery_684,,,
+42,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 43,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 44,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 45,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
@@ -347,7 +347,7 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 58,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 59,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 60,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
-61,0.0,,-1.74106e-13,,0.0,-1.10281e-12,mongenerator-battery_684,,,
+61,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 62,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 63,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 64,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
@@ -376,7 +376,7 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 87,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 88,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 89,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
-90,0.0,,-0.0300203,,0.0,-97.677,mongenerator-battery_684,,,
+90,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 91,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 92,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
 93,0.0,,0.0,,0.0,0.0,mongenerator-battery_684,,,
@@ -388,9 +388,9 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 3,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 4,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 5,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-6,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-7,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-8,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
+6,0.0,,1.81614e-06,,0.0,-0.0948861,mongenerator-fossil_684_existing,,,
+7,0.0,,0.000193963,,0.0,-12.1914,mongenerator-fossil_684_existing,,,
+8,0.0,,3.16638e-05,,0.0,-3.71688,mongenerator-fossil_684_existing,,,
 9,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 10,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 11,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
@@ -400,85 +400,85 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 15,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 16,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 17,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-18,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-19,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-20,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-21,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-22,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-23,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-24,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
+18,0.0,,0.00632002,,0.0,-13.4427,mongenerator-fossil_684_existing,,,
+19,0.0,,0.0104633,,0.0,-21.591,mongenerator-fossil_684_existing,,,
+20,0.0,,-0.000260898,,0.0,-20.4198,mongenerator-fossil_684_existing,,,
+21,0.0,,-0.000489942,,0.0,-17.5389,mongenerator-fossil_684_existing,,,
+22,0.0,,-0.000381217,,0.0,-13.3201,mongenerator-fossil_684_existing,,,
+23,0.0,,-0.000282243,,0.0,-3.00321,mongenerator-fossil_684_existing,,,
+24,0.0,,-7.29422e-06,,0.0,-0.0963659,mongenerator-fossil_684_existing,,,
 25,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 26,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 27,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 28,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-29,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-30,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-31,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-32,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-33,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-34,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
+29,0.0,,3.13279e-21,,0.0,-2.08341e-19,mongenerator-fossil_684_existing,,,
+30,0.0,,1.7148299999999998e-21,,0.0,-3.5728400000000003e-19,mongenerator-fossil_684_existing,,,
+31,0.0,,1.05834e-19,,0.0,-8.86785e-19,mongenerator-fossil_684_existing,,,
+32,0.0,,1.2465000000000002e-19,,0.0,-8.47783e-19,mongenerator-fossil_684_existing,,,
+33,0.0,,-2.8782199999999996e-20,,0.0,-1.77244e-18,mongenerator-fossil_684_existing,,,
+34,0.0,,5.84467e-19,,0.0,-4.865680000000001e-18,mongenerator-fossil_684_existing,,,
 35,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 36,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 37,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 38,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 39,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 40,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-41,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-42,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-43,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-44,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-45,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-46,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-47,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-48,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-49,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-50,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
+41,0.0,,4166640000000.0,,0.0,-15592500000000.0,mongenerator-fossil_684_existing,,,
+42,0.0,,-27443400.0,,0.0,102345000.0,mongenerator-fossil_684_existing,,,
+43,0.0,,-0.0251994,,0.0,0.0939103,mongenerator-fossil_684_existing,,,
+44,0.0,,-2.14738e-10,,0.0,8.00413e-10,mongenerator-fossil_684_existing,,,
+45,0.0,,4.22292e-20,,0.0,-9.45546e-19,mongenerator-fossil_684_existing,,,
+46,0.0,,-5.2453000000000005e-27,,0.0,-7.73413e-19,mongenerator-fossil_684_existing,,,
+47,0.0,,-3.3532099999999997e-31,,0.0,-2.54503e-19,mongenerator-fossil_684_existing,,,
+48,0.0,,-5.54668e-35,,0.0,-1.85732e-19,mongenerator-fossil_684_existing,,,
+49,0.0,,3.3255e-26,,0.0,-4.9947299999999994e-20,mongenerator-fossil_684_existing,,,
+50,0.0,,-4.58232e-24,,0.0,-1.4690199999999998e-20,mongenerator-fossil_684_existing,,,
 51,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-52,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-53,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-54,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-55,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-56,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-57,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
+52,0.0,,3.3837400000000004e-26,,0.0,-1.5280199999999997e-20,mongenerator-fossil_684_existing,,,
+53,0.0,,6.69675e-21,,0.0,-3.6554600000000003e-19,mongenerator-fossil_684_existing,,,
+54,0.0,,3.99711e-21,,0.0,-4.68298e-19,mongenerator-fossil_684_existing,,,
+55,0.0,,1.1700300000000001e-19,,0.0,-9.05531e-19,mongenerator-fossil_684_existing,,,
+56,0.0,,1.48964e-19,,0.0,-8.37389e-19,mongenerator-fossil_684_existing,,,
+57,0.0,,-2.2074299999999997e-20,,0.0,-1.9145e-18,mongenerator-fossil_684_existing,,,
 58,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 59,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 60,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 61,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 62,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-63,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-64,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-65,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-66,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-67,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-68,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-69,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-70,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-71,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-72,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
+63,0.0,,3.43783e+23,,0.0,-1.2851e+24,mongenerator-fossil_684_existing,,,
+64,0.0,,1.23508e+23,,0.0,-4.6162e+23,mongenerator-fossil_684_existing,,,
+65,0.0,,2217.89,,0.0,-8352.66,mongenerator-fossil_684_existing,,,
+66,0.0,,-0.0452241,,0.0,0.168632,mongenerator-fossil_684_existing,,,
+67,0.0,,-1.45014e-11,,0.0,5.40843e-11,mongenerator-fossil_684_existing,,,
+68,0.0,,2.99894e-19,,0.0,-9.10676e-19,mongenerator-fossil_684_existing,,,
+69,0.0,,1.4858199999999999e-27,,0.0,-8.93232e-19,mongenerator-fossil_684_existing,,,
+70,0.0,,-6.981099999999999e-28,,0.0,-7.144240000000001e-19,mongenerator-fossil_684_existing,,,
+71,0.0,,-4.87491e-33,,0.0,-1.63919e-19,mongenerator-fossil_684_existing,,,
+72,0.0,,0.0,,0.0,-6.784479999999999e-20,mongenerator-fossil_684_existing,,,
 73,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 74,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 75,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 76,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-77,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-78,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-79,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-80,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-81,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
+77,0.0,,0.000112558,,0.0,-6.31009,mongenerator-fossil_684_existing,,,
+78,0.0,,0.000296807,,0.0,-9.29197,mongenerator-fossil_684_existing,,,
+79,0.0,,0.00334071,,0.0,-42.9209,mongenerator-fossil_684_existing,,,
+80,0.0,,0.00085728,,0.0,-51.7358,mongenerator-fossil_684_existing,,,
+81,0.0,,-0.00559034,,0.0,-39.8965,mongenerator-fossil_684_existing,,,
 82,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 83,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 84,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
 85,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-86,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
+86,0.0,,-0.000237125,,0.0,-22.9269,mongenerator-fossil_684_existing,,,
 87,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-88,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-89,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-90,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-91,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-92,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-93,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-94,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-95,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
-96,0.0,,0.0,,0.0,0.0,mongenerator-fossil_684_existing,,,
+88,0.0,,-0.000797976,,0.0,-21.3801,mongenerator-fossil_684_existing,,,
+89,0.0,,-0.000936271,,0.0,-49.1347,mongenerator-fossil_684_existing,,,
+90,0.0,,-0.0011943,,0.0,-73.6173,mongenerator-fossil_684_existing,,,
+91,0.0,,0.000134183,,0.0,-55.4972,mongenerator-fossil_684_existing,,,
+92,0.0,,-1.23668e-05,,0.0,-54.4459,mongenerator-fossil_684_existing,,,
+93,0.0,,-0.00165356,,0.0,-42.0183,mongenerator-fossil_684_existing,,,
+94,0.0,,-0.00389664,,0.0,-32.4637,mongenerator-fossil_684_existing,,,
+95,0.0,,-0.000413107,,0.0,-11.0921,mongenerator-fossil_684_existing,,,
+96,0.0,,-0.000986576,,0.0,-7.94237,mongenerator-fossil_684_existing,,,
 1,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
 2,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
 3,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
@@ -487,16 +487,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 6,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
 7,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
 8,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
-9,0.0,-175.207,-0.00220941,,0.0,,mongenerator-solar_634,,,
-10,0.0,-411.263,0.000673396,,0.0,,mongenerator-solar_634,,,
-11,0.0,-598.548,0.000895838,,0.0,,mongenerator-solar_634,,,
-12,0.0,-735.855,0.0214919,,0.0,,mongenerator-solar_634,,,
-13,0.0,-784.675,-0.000407761,,0.0,,mongenerator-solar_634,,,
-14,0.0,-745.405,0.00154079,,0.0,,mongenerator-solar_634,,,
-15,0.0,-633.866,-0.00588252,,0.0,,mongenerator-solar_634,,,
-16,0.0,-456.922,-0.00375612,,0.0,,mongenerator-solar_634,,,
-17,0.0,-243.853,-0.011036,,0.0,,mongenerator-solar_634,,,
-18,0.0,-16.2877,-0.00703577,,0.0,,mongenerator-solar_634,,,
+9,0.0,-175.206,0.00258636,,0.0,,mongenerator-solar_634,,,
+10,0.0,-411.263,0.000122144,,0.0,,mongenerator-solar_634,,,
+11,0.0,-602.69,0.000920933,,0.0,,mongenerator-solar_634,,,
+12,0.0,-737.063,0.000584706,,0.0,,mongenerator-solar_634,,,
+13,0.0,-785.536,-0.000410214,,0.0,,mongenerator-solar_634,,,
+14,0.0,-746.497,0.00138586,,0.0,,mongenerator-solar_634,,,
+15,0.0,-635.51,-0.00261026,,0.0,,mongenerator-solar_634,,,
+16,0.0,-459.023,-0.00164606,,0.0,,mongenerator-solar_634,,,
+17,0.0,-243.859,-0.00288381,,0.0,,mongenerator-solar_634,,,
+18,0.0,-16.2904,-0.000851794,,0.0,,mongenerator-solar_634,,,
 19,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
 20,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
 21,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
@@ -535,16 +535,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 54,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
 55,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
 56,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
-57,0.0,-82.1531,-0.000334618,,0.0,,mongenerator-solar_634,,,
-58,0.0,-360.029,-0.00886823,,0.0,,mongenerator-solar_634,,,
-59,0.0,-511.733,-0.00758441,,0.0,,mongenerator-solar_634,,,
-60,0.0,-602.314,-0.00422121,,0.0,,mongenerator-solar_634,,,
-61,0.0,-638.905,0.0023346,,0.0,,mongenerator-solar_634,,,
-62,0.0,-615.893,0.00437796,,0.0,,mongenerator-solar_634,,,
-63,0.0,-309.077,-0.0291628,,0.0,,mongenerator-solar_634,,,
-64,0.0,-347.687,0.0043229,,0.0,,mongenerator-solar_634,,,
-65,0.0,-169.171,-0.00944996,,0.0,,mongenerator-solar_634,,,
-66,0.0,-6.73608,-0.000349459,,0.0,,mongenerator-solar_634,,,
+57,0.0,-82.1531,-0.00014127,,0.0,,mongenerator-solar_634,,,
+58,0.0,-360.029,-0.00374406,,0.0,,mongenerator-solar_634,,,
+59,0.0,-511.733,-0.003202,,0.0,,mongenerator-solar_634,,,
+60,0.0,-602.327,9.09495e-16,,0.0,,mongenerator-solar_634,,,
+61,0.0,-638.908,0.0,,0.0,,mongenerator-solar_634,,,
+62,0.0,-615.898,0.0,,0.0,,mongenerator-solar_634,,,
+63,0.0,-309.069,1.13687e-16,,0.0,,mongenerator-solar_634,,,
+64,0.0,-347.689,0.0,,0.0,,mongenerator-solar_634,,,
+65,0.0,-169.171,1.42109e-17,,0.0,,mongenerator-solar_634,,,
+66,0.0,-6.7362,-3.55271e-18,,0.0,,mongenerator-solar_634,,,
 67,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
 68,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
 69,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
@@ -559,16 +559,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 78,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
 79,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
 80,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
-81,0.0,-122.141,0.00107455,,0.0,,mongenerator-solar_634,,,
-82,0.0,-360.36,-0.00101377,,0.0,,mongenerator-solar_634,,,
-83,0.0,-553.123,0.00867789,,0.0,,mongenerator-solar_634,,,
-84,0.0,-455.9,0.000283422,,0.0,,mongenerator-solar_634,,,
-85,0.0,-367.715,0.00311459,,0.0,,mongenerator-solar_634,,,
-86,0.0,-240.633,0.000356104,,0.0,,mongenerator-solar_634,,,
-87,0.0,-609.343,-0.00251854,,0.0,,mongenerator-solar_634,,,
-88,0.0,-261.437,-0.00437389,,0.0,,mongenerator-solar_634,,,
-89,0.0,-142.157,3.8809e-05,,0.0,,mongenerator-solar_634,,,
-90,0.0,-5.45888,-0.000196405,,0.0,,mongenerator-solar_634,,,
+81,0.0,-122.141,0.000929001,,0.0,,mongenerator-solar_634,,,
+82,0.0,-360.359,0.000908361,,0.0,,mongenerator-solar_634,,,
+83,0.0,-548.038,0.0085657,,0.0,,mongenerator-solar_634,,,
+84,0.0,-452.188,0.00661044,,0.0,,mongenerator-solar_634,,,
+85,0.0,-367.715,-0.00277088,,0.0,,mongenerator-solar_634,,,
+86,0.0,-240.634,-4.64462e-05,,0.0,,mongenerator-solar_634,,,
+87,0.0,-603.36,-0.00214643,,0.0,,mongenerator-solar_634,,,
+88,0.0,-261.433,0.00244528,,0.0,,mongenerator-solar_634,,,
+89,0.0,-142.157,3.4177e-05,,0.0,,mongenerator-solar_634,,,
+90,0.0,-5.45869,-6.13172e-06,,0.0,,mongenerator-solar_634,,,
 91,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
 92,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
 93,0.0,0.0,0.0,,0.0,,mongenerator-solar_634,,,
@@ -583,16 +583,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 6,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
 7,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
 8,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
-9,0.0,-63.0167,-0.000794656,,0.0,,mongenerator-solar_634_existing,,,
-10,0.0,-148.056,0.000242424,,0.0,,mongenerator-solar_634_existing,,,
-11,0.0,-215.479,0.000322504,,0.0,,mongenerator-solar_634_existing,,,
-12,0.0,-264.909,0.00773712,,0.0,,mongenerator-solar_634_existing,,,
-13,0.0,-282.485,-0.000146795,,0.0,,mongenerator-solar_634_existing,,,
-14,0.0,-268.348,0.000554688,,0.0,,mongenerator-solar_634_existing,,,
-15,0.0,-228.193,-0.00211772,,0.0,,mongenerator-solar_634_existing,,,
-16,0.0,-164.493,-0.00135221,,0.0,,mongenerator-solar_634_existing,,,
-17,0.0,-87.7066,-0.00396932,,0.0,,mongenerator-solar_634_existing,,,
-18,0.0,-5.85818,-0.00253055,,0.0,,mongenerator-solar_634_existing,,,
+9,0.0,-63.0162,0.000930235,,0.0,,mongenerator-solar_634_existing,,,
+10,0.0,-148.056,4.3972e-05,,0.0,,mongenerator-solar_634_existing,,,
+11,0.0,-216.97,0.000331538,,0.0,,mongenerator-solar_634_existing,,,
+12,0.0,-265.344,0.000210495,,0.0,,mongenerator-solar_634_existing,,,
+13,0.0,-282.795,-0.000147678,,0.0,,mongenerator-solar_634_existing,,,
+14,0.0,-268.741,0.000498912,,0.0,,mongenerator-solar_634_existing,,,
+15,0.0,-228.785,-0.0009397,,0.0,,mongenerator-solar_634_existing,,,
+16,0.0,-165.249,-0.000592586,,0.0,,mongenerator-solar_634_existing,,,
+17,0.0,-87.7085,-0.00103722,,0.0,,mongenerator-solar_634_existing,,,
+18,0.0,-5.85918,-0.000306364,,0.0,,mongenerator-solar_634_existing,,,
 19,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
 20,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
 21,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
@@ -631,16 +631,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 54,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
 55,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
 56,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
-57,0.0,-29.548,-0.000120352,,0.0,,mongenerator-solar_634_existing,,,
-58,0.0,-129.491,-0.00318963,,0.0,,mongenerator-solar_634_existing,,,
-59,0.0,-184.055,-0.00272788,,0.0,,mongenerator-solar_634_existing,,,
-60,0.0,-216.634,-0.00151824,,0.0,,mongenerator-solar_634_existing,,,
-61,0.0,-229.795,0.000839684,,0.0,,mongenerator-solar_634_existing,,,
-62,0.0,-221.518,0.00157462,,0.0,,mongenerator-solar_634_existing,,,
-63,0.0,-111.166,-0.010489,,0.0,,mongenerator-solar_634_existing,,,
-64,0.0,-125.052,0.00155481,,0.0,,mongenerator-solar_634_existing,,,
-65,0.0,-60.8458,-0.00339886,,0.0,,mongenerator-solar_634_existing,,,
-66,0.0,-2.42276,-0.00012569,,0.0,,mongenerator-solar_634_existing,,,
+57,0.0,-29.548,-5.08106e-05,,0.0,,mongenerator-solar_634_existing,,,
+58,0.0,-129.491,-0.00134663,,0.0,,mongenerator-solar_634_existing,,,
+59,0.0,-184.055,-0.00115166,,0.0,,mongenerator-solar_634_existing,,,
+60,0.0,-216.638,0.0,,0.0,,mongenerator-solar_634_existing,,,
+61,0.0,-229.795,-4.54747e-16,,0.0,,mongenerator-solar_634_existing,,,
+62,0.0,-221.519,2.27374e-16,,0.0,,mongenerator-solar_634_existing,,,
+63,0.0,-111.162,0.0,,0.0,,mongenerator-solar_634_existing,,,
+64,0.0,-125.053,0.0,,0.0,,mongenerator-solar_634_existing,,,
+65,0.0,-60.8457,3.55271e-18,,0.0,,mongenerator-solar_634_existing,,,
+66,0.0,-2.4228,8.88178e-19,,0.0,,mongenerator-solar_634_existing,,,
 67,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
 68,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
 69,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
@@ -655,16 +655,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 78,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
 79,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
 80,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
-81,0.0,-43.9305,0.000386481,,0.0,,mongenerator-solar_634_existing,,,
-82,0.0,-129.61,-0.000364623,,0.0,,mongenerator-solar_634_existing,,,
-83,0.0,-199.125,0.00312406,,0.0,,mongenerator-solar_634_existing,,,
-84,0.0,-164.125,0.000102033,,0.0,,mongenerator-solar_634_existing,,,
-85,0.0,-132.256,0.00112022,,0.0,,mongenerator-solar_634_existing,,,
-86,0.0,-86.5484,0.00012808,,0.0,,mongenerator-solar_634_existing,,,
-87,0.0,-219.365,-0.000906679,,0.0,,mongenerator-solar_634_existing,,,
-88,0.0,-94.0309,-0.00157315,,0.0,,mongenerator-solar_634_existing,,,
-89,0.0,-51.1294,1.39584e-05,,0.0,,mongenerator-solar_634_existing,,,
-90,0.0,-1.96339,-7.0641e-05,,0.0,,mongenerator-solar_634_existing,,,
+81,0.0,-43.9305,0.000334133,,0.0,,mongenerator-solar_634_existing,,,
+82,0.0,-129.61,0.00032671,,0.0,,mongenerator-solar_634_existing,,,
+83,0.0,-197.295,0.00308367,,0.0,,mongenerator-solar_634_existing,,,
+84,0.0,-162.789,0.00237977,,0.0,,mongenerator-solar_634_existing,,,
+85,0.0,-132.256,-0.0009966,,0.0,,mongenerator-solar_634_existing,,,
+86,0.0,-86.5485,-1.67053e-05,,0.0,,mongenerator-solar_634_existing,,,
+87,0.0,-217.211,-0.00077272,,0.0,,mongenerator-solar_634_existing,,,
+88,0.0,-94.0293,0.000879492,,0.0,,mongenerator-solar_634_existing,,,
+89,0.0,-51.1294,1.22924e-05,,0.0,,mongenerator-solar_634_existing,,,
+90,0.0,-1.96332,-2.20539e-06,,0.0,,mongenerator-solar_634_existing,,,
 91,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
 92,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
 93,0.0,0.0,0.0,,0.0,,mongenerator-solar_634_existing,,,
@@ -679,16 +679,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 6,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
 7,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
 8,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
-9,0.0,, 0.000720008, -220.328,0.0,,mongenerator-solar_646,,,
-10,0.0,, 0.0199197, -512.904,0.0,,mongenerator-solar_646,,,
-11,0.0,, -0.0000465945, -719.3,0.0,,mongenerator-solar_646,,,
-12,0.0,, 0.0124085, -881.664,0.0,,mongenerator-solar_646,,,
-13,0.0,, -0.00342942, -940.634,0.0,,mongenerator-solar_646,,,
-14,0.0,, 0.00465679, -896.165,0.0,,mongenerator-solar_646,,,
-15,0.0,, -0.00677414, -767.853,0.0,,mongenerator-solar_646,,,
-16,0.0,, 0.000301979, -566.054,0.0,,mongenerator-solar_646,,,
-17,0.0,, 0.00855561, -306.655,0.0,,mongenerator-solar_646,,,
-18,0.0,, 0.0038961, -20.4787,0.0,,mongenerator-solar_646,,,
+9,0.0,, 0.00419303, -220.328,0.0,,mongenerator-solar_646,,,
+10,0.0,, -0.000343248, -512.921,0.0,,mongenerator-solar_646,,,
+11,0.0,, 0.00779372, -715.618,0.0,,mongenerator-solar_646,,,
+12,0.0,, 0.00239715, -871.198,0.0,,mongenerator-solar_646,,,
+13,0.0,, -0.00213115, -929.09,0.0,,mongenerator-solar_646,,,
+14,0.0,, 0.00289982, -885.43,0.0,,mongenerator-solar_646,,,
+15,0.0,, -0.00551906, -759.449,0.0,,mongenerator-solar_646,,,
+16,0.0,, 0.00932872, -566.056,0.0,,mongenerator-solar_646,,,
+17,0.0,, -0.0000750833, -306.659,0.0,,mongenerator-solar_646,,,
+18,0.0,, -0.000645385, -20.4837,0.0,,mongenerator-solar_646,,,
 19,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
 20,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
 21,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
@@ -712,7 +712,7 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 39,0.0,, -Inf, -Inf,0.0,,mongenerator-solar_646,,,
 40,0.0,, -Inf, -Inf,0.0,,mongenerator-solar_646,,,
 41,0.0,, -Inf, -Inf,0.0,,mongenerator-solar_646,,,
-42,0.0,, -Inf, -Inf,0.0,,mongenerator-solar_646,,,
+42,0.0,, +Inf, +Inf,0.0,,mongenerator-solar_646,,,
 43,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
 44,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
 45,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
@@ -727,16 +727,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 54,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
 55,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
 56,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
-57,0.0,, -5.76949E-21, -5.16149E-17,0.0,,mongenerator-solar_646,,,
-58,0.0,, -1.48331E-18, -1.20396E-14,0.0,,mongenerator-solar_646,,,
-59,0.0,, -6.9039E-16, -5.81031E-12,0.0,,mongenerator-solar_646,,,
-60,0.0,, -5.98011E-13, -5.43637E-9,0.0,,mongenerator-solar_646,,,
-61,0.0,, -3.36382E-14, 3.1304E-10,0.0,,mongenerator-solar_646,,,
-62,0.0,, -4.21444E-17, 2.85257E-13,0.0,,mongenerator-solar_646,,,
-63,0.0,, 1.24123E-18, -8.35057E-15,0.0,,mongenerator-solar_646,,,
-64,0.0,, 7.24245E-20, -6.12848E-16,0.0,,mongenerator-solar_646,,,
-65,0.0,, 1.9681E-20, -2.16934E-16,0.0,,mongenerator-solar_646,,,
-66,0.0,, 5.59363E-22, -2.80013E-17,0.0,,mongenerator-solar_646,,,
+57,0.0,, 3.68178E-19, 1.40111E-15,0.0,,mongenerator-solar_646,,,
+58,0.0,, -2.82044E-16, -1.10652E-12,0.0,,mongenerator-solar_646,,,
+59,0.0,, -1.52601E-12, -6.95941E-9,0.0,,mongenerator-solar_646,,,
+60,0.0,, -2.25115E15, -9.82164E18,0.0,,mongenerator-solar_646,,,
+61,0.0,, -Inf, -Inf,0.0,,mongenerator-solar_646,,,
+62,0.0,, -Inf, -Inf,0.0,,mongenerator-solar_646,,,
+63,0.0,, -Inf, -Inf,0.0,,mongenerator-solar_646,,,
+64,0.0,, -Inf, -Inf,0.0,,mongenerator-solar_646,,,
+65,0.0,, -Inf, -Inf,0.0,,mongenerator-solar_646,,,
+66,0.0,, +Inf, +Inf,0.0,,mongenerator-solar_646,,,
 67,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
 68,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
 69,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
@@ -751,16 +751,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 78,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
 79,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
 80,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
-81,0.0,, -0.000988723, -153.601,0.0,,mongenerator-solar_646,,,
-82,0.0,, 0.000475586, -453.168,0.0,,mongenerator-solar_646,,,
-83,0.0,, 0.0346979, -655.902,0.0,,mongenerator-solar_646,,,
-84,0.0,, -0.00732663, -567.049,0.0,,mongenerator-solar_646,,,
-85,0.0,, 0.00321906, -462.421,0.0,,mongenerator-solar_646,,,
-86,0.0,, 8.10748E-6, -302.608,0.0,,mongenerator-solar_646,,,
-87,0.0,, 0.00316734, -720.609,0.0,,mongenerator-solar_646,,,
-88,0.0,, -0.000566746, -328.762,0.0,,mongenerator-solar_646,,,
-89,0.0,, -0.0000438088, -178.769,0.0,,mongenerator-solar_646,,,
-90,0.0,, 0.0000420886, -6.86505,0.0,,mongenerator-solar_646,,,
+81,0.0,, -0.000813311, -153.601,0.0,,mongenerator-solar_646,,,
+82,0.0,, -0.000570803, -453.17,0.0,,mongenerator-solar_646,,,
+83,0.0,, 0.0767127, -655.882,0.0,,mongenerator-solar_646,,,
+84,0.0,, 0.00833302, -567.022,0.0,,mongenerator-solar_646,,,
+85,0.0,, 0.000775503, -462.417,0.0,,mongenerator-solar_646,,,
+86,0.0,, -0.000122605, -302.608,0.0,,mongenerator-solar_646,,,
+87,0.0,, 0.00226499, -712.815,0.0,,mongenerator-solar_646,,,
+88,0.0,, 0.000572961, -328.768,0.0,,mongenerator-solar_646,,,
+89,0.0,, -0.0000419587, -178.769,0.0,,mongenerator-solar_646,,,
+90,0.0,, 2.67314E-6, -6.865,0.0,,mongenerator-solar_646,,,
 91,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
 92,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
 93,0.0,, 0, 0,0.0,,mongenerator-solar_646,,,
@@ -775,16 +775,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 6,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
 7,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
 8,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
-9,0.0,-325.621,-0.0174544,-327.742,-0.00306205,-334.038,mongenerator-solar_675,0.128038,0.0,0.0
-10,0.0,-808.714,-0.000578242,-825.009,0.0222022,-853.323,mongenerator-solar_675,0.0101982,0.0,0.0
-11,0.0,-1154.43,0.0018816,-1194.09,-0.0064675,-1240.53,mongenerator-solar_675,0.0410784,0.0,0.0
-12,0.0,-1423.9,0.0510177,-1543.06,0.0198178,-1663.8,mongenerator-solar_675,0.00982505,0.0,0.0
-13,0.0,-1518.41,0.0060689,-1659.48,-0.0132868,-1781.07,mongenerator-solar_675,-0.0250453,0.0,0.0
-14,0.0,-1445.0,-0.0061048,-1572.28,0.0179722,-1693.71,mongenerator-solar_675,0.0322473,0.0,0.0
-15,0.0,-1235.82,-0.0189426,-1324.2,-0.0301787,-1434.43,mongenerator-solar_675,0.107656,0.0,0.0
-16,0.0,-901.95,-0.017279,-942.477,0.00371781,-1012.32,mongenerator-solar_675,0.0454714,0.0,0.0
-17,0.0,-441.164,-0.0502721,-447.184,0.0378488,-458.386,mongenerator-solar_675,0.0925828,0.0,0.0
-18,0.0,-25.9044,-0.0284267,-25.5981,0.0178148,-23.839,mongenerator-solar_675,0.0384793,0.0,0.0
+9,0.0,-291.242,0.00136905,-289.688,0.00408407,-287.086,mongenerator-solar_675,0.0305416,0.0,0.0
+10,0.0,-737.791,0.000335316,-752.635,-0.000181566,-778.489,mongenerator-solar_675,-0.00315398,0.0,0.0
+11,0.0,-1060.83,0.0037924,-1091.47,0.0170452,-1161.12,mongenerator-solar_675,-0.00753073,0.0,0.0
+12,0.0,-1298.7,-2.98479e-06,-1372.62,0.00956174,-1475.92,mongenerator-solar_675,-0.0119562,0.0,0.0
+13,0.0,-1383.53,0.00393029,-1474.25,-0.00690562,-1581.83,mongenerator-solar_675,-0.0196492,0.0,0.0
+14,0.0,-1317.54,-0.00382042,-1398.11,0.00933754,-1503.11,mongenerator-solar_675,0.0259829,0.0,0.0
+15,0.0,-1128.88,-0.0040198,-1181.12,-0.0219065,-1271.28,mongenerator-solar_675,0.0419591,0.0,0.0
+16,0.0,-825.964,-0.0094596,-845.831,0.0295485,-898.648,mongenerator-solar_675,-0.0182149,0.0,0.0
+17,0.0,-405.283,-0.0117088,-404.64,-0.000427361,-411.671,mongenerator-solar_675,0.0485726,0.0,0.0
+18,0.0,-23.9407,-0.00301936,-23.3266,-0.00138142,-21.7919,mongenerator-solar_675,0.010491,0.0,0.0
 19,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
 20,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
 21,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
@@ -799,16 +799,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 30,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
 31,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
 32,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
-33,0.0,-104.032,-4.984e-06,-104.032,-4.98222e-06,-104.032,mongenerator-solar_675,-4.98279e-06,0.0,0.0
-34,0.0,-348.51,-0.000105129,-348.51,-0.000105113,-348.51,mongenerator-solar_675,-0.000105118,0.0,0.0
-35,0.0,-597.777,-0.00030384,-597.777,-0.00030384,-597.777,mongenerator-solar_675,-0.00030384,0.0,0.0
-36,0.0,-737.746,0.0,-737.746,0.0,-737.746,mongenerator-solar_675,0.0,0.0,0.0
-37,0.0,-855.871,0.0,-855.871,0.0,-855.871,mongenerator-solar_675,0.0,0.0,0.0
-38,0.0,-1006.93,0.0,-1006.93,5.82077e-14,-1006.93,mongenerator-solar_675,0.0,0.0,0.0
-39,0.0,-611.889,0.0,-611.889,0.0,-611.889,mongenerator-solar_675,0.0,0.0,0.0
-40,0.0,-664.658,0.0,-664.658,0.0,-664.658,mongenerator-solar_675,0.0,0.0,0.0
-41,0.0,-337.222,1.42109e-17,-337.222,0.0,-337.222,mongenerator-solar_675,0.0,0.0,0.0
-42,0.0,-11.9261,0.0,-11.9261,-9.09495e-16,-11.9261,mongenerator-solar_675,0.0,0.0,0.0
+33,0.0,-94.9068,-4.04001e-06,-94.9068,-4.03839e-06,-94.9068,mongenerator-solar_675,-4.03891e-06,0.0,0.0
+34,0.0,-317.935,-8.43992e-05,-317.935,-8.43841e-05,-317.935,mongenerator-solar_675,-8.4389e-05,0.0,0.0
+35,0.0,-545.321,-0.000243438,-545.321,-0.000243438,-545.321,mongenerator-solar_675,-0.000243438,0.0,0.0
+36,0.0,-672.999,-1.13687e-16,-672.999,0.0,-672.999,mongenerator-solar_675,0.0,0.0,0.0
+37,0.0,-780.748,0.0,-780.748,0.0,-780.748,mongenerator-solar_675,-5.82077e-14,0.0,0.0
+38,0.0,-918.54,0.0,-918.54,0.0,-918.54,mongenerator-solar_675,0.0,0.0,0.0
+39,0.0,-558.195,1.13687e-16,-558.195,0.0,-558.195,mongenerator-solar_675,-2.91038e-14,0.0,0.0
+40,0.0,-606.329,0.0,-606.329,0.0,-606.329,mongenerator-solar_675,0.0,0.0,0.0
+41,0.0,-307.638,1.42109e-17,-307.638,-2.91038e-14,-307.638,mongenerator-solar_675,2.91038e-14,0.0,0.0
+42,0.0,-10.8798,4.44089e-19,-10.8798,0.0,-10.8798,mongenerator-solar_675,0.0,0.0,0.0
 43,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
 44,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
 45,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
@@ -823,16 +823,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 54,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
 55,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
 56,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
-57,0.0,-132.047,-1.18616e-05,-132.047,-1.18576e-05,-132.047,mongenerator-solar_675,-1.18589e-05,0.0,0.0
-58,0.0,-579.073,-0.000540246,-579.073,-0.000540213,-579.073,mongenerator-solar_675,-0.000540224,0.0,0.0
-59,0.0,-823.366,-0.000580453,-823.366,-0.000580453,-823.366,mongenerator-solar_675,-0.000580453,0.0,0.0
-60,0.0,-969.293,-0.000468282,-969.293,-0.000468282,-969.293,mongenerator-solar_675,-0.000468282,0.0,0.0
-61,0.0,-1028.24,-2.73704e-09,-1028.24,-3.28495e-09,-1028.24,mongenerator-solar_675,-2.78815e-09,0.0,0.0
-62,0.0,-991.161,-6.15971e-05,-991.161,-6.14802e-05,-991.161,mongenerator-solar_675,-6.15186e-05,0.0,0.0
-63,0.0,-497.032,-0.000448385,-497.032,-0.000448385,-497.032,mongenerator-solar_675,-0.000448384,0.0,0.0
-64,0.0,-559.188,5.53009e-05,-559.188,5.53008e-05,-559.188,mongenerator-solar_675,5.53008e-05,0.0,0.0
-65,0.0,-271.965,-0.000200159,-271.965,-0.000200159,-271.965,mongenerator-solar_675,-0.000200159,0.0,0.0
-66,0.0,-10.8252,-9.10903e-06,-10.8252,-9.09799e-06,-10.8252,mongenerator-solar_675,-9.10161e-06,0.0,0.0
+57,0.0,-120.465,-7.86378e-06,-120.465,-7.86172e-06,-120.465,mongenerator-solar_675,-7.86237e-06,0.0,0.0
+58,0.0,-528.259,-0.000406283,-528.259,-0.000406258,-528.259,mongenerator-solar_675,-0.000406266,0.0,0.0
+59,0.0,-751.098,-0.00044384,-751.098,-0.00044384,-751.098,mongenerator-solar_675,-0.00044384,0.0,0.0
+60,0.0,-884.206,0.0,-884.206,0.0,-884.206,mongenerator-solar_675,0.0,0.0,0.0
+61,0.0,-937.985,2.27374e-16,-937.985,0.0,-937.985,mongenerator-solar_675,0.0,0.0,0.0
+62,0.0,-904.152,0.0,-904.152,0.0,-904.152,mongenerator-solar_675,0.0,0.0,0.0
+63,0.0,-453.42,0.0,-453.42,0.0,-453.42,mongenerator-solar_675,-2.91038e-14,0.0,0.0
+64,0.0,-510.12,-5.68434e-17,-510.12,-2.91038e-14,-510.12,mongenerator-solar_675,0.0,0.0,0.0
+65,0.0,-248.107,0.0,-248.107,0.0,-248.107,mongenerator-solar_675,0.0,0.0,0.0
+66,0.0,-9.87589,0.0,-9.87589,0.0,-9.87589,mongenerator-solar_675,0.0,0.0,0.0
 67,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
 68,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
 69,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
@@ -847,16 +847,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 78,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
 79,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
 80,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
-81,0.0,-214.445,0.00709572,-205.263,-0.00211762,-200.583,mongenerator-solar_675,-0.0291542,0.0,0.0
-82,0.0,-705.711,-0.00355957,-695.77,0.00138374,-716.374,mongenerator-solar_675,0.0109299,0.0,0.0
-83,0.0,-1090.49,0.0120528,-1104.05,0.0659838,-1180.95,mongenerator-solar_675,0.0317763,0.0,0.0
-84,0.0,-909.004,0.0067118,-912.001,-0.0198566,-960.5,mongenerator-solar_675,-0.00793185,0.0,0.0
-85,0.0,-713.456,0.0066381,-707.217,0.0103129,-729.225,mongenerator-solar_675,-0.0334718,0.0,0.0
-86,0.0,-436.551,0.00176386,-426.45,0.0021563,-430.868,mongenerator-solar_675,-0.0219099,0.0,0.0
-87,0.0,-1201.23,-0.0183551,-1224.93,0.0169236,-1310.71,mongenerator-solar_675,0.0429885,0.0,0.0
-88,0.0,-479.652,-0.0198562,-469.012,-0.00409907,-469.412,mongenerator-solar_675,0.0952114,0.0,0.0
-89,0.0,-247.326,9.02304e-05,-237.974,0.000523589,-227.969,mongenerator-solar_675,-0.00462965,0.0,0.0
-90,0.0,-9.01732,0.000117053,-8.66567,0.000224324,-7.84759,mongenerator-solar_675,-0.00237346,0.0,0.0
+81,0.0,-194.745,0.00550186,-186.652,-0.00111539,-182.777,mongenerator-solar_675,-0.025659,0.0,0.0
+82,0.0,-638.789,0.00400879,-627.266,0.000386501,-638.423,mongenerator-solar_675,-0.0286301,0.0,0.0
+83,0.0,-984.512,0.0124735,-988.694,0.122831,-1043.88,mongenerator-solar_675,0.0186622,0.0,0.0
+84,0.0,-821.559,-0.0123124,-819.174,0.00672235,-850.972,mongenerator-solar_675,0.153326,0.0,0.0
+85,0.0,-645.655,-0.011565,-637.462,0.00100861,-649.917,mongenerator-solar_675,0.0545078,0.0,0.0
+86,0.0,-395.736,-0.000484105,-386.108,0.00036611,-387.837,mongenerator-solar_675,-0.00382404,0.0,0.0
+87,0.0,-1083.65,-0.0137699,-1094.32,0.0107591,-1157.17,mongenerator-solar_675,0.0352665,0.0,0.0
+88,0.0,-434.644,0.00702616,-424.431,0.000877493,-421.91,mongenerator-solar_675,-0.0161201,0.0,0.0
+89,0.0,-224.395,7.57404e-05,-216.296,0.000418652,-207.865,mongenerator-solar_675,-0.00379277,0.0,0.0
+90,0.0,-8.08171,-1.57666e-05,-7.77852,1.88579e-05,-7.08061,mongenerator-solar_675,-0.000106534,0.0,0.0
 91,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
 92,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
 93,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675,0.0,0.0,0.0
@@ -871,16 +871,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 6,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
 7,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
 8,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
-9,0.0,-109.723,-0.0058815,-110.437,-0.0010318,-112.559,mongenerator-solar_675_existing,0.0431444,0.0,0.0
-10,0.0,-272.508,-0.000194847,-277.999,0.00748135,-287.539,mongenerator-solar_675_existing,0.00343644,0.0,0.0
-11,0.0,-389.001,0.000634031,-402.366,-0.00217932,-418.013,mongenerator-solar_675_existing,0.013842,0.0,0.0
-12,0.0,-479.804,0.0171911,-519.957,0.00667788,-560.64,mongenerator-solar_675_existing,0.00331069,0.0,0.0
-13,0.0,-511.651,0.002045,-559.185,-0.00447718,-600.156,mongenerator-solar_675_existing,-0.00843936,0.0,0.0
-14,0.0,-486.915,-0.0020571,-529.801,0.00605598,-570.719,mongenerator-solar_675_existing,0.0108662,0.0,0.0
-15,0.0,-416.428,-0.00638299,-446.207,-0.0101691,-483.352,mongenerator-solar_675_existing,0.0362761,0.0,0.0
-16,0.0,-303.925,-0.00582239,-317.581,0.00125277,-341.114,mongenerator-solar_675_existing,0.0153222,0.0,0.0
-17,0.0,-148.656,-0.0169399,-150.685,0.0127537,-154.46,mongenerator-solar_675_existing,0.0311971,0.0,0.0
-18,0.0,-8.72887,-0.00957879,-8.62564,0.00600294,-8.03289,mongenerator-solar_675_existing,0.0129661,0.0,0.0
+9,0.0,-107.572,0.000505667,-106.998,0.00150848,-106.037,mongenerator-solar_675_existing,0.0112807,0.0,0.0
+10,0.0,-272.508,0.000123851,-277.991,-6.70625e-05,-287.54,mongenerator-solar_675_existing,-0.00116494,0.0,0.0
+11,0.0,-391.823,0.00140075,-403.142,0.00629577,-428.868,mongenerator-solar_675_existing,-0.00278153,0.0,0.0
+12,0.0,-479.684,-1.10245e-06,-506.985,0.00353169,-545.143,mongenerator-solar_675_existing,-0.00441609,0.0,0.0
+13,0.0,-511.015,0.00145168,-544.526,-0.00255064,-584.258,mongenerator-solar_675_existing,-0.00725756,0.0,0.0
+14,0.0,-486.641,-0.0014111,-516.4,0.00344888,-555.184,mongenerator-solar_675_existing,0.00959698,0.0,0.0
+15,0.0,-416.959,-0.00148474,-436.254,-0.00809133,-469.556,mongenerator-solar_675_existing,0.0154979,0.0,0.0
+16,0.0,-305.076,-0.00349397,-312.413,0.0109139,-331.922,mongenerator-solar_675_existing,-0.00672781,0.0,0.0
+17,0.0,-149.694,-0.00432474,-149.457,-0.000157849,-152.053,mongenerator-solar_675_existing,0.0179406,0.0,0.0
+18,0.0,-8.84265,-0.00111522,-8.61583,-0.000510236,-8.049,mongenerator-solar_675_existing,0.00387491,0.0,0.0
 19,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
 20,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
 21,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
@@ -895,16 +895,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 30,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
 31,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
 32,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
-33,0.0,-35.0549,-1.67943e-06,-35.0549,-1.67883e-06,-35.0549,mongenerator-solar_675_existing,-1.67902e-06,0.0,0.0
-34,0.0,-117.435,-3.54249e-05,-117.435,-3.54193e-05,-117.435,mongenerator-solar_675_existing,-3.54211e-05,0.0,0.0
-35,0.0,-201.429,-0.000102383,-201.429,-0.000102383,-201.429,mongenerator-solar_675_existing,-0.000102383,0.0,0.0
-36,0.0,-248.594,-5.68434e-17,-248.594,0.0,-248.594,mongenerator-solar_675_existing,0.0,0.0,0.0
-37,0.0,-288.398,0.0,-288.398,-1.45519e-14,-288.398,mongenerator-solar_675_existing,0.0,0.0,0.0
-38,0.0,-339.301,-1.13687e-16,-339.301,0.0,-339.301,mongenerator-solar_675_existing,0.0,0.0,0.0
-39,0.0,-206.185,0.0,-206.185,-1.45519e-14,-206.185,mongenerator-solar_675_existing,0.0,0.0,0.0
-40,0.0,-223.966,0.0,-223.966,0.0,-223.966,mongenerator-solar_675_existing,1.45519e-14,0.0,0.0
-41,0.0,-113.632,0.0,-113.632,7.27596e-15,-113.632,mongenerator-solar_675_existing,-7.27596e-15,0.0,0.0
-42,0.0,-4.01866,-2.22045e-19,-4.01866,0.0,-4.01866,mongenerator-solar_675_existing,2.27374e-16,0.0,0.0
+33,0.0,-35.0545,-1.49221e-06,-35.0545,-1.49161e-06,-35.0545,mongenerator-solar_675_existing,-1.4918e-06,0.0,0.0
+34,0.0,-117.431,-3.11734e-05,-117.431,-3.11679e-05,-117.431,mongenerator-solar_675_existing,-3.11697e-05,0.0,0.0
+35,0.0,-201.418,-8.99154e-05,-201.418,-8.99154e-05,-201.418,mongenerator-solar_675_existing,-8.99153e-05,0.0,0.0
+36,0.0,-248.577,0.0,-248.577,1.45519e-14,-248.577,mongenerator-solar_675_existing,-1.45519e-14,0.0,0.0
+37,0.0,-288.375,0.0,-288.375,-1.45519e-14,-288.375,mongenerator-solar_675_existing,0.0,0.0,0.0
+38,0.0,-339.269,1.13687e-16,-339.269,-2.91038e-14,-339.269,mongenerator-solar_675_existing,0.0,0.0,0.0
+39,0.0,-206.173,0.0,-206.173,-1.45519e-14,-206.173,mongenerator-solar_675_existing,0.0,0.0,0.0
+40,0.0,-223.952,0.0,-223.952,0.0,-223.952,mongenerator-solar_675_existing,0.0,0.0,0.0
+41,0.0,-113.628,0.0,-113.628,-7.27596e-15,-113.628,mongenerator-solar_675_existing,0.0,0.0,0.0
+42,0.0,-4.01854,0.0,-4.01854,0.0,-4.01854,mongenerator-solar_675_existing,-2.27374e-16,0.0,0.0
 43,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
 44,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
 45,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
@@ -919,16 +919,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 54,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
 55,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
 56,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
-57,0.0,-44.4951,-3.99692e-06,-44.4951,-3.99557e-06,-44.4951,mongenerator-solar_675_existing,-3.99601e-06,0.0,0.0
-58,0.0,-195.127,-0.000182044,-195.127,-0.000182033,-195.127,mongenerator-solar_675_existing,-0.000182036,0.0,0.0
-59,0.0,-277.445,-0.000195592,-277.445,-0.000195592,-277.445,mongenerator-solar_675_existing,-0.000195592,0.0,0.0
-60,0.0,-326.617,-0.000157794,-326.617,-0.000157794,-326.617,mongenerator-solar_675_existing,-0.000157794,0.0,0.0
-61,0.0,-346.481,-9.22285e-10,-346.481,-1.10691e-09,-346.481,mongenerator-solar_675_existing,-9.3953e-10,0.0,0.0
-62,0.0,-333.986,-2.0756e-05,-333.986,-2.07166e-05,-333.986,mongenerator-solar_675_existing,-2.07296e-05,0.0,0.0
-63,0.0,-167.482,-0.00015109,-167.482,-0.00015109,-167.482,mongenerator-solar_675_existing,-0.00015109,0.0,0.0
-64,0.0,-188.426,1.86344e-05,-188.426,1.86344e-05,-188.426,mongenerator-solar_675_existing,1.86344e-05,0.0,0.0
-65,0.0,-91.6424,-6.74465e-05,-91.6424,-6.74464e-05,-91.6424,mongenerator-solar_675_existing,-6.74464e-05,0.0,0.0
-66,0.0,-3.6477,-3.06942e-06,-3.6477,-3.0657e-06,-3.6477,mongenerator-solar_675_existing,-3.06692e-06,0.0,0.0
+57,0.0,-44.4945,-2.90454e-06,-44.4945,-2.90378e-06,-44.4945,mongenerator-solar_675_existing,-2.90402e-06,0.0,0.0
+58,0.0,-195.116,-0.000150063,-195.116,-0.000150054,-195.116,mongenerator-solar_675_existing,-0.000150057,0.0,0.0
+59,0.0,-277.423,-0.000163935,-277.423,-0.000163935,-277.423,mongenerator-solar_675_existing,-0.000163935,0.0,0.0
+60,0.0,-326.587,0.0,-326.587,2.91038e-14,-326.587,mongenerator-solar_675_existing,0.0,0.0,0.0
+61,0.0,-346.451,0.0,-346.451,-2.91038e-14,-346.451,mongenerator-solar_675_existing,-2.91038e-14,0.0,0.0
+62,0.0,-333.955,0.0,-333.955,-2.91038e-14,-333.955,mongenerator-solar_675_existing,0.0,0.0,0.0
+63,0.0,-167.474,0.0,-167.474,-1.45519e-14,-167.474,mongenerator-solar_675_existing,0.0,0.0,0.0
+64,0.0,-188.416,0.0,-188.416,0.0,-188.416,mongenerator-solar_675_existing,0.0,0.0,0.0
+65,0.0,-91.6401,0.0,-91.6401,0.0,-91.6401,mongenerator-solar_675_existing,0.0,0.0,0.0
+66,0.0,-3.64773,0.0,-3.64773,0.0,-3.64773,mongenerator-solar_675_existing,0.0,0.0,0.0
 67,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
 68,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
 69,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
@@ -943,16 +943,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 78,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
 79,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
 80,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
-81,0.0,-72.2603,0.00239101,-69.1664,-0.000713563,-67.5893,mongenerator-solar_675_existing,-0.00982394,0.0,0.0
-82,0.0,-237.8,-0.00119945,-234.45,0.00046627,-241.392,mongenerator-solar_675_existing,0.00368298,0.0,0.0
-83,0.0,-367.457,0.00406135,-372.024,0.0222342,-397.939,mongenerator-solar_675_existing,0.0107075,0.0,0.0
-84,0.0,-306.302,0.00226164,-307.312,-0.00669097,-323.654,mongenerator-solar_675_existing,-0.00267275,0.0,0.0
-85,0.0,-240.409,0.0022368,-238.307,0.00347508,-245.723,mongenerator-solar_675_existing,-0.0112788,0.0,0.0
-86,0.0,-147.102,0.000594357,-143.698,0.000726596,-145.187,mongenerator-solar_675_existing,-0.00738287,0.0,0.0
-87,0.0,-404.771,-0.006185,-412.756,0.00570266,-441.661,mongenerator-solar_675_existing,0.0144856,0.0,0.0
-88,0.0,-161.625,-0.00669083,-158.04,-0.00138124,-158.175,mongenerator-solar_675_existing,0.0320828,0.0,0.0
-89,0.0,-83.34,3.04044e-05,-80.1886,0.000176431,-76.8175,mongenerator-solar_675_existing,-0.00156003,0.0,0.0
-90,0.0,-3.03851,3.94426e-05,-2.92002,7.55891e-05,-2.64436,mongenerator-solar_675_existing,-0.000799771,0.0,0.0
+81,0.0,-71.9305,0.00203215,-68.9413,-0.000411977,-67.51,mongenerator-solar_675_existing,-0.00947732,0.0,0.0
+82,0.0,-235.941,0.00148068,-231.685,0.000142757,-235.806,mongenerator-solar_675_existing,-0.0105747,0.0,0.0
+83,0.0,-363.636,0.00460716,-365.181,0.0453684,-385.564,mongenerator-solar_675_existing,0.00689301,0.0,0.0
+84,0.0,-303.448,-0.00454767,-302.568,0.00248294,-314.312,mongenerator-solar_675_existing,0.0566321,0.0,0.0
+85,0.0,-238.477,-0.00427163,-235.451,0.000372536,-240.051,mongenerator-solar_675_existing,0.0201328,0.0,0.0
+86,0.0,-146.168,-0.000178808,-142.612,0.000135225,-143.25,mongenerator-solar_675_existing,-0.00141244,0.0,0.0
+87,0.0,-400.252,-0.00508602,-404.196,0.00397396,-427.407,mongenerator-solar_675_existing,0.0130259,0.0,0.0
+88,0.0,-160.539,0.00259516,-156.767,0.000324108,-155.835,mongenerator-solar_675_existing,-0.00595407,0.0,0.0
+89,0.0,-82.8818,2.79753e-05,-79.8906,0.000154632,-76.7764,mongenerator-solar_675_existing,-0.00140088,0.0,0.0
+90,0.0,-2.98504,-5.8235e-06,-2.87305,6.96528e-06,-2.61527,mongenerator-solar_675_existing,-3.93492e-05,0.0,0.0
 91,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
 92,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
 93,0.0,0.0,0.0,0.0,0.0,0.0,mongenerator-solar_675_existing,0.0,0.0,0.0
@@ -967,16 +967,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 6,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
 7,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
 8,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
-9,0.0,,0.181081,,0.0,-462.202,mongenerator-solar_684,,,
-10,0.0,,0.0137449,,0.0,-1152.04,mongenerator-solar_684,,,
-11,0.0,,0.0562206,,0.0,-1676.62,mongenerator-solar_684,,,
-12,0.0,,0.0160478,,0.0,-2252.12,mongenerator-solar_684,,,
-13,0.0,,-0.0326574,,0.0,-2411.56,mongenerator-solar_684,,,
-14,0.0,,0.0420988,,0.0,-2292.98,mongenerator-solar_684,,,
-15,0.0,,0.145452,,0.0,-1940.88,mongenerator-solar_684,,,
-16,0.0,,0.0600381,,0.0,-1368.45,mongenerator-solar_684,,,
-17,0.0,,0.126499,,0.0,-643.553,mongenerator-solar_684,,,
-18,0.0,,0.0665311,,0.0,-43.1195,mongenerator-solar_684,,,
+9,0.0,,0.0458346,,0.0,-423.567,mongenerator-solar_684,,,
+10,0.0,,-0.00514865,,0.0,-1055.74,mongenerator-solar_684,,,
+11,0.0,,-0.00982396,,0.0,-1577.37,mongenerator-solar_684,,,
+12,0.0,,-0.0166245,,0.0,-2005.49,mongenerator-solar_684,,,
+13,0.0,,-0.0259174,,0.0,-2149.92,mongenerator-solar_684,,,
+14,0.0,,0.0343338,,0.0,-2042.73,mongenerator-solar_684,,,
+15,0.0,,0.0575192,,0.0,-1726.85,mongenerator-solar_684,,,
+16,0.0,,-0.0261445,,0.0,-1219.69,mongenerator-solar_684,,,
+17,0.0,,0.0695044,,0.0,-589.571,mongenerator-solar_684,,,
+18,0.0,,0.0185174,,0.0,-39.3866,mongenerator-solar_684,,,
 19,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
 20,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
 21,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
@@ -991,16 +991,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 30,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
 31,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
 32,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
-33,0.0,,-1.6342199999999998e-21,,0.0,-4.9159200000000004e-18,mongenerator-solar_684,,,
-34,0.0,,1.46691e-17,,0.0,-1.1294e-16,mongenerator-solar_684,,,
-35,0.0,,1.04022e-15,,0.0,-4.60039e-15,mongenerator-solar_684,,,
-36,0.0,,0.133169,,0.0,-0.497428,mongenerator-solar_684,,,
-37,0.0,,85924000000.0,,0.0,-320964000000.0,mongenerator-solar_684,,,
-38,0.0,,1.35229e+24,,0.0,-5.05094e+24,mongenerator-solar_684,,,
-39,0.0,,2.7890799999999997e+28,,0.0,-1.04189e+29,mongenerator-solar_684,,,
-40,0.0,,1.7144799999999999e+34,,0.0,-6.404509999999999e+34,mongenerator-solar_684,,,
-41,0.0,,2.41905e+22,,0.0,-9.0508e+22,mongenerator-solar_684,,,
-42,0.0,,-1635840000000000.0,,0.0,6470650000000000.0,mongenerator-solar_684,,,
+33,0.0,,-8.74333e-20,,0.0,-5.384240000000001e-18,mongenerator-solar_684,,,
+34,0.0,,1.20534e-17,,0.0,-1.00345e-16,mongenerator-solar_684,,,
+35,0.0,,6.15584e-16,,0.0,-2.8607e-15,mongenerator-solar_684,,,
+36,0.0,,0.00258758,,0.0,-0.00966572,mongenerator-solar_684,,,
+37,0.0,,332659000.0,,0.0,-1242670000.0,mongenerator-solar_684,,,
+38,0.0,,1.76197e+20,,0.0,-6.58131e+20,mongenerator-solar_684,,,
+39,0.0,,5.84727e+22,,0.0,-2.18442e+23,mongenerator-solar_684,,,
+40,0.0,,6.6215e+26,,0.0,-2.4735999999999997e+27,mongenerator-solar_684,,,
+41,0.0,,67958900000000.0,,0.0,-254317000000000.0,mongenerator-solar_684,,,
+42,0.0,,-7209260.0,,0.0,26885500.0,mongenerator-solar_684,,,
 43,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
 44,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
 45,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
@@ -1015,16 +1015,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 54,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
 55,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
 56,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
-57,0.0,,1.20691e-19,,0.0,-5.9758200000000005e-18,mongenerator-solar_684,,,
-58,0.0,,3.41227e-17,,0.0,-3.13889e-16,mongenerator-solar_684,,,
-59,0.0,,2.07933e-15,,0.0,-1.45714e-14,mongenerator-solar_684,,,
-60,0.0,,1.62167e-13,,0.0,-1.05856e-12,mongenerator-solar_684,,,
-61,0.0,,7.7619e-12,,0.0,4.91648e-11,mongenerator-solar_684,,,
-62,0.0,,2.19053e-13,,0.0,1.97264e-12,mongenerator-solar_684,,,
-63,0.0,,-1.47473e-14,,0.0,-1.34415e-13,mongenerator-solar_684,,,
-64,0.0,,-1.84635e-15,,0.0,-1.80841e-14,mongenerator-solar_684,,,
-65,0.0,,-9.11621e-16,,0.0,-8.9899e-15,mongenerator-solar_684,,,
-66,0.0,,-2.75264e-16,,0.0,-2.57856e-15,mongenerator-solar_684,,,
+57,0.0,,-8.813429999999999e-20,,0.0,-7.643850000000001e-18,mongenerator-solar_684,,,
+58,0.0,,1.17134e-16,,0.0,-5.99149e-16,mongenerator-solar_684,,,
+59,0.0,,1.4843e-14,,0.0,-5.84479e-14,mongenerator-solar_684,,,
+60,0.0,,1141.51,,0.0,-4263.91,mongenerator-solar_684,,,
+61,0.0,,3463200000000000.0,,0.0,-1.29365e+16,mongenerator-solar_684,,,
+62,0.0,,1.57658e+27,,0.0,-5.88944e+27,mongenerator-solar_684,,,
+63,0.0,,3.45578e+25,,0.0,-1.29181e+26,mongenerator-solar_684,,,
+64,0.0,,1.26655e+26,,0.0,-4.73381e+26,mongenerator-solar_684,,,
+65,0.0,,23058.6,,0.0,-86839.3,mongenerator-solar_684,,,
+66,0.0,,-0.0112458,,0.0,0.0419334,mongenerator-solar_684,,,
 67,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
 68,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
 69,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
@@ -1039,16 +1039,16 @@ hour,t(sec),P1(kW),Q1(kvar),P2(kW),Q2(kvar),P3(kW),Name,Q3(kvar),P4(kW),Q4(kvar)
 78,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
 79,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
 80,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
-81,0.0,,-0.046637,,0.0,-322.219,mongenerator-solar_684,,,
-82,0.0,,0.0142335,,0.0,-964.261,mongenerator-solar_684,,,
-83,0.0,,0.0421345,,0.0,-1591.86,mongenerator-solar_684,,,
-84,0.0,,-0.00966236,,0.0,-1293.84,mongenerator-solar_684,,,
-85,0.0,,-0.0448771,,0.0,-981.765,mongenerator-solar_684,,,
-86,0.0,,-0.0336139,,0.0,-634.851,mongenerator-solar_684,,,
-87,0.0,,0.0553605,,0.0,-1766.32,mongenerator-solar_684,,,
-88,0.0,,0.140612,,0.0,-689.705,mongenerator-solar_684,,,
-89,0.0,,-0.00797,,0.0,-375.041,mongenerator-solar_684,,,
-90,0.0,,-0.00442613,,0.0,-14.4013,mongenerator-solar_684,,,
+81,0.0,,-0.0413768,,0.0,-295.294,mongenerator-solar_684,,,
+82,0.0,,-0.0401622,,0.0,-871.231,mongenerator-solar_684,,,
+83,0.0,,0.0249357,,0.0,-1412.61,mongenerator-solar_684,,,
+84,0.0,,0.204517,,0.0,-1150.86,mongenerator-solar_684,,,
+85,0.0,,0.0753447,,0.0,-889.011,mongenerator-solar_684,,,
+86,0.0,,-0.00601709,,0.0,-581.774,mongenerator-solar_684,,,
+87,0.0,,0.0457511,,0.0,-1565.45,mongenerator-solar_684,,,
+88,0.0,,-0.02359,,0.0,-632.047,mongenerator-solar_684,,,
+89,0.0,,-0.00654909,,0.0,-343.691,mongenerator-solar_684,,,
+90,0.0,,-0.000214098,,0.0,-13.1972,mongenerator-solar_684,,,
 91,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
 92,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,
 93,0.0,,0.0,,0.0,0.0,mongenerator-solar_684,,,

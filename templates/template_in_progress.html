@@ -311,48 +311,42 @@
         </main>
         <script>
         // Function to fetch logs from the server and update the page.
-        function fetchLogs(model_name) {
-            fetch(`/get_logs/${model_name}`)
-                .then(response => response.json())
-                .then(data => {
-                    const logContainer = document.getElementById('logs-container');
-                    logContainer.innerHTML = data.logs.join('<br>');
-                })
-                .catch(error => console.error('Error fetching logs:', error));
+        async function fetchLogs(model_name) {
+            const logContainer = document.getElementById('logs-container');
+            try {
+                const response = await fetch(`/get_logs/${model_name}`);
+                const responseJson = await response.json();
+                logContainer.innerHTML = responseJson.logs.join('<br>');
+            } catch (error) { alert(error); }
         }
+
         // Function to update logs periodically.
         function updateLogsPeriodically(model_name) {
             fetchLogs(model_name);
             setTimeout(() => updateLogsPeriodically(model_name), 5000); // Fetch logs every 5 seconds.
         }
 
-        function checkStatus() {
+        async function checkStatus() {
             const model_name = "{{model_name}}";
             const checkStatusUrl = `/check_status/${model_name}`;
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', checkStatusUrl, true);
-            // Event listener to process the response.
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    const data = JSON.parse(xhr.responseText);
-                    if (data.status === 'complete') {
-                        window.location.href = data.url; // Redirect to 'output_final.html'.
-                    } else if (data.status === 'crashed') {
-                        modelCrashed();
-                    } else {
-                        setTimeout(checkStatus, 5000); // Check again after 5 seconds.
-                    }
-                } else {
-                    console.log('Error:', xhr.status);
+            try {
+                const response = await fetch(checkStatusUrl);
+                const responseJson = await response.json();
+                if (!response.ok) {
+                    throw new Error(responseJson.message);
                 }
-            };
-            // Handle network errors.
-            xhr.onerror = function () {
-                console.log('Network Error.');
-            };
-            // Send the request.
-            xhr.send();
+                if (responseJson.status === 'complete') {
+                    window.location.href = responseJson.url; // Redirect to 'output_final.html'.
+                } else if (responseJson.status === 'crashed') {
+                    modelCrashed();
+                } else {
+                    setTimeout(checkStatus, 5000); // Check again after 5 seconds.
+                }
+            } catch (error) {
+                alert(error);
+            }
         }
+
         function modelCrashed() {
             document.querySelector('.spinner-container').style.display = 'none';
             document.querySelector('.button-container').style.display = 'block';

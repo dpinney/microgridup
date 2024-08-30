@@ -263,7 +263,7 @@ def test_3mg():
 			'batteryCapacityMax': 100000.0,
 			'batteryCapacityMin': 0.0,
 			'batteryPowerCost': 840.0,
-			'batteryPowerMax': 100000.0,
+			'batteryPowerMax': 10000.0,
 			'batteryPowerMin': 0.0,
 			'batteryMacrsOptionYears': 0,
 			'batteryItcPercent': 0.0,
@@ -388,7 +388,7 @@ def test_4mg():
 			'batteryCapacityMax': 1000000.0,
 			'batteryCapacityMin': 0.0,
 			'batteryPowerCost': 840.0,
-			'batteryPowerMax': 1000000.0,
+			'batteryPowerMax': 10000.0,
 			'batteryPowerMin': 0.0,
 			'batteryMacrsOptionYears': 0,
 			'batteryItcPercent': 0.0,
@@ -507,7 +507,7 @@ def test_auto3mg():
 	ALGO = 'branch' #'lukes'
 	MG_GROUPS = gmg.form_mg_groups(G, CRITICAL_LOADS, ALGO)
 	omd = dssConvert.dssToOmd(CIRC_FILE, '', RADIUS=0.0004, write_out=False)
-	MICROGRIDS = gmg.form_mg_mines(G, MG_GROUPS, omd)
+	MICROGRIDS = gmg.form_microgrids(G, MG_GROUPS, omd)
 	for mg in MICROGRIDS:
 		MICROGRIDS[mg]['parameter_overrides'] = {
 			'reopt_inputs': {}
@@ -640,7 +640,7 @@ def test_mackelroy():
 			"batteryPowerReplaceYear": 10,
 			"batteryCapacityReplaceYear": 10,
 			"dieselGenCost": 500.0,
-			"dieselMax": 1000000000.0,
+			"dieselMax": 1000000.0,
 			"dieselMin": 0.0,
 			"fuelAvailable": 50000.0,
 			"minGenLoading": 0.3,

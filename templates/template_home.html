@@ -374,12 +374,12 @@
             boxes.forEach((box) => boxContainer.appendChild(box));
         }
 
-        function duplicate(project) {
+        async function duplicate(project) {
             let new_name;
-            do {
+            while (true) {
                 new_name = prompt('Name for the duplicate?');
                 if (new_name === null) {
-                    break
+                    return;
                 } else if (new_name !== new_name.toLowerCase()) {
                     alert('Project names must be entirely lowercase.');
                 } else if (new_name === '') {
@@ -387,23 +387,25 @@
                 } else {
                     break;
                 }
-            } while (true);
-            if (new_name !== null) {
-                var xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState == XMLHttpRequest.DONE) {
-                        alert(xhr.responseText);
-                        location.reload();
-                    };
-                };
-                xhr.open('POST', '/duplicate', true);
-                xhr.setRequestHeader('Content-Type', 'application/json');
-                var contents = JSON.stringify({
-                    'project':project,
-                    'new_name':new_name
+            }
+            try {
+                const response = await fetch('/duplicate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        'project': project,
+                        'new_name':new_name
+                    })
                 });
-                xhr.send(contents);
-                // alert(contents);
+                const responseJson = await response.json();
+                if (response.ok) {
+                    alert(responseJson);
+                    location.reload();
+                } else {
+                    throw new Error(responseJson.message);
+                }
+            } catch (error) { 
+                alert(error); // Likely only in the event of network errors.
             }
         }
 
@@ -414,37 +416,29 @@
             }
         }
 
-        function checkStatus(projects) {
+        async function checkStatus(projects) {
             for (let i = 0; i < projects.length; i++) {
                 const model_name = projects[i];
                 const projectLink = document.querySelector(`.clickable-container a[href='load/${model_name}']`);
                 const statusElement = projectLink ? projectLink.closest('.box').querySelector('.status') : null;
                 const checkStatusUrl = `/check_status/${model_name}`;
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', checkStatusUrl, true);
-                // Event listener to process the response.
-                xhr.onload = function () {
-                    if (xhr.status === 200) {
-                        const data = JSON.parse(xhr.responseText);
-                        if (data.status === 'complete') {
-                            statusElement.textContent = "Status: Finished";
-                        } else if (data.status === 'crashed') {
-                            statusElement.textContent = "Status: Crashed";
-                        } else {
-                            statusElement.textContent = "Status: In Progress";
-                        }
-                    } else {
-                        console.log('Error:', xhr.status);
+                try {
+                    const response = await fetch(checkStatusUrl);
+                    const responseJson = await response.json();
+                    if (!response.ok) {
+                        throw new Error(responseJson.message);
                     }
-                };
-                // Handle network errors.
-                xhr.onerror = function () {
-                    console.log('Network Error.');
-                };
-                // Send the request.
-                xhr.send();
+                    if (responseJson.status === 'complete') {
+                        statusElement.textContent = "Status: Finished";
+                    } else if (responseJson.status === 'crashed') {
+                        statusElement.textContent = "Status: Crashed";
+                    } else {
+                        statusElement.textContent = "Status: In Progress";
+                    }
+                } catch (error) { alert(error); }
             }
         }
+        
         window.onload = function () {
             // Sort by previously selected method if page reloads.
             var storedValue = localStorage.getItem('selectedProject');
@@ -472,7 +466,8 @@
 
             const projects_json = '{{ projects | tojson }}';
             const projects = JSON.parse(projects_json);
-            setInterval(checkStatus(projects), 8000); // Check status each 8 seconds.
+            checkStatus(projects);
+            setInterval(() => checkStatus(projects), 8000); // Check status each 8 seconds.
         }
     </script>
 </body>

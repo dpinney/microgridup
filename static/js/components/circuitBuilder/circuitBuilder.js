@@ -1084,7 +1084,7 @@ class CircuitUserControlsView {
             }
             formData.append('json', JSON.stringify(ary));
             // Recognize if we're on the edit flow. If we are not, backend should search data/projects for model_dir and return error if it already exists.
-            formData.append('on_edit_flow',window.on_edit_flow);
+            formData.append('onEditFlow',window.onEditFlow);
             const that = this;
             $.ajax({
                 url: '/wizard_to_dss',

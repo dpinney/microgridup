@@ -12,8 +12,8 @@
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
     <script src="https://unpkg.com/mapbox-gl-leaflet/leaflet-mapbox-gl.js"></script>
     <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js" crossorigin="anonymous"></script>
     <!-- Geocoding -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@3.11.1/dist/geosearch.css"/>
     <script src="https://unpkg.com/leaflet-geosearch@3.11.1/dist/geosearch.umd.js"></script>
@@ -4931,7 +4931,9 @@ class Feature {
      * @returns {boolean} whether this ObservableInterface instance (i.e. a node) is a child of another node or line
      */
     isChild() {
-        return this.hasProperty('parent');
+        // - regcontrol objects used to NOT be configuration objects, but then David made them into configuration objects again. They have a "parent"
+        //   property, so they are child nodes, but they still shouldn't be displayed
+        return this.hasProperty('parent') && !this.isConfigurationObject();
     }
 
     /**
@@ -14879,8 +14881,6 @@ class TopNav {
   return Graph;
 
 }));
-//# sourceMappingURL=graphology.umd.js.map
-
 </script>
 <script>
 "use strict";
@@ -18651,7 +18651,6 @@ class TopNav {
     return chroma_js;
 
 }));
-
 </script>
 <script>
 "use strict";
@@ -20558,7 +20557,6 @@ License: MIT
 
 	return Papa;
 }));
-
 </script>
 <script>
 "use strict";

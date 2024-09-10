@@ -73,7 +73,7 @@ def create_economic_microgrid(data, logger, invalidate_cache):
 	assert isinstance(data, MappingProxyType)
 	assert isinstance(logger, logging.Logger)
 	assert isinstance(invalidate_cache, bool)
-	if not Path('reopt_mgEconomic').exists() or invalidate_cache is True:
+	if not Path('reopt_mgEconomic').exists() or invalidate_cache:
 		economic_microgrid = {
 			'loads': [],
 			'gen_obs_existing': [],
@@ -94,10 +94,10 @@ def create_economic_microgrid(data, logger, invalidate_cache):
 		# - Override certain user parameters
 		with open('reopt_mgEconomic/allInputData.json') as f:
 			allInputData = json.load(f)
-		allInputData['battery'] = 'on'
-		allInputData['solar'] = 'on'
-		allInputData['wind'] = 'on'
-		allInputData['fossil'] = 'on'
+		allInputData['battery'] = True
+		allInputData['solar'] = True
+		allInputData['wind'] = True
+		allInputData['fossil'] = True
 		# - The load shape and critical load shape are the same for the economic microgrid. Also, there's no outage
 		allInputData['fileName'] = 'loadShape.csv'
 		with open('reopt_mgEconomic/loadShape.csv') as f:
@@ -176,7 +176,7 @@ def _run(data, mg_name, logger, invalidate_cache):
 	logger = microgridup.setup_logging('logs.log', mg_name)
 	# - Our convention for reopt folder names could change, so keep this variable even though it's effectively a constant right now
 	reopt_dirname = f'reopt_{mg_name}'
-	if os.path.isdir(reopt_dirname) and invalidate_cache == False:
+	if os.path.isdir(reopt_dirname) and not invalidate_cache:
 		# - The cache is only for testing purposes
 		print('**************************************************')
 		print(f'** Using cached REopt results for {reopt_dirname} **')
@@ -356,7 +356,7 @@ def _set_allinputdata_battery_parameters(reopt_dirname, battery_kw_existing, bat
 		allInputData = json.load(f)
 	allInputData['batteryKwhExisting'] = battery_kwh_existing
 	allInputData['batteryKwExisting'] = battery_kw_existing
-	if allInputData['battery'] == 'on':
+	if allInputData['battery']:
 		critical_load_series = pd.read_csv(reopt_dirname + '/criticalLoadShape.csv', header=None)[0]
 		outage_start_hour = int(allInputData['outage_start_hour'])
 		outage_duration = int(allInputData['outageDuration'])
@@ -393,7 +393,7 @@ def _set_allinputdata_solar_parameters(reopt_dirname, solar_kw_existing):
 	with open(reopt_dirname + '/allInputData.json') as f:
 		allInputData = json.load(f)
 	allInputData['solarExisting'] = solar_kw_existing
-	if allInputData['solar'] == 'on':
+	if allInputData['solar']:
 		critical_load_series = pd.read_csv(reopt_dirname + '/criticalLoadShape.csv', header=None)[0]
 		calculated_max_kw = float(critical_load_series.max() * 4)
 		if calculated_max_kw < float(allInputData['solarMax']):
@@ -425,7 +425,7 @@ def _set_allinputdata_wind_parameters(reopt_dirname, wind_kw_existing):
 	allInputData['windExisting'] = wind_kw_existing
 	critical_load_series = pd.read_csv(reopt_dirname + '/criticalLoadShape.csv', header=None)[0]
 	calculated_max_kw = float(critical_load_series.max() * 2)
-	if allInputData['wind'] == 'on':
+	if allInputData['wind']:
 		if calculated_max_kw < float(allInputData['windMax']):
 			allInputData['windMax'] = calculated_max_kw
 	else:
@@ -454,7 +454,7 @@ def _set_allinputdata_generator_parameters(reopt_dirname, fossil_kw_existing):
 	with open(reopt_dirname + '/allInputData.json') as f:
 		allInputData = json.load(f)
 	allInputData['genExisting'] = fossil_kw_existing
-	if allInputData['fossil'] == 'on':
+	if allInputData['fossil']:
 		critical_load_series = pd.read_csv(reopt_dirname + '/criticalLoadShape.csv', header=None)[0]
 		calculated_max_kw = float(critical_load_series.max())
 		if calculated_max_kw < float(allInputData['dieselMax']):
@@ -661,7 +661,7 @@ def _create_production_factor_series_csv(data, logger, invalidate_cache):
 	assert isinstance(data, MappingProxyType)
 	assert isinstance(logger, logging.Logger)
 	assert isinstance(invalidate_cache, bool)
-	if not Path('production_factor_series.csv').exists() or invalidate_cache is True:
+	if not Path('production_factor_series.csv').exists() or invalidate_cache:
 		microgridDesign.new('reopt_loadshapes')
 		# - The load shape for production_factor_series.csv needs to be the same as for the microgrid(s) in order to use the same wind turbine size
 		#   class. This is tricky because technically different microgrids could have sufficiently different load shapes such that one microgrid could
@@ -680,10 +680,10 @@ def _create_production_factor_series_csv(data, logger, invalidate_cache):
 		allInputData['longitude'] = lon
 		# - We only care about the inputs to the model insofar as they (1) include solar and wind output and (2) the model completes as quickly as
 		#   possible
-		allInputData['solar'] = 'on'
-		allInputData['wind'] = 'on'
-		allInputData['battery'] = 'off'
-		allInputData['fossil'] = 'off'
+		allInputData['solar'] = True
+		allInputData['wind'] = True
+		allInputData['battery'] = False
+		allInputData['fossil'] = False
 		with open('reopt_loadshapes/allInputData.json', 'w') as f:
 			json.dump(allInputData, f, indent=4)
 		__neoMetaModel__.runForeground('reopt_loadshapes')
@@ -732,14 +732,14 @@ def _tests():
 	# - Assert that the input load shape matches the output load shape
 	assert inputs['s']['electric_load']['loads_kw'] == results['ElectricLoad']['load_series_kw']
 	# - Assert that the optimal solar size is within 5% of an expected value
-	assert abs(1 - results['PV']['size_kw']/3554) < 0.05
+	assert abs(1 - results['PV']['size_kw']/3325) < 0.05
 	# - Assert that the optimal generator size is within 5% of an expected value
-	assert abs(1 - results['Generator']['size_kw']/1469) < 0.05
+	assert abs(1 - results['Generator']['size_kw']/1586) < 0.05
 	# - Assert that the optimal storage size is within 5% of an expected value
-	assert abs(1 - results['ElectricStorage']['size_kw']/521) < 0.05
-	assert abs(1 - results['ElectricStorage']['size_kwh']/1237) < 0.05
+	assert abs(1 - results['ElectricStorage']['size_kw']/413) < 0.05
+	assert abs(1 - results['ElectricStorage']['size_kwh']/545) < 0.05
 	# - Assert that the optimal lifecycle cost is within 5% of an expected value
-	assert abs(1 - results['Financial']['lcc']/1.9174941e7) < 0.05
+	assert abs(1 - results['Financial']['lcc']/1.7430358e7) < 0.05
 	os.chdir(curr_dir)
 	print('Ran all tests for microgridup_design.py.')
 

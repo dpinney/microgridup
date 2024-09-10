@@ -4,26 +4,11 @@
     --regularFontPadding: .5rem;
 }
 
-/* IDs */
-
-#circuitTableView {
-    max-width: 780px;
-}
-#csvLoadParserView {
-    max-width: 780px;
-}
-#microgridParameterMVC {
-    width: 780px;
-}
-
 /* Banner styling */
 
 div.div--modalBanner {
-    padding: .5rem;
+    /*padding: .5rem;*/
     /*text-align: center;*/
-}
-div.div--modalBanner.caution {
-    background-color: hsla(50, 100%, 70%, 1);
 }
 div.div--modalBanner.hidden {
     display: none;
@@ -59,35 +44,11 @@ div.div--modal div.div--singleButtonDiv button {
 div.div--modal.outermostModal {
     /*background-color: #e6e6e6;*/
 }
-div.div--modal.indent-level-0 {
-    background-color: #e6e6e6;
-    margin: .25rem 0 0 0;
-}
-div.div--modal.indent-level-1 {
-    background-color: #e6e6e6;
-    margin: .25rem 0 0 0;
-}
-div.div--modal.indent-level-2 {
-    background-color: #e6e6e6;
-    margin: .25rem 0 0 0;
-}
-div.div--modal.indent-level-3 {
-    background-color: #e6e6e6;
-}
-div.div--modalUserInputRow {
-    display: flex;
-    padding: 1rem 0 0 0;
-}
-div.div--modal div.div--singleButtonDiv {
-    width: 200px;
-    padding: 1rem 0 0 0;
-}
 
 /* Input styling */
 
 div.div--modal table input {
     font-size: 1rem;
-    min-width: 50%;
 }
 
 /* Span styling */
@@ -98,12 +59,6 @@ div.div--modal span {
 div.div--modal button span {
     font-size: small;
 }
-div.div--modal div.div--modalUserInputRow span {
-    padding: 0 .5rem 0 .5rem;
-}
-div.div--modal div.div--modalUserInputRow div:first-child span:first-child {
-    padding: 0 .5rem 0 0;
-}
 
 /* Select styling */
 
@@ -111,39 +66,6 @@ div.div--modal select {
     font-size: 1rem;
 }
 
-/* Table styling */
-
-div#circuitTableView div.div--modal table {
-    table-layout: fixed;
-    width: 100%;
-}
-div#circuitTableView div.div--modal table td {
-    padding: 0;
-}
-div#circuitTableView div.div--modal table td:first-child {
-    width: 48px;
-}
-div#circuitTableView div.div--modal table td:nth-child(2) {
-    width: 250px;
-}
-div#circuitTableView div.div--modal.indent-level-1 td:nth-child(1) {
-    padding-left: 1rem;
-}
-div#circuitTableView div.div--modal.indent-level-1 td:nth-child(2) {
-    padding-left: 1rem;
-}
-div#circuitTableView div.div--modal.indent-level-2 td:nth-child(1) {
-    padding-left: 2rem;
-}
-div#circuitTableView div.div--modal.indent-level-2 td:nth-child(2) {
-    padding-left: 2rem;
-}
-div#circuitTableView div.div--modal.indent-level-3 td:nth-child(2) {
-    padding-left: 3rem;
-}
-div#microgridParameterMVC div.div--modal table td:nth-child(2) {
-    width: 260px;
-}
 /* Title stying */
 
 div.div--modalTitle {
@@ -155,3 +77,8 @@ div.div--modalTitle {
 }
 
 /* Classes */
+
+.caution {
+    background-color: hsla(50, 100%, 70%, 1);
+    color: red;
+}

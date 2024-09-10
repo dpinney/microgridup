@@ -219,6 +219,7 @@ def duplicate():
 		inputs['OUTAGE_CSV'] = inputs['OUTAGE_CSV'].replace(model_name, new_name)
 		with open(f'{microgridup.PROJ_DIR}/{new_name}/allInputData.json', 'w') as file:
 			json.dump(inputs, file, indent=4)
+		# - Update output_final.html
 		with open(f'{microgridup.PROJ_DIR}/{new_name}/output_final.html') as file:
 			html_content = file.read()
 		patterns = [
@@ -238,6 +239,17 @@ def duplicate():
 		html_content = ul_pattern.sub(replace_in_ul, html_content)
 		with open(f'{microgridup.PROJ_DIR}/{new_name}/output_final.html', 'w', encoding='utf-8') as file:
 			file.write(html_content)
+		# - Update view_inputs.html
+		with open(f'{microgridup.PROJ_DIR}/{new_name}/view_inputs.html') as file:
+			html_content = file.read()
+		patterns = [
+			(f'"{model_name}"', f'"{new_name}"'),
+			(f'/{model_name}/', f'/{new_name}/'),
+		]
+		for pattern, repl in patterns:
+			html_content = re.sub(pattern, repl, html_content)
+		with open(f'{microgridup.PROJ_DIR}/{new_name}/view_inputs.html', 'w', encoding='utf-8') as file:
+			file.write(html_content)
 		return jsonify(f'Successfully duplicated {model_name} as {new_name}.')
 
 @app.route('/wizard_to_dss', methods=['GET','POST'])
@@ -255,7 +267,7 @@ def wizard_to_dss(model_dir=None, lat=None, lon=None, elements=None, test_run=Fa
 	if on_edit_flow == 'false':
 		if os.path.isdir(f'{microgridup.PROJ_DIR}/{model_dir}'):
 			print('Invalid Model Name.')
-			return jsonify(error=f'A model named "{model_dir}" already exists. Please choose a different Model Name.'), 400 # Name was already taken.
+			return jsonify(error=f'A project named "{model_dir}" already exists. Please choose a different project name.'), 400 # Name was already taken.
 	# Convert to DSS and return loads.
 	dssString = f'clear \nset defaultbasefrequency=60 \nnew object=circuit.{model_dir} \n'
 	busList = []
@@ -538,9 +550,7 @@ def run():
 	data['CRITICAL_LOADS'] = json.loads(data['CRITICAL_LOADS'])
 	if len(data['CRITICAL_LOADS']) == 0:
 		# - I'm assuming that if this is true, then the front-end allowed bad data to be sent, so we should inform the user
-		err_msg = 'No critical loads were specified. The model run was aborted.'
-		print(err_msg)
-		return (err_msg, 400)
+		return jsonify(message='No critical loads were specified. The model run was aborted.'), 400
 	data['mgQuantity'] = int(data['mgQuantity'])
 	# - Format faulted lines
 	data['FAULTED_LINES'] = data['FAULTED_LINES'].split(',')
@@ -548,9 +558,7 @@ def run():
 	data['MICROGRIDS'] = _get_microgrids(data['CRITICAL_LOADS'], data['MG_DEF_METHOD'], data['mgQuantity'], data['BASE_DSS'], data['MICROGRIDS'])
 	if len(list(data['MICROGRIDS'].keys())) == 0:
 		# - I'm assuming that if this is true, then the front-end allowed bad data to be sent, so we should inform the user
-		err_msg = 'No microgrids were defined. The model run was aborted.'
-		print(err_msg)
-		return (err_msg, 400)
+		return jsonify(message='No microgrids were defined. The model run was aborted.'), 400
 	# - Each microgrid needs to store knowledge of parameter overrides to support auto-filling the parameter override wigdet during an edit of a model
 	data['mgParameterOverrides'] = json.loads(data['mgParameterOverrides'])
 	for mg_name, mg_parameter_overrides in data['mgParameterOverrides'].items():
@@ -640,9 +648,9 @@ def _get_reopt_inputs(data):
 		'energyCost':                   float(data['energyCost']),
 		'wholesaleCost':                float(data['wholesaleCost']),
 		'demandCost':                   float(data['demandCost']),
-		'solarCanCurtail':              (data['solarCanCurtail'] == 'true'),
-		'solarCanExport':               (data['solarCanExport'] == 'true'),
-		'urdbLabelSwitch':              data['urdbLabelSwitch'],
+		'solarCanCurtail':              data['solarCanCurtail'] == 'true',
+		'solarCanExport':               data['solarCanExport'] == 'true',
+		'urdbLabelSwitch':              data['urdbLabelSwitch'] == 'true',
 		'urdbLabel':                    data['urdbLabel'],
 		'year':                         int(data['year']),
 		'analysisYears':                int(data['analysisYears']),
@@ -650,10 +658,10 @@ def _get_reopt_inputs(data):
 		'value_of_lost_load':           float(data['value_of_lost_load']),
 		'omCostEscalator':              float(data['omCostEscalator']),
 		'discountRate':                 float(data['discountRate']),
-		'solar':                        data['solar'],
-		'battery':                      data['battery'],
-		'fossil':                       data['fossil'],
-		'wind':                         data['wind'],
+		'solar':                        data['solar'] == 'true',
+		'battery':                      data['battery'] == 'true',
+		'fossil':                       data['fossil'] == 'true',
+		'wind':                         data['wind'] == 'true',
 		'solarCost':                    float(data['solarCost']),
 		'solarMax':                     float(data['solarMax']),
 		'solarMin':                     float(data['solarMin']),
@@ -680,7 +688,7 @@ def _get_reopt_inputs(data):
 		'dieselCO2Factor':              float(data['dieselCO2Factor']),
 		'dieselOMCostKw':               float(data['dieselOMCostKw']),
 		'dieselOMCostKwh':              float(data['dieselOMCostKwh']),
-		'dieselOnlyRunsDuringOutage':   (data['dieselOnlyRunsDuringOutage'] == 'true'),
+		'dieselOnlyRunsDuringOutage':   data['dieselOnlyRunsDuringOutage'] == 'true',
 		'dieselMacrsOptionYears':       int(data['dieselMacrsOptionYears']),
 		'windCost':                     float(data['windCost']),
 		'windMax':                      float(data['windMax']),

@@ -22,18 +22,53 @@ class CycleDetectedError(Exception):
 	'''Used by topological_sort() and passed to GUI to be caught by custom Flask errorhandler.'''
 	pass
 
-# Networkx helper functions
-def nx_get_branches(G):
-	'All branchy boys'
-	return [(n,G.out_degree(n)) for n in G.nodes() if G.out_degree(n) > 1]
+class InsufficientBranchPointsError(Exception):
+	'''Used by nx_group_branch() and passed to GUI to be caught by custom Flask errorhandler.'''
 
-# A function to get all trees in a forest
-def get_all_trees(F):
-	list_of_trees = list(nx.weakly_connected_components(F))
-	return [F.subgraph(tree) for tree in list_of_trees]
+def detect_cycle_dfs(G, node, visited, stack, cycle_nodes):
+	'''Used by topological_sort function to identify cycles using dfs.'''
+	if node in stack: # Cycle detected.
+		cycle_start_index = stack.index(node)
+		cycle_nodes.extend(stack[cycle_start_index:])
+		return True
+	if node in visited:
+		return False # In the event that a node has multiple parents.
+	visited.add(node)
+	stack.append(node)
+	for child in G[node]:
+		if detect_cycle_dfs(G, child, visited, stack, cycle_nodes):
+			return True
+	stack.pop()
+	return False
 
-# Helper function to remove cycles and loops from a graph using hacky topological sort because nx_topological_sort breaks on cycles.
+def topological_sort(G):
+	'''Standardizes topological sort across networkx versions.'''
+	in_degree = {node: 0 for node in G}
+	for node in G:
+		for child in G[node]:
+			in_degree[child] += 1
+	queue = deque([node for node in in_degree if in_degree[node] == 0])
+	result = []
+	visited = set()
+	stack = []
+	cycle_nodes = []
+	for node in G:
+		if node not in visited:
+			if detect_cycle_dfs(G, node, visited, stack, cycle_nodes):
+				raise CycleDetectedError(f'Graph contains a cycle: {cycle_nodes}')
+	while queue:
+		node = queue.popleft()
+		result.append(node)
+		for child in G[node]:
+			in_degree[child] -= 1
+			if in_degree[child] == 0:
+				queue.append(child)
+	if len(result) != len(G):
+		raise CycleDetectedError('Graph contains a cycle, but it could not be fully identified')
+	return result
+
 def remove_loops(G):
+	'''Helper function to remove cycles and loops from a graph using hacky topological sort because nx_topological_sort breaks on cycles. Used by lukes, branch, bottom up, and critical load algorithms.'''
 	# Delete edges to all parents except the first in topological order.
 	H = G.copy()
 	order = []
@@ -54,8 +89,22 @@ def remove_loops(G):
 			# G.remove_edge(parents[0],node)
 	return H
 
-# Used by both bottom up and critical load algorithms.
+def get_object_type_from_omd(node_name, omd):
+	'''Get object type from omd given name. Helper to branch and bottom up algorithms.'''
+	for key in omd:
+		if omd[key].get('name') == node_name:
+			return omd[key].get('object')
+	return None 
+
+def get_bus_nodes(G, omd):
+	'''Get all bus nodes excluding the root node (precautionary, since root node tends to be a substation). Helper to branch and bottom up algorithms.'''
+	tree_root = list(topological_sort(G))[0]
+	subgraph = set(G.nodes()) - {tree_root}
+	bus_nodes = set(node for node in subgraph if get_object_type_from_omd(node, omd) == 'bus')
+	return bus_nodes
+
 def only_child(G, mgs):
+	'''Repeatedly adds parents to mgs defaultdict if parents do not have other children. Helper to bottom up and critical load algorithms.'''
 	for key in list(mgs.keys()):
 		parent = list(G.predecessors(key))
 		if not parent:
@@ -77,8 +126,8 @@ def only_child(G, mgs):
 			siblings = list(G.successors(parent[0]))
 	return mgs
 
-# Used by both bottom up and critical load algorithms.
 def loop_avoider(G, mgs):
+	'''Check to see if a node has multiple parents. If so, add nodes to mgs defaultdict until LCA node of original parents is key in mgs. Helper to bottom up and critical load algorithms.'''
 	bustworthy_nodes = set()
 	
 	def helper(node, isKey):
@@ -119,8 +168,78 @@ def loop_avoider(G, mgs):
 				helper(node, False)
 	return mgs
 
-# Used by the bottom up algorithm.
-def relatable_siblings(G, mgs):
+def nx_group_lukes(G, size, node_weight=None, edge_weight=None):
+	'''Partition the graph using Lukes algorithm into pieces of [size] nodes.'''
+	if not nx.is_tree(G):
+		G = remove_loops(G)
+	tree_root = list(topological_sort(G))[0]
+	G_topo_order = nx.DiGraph(nx.algorithms.traversal.breadth_first_search.bfs_edges(G, tree_root))
+	return nx.algorithms.community.lukes.lukes_partitioning(G_topo_order, size, node_weight=node_weight, edge_weight=edge_weight)
+
+def nx_get_branches(G, min_out_degree=2):
+	'''All branchy boys. Helper to branch algorithm.'''
+	return [n for n in G.nodes() if G.out_degree(n) > min_out_degree]
+
+def nx_group_branch(G, i_branch=0, omd={}):
+	'''Create graph subgroups at branch point i_branch (topological order).'''
+	if not nx.is_tree(G):
+		G = remove_loops(G)
+	tree_root = list(topological_sort(G))[0]
+	edges_in_order = nx.DiGraph(nx.algorithms.traversal.breadth_first_search.bfs_edges(G, tree_root))
+	bbl = nx_get_branches(edges_in_order)
+	bbl_indices_to_delete = set() # Add a check to ensure branch algo does not consider item level for branching when user created circuit with wizard.
+	for idx, bbl_item in enumerate(bbl):
+		bus = bbl_item[0]
+		if bus.endswith('_end'):
+			feeder_name = bus[0:-4]
+			ob_type = get_object_type_from_omd(feeder_name, omd)
+			if ob_type == 'line':
+				bbl_indices_to_delete.add(idx)
+	new_bbl = [item for idx, item in enumerate(bbl) if idx not in bbl_indices_to_delete]
+	if len(new_bbl) == 0:
+		first_branch = list(topological_sort(G))[0] # Consider all but the substation as a microgrid if there are no branching points.
+	else:
+		first_branch = new_bbl[i_branch]
+	succs = list(G.successors(first_branch))
+	parts = [list(nx.algorithms.traversal.depth_first_search.dfs_tree(G, x).nodes()) for x in succs]
+	parts_no_regcontrol_mgs = [part for part in parts if not (len(part) == 1 and get_object_type_from_omd(part[0], omd) == 'regcontrol')] # regcontrol objects should not be their own microgrids alone.
+	return parts_no_regcontrol_mgs
+
+def branch_recursively(G, branch_points, tree_root, subgraph, grouped_nodes):
+	'''Helper to new_nx_group_branch().'''
+	if not subgraph:
+		return []
+	if branch_points:
+		furthest_branch_point = branch_points[-1]
+		branch_points.pop()
+	else:
+		return []
+	descendants = list(nx.descendants(G, furthest_branch_point))
+	current_group = [furthest_branch_point] + [node for node in descendants if node not in grouped_nodes]
+	grouped_nodes.update(current_group) # Mark as grouped.
+	remaining_nodes = [node for node in subgraph if node not in grouped_nodes]
+	return [current_group] + branch_recursively(G, branch_points, tree_root, remaining_nodes, grouped_nodes)
+
+def new_nx_group_branch(G, mg_quantity, omd={}):
+	'''Branch recursively starting at lowest branch points on tree as specified by mg_quanity (that are buses) moving upwards.'''
+	if not nx.is_tree(G):
+		G = remove_loops(G)
+	tree_root = list(topological_sort(G))[0]
+	edges_in_order = nx.DiGraph(nx.algorithms.traversal.breadth_first_search.bfs_edges(G, tree_root))
+	branch_points = nx_get_branches(edges_in_order)
+	if tree_root in branch_points:
+		branch_points.remove(tree_root)
+	if len(branch_points) > mg_quantity:
+		branch_points = branch_points[:mg_quantity]
+	elif mg_quantity > len(branch_points):
+		raise InsufficientBranchPointsError(f'Requested microgrid quantity is greater than number of branch points in circuit ({len(branch_points)} branch points). Please reduce the number of microgrids requested.')
+	grouped_nodes = set()
+	bus_nodes = get_bus_nodes(G, omd) # Only branch on buses. Doesn't affect outcome unless there is a branch point that isn't a bus (unlikely). Alternative is passing a subgraph of all nodes except root instead of bus_nodes to branch_recursively().
+	parts = branch_recursively(G, branch_points, tree_root, bus_nodes, grouped_nodes)
+	return parts
+
+def relatable_siblings(G, mgs, bus_nodes):
+	'''Merges neighboring microgrids in mgs defaultdict if all children of a node are buses and keys in mgs defaultdict. Helper to bottom up algorithm.'''
 	items = [x for x in topological_sort(G) if x in list(mgs.keys())]
 	for key in items:
 		if key not in mgs:
@@ -129,7 +248,8 @@ def relatable_siblings(G, mgs):
 		if len(parent) > 1:
 			continue
 		siblings = list(G.successors(parent[0]))
-		if all(sibling in mgs for sibling in siblings):
+		bus_siblings = [node for node in siblings if node in bus_nodes]
+		if all(sibling in mgs for sibling in bus_siblings):
 			# Merge microgrids 
 			for sibling in siblings:
 				mgs[parent[0]].append(sibling)
@@ -137,13 +257,57 @@ def relatable_siblings(G, mgs):
 				del mgs[sibling]
 	return mgs
 
-# Used by the critical load algorithm.
+def get_initial_mgs(G, bus_nodes):
+	'''Find buses with nodes with parents but no children. Helper to bottom up algorithm.'''
+	mgs = defaultdict(list)
+	for node in bus_nodes:
+		# Make the node an mg if it has no children or the children it has have no children.
+		children = list(G.successors(node))
+		if not children:
+			mgs[node] = []
+		else:
+			for child in children:
+				if list(G.successors(child)):
+					break
+			else:
+				mgs[node] = children
+	return mgs
+
+def nx_bottom_up_branch(G, num_mgs=3, large_or_small='large', omd={}, cannot_be_mg=[]):
+	'''Form all microgrid combinations starting with leaves and working up to source maintaining single points of connection for each.'''
+	try:
+		list(topological_sort(G))
+	except CycleDetectedError:
+		G = remove_loops(G)
+	bus_nodes = get_bus_nodes(G, omd)
+	mgs = get_initial_mgs(G, bus_nodes)
+	mgs = only_child(G, mgs)
+	parts = defaultdict(list)
+	for key in mgs:
+		parts[0].append([key])
+		parts[0][-1].extend(mgs[key])
+	counter = 1
+	while len(mgs) > 1:
+		mgs = loop_avoider(G, mgs)
+		mgs = relatable_siblings(G, mgs, bus_nodes)
+		mgs = only_child(G, mgs)
+		if len(mgs) < num_mgs:
+			break
+		for key in mgs: 
+			parts[counter].append([key])
+			parts[counter][-1].extend(mgs[key])
+		counter += 1
+		if len(mgs) == num_mgs and large_or_small == 'small':
+			break
+	return parts[len(parts)-1]
+
 def merge_mgs(G, mgs):
 	'''
-	Check to see if parent is a key in a microgrid.
-	Check to see if parent is a value in a microgrid.
-	Check to see if parent is parent of other most ancestral node.
-	Check to see if parent has no successors in any other mg.
+	Helper to critical load algorithm.
+	Check to see if parent is a key in a microgrid. If so, merge microgrids.
+	Check to see if parent is a value in a microgrid. If so, merge microgrids.
+	Check to see if parent is parent of other most ancestral node in a microgrid. If so, annex parent and merge microgrids.
+	Check to see if parent has no successors in any other mg. If so, annex parent.
 	'''
 	items = [x for x in topological_sort(G) if x in list(mgs.keys())]
 	for k in items:
@@ -183,89 +347,8 @@ def merge_mgs(G, mgs):
 			del mgs[k]
 	return mgs
 
-def nx_group_branch(G, i_branch=0, omd={}):
-	'Create graph subgroups at branch point i_branch (topological order).'
-	if not nx.is_tree(G):
-		G = remove_loops(G)
-	tree_root = list(topological_sort(G))[0]
-	edges_in_order = nx.DiGraph(nx.algorithms.traversal.breadth_first_search.bfs_edges(G, tree_root))
-	bbl = nx_get_branches(edges_in_order)
-	bbl_indices_to_delete = set() # Add a check to ensure branch algo does not consider item level for branching when user created circuit with wizard.
-	for idx, bbl_item in enumerate(bbl):
-		bus = bbl_item[0]
-		if bus.endswith('_end'):
-			feeder_name = bus[0:-4]
-			ob_type = get_object_type_from_omd(feeder_name, omd)
-			if ob_type == 'line':
-				bbl_indices_to_delete.add(idx)
-	new_bbl = [item for idx, item in enumerate(bbl) if idx not in bbl_indices_to_delete]
-	if len(new_bbl) == 0:
-		first_branch = list(topological_sort(G))[0] # Consider all but the substation as a microgrid if there are no branching points.
-	else:
-		first_branch = new_bbl[i_branch][0]
-	succs = list(G.successors(first_branch))
-	parts = [list(nx.algorithms.traversal.depth_first_search.dfs_tree(G, x).nodes()) for x in succs]
-	parts_no_regcontrol_mgs = [part for part in parts if not (len(part) == 1 and get_object_type_from_omd(part[0], omd) == 'regcontrol')] # regcontrol objects should not be their own microgrids alone.
-	return parts_no_regcontrol_mgs
-
-def nx_group_lukes(G, size, node_weight=None, edge_weight=None):
-	'Partition the graph using Lukes algorithm into pieces of [size] nodes.'
-	if not nx.is_tree(G):
-		G = remove_loops(G)
-	tree_root = list(topological_sort(G))[0]
-	G_topo_order = nx.DiGraph(nx.algorithms.traversal.breadth_first_search.bfs_edges(G, tree_root))
-	return nx.algorithms.community.lukes.lukes_partitioning(G_topo_order, size, node_weight=node_weight, edge_weight=edge_weight)
-
-def get_object_type_from_omd(node_name, omd):
-	'''Get object type from omd given name.'''
-	for key in omd:
-		if omd[key].get('name') == node_name:
-			return omd[key].get('object')
-	return None 
-
-def get_end_nodes(G, omd, cannot_be_mg):
-	'''Find nodes with parents but no children. Omit leaves if they cannot be a microgrid on their own.'''
-	end_nodes = []
-	for node in G.nodes():
-		if G.out_degree(node) == 0 and G.in_degree(node)!=0:
-			object_type = get_object_type_from_omd(node, omd)
-			if object_type not in cannot_be_mg:
-				end_nodes.append([node])
-	return end_nodes
-
-def nx_bottom_up_branch(G, num_mgs=3, large_or_small='large', omd={}, cannot_be_mg=[]):
-	'Form all microgrid combinations starting with leaves and working up to source maintaining single points of connection for each.'
-	try:
-		list(topological_sort(G))
-	except CycleDetectedError:
-		G = remove_loops(G)
-	# Find leaves.
-	end_nodes = get_end_nodes(G, omd, cannot_be_mg)
-	mgs = defaultdict(list)
-	for node in end_nodes:
-		mgs[node[-1]] = []
-	mgs = only_child(G, mgs)
-	parts = defaultdict(list)
-	for key in mgs:
-		parts[0].append([key])
-		parts[0][-1].extend(mgs[key])
-	counter = 1
-	while len(mgs) > 1:
-		mgs = loop_avoider(G, mgs)
-		mgs = relatable_siblings(G, mgs)
-		mgs = only_child(G, mgs)
-		if len(mgs) < num_mgs:
-			break
-		for key in mgs: 
-			parts[counter].append([key])
-			parts[counter][-1].extend(mgs[key])
-		counter += 1
-		if len(mgs) == num_mgs and large_or_small == 'small':
-			break
-	return parts[len(parts)-1]
-
 def nx_critical_load_branch(G, criticalLoads, num_mgs=3, large_or_small='large'):
-	'Form all microgrid combinations prioritizing only critical loads and single points of connection.'
+	'''Form all microgrid combinations prioritizing only critical loads and single points of connection.'''
 	# Find all critical loads. They get a microgrid each. Output.
 	critical_nodes = [[x] for x in G.nodes() if x in criticalLoads]
 	try:
@@ -298,6 +381,7 @@ def nx_critical_load_branch(G, criticalLoads, num_mgs=3, large_or_small='large')
 	return parts[len(parts)-1]
 
 def check_if_loads_in_tree(G, pairs):
+	'''Identify between pairings in current tree (of forest) and pairs outside of current tree. Helper to load grouping algorithm.'''
 	nodes_list = list(G.nodes())
 	loads_in_tree = []
 	nodes_not_in_tree = []
@@ -347,8 +431,7 @@ def load_grouping(G, pairings):
 	return parts
 
 def manual(pairings, gen_obs_existing):
-	'''Partitioning without networkx. 
-	Accepts dict of loads paired by mg and dict of gen_obs_existing paired by mg from user input.'''
+	'''Partitioning without networkx. Accepts dict of loads paired by mg and dict of gen_obs_existing paired by mg from user input.'''
 	pairings.pop('None', None)
 	parts = []
 	for mg in pairings:
@@ -357,97 +440,14 @@ def manual(pairings, gen_obs_existing):
 		parts.append(loads + mg_gen_obs_existing)
 	return parts
 
-def nx_get_parent(G, n):
-	preds = G.predecessors(n)
-	return list(preds)[0]
-
-def nx_out_edges(G, sub_nodes):
-	'Find edges connect sub_nodes to rest of graph.'
-	mg1 = G.subgraph(sub_nodes)
-	out_edges = []
-	for n in mg1.nodes():
-		out_preds = [(x,n) for x in G.predecessors(n) if x not in mg1]
-		# out_succ = [(n,x) for x in G.successors(n) if x not in mg1] # Thomas 8/9/24: our current partitioning algos operate on the assumption that a single point of connection to the rest of the circuit exists 'before' the mg when sorted topologically. Out edges may exist 'after' the mg, but should only be considered in the control module.
-		# out_edges.extend(out_succ)
-		out_edges.extend(out_preds)
-	out_edges.sort()
-	return out_edges
-
-def get_edge_name(fr, to, omd_list):
-	'Get an edge name using (fr,to) in the omd_list'
-	edges = [ob.get('name') for ob in omd_list if ob.get('from') == fr and ob.get('to') == to]
-	if len(edges) == 0:
-		raise SwitchNotFoundError(f'Selected partitioning method produced invalid results. No valid switch found between {fr} and {to}. Please change partitioning parameter(s).')
-	else:
-		return edges[0]
-
-def detect_cycle_dfs(G, node, visited, stack, cycle_nodes):
-	'Used by topological_sort function to identify cycles using dfs.'
-	if node in stack: # Cycle detected.
-		cycle_start_index = stack.index(node)
-		cycle_nodes.extend(stack[cycle_start_index:])
-		return True
-	if node in visited:
-		return False # In the event that a node has multiple parents.
-	visited.add(node)
-	stack.append(node)
-	for child in G[node]:
-		if detect_cycle_dfs(G, child, visited, stack, cycle_nodes):
-			return True
-	stack.pop()
-	return False
-
-def topological_sort(G):
-	'Standardizes topological sort across networkx versions.'
-	in_degree = {node: 0 for node in G}
-	for node in G:
-		for child in G[node]:
-			in_degree[child] += 1
-	queue = deque([node for node in in_degree if in_degree[node] == 0])
-	result = []
-	visited = set()
-	stack = []
-	cycle_nodes = []
-	for node in G:
-		if node not in visited:
-			if detect_cycle_dfs(G, node, visited, stack, cycle_nodes):
-				raise CycleDetectedError(f'Graph contains a cycle: {cycle_nodes}')
-	while queue:
-		node = queue.popleft()
-		result.append(node)
-		for child in G[node]:
-			in_degree[child] -= 1
-			if in_degree[child] == 0:
-				queue.append(child)
-	if len(result) != len(G):
-		raise CycleDetectedError('Graph contains a cycle, but it could not be fully identified')
-	return result
-
-def form_microgrids(G, MG_GROUPS, omd, switch=None, gen_bus=None):
-	'''Generate microgrid data structure from a networkx graph, group of mgs, and omd. 
-	Optional parameters switch and gen_bus may be supplied when loadGrouping or manual partitioning is used.'''
-	omd_list = list(omd.values())
-	all_mgs = [
-		(M_ID, MG_GROUP, MG_GROUP[0], nx_out_edges(G, MG_GROUP))
-		for (M_ID, MG_GROUP) in enumerate([list(x) for x in MG_GROUPS])
-	]
-	MICROGRIDS = {}
-	for idx in range(len(all_mgs)):
-		M_ID, MG_GROUP, TREE_ROOT, BORDERS = all_mgs[idx]
-		this_switch = switch[f'Mg{M_ID}'] if switch and switch[f'Mg{M_ID}'] != [''] else [get_edge_name(swedge[0], swedge[1], omd_list) for swedge in BORDERS]
-		if this_switch and type(this_switch) == list:
-			this_switch = this_switch[-1] if this_switch[-1] else this_switch[0] # TODO: Why is this_switch a list? Which value do we use? 
-		this_gen_bus = gen_bus[f'Mg{M_ID}'] if gen_bus and gen_bus[f'Mg{M_ID}'] != '' else TREE_ROOT
-		MICROGRIDS[f'mg{M_ID}'] = {
-			'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
-			'switch': this_switch, 
-			'gen_bus': this_gen_bus,
-			'gen_obs_existing': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') in ('generator','storage')]
-		}
-	return MICROGRIDS
+def get_all_trees(F):
+	'''A function to get all trees in a forest. Used when forming mg_groups.'''
+	list_of_trees = list(nx.weakly_connected_components(F))
+	return [F.subgraph(tree) for tree in list_of_trees]
 
 def form_mg_groups(G, CRITICAL_LOADS, algo, algo_params={}):
-	'''Generate a group of mgs from networkx graph and crit_loads
+	'''
+	Generate a group of mgs from networkx graph and crit_loads
 	algo must be one of ["lukes", "branch", "bottomUp", "criticalLoads", "loadGrouping", "manual"]
 	lukes algo params is 'size':int giving size of each mg.
 	branch algo params is 'i_branch': giving which branch in the tree to split on.
@@ -475,6 +475,51 @@ def form_mg_groups(G, CRITICAL_LOADS, algo, algo_params={}):
 				print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", "criticalLoads", "loadGrouping", or "manual". No mgs generated.')
 				return {}
 	return MG_GROUPS
+
+def nx_out_edges(G, sub_nodes):
+	'''Find edges connect sub_nodes to rest of graph. Helper to form_microgrids().'''
+	mg1 = G.subgraph(sub_nodes)
+	out_edges = []
+	for n in mg1.nodes():
+		out_preds = [(x,n) for x in G.predecessors(n) if x not in mg1]
+		# out_succ = [(n,x) for x in G.successors(n) if x not in mg1] # Thomas 8/9/24: our current partitioning algos operate on the assumption that a single point of connection to the rest of the circuit exists 'before' the mg when sorted topologically. Out edges may exist 'after' the mg, but should only be considered in the control module.
+		# out_edges.extend(out_succ)
+		out_edges.extend(out_preds)
+	out_edges.sort()
+	return out_edges
+
+def get_edge_name(fr, to, omd_list):
+	'''Get an edge name using (fr,to) in the omd_list. Helper to form_microgrids().'''
+	edges = [ob.get('name') for ob in omd_list if ob.get('from') == fr and ob.get('to') == to]
+	if len(edges) == 0:
+		raise SwitchNotFoundError(f'Selected partitioning method produced invalid results. No valid switch found between {fr} and {to}. Please change partitioning parameter(s).')
+	else:
+		return edges[0]
+
+def form_microgrids(G, MG_GROUPS, omd, switch=None, gen_bus=None):
+	'''
+	Generate microgrid data structure from a networkx graph, group of mgs, and omd. 
+	Optional parameters switch and gen_bus may be supplied when loadGrouping or manual partitioning is used.
+	'''
+	omd_list = list(omd.values())
+	all_mgs = [
+		(M_ID, MG_GROUP, MG_GROUP[0], nx_out_edges(G, MG_GROUP))
+		for (M_ID, MG_GROUP) in enumerate([list(x) for x in MG_GROUPS])
+	]
+	MICROGRIDS = {}
+	for idx in range(len(all_mgs)):
+		M_ID, MG_GROUP, TREE_ROOT, BORDERS = all_mgs[idx]
+		this_switch = switch[f'Mg{M_ID}'] if switch and switch[f'Mg{M_ID}'] != [''] else [get_edge_name(swedge[0], swedge[1], omd_list) for swedge in BORDERS]
+		if this_switch and type(this_switch) == list:
+			this_switch = this_switch[-1] if this_switch[-1] else this_switch[0] # TODO: Why is this_switch a list? Which value do we use? 
+		this_gen_bus = gen_bus[f'Mg{M_ID}'] if gen_bus and gen_bus[f'Mg{M_ID}'] != '' else TREE_ROOT
+		MICROGRIDS[f'mg{M_ID}'] = {
+			'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
+			'switch': this_switch, 
+			'gen_bus': this_gen_bus,
+			'gen_obs_existing': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') in ('generator','storage')]
+		}
+	return MICROGRIDS
 
 def _tests():
 	with open(f'{microgridup.MGU_DIR}/testfiles/test_params.json') as file:

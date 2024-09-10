@@ -455,6 +455,7 @@
 				</div>
 				<div id="branchDescription" class="partitionDescription">
 					<p>Divide circuit into microgrids at the first bus from which there are multiple feeders.</p>
+					<!-- <p>Divide circuit into microgrids at branch points.</p> Uncomment and remove this sentence when transitioning to new_nx_group_branch(). -->
 				</div>
 				<div id="bottomUpDescription" class="partitionDescription">
 					<p>Form microgrids at the ends of each feeder and add elements upstream of each element to the same microgrid, merging with neighboring microgrids, until there are the desired number of microgrids.</p>
@@ -482,6 +483,10 @@
                 <form id="minQuantMgsForm" style="display: none;">
                     <label for="mingQuantMgs">At least how many microgrids?</label>
                     <input id="minQuantMgs" type="text" autocomplete="off" placeholder="Min # of microgrids" />
+                </form>
+				<form id="branchForm" style="display: none;"> <!-- new_nx_group_branch. -->
+                    <label for="branchForm">How many microgrids?</label>
+                    <input id="mgQuantBranch" type="text" autocomplete="off" placeholder="# of microgrids" />
                 </form>
                 <div id="dropDowns" class="chunk" style="display: none;">
                 </div>
@@ -1032,17 +1037,20 @@
 			} else if (selectedPartitioningMethod == '') {} // Show no description because no partition method has been selected yet.
 
 			document.getElementById('minQuantMgs').value = ''; // Clear input from bottomUp and criticalLoads partitioning.
+			document.getElementById('mgQuantBranch').value = ''; // Clear input from branch partitioning. // new_nx_group_branch.
 			if ((selectedPartitioningMethod == 'loadGrouping') || (selectedPartitioningMethod == 'manual')) {
 				$('#dropDowns').hide();
 				$('#partitionManuallyForm').show();
 				$('#makeDropdownsButton').show();
 				$('#previewPartitionsButton').hide();
 				$('#minQuantMgsForm').hide();
+				$('#branchForm').hide(); // // new_nx_group_branch.
 				$('#partitionsPreviewDiv').empty();
 			}
 			else { 
 				$('#partitionManuallyForm').hide();
 				$('#minQuantMgsForm').hide();
+				$('#branchForm').hide(); // new_nx_group_branch.
 				$('#dropDowns').hide();
 				$('#previewPartitionsButton').show();
 			}
@@ -1050,6 +1058,10 @@
 				$('#minQuantMgsForm').show();
 				$('#makeDropdownsButton').hide();
 			}
+			//if (selectedPartitioningMethod == 'branch') { // Uncomment when transitioning to new_nx_group_branch.
+			//	$('#branchForm').show();
+			//	$('#makeDropdownsButton').hide();
+			//}
 		})
 	}
 
@@ -1075,7 +1087,7 @@
 				return;
 			}
 			// Get mgQuantity, if applicable. 
-			const mgQuantity = document.getElementById('minQuantMgs').value || 0;
+			const mgQuantity = document.getElementById('minQuantMgs').value || document.getElementById('mgQuantBranch').value || 0; // new_nx_group_branch.
 			document.body.style.cursor = 'progress';
 			try {
 				const response = await fetch('previewPartitions', {
@@ -1119,6 +1131,12 @@
 		});
 		// Also call above function if user presses enter.
 		document.getElementById('minQuantMgs').addEventListener('keypress', function(e) {
+			if (e.which === 13) {
+				e.preventDefault();
+				document.getElementById('previewPartitionsButton').click();
+			}
+		});
+		document.getElementById('mgQuantBranch').addEventListener('keypress', function(e) { // new_nx_group_branch.
 			if (e.which === 13) {
 				e.preventDefault();
 				document.getElementById('previewPartitionsButton').click();
@@ -1257,7 +1275,7 @@
 		}
 		form1.append('MICROGRIDS',JSON.stringify(MICROGRIDS));
 		// Append mgQuantity. 
-		var mgQuantity = $('#minQuantMgs').val() ? $('#minQuantMgs').val() : 0;
+		const mgQuantity = document.getElementById('minQuantMgs').value || document.getElementById('mgQuantBranch').value || 0; // new_nx_group_branch.
 		form1.append('mgQuantity',mgQuantity);
 
 		// Append microgrid parameter overrides

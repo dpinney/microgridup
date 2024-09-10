@@ -8,17 +8,23 @@ from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, Request, request, redirect, render_template, jsonify, url_for, send_from_directory, Blueprint
 from omf.solvers.opendss import dssConvert
-from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_microgrids, form_mg_groups, topological_sort, SwitchNotFoundError, CycleDetectedError
+from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_microgrids, form_mg_groups, topological_sort, SwitchNotFoundError, CycleDetectedError, InsufficientBranchPointsError
 import microgridup
 
 app = Flask(__name__)
 
 '''Set error handlers.'''
-# @app.errorhandler(ValueError) # Helpful for unexpected Python function errors.
-# def handle_value_error(error):
-# 	response = jsonify(message=str(error), error=error.__class__.__name__)
-# 	response.status = 400
-# 	return response
+@app.errorhandler(ValueError) # Helpful for unexpected Python function errors.
+def handle_value_error(error):
+	response = jsonify(message=str(error), error=error.__class__.__name__)
+	response.status = 400
+	return response
+
+@app.errorhandler(InsufficientBranchPointsError)
+def handle_insufficient_branch_points_error(error):
+	response = jsonify(message=str(error), error=error.__class__.__name__)
+	response.status_code = 422
+	return response
 
 @app.errorhandler(SwitchNotFoundError)
 def handle_switch_not_found_error(error):
@@ -460,6 +466,7 @@ def previewPartitions():
 				MG_GROUPS.extend(nx_group_lukes(tree, algo_params.get('size',default_size)))
 			elif METHOD == 'branch':
 				MG_GROUPS.extend(nx_group_branch(tree, i_branch=algo_params.get('i_branch',0), omd=omd))
+				# MG_GROUPS.extend(nx_group_branch(tree, MGQUANT, i_branch=algo_params.get('i_branch',0), omd=omd)) # Uncomment when transitioning to new_nx_group_branch().
 			elif METHOD == 'bottomUp':
 				MG_GROUPS.extend(nx_bottom_up_branch(tree, num_mgs=MGQUANT/num_trees_pruned, large_or_small='large', omd=omd, cannot_be_mg=['regcontrol']))
 			elif METHOD == 'criticalLoads':
@@ -467,7 +474,9 @@ def previewPartitions():
 			else:
 				print('Invalid algorithm. algo must be "branch", "lukes", "bottomUp", or "criticalLoads". No mgs generated.')
 				return {}
-	except:
+	except InsufficientBranchPointsError as error:
+		raise error
+	except Exception:
 		return jsonify('Invalid partitioning method')
 	MICROGRIDS = form_microgrids(G, MG_GROUPS, omd)
 	for mg in MICROGRIDS:

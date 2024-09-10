@@ -1021,4 +1021,4 @@ if __name__ == '__main__':
 	test_3mg()
 	test_4mg()
 	test_auto3mg()
-	# test_mackelroy()
+	test_mackelroy()

@@ -283,7 +283,7 @@ def nx_bottom_up_branch(G, num_mgs=3, large_or_small='large', omd={}, cannot_be_
 	mgs = get_initial_mgs(G, bus_nodes)
 	mgs = only_child(G, mgs)
 	parts = defaultdict(list)
-	for key in mgs:
+	for key in sorted(mgs):
 		parts[0].append([key])
 		parts[0][-1].extend(mgs[key])
 	counter = 1
@@ -293,7 +293,7 @@ def nx_bottom_up_branch(G, num_mgs=3, large_or_small='large', omd={}, cannot_be_
 		mgs = only_child(G, mgs)
 		if len(mgs) < num_mgs:
 			break
-		for key in mgs: 
+		for key in sorted(mgs): 
 			parts[counter].append([key])
 			parts[counter][-1].extend(mgs[key])
 		counter += 1
@@ -544,11 +544,13 @@ def _tests():
 			_dir.index('wizard')
 			G = opendss.dssConvert.dss_to_networkx(wizard_dss_path)
 			omd = opendss.dssConvert.dssToOmd(wizard_dss_path, '', RADIUS=0.0004, write_out=False)
+			params['omd'] = omd
 			MG_GROUPS_TEST = form_mg_groups(G, crit_loads, partitioning_method, params)
 			MICROGRIDS_TEST = form_microgrids(G, MG_GROUPS_TEST, omd) if partitioning_method != 'manual' else form_microgrids(G, MG_GROUPS_TEST, omd, params.get('switch'), params.get('gen_bus')) # No valid gen_bus in MG_GROUPS_TEST. When using manual partitioning, the user should specify gen_bus and switch.
 		except ValueError:
 			G = opendss.dssConvert.dss_to_networkx(lehigh_dss_path)
 			omd = opendss.dssConvert.dssToOmd(lehigh_dss_path, '', RADIUS=0.0004, write_out=False)
+			params['omd'] = omd
 			MG_GROUPS_TEST = form_mg_groups(G, crit_loads, partitioning_method, params)
 			MICROGRIDS_TEST = form_microgrids(G, MG_GROUPS_TEST, omd, params.get('switch'), params.get('gen_bus'))
 		# - Austin (8/1/2024): the "parameter_overrides" key is now a part of the schema for microgrid dicts. The "parameter_overrides" key is

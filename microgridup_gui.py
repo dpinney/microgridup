@@ -7,8 +7,10 @@ import networkx as nx
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, Request, request, redirect, render_template, jsonify, url_for, send_from_directory, Blueprint
+from omf import geo
 from omf.solvers.opendss import dssConvert
 from microgridup_gen_mgs import nx_group_branch, nx_group_lukes, nx_bottom_up_branch, nx_critical_load_branch, get_all_trees, form_microgrids, form_mg_groups, topological_sort, SwitchNotFoundError, CycleDetectedError, InsufficientBranchPointsError
+# from microgridup_gen_mgs import new_nx_group_branch # Add to above imports when transitioning to new_nx_group_branch().
 import microgridup
 
 app = Flask(__name__)
@@ -447,14 +449,18 @@ def remove_nodes_without_edges(G):
 @app.route('/edit/previewPartitions', methods = ['GET','POST'])
 def previewPartitions():
 	request_json = request.get_json()
+	MODEL_DIR = request_json['modelDir']
 	CIRC_FILE = request_json['fileName']
 	if not CIRC_FILE.startswith('/'):
 		CIRC_FILE = str(Path(microgridup.PROJ_DIR).resolve(True) / request_json['modelDir'] / CIRC_FILE)
 	CRITICAL_LOADS = request_json['critLoads']
 	METHOD = request_json['method']
 	MGQUANT = int(request_json['mgQuantity'])
-	# Convert to omd to give coordinates to important grid items.
-	omd = dssConvert.dssToOmd(CIRC_FILE, '', RADIUS=0.0004, write_out=False)
+	# Convert to omd to give coordinates to important grid items. Save in static directory.
+	output_dir = os.path.join('static', 'preview_partition_maps', MODEL_DIR)
+	os.makedirs(output_dir, exist_ok=True)
+	omd_path = os.path.join(output_dir, 'preview_partitions_omd.omd')
+	omd = dssConvert.dssToOmd(CIRC_FILE, omd_path, RADIUS=0.0004, write_out=True)
 	# Convert omd to NetworkX graph because omd has full coordinates.
 	G = dssConvert.dss_to_networkx(CIRC_FILE, omd=omd)
 	# Check to see if omd contains coordinates for each important node.
@@ -478,7 +484,7 @@ def previewPartitions():
 				MG_GROUPS.extend(nx_group_lukes(tree, algo_params.get('size',default_size)))
 			elif METHOD == 'branch':
 				MG_GROUPS.extend(nx_group_branch(tree, i_branch=algo_params.get('i_branch',0), omd=omd))
-				# MG_GROUPS.extend(nx_group_branch(tree, MGQUANT, i_branch=algo_params.get('i_branch',0), omd=omd)) # Uncomment when transitioning to new_nx_group_branch().
+				# MG_GROUPS.extend(new_nx_group_branch(tree, MGQUANT, omd=omd)) # Uncomment when transitioning to new_nx_group_branch().
 			elif METHOD == 'bottomUp':
 				MG_GROUPS.extend(nx_bottom_up_branch(tree, num_mgs=MGQUANT/num_trees_pruned, large_or_small='large', omd=omd, cannot_be_mg=['regcontrol']))
 			elif METHOD == 'criticalLoads':
@@ -495,16 +501,19 @@ def previewPartitions():
 		if not MICROGRIDS[mg]['switch']:
 			print(f'Selected partitioning method produced invalid results. Please change partitioning parameter(s).')
 			raise SwitchNotFoundError(f'Selected partitioning method produced invalid results. Please change partitioning parameter(s).')
-	plt.switch_backend('Agg')
-	plt.figure(figsize=(14,12), dpi=350)
-	n_color_map = node_group_map(G, MG_GROUPS)
-	edge_color_map = ['black' if node in CRITICAL_LOADS else 'none' for node in G.nodes()]
-	nx.draw(G, with_labels=True, pos=pos, node_color=n_color_map, edgecolors=edge_color_map, linewidths=2)
-	pic_IObytes = io.BytesIO()
-	plt.savefig(pic_IObytes,  format='png')
-	pic_IObytes.seek(0)
-	pic_hash = base64.b64encode(pic_IObytes.read()).decode('ascii')
-	return jsonify({'pic_hash': pic_hash, 'MICROGRIDS': MICROGRIDS})
+	# Embed the map. 
+	microgrids_as_mapping_proxy_type = microgridup.get_immutable_dict(MICROGRIDS)
+	critical_loads_as_tuple = tuple(CRITICAL_LOADS)
+	out = microgridup.colorby_mgs(omd_path, microgrids_as_mapping_proxy_type, critical_loads_as_tuple)
+	# Need to reopen omd from file since saved file is different from return variable.
+	omd_from_file = json.load(open(omd_path))
+	omd_from_file['attachments'] = out
+	with open(omd_path, 'w+') as out_file:
+		json.dump(omd_from_file, out_file, indent=4)
+	geo.map_omd(omd_path, output_dir, open_browser=False)
+	map_html_file = os.path.join(output_dir, 'geoJson_offline.html')
+	map_url = url_for('static', filename=f'preview_partition_maps/{MODEL_DIR}/{os.path.basename(map_html_file)}')
+	return jsonify({'map_url': map_url, 'MICROGRIDS': MICROGRIDS})
 
 @app.route('/has_cycles', methods=['GET','POST'])
 def has_cycles():

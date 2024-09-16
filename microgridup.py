@@ -657,16 +657,16 @@ def _tests():
 	with open('testfiles/test_params.json') as file:
 		test_params = json.load(file)
 	# - It appears that, for these tests, all we need from test_params.json are the microgrid definitions. We can ignore everything else
-	MG_MINES = test_params['MG_MINES']
-	for model_name in MG_MINES:
+	MICROGRIDS = test_params['MICROGRIDS']
+	for model_name in MICROGRIDS:
 		data['MODEL_DIR'] = model_name
-		data['MICROGRIDS'] = MG_MINES[model_name][0]
+		data['MICROGRIDS'] = MICROGRIDS[model_name][0]
 		try:
 			model_name.index('wizard')
 			data['BASE_DSS'] = f'{MGU_DIR}/testfiles/wizard_base_3mg.dss'
 			data['FAULTED_LINES'] = ['reg1']
 		except ValueError as e:
-			data['BASE_DSS'] = f'{MGU_DIR}/testfiles/lehigh_base_3mg.dss'
+			data['BASE_DSS'] = f'{MGU_DIR}/testfiles/lehigh_base_phased.dss'
 			data['FAULTED_LINES'] = ['670671']
 		print(f'---------------------------------------------------------\nBeginning end-to-end backend test of {model_name}.\n---------------------------------------------------------')
         # - These tests don't run in GitHub, so it's okay to take longer and actually run REopt

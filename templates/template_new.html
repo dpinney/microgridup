@@ -217,6 +217,14 @@
 		fieldset {
 			border: none;
 		}
+		#partitionsPreviewDiv iframe {
+			width: 900px;
+			height: 750px;
+			border: 1px solid #ccc;
+		}
+		.partitionDescription {
+			max-width: 900px;
+		}
 	</style>
 </head>
 <body>
@@ -672,9 +680,6 @@
 				const img = document.createElement('img');
 				img.id = 'oldPartitionPreview';
 				img.src = 'data:image/gif;base64,' + responseJson.pic_hash;
-				const description = document.createElement('p');
-				description.textContent = 'Colors represent microgrid boundaries. Black borders represent critical loads.';
-				oldPartitionsDiv.prepend(description);
 				oldPartitionsDiv.prepend(img);
 				window.createReoptParametersMVC(responseJson.MICROGRIDS);
 				{% if iframe_mode %}
@@ -846,7 +851,7 @@
 				$('#makeDropdownsButton').show();
 				$('#previewPartitionsButton').hide();
 				$('#minQuantMgsForm').hide();
-				$('#branchForm').hide(); // // new_nx_group_branch.
+				$('#branchForm').hide(); // new_nx_group_branch.
 				$('#partitionsPreviewDiv').empty();
 			}
 			else { 
@@ -911,16 +916,13 @@
 					if (responseJson === 'Invalid partitioning method') {
 						alert('Selected partitioning method produced invalid results. Please choose a different partitioning method.');
 					} else {
-						// Create image.
-						const img = document.createElement('img');
-						img.id = 'previewImage';
-						img.src = 'data:image/gif;base64,' + responseJson.pic_hash;
-						const description = document.createElement('p');
-						description.textContent = 'Colors represent microgrid boundaries. Black borders represent critical loads.';
+						// Create iframe. 
+						const iframe = document.createElement('iframe');
+						iframe.id = 'previewIframe';
+						iframe.src = responseJson.map_url;
 						const previewDiv = document.getElementById('partitionsPreviewDiv');
 						previewDiv.innerHTML = '';
-						previewDiv.appendChild(img);
-						previewDiv.appendChild(description);
+						previewDiv.appendChild(iframe);
 						window.createReoptParametersMVC(responseJson.MICROGRIDS);
 					}
 				} else {

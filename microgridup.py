@@ -165,6 +165,8 @@ def main(data, invalidate_cache=True, open_results=False):
 			error_message = str(e)
 			print(error_message)
 			logger.warning(error_message)
+			with open('output_control.html', 'w') as file:
+				file.write(f"<html><body><h1>Error</h1><p>{error_message}</p></body></html>")
 		# Resilience simulation with outages. Optional. Skipped if no OUTAGE_CSV
 		if immutable_data['OUTAGE_CSV']:
 			all_microgrid_loads = [x.get('loads',[]) for x in immutable_data['MICROGRIDS'].values()]

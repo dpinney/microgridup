@@ -423,7 +423,7 @@ def load_grouping(G, pairings):
 	parts = []
 	counter = 0
 	while mgs:
-		key = f'Mg{counter}'
+		key = f'mg{counter}'
 		if mgs.get(key):
 			parts.append(mgs[key])
 			del mgs[key]
@@ -434,9 +434,10 @@ def manual(pairings, gen_obs_existing):
 	'''Partitioning without networkx. Accepts dict of loads paired by mg and dict of gen_obs_existing paired by mg from user input.'''
 	pairings.pop('None', None)
 	parts = []
-	for mg in pairings:
-		loads = pairings[mg]
-		mg_gen_obs_existing = gen_obs_existing[mg].split(',')
+	sorted_mg_ids = sorted(pairings.keys(), key=lambda mg: int(mg[2:]))
+	for mg_id in sorted_mg_ids:
+		loads = pairings[mg_id]
+		mg_gen_obs_existing = gen_obs_existing[mg_id].split(',')
 		parts.append(loads + mg_gen_obs_existing)
 	return parts
 
@@ -496,7 +497,7 @@ def get_edge_name(fr, to, omd_list):
 	else:
 		return edges[0]
 
-def form_microgrids(G, MG_GROUPS, omd, switch=None, gen_bus=None):
+def form_microgrids(G, MG_GROUPS, omd, switch_dict=None, gen_bus_dict=None, mg_name_dict=None):
 	'''
 	Generate microgrid data structure from a networkx graph, group of mgs, and omd. 
 	Optional parameters switch and gen_bus may be supplied when loadGrouping or manual partitioning is used.
@@ -509,11 +510,13 @@ def form_microgrids(G, MG_GROUPS, omd, switch=None, gen_bus=None):
 	MICROGRIDS = {}
 	for idx in range(len(all_mgs)):
 		M_ID, MG_GROUP, TREE_ROOT, BORDERS = all_mgs[idx]
-		this_switch = switch[f'Mg{M_ID}'] if switch and switch[f'Mg{M_ID}'] != [''] else [get_edge_name(swedge[0], swedge[1], omd_list) for swedge in BORDERS]
+		mg_name = mg_name_dict[f'mg{M_ID}'] if mg_name_dict and mg_name_dict[f'mg{M_ID}'] else f'mg{M_ID}'
+		this_switch = switch_dict[f'mg{M_ID}'] if switch_dict and switch_dict[f'mg{M_ID}'] != [''] else [get_edge_name(swedge[0], swedge[1], omd_list) for swedge in BORDERS]
 		if this_switch and type(this_switch) == list:
 			this_switch = this_switch[-1] if this_switch[-1] else this_switch[0] # TODO: Why is this_switch a list? Which value do we use? 
-		this_gen_bus = gen_bus[f'Mg{M_ID}'] if gen_bus and gen_bus[f'Mg{M_ID}'] != '' else TREE_ROOT
-		MICROGRIDS[f'mg{M_ID}'] = {
+		this_gen_bus = gen_bus_dict[f'mg{M_ID}'] if gen_bus_dict and gen_bus_dict[f'mg{M_ID}'] != '' else TREE_ROOT
+		# MICROGRIDS[f'mg{M_ID}'] = {
+		MICROGRIDS[mg_name] = {
 			'loads': [ob.get('name') for ob in omd_list if ob.get('name') in MG_GROUP and ob.get('object') == 'load'],
 			'switch': this_switch, 
 			'gen_bus': this_gen_bus,

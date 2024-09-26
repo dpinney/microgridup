@@ -236,7 +236,7 @@ def main(data, invalidate_cache=True, open_results=False):
 	except Exception as e:
 		print(traceback.format_exc())
 		logger.warning(traceback.format_exc())
-		os.system(f'touch "{data["MODEL_DIR"]}/0crashed.txt"')
+		os.system(f'touch "{absolute_model_directory}/0crashed.txt"')
 		check_each_mg_for_reopt_error(immutable_data['MICROGRIDS'], logger)
 	finally:
 		os.chdir(curr_dir)

@@ -117,10 +117,6 @@
 		}
 		a {text-decoration: none; color: black;}
 		a:hover {text-decoration: underline;}
-		#previewImage, #oldPartitionPreview {
-			max-width: 700px;
-			padding: 10px;
-		}
 		.partitionDescription {
             display: none;
         }
@@ -217,7 +213,7 @@
 		fieldset {
 			border: none;
 		}
-		#partitionsPreviewDiv iframe {
+		#partitionsPreviewDiv iframe, #oldPartitionPreview {
 			width: 900px;
 			height: 750px;
 			border: 1px solid #ccc;
@@ -422,7 +418,7 @@
                 <form id="partitionManuallyForm" style="display: none;">
                     <label for="mgQuantity">How many microgrids?</label>
                     <input id="mgQuantity" type="text" autocomplete="off" placeholder="# of microgrids" />
-                    <button id="makeDropdownsButton" type="button">Go</button><br>
+                    <button id="makeManuallyPartitioningContainerButton" type="button">Go</button><br>
                 </form>
                 <form id="minQuantMgsForm" style="display: none;">
                     <label for="mingQuantMgs">At least how many microgrids?</label>
@@ -432,11 +428,9 @@
                     <label for="branchForm">How many microgrids?</label>
                     <input id="mgQuantBranch" type="text" autocomplete="off" placeholder="# of microgrids" />
                 </form>
-                <div id="dropDowns" class="chunk" style="display: none;">
-                </div>
+                <div id="manualPartitioningContainer" class="chunk" style="display: none;"></div>
                 <button id="previewPartitionsButton" type="button" disabled>Preview partitions</button>
-                <div id="partitionsPreviewDiv">
-                </div>
+                <div id="partitionsPreviewDiv"></div>
             </div>
         </div>
 
@@ -595,21 +589,25 @@
 			window.circuitIsSpecified = true;
 			const loads = responseJson.loads;
 			const critLoadsContainer = document.getElementById('critLoads');
-			const dropDownsContainer = document.getElementById('dropDowns');
-			// Clear contents of critLoads and dropDowns.
+			const manualPartitioningContainer = document.getElementById('manualPartitioningContainer');
+			// Clear contents of critLoads and manualPartitioningContainer.
 			critLoadsContainer.innerHTML = '';
-			dropDownsContainer.innerHTML = '';
+			manualPartitioningContainer.innerHTML = '';
 			// Instructions for critLoads.
 			const critLoadsParagraph = document.createElement('p');
 			critLoadsParagraph.textContent = 'Please select all critical loads:';
 			critLoadsContainer.appendChild(critLoadsParagraph);
-			// Hide dropDowns.
-			dropDownsContainer.style.display = 'none';
+			// Hide manualPartitioningContainer.
+			manualPartitioningContainer.style.display = 'none';
 			// Create a form to house checkboxes.
 			const criticalLoadsSelect = document.createElement('form');
 			criticalLoadsSelect.id = 'criticalLoadsSelect';
 			criticalLoadsSelect.classList.add('chunk');
 			critLoadsContainer.appendChild(criticalLoadsSelect);
+			// Create a div to house load assignment dropdown menus.
+			const loadAssignmentContainer = document.createElement('div');
+			loadAssignmentContainer.id = 'loadAssignmentContainer';
+			manualPartitioningContainer.appendChild(loadAssignmentContainer);
 			// Create checkboxes and labels for each load.
 			for (let i = 0; i < loads.length; i++) {
 				const checkbox = document.createElement('input');
@@ -623,15 +621,16 @@
 				label.appendChild(checkbox);
 				label.appendChild(document.createTextNode(loads[i]));
 				criticalLoadsSelect.appendChild(label);
-				// Add a dropdown to dropDowns.
+				// Add a dropdown to loadAssignmentContainer.
 				const dropdownLabel = document.createElement('label');
 				dropdownLabel.style.display = 'inline-block';
 				dropdownLabel.style.paddingRight = '8px';
 				const dropdown = document.createElement('select');
+				dropdown.dataset.loadId = loads[i];
 				dropdown.style.marginRight = '3px';
 				dropdownLabel.appendChild(dropdown);
 				dropdownLabel.appendChild(document.createTextNode(loads[i]));
-				dropDownsContainer.appendChild(dropdownLabel);
+				loadAssignmentContainer.appendChild(dropdownLabel);
 			}
 			// Handle case where there are no loads.
 			if (loads.length === 0) {
@@ -641,7 +640,7 @@
 				
 				const noLoadsMessage2 = document.createElement('p');
 				noLoadsMessage2.textContent = 'No loads to assign to microgrids.';
-				dropDownsContainer.appendChild(noLoadsMessage2);
+				manualPartitioningContainer.appendChild(noLoadsMessage2);
 			}
 			// Make directory uneditable.
 			const modelDirInput = document.querySelector('input[name="MODEL_DIR"]');
@@ -677,10 +676,10 @@
 			const responseJson = await response.json();
 			document.body.style.cursor = 'default';
 			if (response.ok) {
-				const img = document.createElement('img');
-				img.id = 'oldPartitionPreview';
-				img.src = 'data:image/gif;base64,' + responseJson.pic_hash;
-				oldPartitionsDiv.prepend(img);
+				const iframe = document.createElement('iframe');
+				iframe.id = 'oldPartitionPreview';
+				iframe.src = responseJson.map_url;
+				oldPartitionsDiv.prepend(iframe);
 				window.createReoptParametersMVC(responseJson.MICROGRIDS);
 				{% if iframe_mode %}
 				window.disableInputs();
@@ -693,9 +692,11 @@
 			alert(error);
 		}
 		document.getElementById('partitionPreviewerContainer').appendChild(oldPartitionsDiv);
+		const partitionButtonContainer = document.createElement('div');
 		const partitionButton = document.createElement('button');
 		partitionButton.textContent = 'Partition circuit differently';
-		oldPartitionsDiv.appendChild(partitionButton);
+		partitionButtonContainer.appendChild(partitionButton);
+		oldPartitionsDiv.appendChild(partitionButtonContainer);
 		partitionButton.addEventListener('click', function() {
 			document.getElementById('stepThree').style.display = 'block';
 			oldPartitionsDiv.style.display = 'none';
@@ -741,23 +742,62 @@
 		}
 	}
 
-	function makeGenObsExisitingInput(count) {
-		$('#switchGenBus').append('<label class="tooltip" for="mg' + count + 'GenObsExisting">Mg' + count + ' Existing Generation Objects <span class="classic">Input existing generation objects separated by commas.</span></label>');
-		$('#switchGenBus').append('<input id="mg' + count + 'GenObsExisting" type="text"></input>');
-		$('#switchGenBus').append('<br>');
+	function makeMgNameInput(idx) {
+		const mgNameLabel = document.createElement('label');
+		mgNameLabel.setAttribute('for', `mg${idx}Name`);
+		mgNameLabel.innerHTML = `Mg${idx} Name `;
+		const mgNameInput = document.createElement('input');
+		mgNameInput.id = `mg${idx}Name`;
+		mgNameInput.type = 'text';
+		mgNameInput.placeholder = 'Optional';
+		mgNameInput.dataset.mgId = `mg${idx}`;
+		mgNameInput.addEventListener('input', function() { // Real time input filtering.
+			let value = mgNameInput.value;
+			value = value.toLowerCase(); // Convert to lowercase.
+			value = value.replace(/[^a-z0-9-]/g, ''); // Remove any character that is not alphanumeric or dash.
+			value = value.replace(/\s/g, ''); // Remove spaces.
+			mgNameInput.value = value;
+		});
+		partitioningTextInputContainer.append(mgNameLabel, mgNameInput);
 	}
 
-	function makeswitchGenBusInput(count) {
-		$('#switchGenBus').append('<label for="mg' + count + 'GenBus">Mg' + count + ' Gen Bus </label>');
-		$('#switchGenBus').append('<input id="mg' + count + 'GenBus" type="text" placeholder="Optional"></input>');
-		$('#switchGenBus').append('<label for="mg' + count + 'Switch"> Mg' + count + ' Switch </label>');
-		$('#switchGenBus').append('<input id="mg' + count + 'Switch" type="text" placeholder="Optional"></input>');
-		$('#switchGenBus').append('<br>');
+	function makeGenObsExistingInput(idx) {
+		const partitioningTextInputContainer = document.getElementById('partitioningTextInput');
+		const label = document.createElement('label');
+		label.setAttribute('for', `mg${idx}GenObsExisting`);
+		label.className = 'tooltip';
+		label.innerHTML = ` Mg${idx} Existing Generation Objects <span class="classic">Input names of existing generation objects separated by commas.</span>`;
+		const input = document.createElement('input');
+		input.id = `mg${idx}GenObsExisting`;
+		input.type = 'text';
+		input.dataset.mgId = `mg${idx}`;
+		partitioningTextInputContainer.append(label, input);
 	}
 
-	function attachDropdownsEventHandler() {
+	function makePartitioningTextInputInput(idx) {
+		const partitioningTextInputContainer = document.getElementById('partitioningTextInput');
+		const genBusLabel = document.createElement('label');
+		genBusLabel.setAttribute('for', `mg${idx}GenBus`);
+		genBusLabel.innerHTML = ` Mg${idx} Gen Bus `;
+		const genBusInput = document.createElement('input');
+		genBusInput.id = `mg${idx}GenBus`;
+		genBusInput.type = 'text';
+		genBusInput.placeholder = 'Optional';
+		genBusInput.dataset.mgId = `mg${idx}`;
+		const switchLabel = document.createElement('label');
+		switchLabel.setAttribute('for', `mg${idx}Switch`);
+		switchLabel.innerHTML = ` Mg${idx} Switch `;
+		const switchInput = document.createElement('input');
+		switchInput.id = `mg${idx}Switch`;
+		switchInput.type = 'text';
+		switchInput.placeholder = 'Optional';
+		switchInput.dataset.mgId = `mg${idx}`;
+		partitioningTextInputContainer.append(genBusLabel, genBusInput, switchLabel, switchInput);
+	}
+
+	function attachManualPartitioningEventHandler() {
 		// Manual partitioning dynamic dropdown creation. 
-		$('#makeDropdownsButton').on('click', async function() {
+		document.getElementById('makeManuallyPartitioningContainerButton').addEventListener('click', async function() {
 			if (window.circuitIsSpecified === false) {
 				alert('Please complete step 2.')
 				return
@@ -788,43 +828,55 @@
 			}
 			window.createReoptParametersMVC(mgs);
 			const usedUpload = window.circuitModel.getElements().length == 0;
-			$('#switchGenBus').remove(); // Clear existing #switchGenBus if it exists already.
-			for (let idx = 0; idx < numMgs; idx++) {
-				if (selectedPartitioningMethod == 'manual') {
-					if (idx == 0) {
-						$('#dropDowns').prepend('<div id="switchGenBus"></div>'); // Make div on first loop iteration.
-					}
-					makeGenObsExisitingInput(idx); // manual + wizard = genObsExisting
-					if (usedUpload) {
-						makeswitchGenBusInput(idx); // manual + upload = genObsExisting + switchGenBus
-					}
-				} else if ((selectedPartitioningMethod == 'loadGrouping') && (usedUpload)) {
-					if (idx == 0) {
-						$('#dropDowns').prepend('<div id="switchGenBus"></div>'); // Make div on first loop iteration.
-					}
-					makeswitchGenBusInput(idx);
-				}
+			const manualPartitioningContainer = document.getElementById('manualPartitioningContainer');
+			let existingPartitioningTextInputContainer = document.getElementById('partitioningTextInput');
+			if (existingPartitioningTextInputContainer) {
+				existingPartitioningTextInputContainer.remove(); // Clear existing #partitioningTextInput if it exists already.
 			}
-
-			$('#dropDowns label select').each(function() {
-				$(this).empty();
-				$(this).append('<option value="">None</option>')
+			partitioningTextInputContainer = document.createElement('div');
+			partitioningTextInputContainer.id = 'partitioningTextInput';
+			manualPartitioningContainer.prepend(partitioningTextInputContainer);
+			for (let idx = 0; idx < numMgs; idx++) {
+				// Regardless of partitioning method (manual vs loadGrouping) and circuit origin (wizard vs upload), we provide optional inputs for naming microgrids. 
+				makeMgNameInput(idx);
+				if (selectedPartitioningMethod === 'manual') { // If the user selected manual partitioning, we should always provide genObsExisting input. If the user uploaded their circuit, we should also provide inputs for switch and genBus. If the user used the wizard, switch and genBus are preselected.
+					makeGenObsExistingInput(idx); // manual + wizard = genObsExisting
+					if (usedUpload) {
+						makePartitioningTextInputInput(idx); // manual + upload = genObsExisting + partitioningTextInput
+					}
+				} else if (selectedPartitioningMethod === 'loadGrouping' && usedUpload) { // If the user selected loadGrouping partitioning, we do not provide genObsExisting input because networkx will find existing generation. We provide switch and genBus input only if the user uploaded their circuit because, as with manual paritioning, wizard circuits come with preselected switch and genBus.
+					makePartitioningTextInputInput(idx);
+				}
+				partitioningTextInputContainer.append(document.createElement('br'));
+			}
+			const selects = document.querySelectorAll('#manualPartitioningContainer label select');
+			selects.forEach(select => {
+				select.innerHTML = ''; 			
+				const noneOption = document.createElement('option');
+				noneOption.value = 'None';
+				noneOption.textContent = 'None';
+				noneOption.dataset.mgId = 'None';
+				select.appendChild(noneOption);
 				for (let idx = 0; idx < numMgs; idx++) {
-					$(this).append('<option value="Mg' + idx + '">Mg' + idx + '</option>');
+					const option = document.createElement('option');
+					option.value = `Mg${idx}`;
+					option.textContent = `Mg${idx}`;
+					option.dataset.mgId = `mg${idx}`;
+					select.appendChild(option);
 				}
 			});
-			$('#dropDowns').show();
+			manualPartitioningContainer.style.display = 'block';
 		})
 		// Also call above function if user presses enter.
-		$('#mgQuantity').keypress(function(e){
-			if (e.which === 13) {
+		document.getElementById('mgQuantity').addEventListener('keypress', function(e) {
+			if (e.key === 'Enter' || e.which === 13) {
 				e.preventDefault();
-				$('#makeDropdownsButton').click();
+				document.getElementById('makeManuallyPartitioningContainerButton').click();
 			}
 		});
 	}
 
-	function attachPartitioningEventHandler() {
+	function attachPartitioningSelectEventHandler() {
 		// Hide/show manual partitioning div. 
 		document.getElementById('partitionMethod').addEventListener('change', function() {
 			// Show appropriate description in body of partition block.
@@ -846,9 +898,9 @@
 			document.getElementById('minQuantMgs').value = ''; // Clear input from bottomUp and criticalLoads partitioning.
 			document.getElementById('mgQuantBranch').value = ''; // Clear input from branch partitioning. // new_nx_group_branch.
 			if ((selectedPartitioningMethod == 'loadGrouping') || (selectedPartitioningMethod == 'manual')) {
-				$('#dropDowns').hide();
+				$('#manualPartitioningContainer').hide();
 				$('#partitionManuallyForm').show();
-				$('#makeDropdownsButton').show();
+				$('#makeManuallyPartitioningContainerButton').show();
 				$('#previewPartitionsButton').hide();
 				$('#minQuantMgsForm').hide();
 				$('#branchForm').hide(); // new_nx_group_branch.
@@ -858,16 +910,16 @@
 				$('#partitionManuallyForm').hide();
 				$('#minQuantMgsForm').hide();
 				$('#branchForm').hide(); // new_nx_group_branch.
-				$('#dropDowns').hide();
+				$('#manualPartitioningContainer').hide();
 				$('#previewPartitionsButton').show();
 			}
 			if (selectedPartitioningMethod == 'bottomUp' || selectedPartitioningMethod == 'criticalLoads') {
 				$('#minQuantMgsForm').show();
-				$('#makeDropdownsButton').hide();
+				$('#makeManuallyPartitioningContainerButton').hide();
 			}
 			//if (selectedPartitioningMethod == 'branch') { // Uncomment when transitioning to new_nx_group_branch.
 			//	$('#branchForm').show();
-			//	$('#makeDropdownsButton').hide();
+			//	$('#makeManuallyPartitioningContainerButton').hide();
 			//}
 		})
 	}
@@ -1010,54 +1062,69 @@
 		});
 		form1.append('CRITICAL_LOADS',JSON.stringify(critLoads));
 		// Append MG_DEF_METHOD. 
-		var method = $( "#partitionMethod option:selected" ).val();
-		form1.append('MG_DEF_METHOD',method);
-
+		const selectedPartitioningMethod = document.getElementById('partitionMethod').value;
+		form1.append('MG_DEF_METHOD',selectedPartitioningMethod);
 		// Do not proceed if manual is selected and no partitions are created.
-		if (((method === 'loadGrouping' && !$('#dropDowns').is(':visible'))) || ((method === 'manual' && !$('#dropDowns').is(':visible')))) {
+		if (((selectedPartitioningMethod === 'loadGrouping' && !$('#manualPartitioningContainer').is(':visible'))) || ((selectedPartitioningMethod === 'manual' && !$('#manualPartitioningContainer').is(':visible')))) {
 			alert('Please enter a number of microgrids and press Go.')
 			return
 		}
-		// If loadGrouping or manual is selected, append a 'MICROGRIDS' value.
-		var MICROGRIDS = {}
-		if ((method == 'loadGrouping') || (method == 'manual')) {
-			$('#dropDowns label').each(function() {
-				if (this.hasAttribute('for')) {
-					return true // Skip the Gen Obs Existing, Gen Buses, and Switches.
-				}
-				var load = $(this).text().split(' ')[1]
-				var mg = $(this).find(':selected').text()
-				MICROGRIDS.pairings ??= {};
-				MICROGRIDS.pairings[mg] ??= [];
-				MICROGRIDS['pairings'][mg].push(load); 
-			})
+		// If loadGrouping or manual is selected, append a 'PARTITION_PARAMS' value.
+		let PARTITION_PARAMS = {
+			pairings: {},
+			gen_obs_existing: {},
+			gen_bus: {},
+			switch: {},
+			mg_name: {}
+		};
+		if ((selectedPartitioningMethod == 'loadGrouping') || (selectedPartitioningMethod == 'manual')) {
+			// Add all load->microgrid assignments to PARTITION_PARAMS.pairings object.
+			const loadAssignmentContainerSelects = document.querySelectorAll('#loadAssignmentContainer select');
+			loadAssignmentContainerSelects.forEach(select => {
+				const loadId = select.dataset.loadId;
+				const selectedOption = select.options[select.selectedIndex];
+				const selectedMicrogrid = selectedOption.dataset.mgId;
+				PARTITION_PARAMS.pairings[selectedMicrogrid] = PARTITION_PARAMS.pairings[selectedMicrogrid] || [];
+				PARTITION_PARAMS.pairings[selectedMicrogrid].push(loadId);
+			});
 			// Do not proceed if no loads are in microgrids.
-			const pairings = MICROGRIDS.pairings;
-			if (typeof pairings === 'object' && Object.keys(pairings).length === 1 && 'None' in pairings) {
-				alert('At least one load should be placed in a microgrid. Please return to step 3.')
-				return
-			}
-			// Append gen_obs_exising, switch, and gen_bus values.
-			var counter = 0;
-			$('#switchGenBus input').each( function() {
-				var id = $(this).attr('id');
-				var val = $(this).val();
-				var mg = 'Mg' + id.match(/^mg(\d+)/)[1]; // Get digits from next to 'mg' in input ID.
-				if (id.includes('GenObsExisting')) {
-					MICROGRIDS.gen_obs_existing ??= {};
-					MICROGRIDS.gen_obs_existing[mg] = val;
+			if (Object.keys(PARTITION_PARAMS.pairings).length === 1 && PARTITION_PARAMS.pairings.None) {
+            	alert('At least one load should be placed in a microgrid. Please return to step 3.');
+            	return;
+        	}
+			// Add all text inputs to PARTITION_PARAMS object.
+			const mgNames = new Set();
+			const partitioningTextInputInputs = document.querySelectorAll('#partitioningTextInput input');
+			let hasDuplicates = false;
+			partitioningTextInputInputs.forEach(input => {
+				const id = input.id;
+				const val = input.value.trim();
+				const mgId = input.dataset.mgId;
+				if (id.includes('Name')) {
+					const isValid = /^[a-z0-9-]+$/.test(val);
+					if (!isValid) {
+						alert(`Invalid microgrid name: ${val}. Please use only lowercase alphanumeric characters or dashes.`);
+						return;
+					}
+					if (mgNames.has(val)) {
+						alert(`Duplicate microgrid name: ${val}. Please provide unique names.`);
+						hasDuplicates = true;
+						return;
+					}
+					mgNames.add(val);
+					PARTITION_PARAMS.mg_name[mgId] = val;
+				} else if (id.includes('GenObsExisting')) {
+					PARTITION_PARAMS.gen_obs_existing[mgId] = val;
 				} else if (id.includes('GenBus')) {
-					MICROGRIDS.gen_bus ??= {};
-					MICROGRIDS.gen_bus[mg] = val;
-				} else {
-					MICROGRIDS.switch ??= {};
-					MICROGRIDS.switch[mg] = [String(val)];
+					PARTITION_PARAMS.gen_bus[mgId] = val;
+				} else if (id.includes('Switch')) {
+					PARTITION_PARAMS.switch[mgId] = val;
 				}
-			})
-		} else if (($('#circuitPostCreation').length) && (method == '')) {
-			var MICROGRIDS = JSON.parse('{{ in_data.MICROGRIDS | tojson | safe }}');
+			});
+		} else if (($('#circuitPostCreation').length) && (selectedPartitioningMethod == '')) {
+			PARTITION_PARAMS = JSON.parse('{{ in_data.MICROGRIDS | tojson | safe }}');
 		}
-		form1.append('MICROGRIDS',JSON.stringify(MICROGRIDS));
+		form1.append('PARTITION_PARAMS',JSON.stringify(PARTITION_PARAMS));
 		// Append mgQuantity. 
 		const mgQuantity = document.getElementById('minQuantMgs').value || document.getElementById('mgQuantBranch').value || 0; // new_nx_group_branch.
 		form1.append('mgQuantity',mgQuantity);
@@ -1121,8 +1188,8 @@
 		// Clone partitioning div for resetting.
 		var stepThreeClone = $("#stepThree").clone();
 		// Attach event handlers for partitioning, dropdown creation, and partition button behavior.
-		attachPartitioningEventHandler();
-		attachDropdownsEventHandler();
+		attachPartitioningSelectEventHandler();
+		attachManualPartitioningEventHandler();
 		attachPartitionButtonEventHandler();
 
 		// Add Remove File buttons for previously uploaded inputs.
@@ -1151,8 +1218,8 @@
 				// Reset previous partitioning.
 				$("#stepThree").replaceWith(stepThreeClone.clone());
 				// Reattach partitioning, dropdown creation, and partition button event handler. 
-				attachPartitioningEventHandler();
-				attachDropdownsEventHandler();
+				attachPartitioningSelectEventHandler();
+				attachManualPartitioningEventHandler();
 				attachPartitionButtonEventHandler();
 			}
 		});
@@ -1316,15 +1383,19 @@
 				const critLoadsParagraph = document.createElement('p');
 				critLoadsParagraph.textContent = 'Please select all critical loads:';
 				critLoadsContainer.appendChild(critLoadsParagraph);
-				// Clear previous content and add loads to dropdowns (shown if user chooses manual partitioning).
-				const dropDownsContainer = document.getElementById('dropDowns');
-				dropDownsContainer.innerHTML = '';
-				dropDownsContainer.style.display = 'none';
+				// Clear previous content and add loads to manualpartitioningcontainer (shown if user chooses manual partitioning).
+				const manualPartitioningContainer = document.getElementById('manualPartitioningContainer');
+				manualPartitioningContainer.innerHTML = '';
+				manualPartitioningContainer.style.display = 'none';
 				// Form element for checkboxes.
 				const criticalLoadsSelect = document.createElement('form');
 				criticalLoadsSelect.id = 'criticalLoadsSelect';
 				criticalLoadsSelect.classList.add('chunk');
 				critLoadsContainer.appendChild(criticalLoadsSelect);
+				// Create a div to house load assignment dropdown menus.
+				const loadAssignmentContainer = document.createElement('div');
+				loadAssignmentContainer.id = 'loadAssignmentContainer';
+				manualPartitioningContainer.appendChild(loadAssignmentContainer);
 				// Create checkboxes and labels for each load.
 				for (let i = 0; i < loads.length; i++) {
 					const label = document.createElement('label');
@@ -1335,15 +1406,16 @@
 					label.appendChild(checkbox);
 					label.appendChild(document.createTextNode(loads[i]));
 					criticalLoadsSelect.appendChild(label);
-					// Add a dropdown to dropDowns.
+					// Add a dropdown to loadAssignmentContainer.
 					const dropdownLabel = document.createElement('label');
 					dropdownLabel.style.display = 'inline-block';
 					dropdownLabel.style.paddingRight = '8px';
 					const dropdown = document.createElement('select');
 					dropdown.style.marginRight = '3px';
+					dropdown.dataset.loadId = loads[i];
 					dropdownLabel.appendChild(dropdown);
 					dropdownLabel.appendChild(document.createTextNode(loads[i]));
-					dropDownsContainer.appendChild(dropdownLabel);
+					loadAssignmentContainer.appendChild(dropdownLabel);
 				}
 				// Handle the case where there are no loads.
 				if (loads.length === 0) {
@@ -1353,7 +1425,7 @@
 
 					const noLoadsMessage2 = document.createElement('p');
 					noLoadsMessage2.textContent = 'No loads to assign to microgrids.';
-					dropDownsContainer.appendChild(noLoadsMessage2);
+					manualPartitioningContainer.appendChild(noLoadsMessage2);
 				}
 				window.filename = responseJson.filename; // Set filename.
 				const modelDirInput = document.querySelector('input[name="MODEL_DIR"]');

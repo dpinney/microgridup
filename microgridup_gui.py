@@ -1,4 +1,4 @@
-import base64, io, json, multiprocessing, os, platform, shutil, datetime, time, markdown, re
+import base64, io, json, multiprocessing, os, platform, shutil, datetime, time, markdown, re, traceback
 from pathlib import Path
 from subprocess import Popen
 from collections import OrderedDict
@@ -39,7 +39,7 @@ def handle_cycle_detected_error(error):
 	response = jsonify(message=str(error), error=error.__class__.__name__)
 	response.status_code = 422
 	return response
-	
+
 @app.errorhandler(400)
 def bad_request(error):
 	response = jsonify(message=str(error), error=error.__class__.__name__)
@@ -55,6 +55,13 @@ def not_found(error):
 @app.errorhandler(500)
 def internal_server_error(error):
 	response = jsonify(message=str(error), error=error.__class__.__name__)
+	response.status_code = 500
+	return response
+
+@app.errorhandler(Exception) # Should catch any unexpected errors.
+def handle_unexpected_error(error):
+	traceback.print_exc()
+	response = jsonify(message=f'Unexpected server error of type {error.__class__.__name__}')
 	response.status_code = 500
 	return response
 
@@ -337,21 +344,21 @@ def uploadDss():
 	on_edit_flow = request.form['onEditFlow']
 	if on_edit_flow == 'false':
 		if os.path.isdir(f'{microgridup.PROJ_DIR}/{model_dir}'):
-			return jsonify(error=f'A model named "{model_dir}" already exists. Please choose a different Model Name.'), 400 # Name was already taken.
+			raise ValueError(f'A model named "{model_dir}" already exists. Please choose a different Model Name.')
 	# Check if the post request has the file part.
 	if 'BASE_DSS_NAME' not in request.files:
-		return jsonify(error='No file part'), 400  # Return a JSON response with 400 Bad Request status.
+		raise ValueError('No file part.')
 	file = request.files['BASE_DSS_NAME']
 	# If the user does not select a file, the browser submits an empty file without a filename.
 	if file.filename == '':
-		return jsonify(error='No selected file'), 400  # Return a JSON response with 400 Bad Request status.
+		raise ValueError('No selected file.')
 	if file and allowed_file(file.filename):
 		if not os.path.isdir(f'{microgridup.MGU_DIR}/uploads'):
 			os.mkdir(f'{microgridup.MGU_DIR}/uploads')
 		file.save(f'{microgridup.MGU_DIR}/uploads/BASE_DSS_{model_dir}')
 		loads = getLoads(f'{microgridup.MGU_DIR}/uploads/BASE_DSS_{model_dir}')
 		return jsonify(loads=loads, filename=f'{microgridup.MGU_DIR}/uploads/BASE_DSS_{model_dir}')
-	return jsonify(error='Invalid file'), 400  # Return a JSON response with 400 Bad Request status for invalid files.
+	raise ValueError('Invalid file.')
 
 @app.route('/getLoadsFromExistingFile', methods=['POST'])
 def getLoadsFromExistingFile():
@@ -368,7 +375,11 @@ def previewOldPartitions():
 	filename = f'{microgridup.PROJ_DIR}/{model_dir}/circuit.dss'
 	MICROGRIDS = request_json['MICROGRIDS']
 	CRITICAL_LOADS = request_json['CRITICAL_LOADS']
-	omd = dssConvert.dssToOmd(filename, '', RADIUS=0.0004, write_out=False)
+	# Convert to omd to give coordinates to important grid items. Save in static directory.
+	output_dir = os.path.join('static', 'preview_partition_maps', model_dir)
+	os.makedirs(output_dir, exist_ok=True)
+	omd_path = os.path.join(output_dir, 'preview_old_partitions_omd.omd')
+	omd = dssConvert.dssToOmd(filename, omd_path, RADIUS=0.0004, write_out=True)
 	G = dssConvert.dss_to_networkx(filename, omd=omd)
 	parts = []
 	for mg in MICROGRIDS:
@@ -392,19 +403,19 @@ def previewOldPartitions():
 		pos = nice_pos(G)
 		# Remove elements like 'clear' and 'set' which have no edges to other nodes.
 		remove_nodes_without_edges(G)
-	# Make and save plot, convert to base64 hash, send to frontend.
-	plt.switch_backend('Agg')
-	plt.figure(figsize=(14,12), dpi=350)
-	# Add here later: function to convert MICROGRIDS to algo_params[pairings] for passing to manual_groups(). Would be more accurate when passed to node_group_map() than parts.
-	n_color_map = node_group_map(G, parts)
-	edge_color_map = ['black' if node in CRITICAL_LOADS else 'none' for node in G.nodes()]
-	nx.draw(G, with_labels=True, pos=pos, node_color=n_color_map, edgecolors=edge_color_map, linewidths=2)
-	# nx.draw(G, with_labels=True, pos=pos, node_color=n_color_map)
-	pic_IObytes = io.BytesIO()
-	plt.savefig(pic_IObytes,  format='png')
-	pic_IObytes.seek(0)
-	pic_hash = base64.b64encode(pic_IObytes.getvalue()).decode('utf-8')
-	return jsonify({'pic_hash': pic_hash, 'MICROGRIDS': MICROGRIDS})
+	# Embed the map. 
+	microgrids_as_mapping_proxy_type = microgridup.get_immutable_dict(MICROGRIDS)
+	critical_loads_as_tuple = tuple(CRITICAL_LOADS)
+	out = microgridup.colorby_mgs(omd_path, microgrids_as_mapping_proxy_type, critical_loads_as_tuple)
+	# Need to reopen omd from file since saved file is different from return variable.
+	omd_from_file = json.load(open(omd_path))
+	omd_from_file['attachments'] = out
+	with open(omd_path, 'w+') as out_file:
+		json.dump(omd_from_file, out_file, indent=4)
+	geo.map_omd(omd_path, output_dir, open_browser=False)
+	map_html_file = os.path.join(output_dir, 'geoJson_offline.html')
+	map_url = url_for('static', filename=f'preview_partition_maps/{model_dir}/{os.path.basename(map_html_file)}')
+	return jsonify({'map_url': map_url, 'MICROGRIDS': MICROGRIDS})
 
 def build_pos_from_omd(omd):
 	'''
@@ -564,18 +575,22 @@ def run():
 	# - Format faulted lines
 	data['FAULTED_LINES'] = data['FAULTED_LINES'].split(',')
 	# - Create microgrids here and not in microgridup.main because it's easier to format the testing data
-	data['MICROGRIDS'] = _get_microgrids(data['CRITICAL_LOADS'], data['MG_DEF_METHOD'], data['mgQuantity'], data['BASE_DSS'], data['MICROGRIDS'])
+	data['MICROGRIDS'] = _get_microgrids(data['CRITICAL_LOADS'], data['MG_DEF_METHOD'], data['mgQuantity'], data['BASE_DSS'], data['PARTITION_PARAMS'])
 	if len(list(data['MICROGRIDS'].keys())) == 0:
 		# - I'm assuming that if this is true, then the front-end allowed bad data to be sent, so we should inform the user
-		return jsonify(message='No microgrids were defined. The model run was aborted.'), 400
+		raise ValueError('No microgrids were defined. The model run was aborted.')
 	# - Each microgrid needs to store knowledge of parameter overrides to support auto-filling the parameter override wigdet during an edit of a model
 	data['mgParameterOverrides'] = json.loads(data['mgParameterOverrides'])
-	for mg_name, mg_parameter_overrides in data['mgParameterOverrides'].items():
+	# Need to use custom mg_names to parse mgParameterOverrides dictionary.
+	mg_name_dict = json.loads(data['PARTITION_PARAMS'])['mg_name'] if data['MG_DEF_METHOD'] in ('manual', 'loadGrouping') else None
+	for mg_id, mg_parameter_overrides in data['mgParameterOverrides'].items():
+		mg_name = mg_name_dict[mg_id] if mg_name_dict and mg_name_dict[mg_id] else mg_id
 		data['MICROGRIDS'][mg_name]['parameter_overrides'] = mg_parameter_overrides
 	# - Remove form keys that are not needed past this point
 	del data['MG_DEF_METHOD']
 	del data['mgQuantity']
 	del data['mgParameterOverrides']
+	del data['PARTITION_PARAMS']
 	# Kickoff the run
 	new_proc = multiprocessing.Process(target=microgridup.main, args=(data,))
 	new_proc.start()
@@ -709,7 +724,7 @@ def _get_reopt_inputs(data):
 		del data[k]
 	return reopt_inputs
 
-def _get_microgrids(critical_loads, partition_method, quantity, dss_path, microgrids):
+def _get_microgrids(critical_loads, partition_method, quantity, dss_path, partition_params_json):
 	'''
 	:param critical_loads: a list of critical loads
 	:type critical_loads: list
@@ -719,8 +734,8 @@ def _get_microgrids(critical_loads, partition_method, quantity, dss_path, microg
 	:type quantity: int
 	:param dss_path: the path to the DSS file
 	:type dss_path: str
-	:param microgrids: a str of microgrids
-	:type microgrids: str
+	:param partition_params_json: a str of optional parameters
+	:type partition_params_json: str
 	:return: a dict of microgrids
 	:rtype: dict
 	'''
@@ -728,11 +743,11 @@ def _get_microgrids(critical_loads, partition_method, quantity, dss_path, microg
 	assert isinstance(partition_method, str)
 	assert isinstance(quantity, int)
 	assert isinstance(dss_path, str)
-	assert isinstance(microgrids, str)
+	assert isinstance(partition_params_json, str)
 	G = dssConvert.dss_to_networkx(dss_path)
 	omd = dssConvert.dssToOmd(dss_path, '', RADIUS=0.0004, write_out=False)
 	if partition_method == 'lukes':
-		mg_groups = form_mg_groups(G, critical_loads, 'lukes', algo_params)
+		mg_groups = form_mg_groups(G, critical_loads, 'lukes', json.loads(partition_params_json))
 		microgrids = form_microgrids(G, mg_groups, omd)
 	elif partition_method == 'branch':
 		mg_groups = form_mg_groups(G, critical_loads, 'branch')
@@ -744,15 +759,15 @@ def _get_microgrids(critical_loads, partition_method, quantity, dss_path, microg
 		mg_groups = form_mg_groups(G, critical_loads, 'criticalLoads', algo_params={'num_mgs':quantity})
 		microgrids = form_microgrids(G, mg_groups, omd)
 	elif partition_method == 'loadGrouping':
-		algo_params = json.loads(microgrids)
+		algo_params = json.loads(partition_params_json)
 		mg_groups = form_mg_groups(G, critical_loads, 'loadGrouping', algo_params)
-		microgrids = form_microgrids(G, mg_groups, omd, switch=algo_params.get('switch', None), gen_bus=algo_params.get('gen_bus', None))
+		microgrids = form_microgrids(G, mg_groups, omd, switch_dict=algo_params.get('switch', None), gen_bus_dict=algo_params.get('gen_bus', None), mg_name_dict=algo_params.get('mg_name', None))
 	elif partition_method == 'manual':
-		algo_params = json.loads(microgrids)
+		algo_params = json.loads(partition_params_json)
 		mg_groups = form_mg_groups(G, critical_loads, 'manual', algo_params)
-		microgrids = form_microgrids(G, mg_groups, omd, switch=algo_params.get('switch', None), gen_bus=algo_params.get('gen_bus', None))
+		microgrids = form_microgrids(G, mg_groups, omd, switch_dict=algo_params.get('switch', None), gen_bus_dict=algo_params.get('gen_bus', None), mg_name_dict=algo_params.get('mg_name', None))
 	elif partition_method == '':
-		microgrids = json.loads(microgrids)
+		microgrids = json.loads(partition_params_json)
 	return microgrids
 
 def allowed_file(filename):

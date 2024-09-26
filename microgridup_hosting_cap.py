@@ -175,16 +175,16 @@ def run_hosting_capacity():
 	df = pd.DataFrame(kw_capacity_per_bus)
 	df['load_kw'] = df.apply(lambda row: kw_load_and_gen_per_bus[row['bus']].get('load', 0), axis=1)
 	df['generation_kw'] = df.apply(lambda row: kw_load_and_gen_per_bus[row['bus']].get('generation', 0), axis=1)
-	non_violation_rows = df[(df['thermal_violation'] == False) & (df['voltage_violation'] == False)]
-	voltage_violation_rows = df[(df['thermal_violation'] == False) & (df['voltage_violation'] == True)]
-	thermal_violation_rows = df[(df['thermal_violation'] == True) & (df['voltage_violation'] == False)]
-	duel_violation_rows = df[(df['thermal_violation'] == True) & (df['voltage_violation'] == True)]
+	non_violation_rows = df[(df['thermally_limited'] == False) & (df['voltage_limited'] == False)]
+	voltage_limited_rows = df[(df['thermally_limited'] == False) & (df['voltage_limited'] == True)]
+	thermally_limited_rows = df[(df['thermally_limited'] == True) & (df['voltage_limited'] == False)]
+	duel_violation_rows = df[(df['thermally_limited'] == True) & (df['voltage_limited'] == True)]
 	fig = go.Figure(data=[
 		go.Bar(name='Bus Existing kW Load', x=df['bus'], y=df['load_kw'], marker_color='purple', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Existing kW Load: %{y}'])),
 		go.Bar(name='Bus Existing kW Generation', x=df['bus'], y=df['generation_kw'], marker_color='blue', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Existing kW Generation: %{y}'])),
 		go.Bar(name='Bus Max kW Capacity', x=non_violation_rows['bus'], y=non_violation_rows['max_kw'], marker_color='green', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Max kW Capacity: %{y}'])),
-		go.Bar(name='Bus Voltage Violation kW', x=voltage_violation_rows['bus'], y=voltage_violation_rows['max_kw'], marker_color='yellow', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Voltage Violation kW: %{y}'])),
-		go.Bar(name='Bus Thermal Violation kW', x=thermal_violation_rows['bus'], y=thermal_violation_rows['max_kw'], marker_color='orange', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Thermal Violation kW: %{y}'])),
+		go.Bar(name='Bus Voltage Violation kW', x=voltage_limited_rows['bus'], y=voltage_limited_rows['max_kw'], marker_color='yellow', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Voltage Violation kW: %{y}'])),
+		go.Bar(name='Bus Thermal Violation kW', x=thermally_limited_rows['bus'], y=thermally_limited_rows['max_kw'], marker_color='orange', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Thermal Violation kW: %{y}'])),
 		go.Bar(name='Bus Voltage and Thermal Violation kW', x=duel_violation_rows['bus'], y=duel_violation_rows['max_kw'], marker_color='red', hovertemplate='<br>'.join(['bus: %{x}', 'Bus Voltage and Thermal Violation kW: %{y}']))])
 	fig.update_layout(
 		title='Traditional Hosting Capacity By Bus',

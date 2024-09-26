@@ -40,7 +40,7 @@ def run_reopt(data, logger, invalidate_cache):
 	for mg_name in data['MICROGRIDS']:
 		process_argument_lists.append([data, mg_name, logger, invalidate_cache])
 		# - Uncomment to run in single-process mode
-		#_run(immutable_data, mg_name, logger, invalidate_cache)
+		# _run(immutable_data, mg_name, logger, invalidate_cache)
 	# - Uncomment to run in multiprocessing mode
 	with concurrent.futures.ProcessPoolExecutor() as executor:
 		future_list = []

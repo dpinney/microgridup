@@ -1058,7 +1058,7 @@ class CircuitUserControlsView {
         const span = document.createElement('span');
         button.append(span);
         span.textContent = 'Submit circuit';
-        button.addEventListener('click', (e) => {
+        button.addEventListener('click', async (e) => {
             // - Don't let form be submitted
             e.preventDefault();
             // - Check if there are any caution divs. Technically, only the circuit builder names and properties and model name need to be valid
@@ -1086,49 +1086,85 @@ class CircuitUserControlsView {
             // Recognize if we're on the edit flow. If we are not, backend should search data/projects for model_dir and return error if it already exists.
             formData.append('onEditFlow',window.onEditFlow);
             const that = this;
-            $.ajax({
-                url: '/wizard_to_dss',
-                type: 'POST',
-                contentType: false,
-                data: formData,
-                processData : false,
-                success: function(data) {
-                    // - Global variable!
-                    window.circuitIsSpecified = true;
-                    const loads = data.loads;
-                    $('#critLoads').empty();
-                    $('#critLoads').append('<p>Please select all critical loads:</p>')
-                    $('#dropDowns').empty();
-                    $('#dropDowns').hide();
-                    jQuery('<form>', {
-                        id: 'criticalLoadsSelect',
-                        class: 'chunk'
-                    }).appendTo('#critLoads');
-                    for (let i=0; i<loads.length; i++) {
-                        $('#criticalLoadsSelect').append('<label><input type="checkbox">'+loads[i]+'</label>')
-                        $('#dropDowns').append('<label><select></select> '+loads[i]+'</label><br>')
-                    }
-                    if (loads.length === 0) {
-                        $('#criticalLoadsSelect').append('<p>No loads to select from.</p>')
-                        $('#dropDowns').append('<p>No loads to assign to microgrids.</p>')
-                    }
-                    // Global variable!
-                    window.filename = data.filename;
-                    // Make directory uneditable.
-                    $('input[name="MODEL_DIR"]').prop("readonly", true);
-                    // Enable partition selector.
-                    $('#previewPartitionsButton').prop('disabled', false);
-                    $('#partitionMethod').prop('disabled', false);
-                    that.modal.setBanner('', ['hidden']);
-                    document.getElementById('partitionMethod').dispatchEvent(new Event('change')); // Manually trigger dropdown select menu change to potentially refresh partition method descriptions (manual is different dependent on wizard vs upload).
-                },
-                error: function(data) {
-                    that.modal.setBanner(data.responseJSON.error, ['caution']);
-                    setTimeout(() => {
-                        that.modal.setBanner('', ['hidden']);
-                    }, 5000)
+            try {
+                const response = await fetch('/wizard_to_dss', {
+                    method: 'POST',
+                    body: formData
+                });
+                const responseJson = await response.json();
+                if (!response.ok) {
+                    throw new Error(responseJson.message);
                 }
-            });
+                // Enable partition selector.
+				document.getElementById('previewPartitionsButton').disabled = false;
+				document.getElementById('partitionMethod').disabled = false;
+				window.circuitIsSpecified = true; // - Global variable!
+				const loads = responseJson.loads;
+                // Clear critLoads.
+				const critLoadsContainer = document.getElementById('critLoads');
+				critLoadsContainer.innerHTML = '';
+                // Instructions for critLoads.
+				const critLoadsParagraph = document.createElement('p');
+				critLoadsParagraph.textContent = 'Please select all critical loads:';
+				critLoadsContainer.appendChild(critLoadsParagraph);
+                // Clear previous content and add loads to manualpartitioningcontainer (shown if user chooses manual partitioning).
+				const manualPartitioningContainer = document.getElementById('manualPartitioningContainer');
+				manualPartitioningContainer.innerHTML = '';
+				manualPartitioningContainer.style.display = 'none';
+                // Form element for checkboxes.
+				const criticalLoadsSelect = document.createElement('form');
+				criticalLoadsSelect.id = 'criticalLoadsSelect';
+				criticalLoadsSelect.classList.add('chunk');
+				critLoadsContainer.appendChild(criticalLoadsSelect);
+                // Create a div to house load assignment dropdown menus.
+				const loadAssignmentContainer = document.createElement('div');
+				loadAssignmentContainer.id = 'loadAssignmentContainer';
+				manualPartitioningContainer.appendChild(loadAssignmentContainer);
+                // Create checkboxes and labels for each load.
+				for (let i = 0; i < loads.length; i++) {
+					const label = document.createElement('label');
+					label.style.display = 'inline-block';
+					label.style.paddingRight = '5px';
+					const checkbox = document.createElement('input');
+					checkbox.type = 'checkbox';
+					label.appendChild(checkbox);
+					label.appendChild(document.createTextNode(loads[i]));
+					criticalLoadsSelect.appendChild(label);
+					// Add a dropdown to loadAssignmentContainer.
+					const dropdownLabel = document.createElement('label');
+					dropdownLabel.style.display = 'inline-block';
+					dropdownLabel.style.paddingRight = '8px';
+					const dropdown = document.createElement('select');
+					dropdown.style.marginRight = '3px';
+					dropdown.dataset.loadId = loads[i];
+					dropdownLabel.appendChild(dropdown);
+					dropdownLabel.appendChild(document.createTextNode(loads[i]));
+					loadAssignmentContainer.appendChild(dropdownLabel);
+				}
+                // Handle the case where there are no loads.
+				if (loads.length === 0) {
+					const noLoadsMessage1 = document.createElement('p');
+					noLoadsMessage1.textContent = 'No loads to select from.';
+					criticalLoadsSelect.appendChild(noLoadsMessage1);
+
+					const noLoadsMessage2 = document.createElement('p');
+					noLoadsMessage2.textContent = 'No loads to assign to microgrids.';
+					manualPartitioningContainer.appendChild(noLoadsMessage2);
+				}
+                window.filename = responseJson.filename; // Set filename. // Global variable!
+                const modelDirInput = document.querySelector('input[name="MODEL_DIR"]');
+				if (modelDirInput) {
+					modelDirInput.readOnly = true; // Make the directory input uneditable.
+				}
+                that.modal.setBanner('', ['hidden']);
+                document.getElementById('partitionMethod').dispatchEvent(new Event('change')); // Manually trigger dropdown select menu change to potentially refresh partition method descriptions (manual partitioning description differs dependent on wizard vs upload).
+            } catch (error) {
+                that.modal.setBanner(data.responseJSON.error, ['caution']);
+                setTimeout(() => {
+                    that.modal.setBanner('', ['hidden']);
+                }, 5000)
+                alert(error);
+            }
         });
         modal.divElement.append(div);
     }

@@ -20,39 +20,39 @@
                 "670b_residential2",
                 "670c_residential2"
             ],
-            "Mg0": [
+            "mg0": [
                 "634a_data_center",
                 "634b_radar",
                 "634c_atc_tower"
             ],
-            "Mg1": [
+            "mg1": [
                 "675a_hospital",
                 "675b_residential1",
                 "675c_residential1"
             ],
-            "Mg2": [
+            "mg2": [
                 "645_hangar",
                 "646_office"
             ]
         },
         "gen_obs_existing": {
-            "Mg0": "solar_634_existing,battery_634_existing",
-            "Mg1": "fossil_675_existing",
-            "Mg2": ""
+            "mg0": "solar_634_existing,battery_634_existing",
+            "mg1": "fossil_675_existing",
+            "mg2": ""
         },
         "gen_bus": {
-            "Mg0": "634",
-            "Mg1": "675",
-            "Mg2": "646"
+            "mg0": "634",
+            "mg1": "675",
+            "mg2": "646"
         },
         "switch": {
-            "Mg0": [
+            "mg0": [
                 "632633"
             ],
-            "Mg1": [
+            "mg1": [
                 "671692"
             ],
-            "Mg2": [
+            "mg2": [
                 "632645"
             ]
         }

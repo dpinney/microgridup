@@ -510,52 +510,57 @@
 	}
 
 	/** Check if a .file-input (can be a file input or read-only text input) has a value and show/hide the associated Remove File button. */
-	function toggleRemoveButton(chunk, btnElement) {
-		const fileInput = $(chunk).find('input.file-input');
-		const removeBtn = $(chunk).find('button.remove-btn');
-		const uploadedFile = $(fileInput).data('uploaded');
-		const isNoneValue = uploadedFile === 'None';
-		if ($(fileInput).val() || (uploadedFile && !isNoneValue) || (uploadedFile && $(fileInput).attr('type') === 'text')) {
-			// Show the Remove File button if there is a file input value or uploadedFile is not 'None'. Also show the Remove File button if there is a non-empty uploadedFile value and the file input is a read-only text input.
-			removeBtn.show();
-		} else {
-			removeBtn.hide();
-			// Modify the behavior when the Remove File button is clicked for pre-Jinja'd file uploads (read-only text input).
-			if ($(fileInput).attr('type') === 'text') {
-				if ($(fileInput).attr('name') === 'LOAD_CSV_NAME') {
-					var nameAttribute = 'LOAD_CSV';
-					chunk[0].replaceChildren(window.csvLoadParser.modal.divElement);
-					const removeBtn = $(chunk).find('button.remove-btn');
-					removeBtn.hide();
-				} else {
-					const oldNameAttribute = $(fileInput).attr('name');
-					var nameAttribute = oldNameAttribute;
-					var fileType = oldNameAttribute == 'BASE_DSS_NAME' ? '.dss' : '.csv';
-					// Replace the read-only text input with a new file input.
-					const newFileInput = $('<input type="file" class="file-input">').attr('name', nameAttribute).attr('accept', fileType);
-					fileInput.replaceWith(newFileInput);
-					// Set up the new file input for further functionality.
-					newFileInput.on('change', function () {
-						toggleRemoveButton(chunk, this);
-					});
-					toggleRemoveButton(chunk, newFileInput);
-					// Show the upload button if user wants to upload new circuit.
-					$('#upload-file-btn').show();
+	function toggleRemoveButton(chunk) {
+		const fileInput = chunk.querySelector('input.file-input');
+		const removeBtn = chunk.querySelector('button.remove-btn');
+		if (fileInput) {
+			const uploadedFile = fileInput.getAttribute('data-uploaded');
+			const isNoneValue = uploadedFile === 'None';
+			if (fileInput.value || (uploadedFile && !isNoneValue) || (uploadedFile && fileInput.getAttribute('type') === 'text')) {
+				// Show the Remove File button if there is a file input value or uploadedFile is not 'None'. Also show the Remove File button if there is a non-empty uploadedFile value and the file input is a read-only text input.
+				removeBtn.style.display = 'inline-block';
+			} else {
+				removeBtn.style.display = 'none';
+				// Modify the behavior when the Remove File button is clicked for pre-Jinja'd file uploads (read-only text input).
+				if (fileInput.getAttribute('type') === 'text') {
+					if (fileInput.getAttribute('name') === 'LOAD_CSV_NAME') {
+						const nameAttribute = 'LOAD_CSV';
+						chunk.replaceChildren(window.csvLoadParser.modal.divElement);
+						const removeBtn = chunk.querySelector('button.remove-btn');
+						removeBtn.style.display = 'none';
+					} else {
+						const oldNameAttribute = fileInput.getAttribute('name');
+						const nameAttribute = oldNameAttribute;
+						const fileType = oldNameAttribute === 'BASE_DSS_NAME' ? '.dss' : '.csv';
+						// Replace the read-only text input with a new file input.
+						const newFileInput = document.createElement('input');
+						newFileInput.setAttribute('type', 'file');
+						newFileInput.classList.add('file-input');
+						newFileInput.setAttribute('name', nameAttribute);
+						newFileInput.setAttribute('accept', fileType);
+						fileInput.replaceWith(newFileInput);
+						// Set up the new file input for further functionality
+						newFileInput.addEventListener('change', function () {
+							toggleRemoveButton(chunk);
+						});
+						toggleRemoveButton(chunk);
+						// Show the upload button if user wants to upload new circuit
+						document.getElementById('upload-file-btn').style.display = 'inline-block';
+					}
 				}
-			};
+			}
 		}
 	}
 
 	/** Limit description text. */
 	function limitTextareaCharacters() {
-		var textarea = $('#DESCRIPTION')[0];
-		var characterCount = $('#characterCount')[0];
-		var text = textarea.value;
-		var remainingCharacters = 140 - text.length;
-		if (remainingCharacters < 0) {
-			// Trim the text if it exceeds the character limit.
+		const textarea = document.getElementById('DESCRIPTION');
+		const characterCount = document.getElementById('characterCount');
+		let text = textarea.value;
+		// Trim the text if it exceeds the character limit.
+		if (text.length > 140) {
 			textarea.value = text.substr(0, 140);
-			remainingCharacters = 0;
+			text = textarea.value;
 		}
 		characterCount.textContent = text.length + " / 140";
 	}
@@ -1184,137 +1189,150 @@
 	window.filename = '';
 	window.onEditFlow = false;
 
-	$(document).ready(function() {
+	document.addEventListener('DOMContentLoaded', function() {
 		// Clone partitioning div for resetting.
-		var stepThreeClone = $("#stepThree").clone();
+		const stepThreeClone = document.getElementById('stepThree').cloneNode(true);
 		// Attach event handlers for partitioning, dropdown creation, and partition button behavior.
 		attachPartitioningSelectEventHandler();
 		attachManualPartitioningEventHandler();
 		attachPartitionButtonEventHandler();
 
 		// Add Remove File buttons for previously uploaded inputs.
-		$('.chunk').each(function () {
-			toggleRemoveButton(this);
+		const chunks = document.querySelectorAll('.chunk');
+		chunks.forEach(function(chunk) {
+			toggleRemoveButton(chunk);
 		});
 
 		// Add click event listeners to the Remove File buttons.
-		$(document).on('click', 'button.remove-btn', function () {
-			const chunk = $(this).closest('.chunk');
-			const fileInput = chunk.find('input.file-input');
-			// Clear the file input value and hide the Remove File button.
-			fileInput.val('');
-			$(this).hide();
-			toggleRemoveButton(chunk, this);
+		document.addEventListener('click', function(event) {
+			if (event.target.matches('button.remove-btn')) {
+				const chunk = event.target.closest('.chunk');
+				const fileInput = chunk.querySelector('input.file-input');
+				// Clear the file input value and hide the Remove File button.
+				fileInput.value = '';
+				event.target.style.display = 'none';
+				toggleRemoveButton(chunk);
 
-			// Special behavior if user removes circuit.
-			if ($(this).attr('id') == 'remove-circuit-button') {
-				$('#wizard').prop('disabled', false);
-				// Clear critical loads select and reset partitioning.
-				$('#critLoads').empty();
-				$('#stepThree').show();
-				$('#oldPartitionDiv').hide();
-				$('#previewPartitionsButton').prop('disabled', false);
-				$('#partitionMethod').prop('disabled', false);
-				// Reset previous partitioning.
-				$("#stepThree").replaceWith(stepThreeClone.clone());
-				// Reattach partitioning, dropdown creation, and partition button event handler. 
-				attachPartitioningSelectEventHandler();
-				attachManualPartitioningEventHandler();
-				attachPartitionButtonEventHandler();
+				// Special behavior if the user removes the circuit.
+				if (event.target.id === 'remove-circuit-button') {
+					document.getElementById('wizard').disabled = false;
+					// Clear critical loads select and reset partitioning.
+					document.getElementById('critLoads').innerHTML = '';
+					document.getElementById('stepThree').style.display = 'block';
+					document.getElementById('oldPartitionDiv').style.display = 'none';
+					document.getElementById('previewPartitionsButton').disabled = false;
+					document.getElementById('partitionMethod').disabled = false;
+					// Reset previous partitioning.
+					document.getElementById('stepThree').replaceWith(stepThreeClone);
+					// Reattach partitioning, dropdown creation, and partition button event handler.
+					attachPartitioningSelectEventHandler();
+					attachManualPartitioningEventHandler();
+					attachPartitionButtonEventHandler();
+				}
 			}
 		});
 
 		// Function to check if a .file-input has a value and show/hide the associated Remove button after a new file is selected.
-		$(document).on('change', 'input.file-input', function () {
-			const chunk = $(this).closest('.chunk');
-			toggleRemoveButton(chunk);
+		document.addEventListener('change', function(event) {
+			if (event.target.matches('input.file-input')) {
+				const chunk = event.target.closest('.chunk');
+				toggleRemoveButton(chunk);
+			}
 		});
 
 		// Limit characters in description textarea.
-		$("#DESCRIPTION").on("input", limitTextareaCharacters);
+		document.getElementById('DESCRIPTION').addEventListener('input', limitTextareaCharacters);
 		
 		// Enable technology toggling.
 		toggleDivVisibility('solar', 'solarDiv');
 		toggleDivVisibility('battery', 'batteryDiv');
 		toggleDivVisibility('fossil', 'fossilDiv');
 		toggleDivVisibility('wind', 'windDiv');
-		$('#solar').change(function() {
+		document.getElementById('solar').addEventListener('change', function() {
 			toggleDivVisibility('solar', 'solarDiv');
 		});
-		$('#battery').change(function() {
+		document.getElementById('battery').addEventListener('change', function() {
 			toggleDivVisibility('battery', 'batteryDiv');
 		});
-		$('#fossil').change(function() {
+		document.getElementById('fossil').addEventListener('change', function() {
 			toggleDivVisibility('fossil', 'fossilDiv');
 		});
-		$('#wind').change(function() {
+		document.getElementById('wind').addEventListener('change', function() {
 			toggleDivVisibility('wind', 'windDiv');
 		});
 
 		// Enable circuit definition method choice.
-		$("div.desc").hide();
-		[...document.querySelectorAll('input[type="radio"][name="circuit"]')].forEach(input => input.checked = false);
-		$("input[name$='circuit']").click(function() {
-			var test = $(this).val();
-			$("div.desc").hide();
-			$("#circuit" + test).show();
-			if (test === 'Creator') {
-				const circuitElements = [
-					{
-						name: 'substation_1',
-						namespace: 'element',
-						type: 'substation',
-						basekv: 2.4
-					},
-					{
-						name: 'feeder_1',
-						namespace: 'element',
-						type: 'feeder',
-						parent: 'element.substation_1',
-					},
-					{
-						name: 'solar_1',
-						namespace: 'element',
-						type: 'solar',
-						parent: 'element.feeder_1',
-						kw: 440
-					},
-					{
-						name: 'wind_1',
-						namespace: 'element',
-						type: 'wind',
-						parent: 'element.feeder_1',
-						kw: 200
-					},
-					{
-						name: 'fossil_1',
-						namespace: 'element',
-						type: 'fossil',
-						parent: 'element.feeder_1',
-						kw: 265
-					},
-					{
-						name: 'battery_1',
-						namespace: 'element',
-						type: 'battery',
-						parent: 'element.feeder_1',
-						kwh: 307,
-						kw: 79
+		document.querySelectorAll('div.desc').forEach(function(desc) {
+			desc.style.display = 'none';
+		});
+		document.querySelectorAll('input[type="radio"][name="circuit"]').forEach(function(input) {
+			input.checked = false;
+		});
+		document.querySelectorAll('input[name="circuit"]').forEach(function(input) {
+			input.addEventListener('click', function() {
+				const test = input.value;
+				document.querySelectorAll('div.desc').forEach(function(desc) {
+					desc.style.display = 'none';
+				});
+				document.getElementById('circuit' + test).style.display = 'block';
+				if (test === 'Creator') {
+					const circuitElements = [
+						{
+							name: 'substation_1',
+							namespace: 'element',
+							type: 'substation',
+							basekv: 2.4
+						},
+						{
+							name: 'feeder_1',
+							namespace: 'element',
+							type: 'feeder',
+							parent: 'element.substation_1',
+						},
+						{
+							name: 'solar_1',
+							namespace: 'element',
+							type: 'solar',
+							parent: 'element.feeder_1',
+							kw: 440
+						},
+						{
+							name: 'wind_1',
+							namespace: 'element',
+							type: 'wind',
+							parent: 'element.feeder_1',
+							kw: 200
+						},
+						{
+							name: 'fossil_1',
+							namespace: 'element',
+							type: 'fossil',
+							parent: 'element.feeder_1',
+							kw: 265
+						},
+						{
+							name: 'battery_1',
+							namespace: 'element',
+							type: 'battery',
+							parent: 'element.feeder_1',
+							kwh: 307,
+							kw: 79
+						}
+					].map(element => new window.CircuitElement(element));
+					for (const e of circuitElements) {
+						window.circuitModel.addElement(e);
+						// - The CircuitTableView is already a graph observer, so it will become an observer of every new element that is added
+						// - The CircuitUserControlsView is already a graph observer, so it will become an observer of every new element that is added
+						// - The OutageLocationInputview is already a graph observer, so it will become an observer of every new element that is added
 					}
-				].map(element => new window.CircuitElement(element));
-				for (const e of circuitElements) {
-					window.circuitModel.addElement(e);
-					// - The CircuitTableView is already a graph observer, so it will become an observer of every new element that is added
-					// - The CircuitUserControlsView is already a graph observer, so it will become an observer of every new element that is added
-					// - The OutageLocationInputview is already a graph observer, so it will become an observer of every new element that is added
+					window.outageLocationInputView.updateInput();
+				} else {
+					for (const e of window.circuitModel.getElements((e) => e.getProperty('type') === 'substation')) {
+						window.circuitModel.removeElement(e.fullName);
+					}
+					window.outageLocationInputView.setValue("{{','.join(in_data.FAULTED_LINES)}}");
 				}
-				window.outageLocationInputView.updateInput();
-			} else {
-				for (const e of window.circuitModel.getElements((e) => e.getProperty('type') === 'substation')) {
-					window.circuitModel.removeElement(e.fullName);
-				}
-				window.outageLocationInputView.setValue("{{','.join(in_data.FAULTED_LINES)}}");
-			}
+			});
 		});
 		// If user clicked edit, show used circuit.
 		if (document.getElementById('circuitPostCreation')) {

@@ -8,7 +8,6 @@
 	<script src="/static/js/libraries/graphology-library.js"></script>
 	<script src="/static/js/libraries/graphology.js"></script>
 	<script src="/static/js/libraries/papaparse.js"></script>
-	<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 	<script src="https://kit.fontawesome.com/92028f16c4.js" crossorigin="anonymous"></script>
 	<style type="text/css">
 		:root {
@@ -565,15 +564,56 @@
 		characterCount.textContent = text.length + " / 140";
 	}
 
+	/** Meant to emulate jQuery slideUp method. */
+	function slideUp(element, duration = 500) {
+		element.style.transition = `height ${duration}ms ease-in-out`;
+		element.style.height = element.offsetHeight + 'px';
+		element.offsetHeight; // Force reflow
+		element.style.height = 0;
+		element.style.overflow = 'hidden';
+		setTimeout(() => {
+			element.style.display = 'none';
+			element.style.height = '';
+			element.style.overflow = '';
+			element.style.transition = '';
+		}, duration);
+	}
+
+	/** Meant to emulate jQuery slideDown method. */
+	function slideDown(element, duration = 500) {
+		element.style.display = 'block';
+		element.style.height = 0;
+		element.style.overflow = 'hidden';
+		element.style.transition = `height ${duration}ms ease-in-out`;
+		setTimeout(() => {
+			element.style.height = element.scrollHeight + 'px';
+			element.offsetHeight; // Force reflow
+
+			setTimeout(() => {
+				element.style.height = '';
+				element.style.overflow = '';
+				element.style.transition = '';
+			}, duration);
+		}, 0);
+	}
+
 	/** Toggle technology checkboxes. */
 	function toggleDivVisibility(checkboxId, divId) {
 		// - TODO: use actual checkboxes again
-		const checkbox = $(`#${checkboxId}`);
-		const div = $(`#${divId}`);
-		if (checkbox.is(':checked')) {
-			div.slideDown(500);
+		const checkbox = document.getElementById(checkboxId);
+		const div = document.getElementById(divId);
+		if (checkbox.checked) {
+			slideDown(div);
 		} else {
-			div.slideUp(500);
+			slideUp(div);
+		}
+	}
+
+	function slideToggle(element, duration = 500) {
+		if (window.getComputedStyle(element).display === 'none') {
+			slideDown(element, duration);
+		} else {
+			slideUp(element, duration);
 		}
 	}
 
@@ -902,30 +942,31 @@
 
 			document.getElementById('minQuantMgs').value = ''; // Clear input from bottomUp and criticalLoads partitioning.
 			document.getElementById('mgQuantBranch').value = ''; // Clear input from branch partitioning. // new_nx_group_branch.
-			if ((selectedPartitioningMethod == 'loadGrouping') || (selectedPartitioningMethod == 'manual')) {
-				$('#manualPartitioningContainer').hide();
-				$('#partitionManuallyForm').show();
-				$('#makeManuallyPartitioningContainerButton').show();
-				$('#previewPartitionsButton').hide();
-				$('#minQuantMgsForm').hide();
-				$('#branchForm').hide(); // new_nx_group_branch.
-				$('#partitionsPreviewDiv').empty();
+			if (selectedPartitioningMethod === 'loadGrouping' || selectedPartitioningMethod === 'manual') {
+				document.getElementById('manualPartitioningContainer').style.display = 'none';
+				document.getElementById('partitionManuallyForm').style.display = 'block';
+				document.getElementById('makeManuallyPartitioningContainerButton').style.display = 'inline-block';
+				document.getElementById('previewPartitionsButton').style.display = 'none';
+				document.getElementById('minQuantMgsForm').style.display = 'none';
+				document.getElementById('branchForm').style.display = 'none'; // new_nx_group_branch.
+				document.getElementById('partitionsPreviewDiv').innerHTML = '';
+			} else {
+				document.getElementById('partitionManuallyForm').style.display = 'none';
+				document.getElementById('minQuantMgsForm').style.display = 'none';
+				document.getElementById('branchForm').style.display = 'none'; // new_nx_group_branch.
+				document.getElementById('manualPartitioningContainer').style.display = 'none';
+				document.getElementById('previewPartitionsButton').style.display = 'block';
 			}
-			else { 
-				$('#partitionManuallyForm').hide();
-				$('#minQuantMgsForm').hide();
-				$('#branchForm').hide(); // new_nx_group_branch.
-				$('#manualPartitioningContainer').hide();
-				$('#previewPartitionsButton').show();
+			if (selectedPartitioningMethod === 'bottomUp' || selectedPartitioningMethod === 'criticalLoads') {
+				document.getElementById('minQuantMgsForm').style.display = 'block';
+				document.getElementById('makeManuallyPartitioningContainerButton').style.display = 'none';
 			}
-			if (selectedPartitioningMethod == 'bottomUp' || selectedPartitioningMethod == 'criticalLoads') {
-				$('#minQuantMgsForm').show();
-				$('#makeManuallyPartitioningContainerButton').hide();
-			}
-			//if (selectedPartitioningMethod == 'branch') { // Uncomment when transitioning to new_nx_group_branch.
-			//	$('#branchForm').show();
-			//	$('#makeManuallyPartitioningContainerButton').hide();
-			//}
+			// Uncomment when transitioning to new_nx_group_branch.
+			// if (selectedPartitioningMethod === 'branch') {
+			//     document.getElementById('branchForm').style.display = 'block';
+			//     document.getElementById('makeManuallyPartitioningContainerButton').style.display = 'none';
+			// }
+
 		})
 	}
 
@@ -1024,12 +1065,16 @@
 			return 
 		}
 		// Do not proceed if no loads are specified.
-		if ((!$('[name="LOAD_CSV"]').val()) && (!$('[name="LOAD_CSV_NAME"]').val())) {
-			alert('Please specify load data.')
-			return
+		const loadCsvElement = document.querySelector('[name="LOAD_CSV"]');
+		const loadCsvNameElement = document.querySelector('[name="LOAD_CSV_NAME"]');
+		if ((!loadCsvElement || !loadCsvElement.value) && (!loadCsvNameElement || !loadCsvNameElement.value)) {
+			alert('Please specify load data.');
+			return;
 		}
 		// Do not proceed if no partition method is specified.
-		if (($( "#partitionMethod option:selected" ).val() === '') && ($('#oldPartitionDiv').length == 0)) {
+		const partitionMethodValue = document.querySelector("#partitionMethod option:checked").value;
+		const oldPartitionDiv = document.getElementById('oldPartitionDiv');
+		if (partitionMethodValue === '' && (!oldPartitionDiv || oldPartitionDiv.offsetParent === null)) {
 			alert('Please specify a partitioning method.')
 			return 
 		}
@@ -1058,22 +1103,24 @@
 			form1.append('OUTAGES_PATH',outages_path);
 		}
 		// Append CRITICAL_LOADS.
-		critLoads = new Array();
-		$('#criticalLoadsSelect label').each(function() {
-			if ($(this).find('input')[0].checked) {
-				var element = $(this).text();
-				critLoads.push(element);
+		const critLoads = [];
+		document.querySelectorAll('#criticalLoadsSelect label').forEach(label => {
+			const input = label.querySelector('input');
+			if (input && input.checked) {
+				critLoads.push(label.textContent.trim());
 			}
 		});
 		form1.append('CRITICAL_LOADS',JSON.stringify(critLoads));
 		// Append MG_DEF_METHOD. 
 		const selectedPartitioningMethod = document.getElementById('partitionMethod').value;
 		form1.append('MG_DEF_METHOD',selectedPartitioningMethod);
-		// Do not proceed if manual is selected and no partitions are created.
-		if (((selectedPartitioningMethod === 'loadGrouping' && !$('#manualPartitioningContainer').is(':visible'))) || ((selectedPartitioningMethod === 'manual' && !$('#manualPartitioningContainer').is(':visible')))) {
+		// Do not proceed if loadGrouping/manual is selected and no partitions are created.
+		const manualPartitioningContainer = document.getElementById('manualPartitioningContainer');
+		const isManualPartitioningContainerVisible = manualPartitioningContainer && manualPartitioningContainer.offsetParent !== null;
+		if ((selectedPartitioningMethod === 'loadGrouping' && !isManualPartitioningContainerVisible) || (selectedPartitioningMethod === 'manual' && !isManualPartitioningContainerVisible)) {
 			alert('Please enter a number of microgrids and press Go.')
 			return
-		}
+		};
 		// If loadGrouping or manual is selected, append a 'PARTITION_PARAMS' value.
 		let PARTITION_PARAMS = {
 			pairings: {},
@@ -1126,7 +1173,7 @@
 					PARTITION_PARAMS.switch[mgId] = val;
 				}
 			});
-		} else if (($('#circuitPostCreation').length) && (selectedPartitioningMethod == '')) {
+		} else if ((document.getElementById('circuitPostCreation')) && (selectedPartitioningMethod == '')) {
 			PARTITION_PARAMS = JSON.parse('{{ in_data.MICROGRIDS | tojson | safe }}');
 		}
 		form1.append('PARTITION_PARAMS',JSON.stringify(PARTITION_PARAMS));
@@ -1160,9 +1207,8 @@
 		}
 
 		// Show loading indicator.
-		$('#loading-background').show();
-		$("#loading-indicator").show();
-
+		document.getElementById('loading-background').style.display = 'block';
+		document.getElementById('loading-indicator').style.display = 'block';
 		const modelDir = document.querySelector('input[name="MODEL_DIR"]').value;
 		try {
 			const response = await fetch('/run', {
@@ -1354,11 +1400,15 @@
 		}
 
 		// Add tooltip handler to partitioning dropdown.
-		$("#partitionMethod").change(function(event) {
-			$.each($(this).find('option'), function(key, value) {
-				$(value).removeClass('active');
-			})
-			$('option:selected').addClass('active');
+		document.getElementById('partitionMethod').addEventListener('change', function(event) {
+			const options = this.querySelectorAll('option');
+			options.forEach(option => {
+				option.classList.remove('active');
+			});
+			const selectedOption = this.querySelector('option:checked');
+			if (selectedOption) {
+				selectedOption.classList.add('active');
+			}
 		});
 
 		// Upload DSS circuit. Get loads.
@@ -1457,30 +1507,45 @@
 		});
 
 		// Show/hide optional inputs.
-		$('.toggle').click(function() {
-			if ( $(this).hasClass('show') ) {
-				//replace the text
-				$(this).text('Show fewer inputs');
-				//replace the icon
-				$(this).prev('i').removeClass('fa-plus-square').addClass('fa-minus-square');
-				$(this).removeClass('show').addClass('hide');
-			} else {
-				//replace the text
-				$(this).text('Optional inputs');
-				//replace the icon
-				$(this).prev('i').removeClass('fa-minus-square').addClass('fa-plus-square');
-				$(this).removeClass('hide').addClass('show');                
-			}
-			$(this).next('div').slideToggle('500');
+		document.querySelectorAll('.toggle').forEach(toggle => {
+			toggle.addEventListener('click', function() {
+				if (this.classList.contains('show')) {
+					// Replace the text
+					this.textContent = 'Show fewer inputs';
+					// Replace the icon
+					const icon = this.previousElementSibling;
+					if (icon && icon.tagName.toLowerCase() === 'i') {
+						icon.classList.remove('fa-plus-square');
+						icon.classList.add('fa-minus-square');
+					}
+					this.classList.remove('show');
+					this.classList.add('hide');
+				} else {
+					// Replace the text
+					this.textContent = 'Optional inputs';
+					// Replace the icon
+					const icon = this.previousElementSibling;
+					if (icon && icon.tagName.toLowerCase() === 'i') {
+						icon.classList.remove('fa-minus-square');
+						icon.classList.add('fa-plus-square');
+					}
+					this.classList.remove('hide');
+					this.classList.add('show');
+				}
+				const nextDiv = this.nextElementSibling;
+				if (nextDiv && nextDiv.tagName.toLowerCase() === 'div') {
+					slideToggle(nextDiv, 500);
+				}
+			});
 		});
 
 		// Validate forms.
-		$('#submitEverything').click(function() {
-            if ([...document.getElementsByClassName('caution')].length > 0) {
-                alert('Please correct any erroneous inputs with a highlighted error message before submitting your data.');
-            } else {
-                submitEverything();
-            }
+		document.getElementById('submitEverything').addEventListener('click', function() {
+			if (document.getElementsByClassName('caution').length > 0) {
+				alert('Please correct any erroneous inputs with a highlighted error message before submitting your data.');
+			} else {
+				submitEverything();
+			}
 		});
 	});
 	</script>

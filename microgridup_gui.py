@@ -412,7 +412,7 @@ def previewOldPartitions():
 	omd_from_file['attachments'] = out
 	with open(omd_path, 'w+') as out_file:
 		json.dump(omd_from_file, out_file, indent=4)
-	geo.map_omd(omd_path, output_dir, open_browser=False)
+	geo.map_omd(omd_path, output_dir, open_browser=False, showAddNewObjectsButton=False, showAttachmentsButton=False, showAddGeojsonButton=False)
 	map_html_file = os.path.join(output_dir, 'geoJson_offline.html')
 	map_url = url_for('static', filename=f'preview_partition_maps/{model_dir}/{os.path.basename(map_html_file)}')
 	return jsonify({'map_url': map_url, 'MICROGRIDS': MICROGRIDS})
@@ -521,7 +521,7 @@ def previewPartitions():
 	omd_from_file['attachments'] = out
 	with open(omd_path, 'w+') as out_file:
 		json.dump(omd_from_file, out_file, indent=4)
-	geo.map_omd(omd_path, output_dir, open_browser=False)
+	geo.map_omd(omd_path, output_dir, open_browser=False, showAddNewObjectsButton=False, showAttachmentsButton=False, showAddGeojsonButton=False)
 	map_html_file = os.path.join(output_dir, 'geoJson_offline.html')
 	map_url = url_for('static', filename=f'preview_partition_maps/{MODEL_DIR}/{os.path.basename(map_html_file)}')
 	return jsonify({'map_url': map_url, 'MICROGRIDS': MICROGRIDS})

@@ -469,7 +469,7 @@ def colorby_mgs(omd_path, mg_group_dictionary, critical_loads):
 		all_items = list(all_mg_elements[mg_key])
 		for item in all_items:
 			critical_binary = 1 if item in critical_loads else 0
-			output_csv += item + ',' + str(my_color) + ',' + str(critical_binary) + '\n'
+			output_csv += item + ',' + str(mg_key) + ',' + str(critical_binary) + '\n'
 			seen.add(item)
 	# Color all circuit elements that aren't in an mg/critical as 0.
 	for item in all_colorable_elements:

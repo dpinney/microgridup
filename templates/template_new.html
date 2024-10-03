@@ -1123,6 +1123,7 @@
 		};
 		// If loadGrouping or manual is selected, append a 'PARTITION_PARAMS' value.
 		let PARTITION_PARAMS = {
+			ids: new Set(),
 			pairings: {},
 			gen_obs_existing: {},
 			gen_bus: {},
@@ -1131,13 +1132,15 @@
 		};
 		if ((selectedPartitioningMethod == 'loadGrouping') || (selectedPartitioningMethod == 'manual')) {
 			// Add all load->microgrid assignments to PARTITION_PARAMS.pairings object.
+			// Add all mg ids that user has assigned loads to to PARTITION_PARAMS.ids set.
 			const loadAssignmentContainerSelects = document.querySelectorAll('#loadAssignmentContainer select');
 			loadAssignmentContainerSelects.forEach(select => {
 				const loadId = select.dataset.loadId;
 				const selectedOption = select.options[select.selectedIndex];
-				const selectedMicrogrid = selectedOption.dataset.mgId;
-				PARTITION_PARAMS.pairings[selectedMicrogrid] = PARTITION_PARAMS.pairings[selectedMicrogrid] || [];
-				PARTITION_PARAMS.pairings[selectedMicrogrid].push(loadId);
+				const selectedMicrogridId = selectedOption.dataset.mgId;
+				PARTITION_PARAMS.pairings[selectedMicrogridId] = PARTITION_PARAMS.pairings[selectedMicrogridId] || [];
+				PARTITION_PARAMS.pairings[selectedMicrogridId].push(loadId);
+				PARTITION_PARAMS.ids.add(selectedMicrogridId);
 			});
 			// Do not proceed if no loads are in microgrids.
 			if (Object.keys(PARTITION_PARAMS.pairings).length === 1 && PARTITION_PARAMS.pairings.None) {
@@ -1153,15 +1156,17 @@
 				const val = input.value.trim();
 				const mgId = input.dataset.mgId;
 				if (id.includes('Name')) {
-					const isValid = /^[a-z0-9-]+$/.test(val);
-					if (!isValid) {
-						alert(`Invalid microgrid name: ${val}. Please use only lowercase alphanumeric characters or dashes.`);
-						return;
-					}
-					if (mgNames.has(val)) {
-						alert(`Duplicate microgrid name: ${val}. Please provide unique names.`);
-						hasDuplicates = true;
-						return;
+					if (val !== "") {
+						const isValid = /^[a-z0-9-]+$/.test(val);
+						if (!isValid) {
+							alert(`Invalid microgrid name: ${val}. Please use only lowercase alphanumeric characters or dashes.`);
+							return;
+						}
+						if (mgNames.has(val)) {
+							alert(`Duplicate microgrid name: ${val}. Please provide unique names.`);
+							hasDuplicates = true;
+							return;
+						}
 					}
 					mgNames.add(val);
 					PARTITION_PARAMS.mg_name[mgId] = val;
@@ -1183,6 +1188,20 @@
 
 		// Append microgrid parameter overrides
 		const mgParameterOverrides = window.reoptParametersModel.getExportData();
+		// Workaround to give mgParameterOverrides keys custom mg names.
+		// Workaround to ensure mgParameterOverrides keys update if user changes mg names on edit flow.
+		if (selectedPartitioningMethod === 'loadGrouping' || selectedPartitioningMethod === 'manual') {
+			PARTITION_PARAMS.ids.forEach(id => {
+				if (id !== 'None') {
+					const mg_name = PARTITION_PARAMS.mg_name[id];
+					if (mg_name !== '') {
+						// Create new key in mgParameterOverrides, copy old value, delete old key.
+						mgParameterOverrides[mg_name] = mgParameterOverrides[id];
+						delete mgParameterOverrides[id];
+					}
+				}
+			});
+		}
 		form1.append('mgParameterOverrides', JSON.stringify(mgParameterOverrides));
 
 		// - Append data to get single phase load count and three phase load count per load

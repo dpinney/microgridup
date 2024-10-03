@@ -581,10 +581,7 @@ def run():
 		raise ValueError('No microgrids were defined. The model run was aborted.')
 	# - Each microgrid needs to store knowledge of parameter overrides to support auto-filling the parameter override wigdet during an edit of a model
 	data['mgParameterOverrides'] = json.loads(data['mgParameterOverrides'])
-	# Need to use custom mg_names to parse mgParameterOverrides dictionary.
-	mg_name_dict = json.loads(data['PARTITION_PARAMS'])['mg_name'] if data['MG_DEF_METHOD'] in ('manual', 'loadGrouping') else None
-	for mg_id, mg_parameter_overrides in data['mgParameterOverrides'].items():
-		mg_name = mg_name_dict[mg_id] if mg_name_dict and mg_name_dict[mg_id] else mg_id
+	for mg_name, mg_parameter_overrides in data['mgParameterOverrides'].items():
 		data['MICROGRIDS'][mg_name]['parameter_overrides'] = mg_parameter_overrides
 	# - Remove form keys that are not needed past this point
 	del data['MG_DEF_METHOD']

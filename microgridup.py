@@ -458,14 +458,11 @@ def colorby_mgs(omd_path, mg_group_dictionary, critical_loads):
 			}
 		}
 	}
-	mg_keys = mg_group_dictionary.keys()
-	color_step = float(1/(len(mg_keys) + 1))
 	output_csv = 'bus,mg_color,crit_color\n'
 	all_mg_elements = microgridup_control.get_all_mg_elements(None, mg_group_dictionary, omd_path)
 	all_colorable_elements = get_all_colorable_elements(None, omd_path)
 	seen = set()
-	for i, mg_key in enumerate(mg_group_dictionary):
-		my_color = (i+1) * color_step
+	for mg_key in mg_group_dictionary:
 		all_items = list(all_mg_elements[mg_key])
 		for item in all_items:
 			critical_binary = 1 if item in critical_loads else 0

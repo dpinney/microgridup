@@ -804,9 +804,6 @@ def _tests():
 	MICROGRIDS = test_params['MICROGRIDS']
 	wizard_dir = [_dir for _dir in MICROGRIDS if 'wizard' in _dir]
 	elements = test_params['elements']
-	for e in elements:
-		e['type'] = e['class']
-		e['name'] = e['text']
 	templateDssTree = [OrderedDict(item) for item in test_params['templateDssTree']]
 	# Testing wizard_to_dss().
 	for _dir in wizard_dir:

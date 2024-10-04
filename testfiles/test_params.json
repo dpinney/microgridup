@@ -59,136 +59,136 @@
     },
     "elements": [
         {
-            "class": "substation",
-            "text": "sub",
+            "type": "substation",
+            "name": "sub",
             "basekv": 2.4
         },
         {
-            "class": "feeder",
-            "text": "regnone",
+            "type": "feeder",
+            "name": "regnone",
             "parent": "sub"
         },
         {
-            "class": "load",
-            "text": "684_command_center",
+            "type": "load",
+            "name": "684_command_center",
             "parent": "regnone",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "692_warehouse2",
+            "type": "load",
+            "name": "692_warehouse2",
             "parent": "regnone",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "611_runway",
+            "type": "load",
+            "name": "611_runway",
             "parent": "regnone",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "652_residential",
+            "type": "load",
+            "name": "652_residential",
             "parent": "regnone",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "670a_residential2",
+            "type": "load",
+            "name": "670a_residential2",
             "parent": "regnone",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "670b_residential2",
+            "type": "load",
+            "name": "670b_residential2",
             "parent": "regnone",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "670c_residential2",
+            "type": "load",
+            "name": "670c_residential2",
             "parent": "regnone",
             "kw": "1155"
         },
         {
-            "class": "feeder",
-            "text": "reg0",
+            "type": "feeder",
+            "name": "reg0",
             "parent": "sub"
         },
         {
-            "class": "load",
-            "text": "634a_data_center",
+            "type": "load",
+            "name": "634a_data_center",
             "parent": "reg0",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "634b_radar",
+            "type": "load",
+            "name": "634b_radar",
             "parent": "reg0",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "634c_atc_tower",
+            "type": "load",
+            "name": "634c_atc_tower",
             "parent": "reg0",
             "kw": "1155"
         },
         {
-            "class": "solar",
-            "text": "solar_634_existing",
+            "type": "solar",
+            "name": "solar_634_existing",
             "parent": "reg0",
             "kw": "440"
         },
         {
-            "class": "battery",
-            "text": "battery_634_existing",
+            "type": "battery",
+            "name": "battery_634_existing",
             "parent": "reg0",
             "kwh": "307",
             "kw": "79"
         },
         {
-            "class": "feeder",
-            "text": "reg1",
+            "type": "feeder",
+            "name": "reg1",
             "parent": "sub"
         },
         {
-            "class": "load",
-            "text": "675a_hospital",
+            "type": "load",
+            "name": "675a_hospital",
             "parent": "reg1",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "675b_residential1",
+            "type": "load",
+            "name": "675b_residential1",
             "parent": "reg1",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "675c_residential1",
+            "type": "load",
+            "name": "675c_residential1",
             "parent": "reg1",
             "kw": "1155"
         },
         {
-            "class": "fossil",
-            "text": "fossil_675_existing",
+            "type": "fossil",
+            "name": "fossil_675_existing",
             "parent": "reg1",
             "kw": "265"
         },
         {
-            "class": "feeder",
-            "text": "reg2",
+            "type": "feeder",
+            "name": "reg2",
             "parent": "sub"
         },
         {
-            "class": "load",
-            "text": "645_hangar",
+            "type": "load",
+            "name": "645_hangar",
             "parent": "reg2",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "646_office",
+            "type": "load",
+            "name": "646_office",
             "parent": "reg2",
             "kw": "1155"
         }

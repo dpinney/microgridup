@@ -50,7 +50,7 @@ def install_server():
 	sudo ln -s ${mgu_path}/systemd/cert.service /etc/systemd/system/cert.service
 	sudo ln -s ${mgu_path}/systemd/cert.timer /etc/systemd/system/cert.timer
 	# Setup TLS via letsencrypt certbot
-	sudo certbot certonly --standalone --agree-tos -n -m $EMAIL -d $DOMAIN
+	sudo certbot certonly --webroot -w THE_MICROGRIDUP_DIR -d app.microgridup.org -v
 	# Add microgridup user:group
 	sudo useradd -r microgridup
 	sudo chown -R microgridup:microgridup ./

@@ -20,175 +20,175 @@
                 "670b_residential2",
                 "670c_residential2"
             ],
-            "Mg0": [
+            "mg0": [
                 "634a_data_center",
                 "634b_radar",
                 "634c_atc_tower"
             ],
-            "Mg1": [
+            "mg1": [
                 "675a_hospital",
                 "675b_residential1",
                 "675c_residential1"
             ],
-            "Mg2": [
+            "mg2": [
                 "645_hangar",
                 "646_office"
             ]
         },
         "gen_obs_existing": {
-            "Mg0": "solar_634_existing,battery_634_existing",
-            "Mg1": "fossil_675_existing",
-            "Mg2": ""
+            "mg0": "solar_634_existing,battery_634_existing",
+            "mg1": "fossil_675_existing",
+            "mg2": ""
         },
         "gen_bus": {
-            "Mg0": "634",
-            "Mg1": "675",
-            "Mg2": "646"
+            "mg0": "634",
+            "mg1": "675",
+            "mg2": "646"
         },
         "switch": {
-            "Mg0": [
+            "mg0": [
                 "632633"
             ],
-            "Mg1": [
+            "mg1": [
                 "671692"
             ],
-            "Mg2": [
+            "mg2": [
                 "632645"
             ]
         }
     },
     "elements": [
         {
-            "class": "substation",
-            "text": "sub",
+            "type": "substation",
+            "name": "sub",
             "basekv": 2.4
         },
         {
-            "class": "feeder",
-            "text": "regnone",
+            "type": "feeder",
+            "name": "regnone",
             "parent": "sub"
         },
         {
-            "class": "load",
-            "text": "684_command_center",
+            "type": "load",
+            "name": "684_command_center",
             "parent": "regnone",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "692_warehouse2",
+            "type": "load",
+            "name": "692_warehouse2",
             "parent": "regnone",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "611_runway",
+            "type": "load",
+            "name": "611_runway",
             "parent": "regnone",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "652_residential",
+            "type": "load",
+            "name": "652_residential",
             "parent": "regnone",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "670a_residential2",
+            "type": "load",
+            "name": "670a_residential2",
             "parent": "regnone",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "670b_residential2",
+            "type": "load",
+            "name": "670b_residential2",
             "parent": "regnone",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "670c_residential2",
+            "type": "load",
+            "name": "670c_residential2",
             "parent": "regnone",
             "kw": "1155"
         },
         {
-            "class": "feeder",
-            "text": "reg0",
+            "type": "feeder",
+            "name": "reg0",
             "parent": "sub"
         },
         {
-            "class": "load",
-            "text": "634a_data_center",
+            "type": "load",
+            "name": "634a_data_center",
             "parent": "reg0",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "634b_radar",
+            "type": "load",
+            "name": "634b_radar",
             "parent": "reg0",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "634c_atc_tower",
+            "type": "load",
+            "name": "634c_atc_tower",
             "parent": "reg0",
             "kw": "1155"
         },
         {
-            "class": "solar",
-            "text": "solar_634_existing",
+            "type": "solar",
+            "name": "solar_634_existing",
             "parent": "reg0",
             "kw": "440"
         },
         {
-            "class": "battery",
-            "text": "battery_634_existing",
+            "type": "battery",
+            "name": "battery_634_existing",
             "parent": "reg0",
             "kwh": "307",
             "kw": "79"
         },
         {
-            "class": "feeder",
-            "text": "reg1",
+            "type": "feeder",
+            "name": "reg1",
             "parent": "sub"
         },
         {
-            "class": "load",
-            "text": "675a_hospital",
+            "type": "load",
+            "name": "675a_hospital",
             "parent": "reg1",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "675b_residential1",
+            "type": "load",
+            "name": "675b_residential1",
             "parent": "reg1",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "675c_residential1",
+            "type": "load",
+            "name": "675c_residential1",
             "parent": "reg1",
             "kw": "1155"
         },
         {
-            "class": "fossil",
-            "text": "fossil_675_existing",
+            "type": "fossil",
+            "name": "fossil_675_existing",
             "parent": "reg1",
             "kw": "265"
         },
         {
-            "class": "feeder",
-            "text": "reg2",
+            "type": "feeder",
+            "name": "reg2",
             "parent": "sub"
         },
         {
-            "class": "load",
-            "text": "645_hangar",
+            "type": "load",
+            "name": "645_hangar",
             "parent": "reg2",
             "kw": "1155"
         },
         {
-            "class": "load",
-            "text": "646_office",
+            "type": "load",
+            "name": "646_office",
             "parent": "reg2",
             "kw": "1155"
         }
@@ -197,9 +197,9 @@
         "energyCost": 0.12,
         "wholesaleCost": 0.034,
         "demandCost": 20.0,
-        "solarCanCurtail": "true",
-        "solarCanExport": "true",
-        "urdbLabelSwitch": "off",
+        "solarCanCurtail": true,
+        "solarCanExport": true,
+        "urdbLabelSwitch": false,
         "urdbLabel": "5b75cfe95457a3454faf0aea",
         "year": 2017,
         "analysisYears": 25,
@@ -207,10 +207,10 @@
         "value_of_lost_load": 1,
         "omCostEscalator": 0.025,
         "discountRate": 0.083,
-        "solar": "on",
-        "battery": "on",
-        "fossil": "on",
-        "wind": "off",
+        "solar": true,
+        "battery": true,
+        "fossil": true,
+        "wind": false,
         "solarCost": 1600.0,
         "solarMax": 1000000000,
         "solarMin": 0,
@@ -237,7 +237,7 @@
         "dieselCO2Factor": 24.1,
         "dieselOMCostKw": 35.0,
         "dieselOMCostKwh": 0.02,
-        "dieselOnlyRunsDuringOutage": "false",
+        "dieselOnlyRunsDuringOutage": false,
         "dieselMacrsOptionYears": 0,
         "windCost": 4989,
         "windMax": 1000000000,
@@ -617,23 +617,6 @@
             {
                 "mg0": {
                     "loads": [
-                        "684_command_center",
-                        "692_warehouse2",
-                        "611_runway",
-                        "652_residential",
-                        "670a_residential2",
-                        "670b_residential2",
-                        "670c_residential2"
-                    ],
-                    "switch": "regnone",
-                    "gen_bus": "regnone_end",
-                    "gen_obs_existing": [],
-                    "parameter_overrides": {
-                        "reopt_inputs": {}
-                    }
-                },
-                "mg1": {
-                    "loads": [
                         "634a_data_center",
                         "634b_radar",
                         "634c_atc_tower"
@@ -648,7 +631,7 @@
                         "reopt_inputs": {}
                     }
                 },
-                "mg2": {
+                "mg1": {
                     "loads": [
                         "675a_hospital",
                         "675b_residential1",
@@ -663,13 +646,30 @@
                         "reopt_inputs": {}
                     }
                 },
-                "mg3": {
+                "mg2": {
                     "loads": [
                         "645_hangar",
                         "646_office"
                     ],
                     "switch": "reg2",
                     "gen_bus": "reg2_end",
+                    "gen_obs_existing": [],
+                    "parameter_overrides": {
+                        "reopt_inputs": {}
+                    }
+                },
+                "mg3": {
+                    "loads": [
+                        "684_command_center",
+                        "692_warehouse2",
+                        "611_runway",
+                        "652_residential",
+                        "670a_residential2",
+                        "670b_residential2",
+                        "670c_residential2"
+                    ],
+                    "switch": "regnone",
+                    "gen_bus": "regnone_end",
                     "gen_obs_existing": [],
                     "parameter_overrides": {
                         "reopt_inputs": {}
@@ -878,18 +878,6 @@
             {
                 "mg0": {
                     "loads": [
-                        "645_hangar",
-                        "646_office"
-                    ],
-                    "switch": "632645",
-                    "gen_bus": "645",
-                    "gen_obs_existing": [],
-                    "parameter_overrides": {
-                        "reopt_inputs": {}
-                    }
-                },
-                "mg1": {
-                    "loads": [
                         "634a_data_center",
                         "634b_radar",
                         "634c_atc_tower"
@@ -900,6 +888,18 @@
                         "solar_634_existing",
                         "battery_634_existing"
                     ],
+                    "parameter_overrides": {
+                        "reopt_inputs": {}
+                    }
+                },
+                "mg1": {
+                    "loads": [
+                        "645_hangar",
+                        "646_office"
+                    ],
+                    "switch": "632645",
+                    "gen_bus": "645",
+                    "gen_obs_existing": [],
                     "parameter_overrides": {
                         "reopt_inputs": {}
                     }

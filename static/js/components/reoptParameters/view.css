@@ -1,3 +1,12 @@
+/* Set a reasonable total width for the microgrid parameter override widget */
 div#reoptParametersModal.div--modal {
-    width: 40rem;
+    width: 970px;
+}
+/* Fix the width of the column that contains parameter names so that column doesn't change width when a caution message appears */
+div#reoptParametersModal.div--modal table td:nth-child(2) {
+    width: 350px;
+}
+/* Set a fixed width for the parameter column so that longer or shorter parameter names don't shift the table around */
+div#microgridParameterMVC div.div--modal table td:nth-child(2) {
+    width: 260px;
 }

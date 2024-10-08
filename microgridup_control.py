@@ -752,8 +752,15 @@ def faulted_lines_in_graph(path_to_dss, faulted_lines):
 	assert isinstance(path_to_dss, str)
 	assert isinstance(faulted_lines, tuple)
 	omd = dssConvert.dssToOmd(path_to_dss, '', write_out=False)
-	return len([[key for key in omd if omd[key].get('name', '') == line_name] for line_name in faulted_lines]) == len(faulted_lines)
-
+	for line_name in faulted_lines:
+		found_match = False
+		for key in omd:
+			if omd[key].get('name', '') == line_name:
+				found_match = True
+				break
+		if not found_match:
+			return False
+	return True
 
 def play(data, outage_start, outage_length, logger):
 	'''

@@ -1,163 +1,42 @@
-2024-08-02 00:52:54,104 MainProcess root Logging status updates for /home/austin/programming/repositories/microgridup/microgridup/data/projects/lehigh3mgs.
-2024-08-02 00:54:30,629 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
-2024-08-02 00:54:30,629 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
-2024-08-02 00:54:30,629 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
-2024-08-02 00:54:30,639 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '634', 'phases': ['1'], 'kv': 0.27712812921102037}
-2024-08-02 00:54:30,656 MainProcess root Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
+2024-08-30 18:35:52,471 Process-3  root Logging status updates for /home/austin/programming/repositories/microgridup/microgridup/data/projects/lehigh3mgs.
+2024-08-30 18:35:52,472 Process-3  root Rerunning existing project. "circuit.dss" file not moved.
+2024-08-30 18:35:52,472 Process-3  root Rerunning existing project. "loads.csv" file not moved.
+2024-08-30 18:42:08,884 Process-3  root load_phases on bus_name: phases ['1'] on bus 634.1
+2024-08-30 18:42:08,893 Process-3  root load_phases on bus_name: phases ['1'] on bus 634.1
+2024-08-30 18:42:08,903 Process-3  root load_phases on bus_name: phases ['1'] on bus 634.1
+2024-08-30 18:42:08,938 Process-3  root mg_phase_and_kv out_dict: {'gen_bus': '634', 'phases': ['1'], 'kv': 0.27712812921102037}
+2024-08-30 18:42:08,991 Process-3  root Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
 
-2024-08-02 00:54:30,755 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+2024-08-30 18:42:09,285 Process-3  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-08-02 00:54:30,755 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+2024-08-30 18:42:09,288 Process-3  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-08-02 00:54:30,755 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+2024-08-30 18:42:09,290 Process-3  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-08-02 00:54:30,788 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 1663.3458, 'solar_size_existing': 440.0, 'solar_size_new': 1223.3458, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 110.03, 'fossil_size_existing': 0.0, 'fossil_size_new': 110.03, 'battery_cap_total': 371.49, 'battery_cap_existing': 307.0, 'battery_cap_new': 64.49000000000001, 'battery_pow_total': 179.33, 'battery_pow_existing': 79.0, 'battery_pow_new': 100.33000000000001}
-2024-08-02 00:54:30,904 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-08-02 00:54:30,904 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-08-02 00:54:30,904 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-08-02 00:54:30,905 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 692.1.2.3
-2024-08-02 00:54:30,968 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '675', 'phases': ['1', '2', '3'], 'kv': 2.4017771198288433}
-2024-08-02 00:54:31,033 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-30 18:42:09,407 Process-3  root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 1663.3458, 'solar_size_existing': 440.0, 'solar_size_new': 1223.3458, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 110.03, 'fossil_size_existing': 0.0, 'fossil_size_new': 110.03, 'battery_cap_total': 371.49, 'battery_cap_existing': 307.0, 'battery_cap_new': 64.49000000000001, 'battery_pow_total': 179.33, 'battery_pow_existing': 79.0, 'battery_pow_new': 100.33000000000001}
+2024-08-30 18:42:09,665 Process-3  root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-08-30 18:42:09,698 Process-3  root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-08-30 18:42:09,701 Process-3  root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
+2024-08-30 18:42:09,708 Process-3  root load_phases on bus_name: phases ['1', '2', '3'] on bus 692.1.2.3
+2024-08-30 18:42:09,836 Process-3  root mg_phase_and_kv out_dict: {'gen_bus': '675', 'phases': ['1', '2', '3'], 'kv': 2.4017771198288433}
+2024-08-30 18:42:09,989 Process-3  root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 
-2024-08-02 00:54:31,033 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-30 18:42:09,993 Process-3  root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 
-2024-08-02 00:54:31,033 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-30 18:42:09,994 Process-3  root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 
-2024-08-02 00:54:31,033 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
+2024-08-30 18:42:09,995 Process-3  root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
 
-2024-08-02 00:54:31,067 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 2852.2285, 'solar_size_existing': 0.0, 'solar_size_new': 2852.2285, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 411.32, 'fossil_size_existing': 0.0, 'fossil_size_new': 411.32, 'battery_cap_total': 655.34, 'battery_cap_existing': 0.0, 'battery_cap_new': 655.34, 'battery_pow_total': 290.34, 'battery_pow_existing': 0.0, 'battery_pow_new': 290.34}
-2024-08-02 00:54:31,184 MainProcess root load_phases on bus_name: phases ['2'] on bus 645.2
-2024-08-02 00:54:31,184 MainProcess root load_phases on bus_name: phases ['2'] on bus 646.2
-2024-08-02 00:54:31,252 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '646', 'phases': ['2'], 'kv': 2.4017771198288433}
-2024-08-02 00:54:31,319 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+2024-08-30 18:42:10,123 Process-3  root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 2852.2285, 'solar_size_existing': 0.0, 'solar_size_new': 2852.2285, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 411.32, 'fossil_size_existing': 0.0, 'fossil_size_new': 411.32, 'battery_cap_total': 655.34, 'battery_cap_existing': 0.0, 'battery_cap_new': 655.34, 'battery_pow_total': 290.34, 'battery_pow_existing': 0.0, 'battery_pow_new': 290.34}
+2024-08-30 18:42:10,563 Process-3  root load_phases on bus_name: phases ['2'] on bus 645.2
+2024-08-30 18:42:10,569 Process-3  root load_phases on bus_name: phases ['2'] on bus 646.2
+2024-08-30 18:42:10,756 Process-3  root mg_phase_and_kv out_dict: {'gen_bus': '646', 'phases': ['2'], 'kv': 2.4017771198288433}
+2024-08-30 18:42:10,990 Process-3  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-08-02 00:54:31,319 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
+2024-08-30 18:42:10,991 Process-3  root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
 
-2024-08-02 00:54:31,354 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 1538.416, 'solar_size_existing': 0.0, 'solar_size_new': 1538.416, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 96.31, 'fossil_size_existing': 0.0, 'fossil_size_new': 96.31, 'battery_cap_total': 443.1, 'battery_cap_existing': 0.0, 'battery_cap_new': 443.1, 'battery_pow_total': 202.57, 'battery_pow_existing': 0.0, 'battery_pow_new': 202.57}
-2024-08-02 00:54:31,616 MainProcess root QSTS with circuit_plus_mgAll.dss AND CWD IS /home/austin/programming/repositories/microgridup/microgridup/data/projects/lehigh3mgs
-2024-08-02 00:54:34,211 MainProcess root CONTROLLING ON {'mg0': mappingproxy({'gen_bus': '634', 'gen_obs_existing': ('solar_634_existing', 'battery_634_existing'), 'loads': ('634a_data_center', '634b_radar', '634c_atc_tower'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})}), 'switch': '632633'}), 'mg1': mappingproxy({'gen_bus': '675', 'gen_obs_existing': (), 'loads': ('675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})}), 'switch': '671692'}), 'mg2': mappingproxy({'gen_bus': '646', 'gen_obs_existing': (), 'loads': ('645_hangar', '646_office'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})}), 'switch': '632645'})}
-2024-08-02 00:54:34,234 MainProcess root reduced 692_warehouse2 from 170kW to 0kW.
-2024-08-02 00:54:36,354 MainProcess root Control microgrids count 3 and renewable count 0
-2024-08-02 00:55:23,365 MainProcess root Logging status updates for /home/austin/programming/repositories/microgridup/microgridup/data/projects/lehigh4mgs.
-2024-08-02 00:57:13,910 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
-2024-08-02 00:57:13,910 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
-2024-08-02 00:57:13,910 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
-2024-08-02 00:57:13,921 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '634', 'phases': ['1'], 'kv': 0.27712812921102037}
-2024-08-02 00:57:13,939 MainProcess root Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
-
-2024-08-02 00:57:14,040 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:57:14,041 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:57:14,041 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:57:14,076 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 1663.3458, 'solar_size_existing': 440.0, 'solar_size_new': 1223.3458, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 107.43, 'fossil_size_existing': 0.0, 'fossil_size_new': 107.43, 'battery_cap_total': 410.29, 'battery_cap_existing': 307.0, 'battery_cap_new': 103.29000000000002, 'battery_pow_total': 185.34, 'battery_pow_existing': 79.0, 'battery_pow_new': 106.34}
-2024-08-02 00:57:14,194 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-08-02 00:57:14,195 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-08-02 00:57:14,195 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-08-02 00:57:14,195 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 692.1.2.3
-2024-08-02 00:57:14,258 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '675', 'phases': ['1', '2', '3'], 'kv': 2.4017771198288433}
-2024-08-02 00:57:14,336 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-08-02 00:57:14,336 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-08-02 00:57:14,337 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-08-02 00:57:14,337 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-08-02 00:57:14,372 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 3177.6562, 'solar_size_existing': 800.0, 'solar_size_new': 2377.6562, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 404.78, 'fossil_size_existing': 0.0, 'fossil_size_new': 404.78, 'battery_cap_total': 757.91, 'battery_cap_existing': 0.0, 'battery_cap_new': 757.91, 'battery_pow_total': 343.17, 'battery_pow_existing': 0.0, 'battery_pow_new': 343.17}
-2024-08-02 00:57:14,488 MainProcess root load_phases on bus_name: phases ['3'] on bus 684.3
-2024-08-02 00:57:14,488 MainProcess root load_phases on bus_name: phases ['3'] on bus 652.3
-2024-08-02 00:57:14,488 MainProcess root load_phases on bus_name: phases ['3'] on bus 611.3
-2024-08-02 00:57:14,558 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '684', 'phases': ['3'], 'kv': 2.4017771198288433}
-2024-08-02 00:57:14,579 MainProcess root Pre-existing battery battery_684_existing will not be utilized to support loads in microgrid mg2.
-
-2024-08-02 00:57:14,635 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:57:14,636 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:57:14,636 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:57:14,670 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 3227.3835, 'solar_size_existing': 0.0, 'solar_size_new': 3227.3835, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 526.01, 'fossil_size_existing': 81.0, 'fossil_size_new': 445.01, 'battery_cap_total': 779.04, 'battery_cap_existing': 100.0, 'battery_cap_new': 679.04, 'battery_pow_total': 353.31, 'battery_pow_existing': 20.0, 'battery_pow_new': 333.31}
-2024-08-02 00:57:14,786 MainProcess root load_phases on bus_name: phases ['2'] on bus 645.2
-2024-08-02 00:57:14,786 MainProcess root load_phases on bus_name: phases ['2'] on bus 646.2
-2024-08-02 00:57:14,859 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '646', 'phases': ['2'], 'kv': 2.4017771198288433}
-2024-08-02 00:57:14,927 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:57:14,927 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:57:14,961 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 1538.416, 'solar_size_existing': 0.0, 'solar_size_new': 1538.416, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 96.31, 'fossil_size_existing': 0.0, 'fossil_size_new': 96.31, 'battery_cap_total': 443.1, 'battery_cap_existing': 0.0, 'battery_cap_new': 443.1, 'battery_pow_total': 202.57, 'battery_pow_existing': 0.0, 'battery_pow_new': 202.57}
-2024-08-02 00:57:15,228 MainProcess root QSTS with circuit_plus_mgAll.dss AND CWD IS /home/austin/programming/repositories/microgridup/microgridup/data/projects/lehigh4mgs
-2024-08-02 00:57:17,949 MainProcess root CONTROLLING ON {'mg0': mappingproxy({'gen_bus': '634', 'gen_obs_existing': ('solar_634_existing', 'battery_634_existing'), 'loads': ('634a_data_center', '634b_radar', '634c_atc_tower'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})}), 'switch': '632633'}), 'mg1': mappingproxy({'gen_bus': '675', 'gen_obs_existing': ('solar_675_existing',), 'loads': ('675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})}), 'switch': '671692'}), 'mg2': mappingproxy({'gen_bus': '684', 'gen_obs_existing': ('fossil_684_existing', 'battery_684_existing'), 'loads': ('684_command_center', '652_residential', '611_runway'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})}), 'switch': '671684'}), 'mg3': mappingproxy({'gen_bus': '646', 'gen_obs_existing': (), 'loads': ('645_hangar', '646_office'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})}), 'switch': '632645'})}
-2024-08-02 00:57:17,972 MainProcess root reduced 692_warehouse2 from 170kW to 0kW.
-2024-08-02 00:57:17,991 MainProcess root reduced 611_runway from 170kW to 0kW.
-2024-08-02 00:57:20,240 MainProcess root Control microgrids count 4 and renewable count 0
-2024-08-02 00:58:02,810 MainProcess root Logging status updates for /home/austin/programming/repositories/microgridup/microgridup/data/projects/lehighauto_3mg.
-2024-08-02 00:59:29,286 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
-2024-08-02 00:59:29,286 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
-2024-08-02 00:59:29,286 MainProcess root load_phases on bus_name: phases ['1'] on bus 634.1
-2024-08-02 00:59:29,297 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '633', 'phases': ['1'], 'kv': 2.4017771198288433}
-2024-08-02 00:59:29,314 MainProcess root Pre-existing battery battery_634_existing will not be utilized to support loads in microgrid mg0.
-
-2024-08-02 00:59:29,414 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:59:29,414 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:59:29,414 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:59:29,449 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 1663.3458, 'solar_size_existing': 440.0, 'solar_size_new': 1223.3458, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 110.03, 'fossil_size_existing': 0.0, 'fossil_size_new': 110.03, 'battery_cap_total': 371.49, 'battery_cap_existing': 307.0, 'battery_cap_new': 64.49000000000001, 'battery_pow_total': 179.33, 'battery_pow_existing': 79.0, 'battery_pow_new': 100.33000000000001}
-2024-08-02 00:59:29,568 MainProcess root load_phases on bus_name: phases ['2'] on bus 645.2
-2024-08-02 00:59:29,568 MainProcess root load_phases on bus_name: phases ['2'] on bus 646.2
-2024-08-02 00:59:29,632 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '645', 'phases': ['2'], 'kv': 2.4017771198288433}
-2024-08-02 00:59:29,698 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:59:29,698 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:59:29,733 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 639.6613, 'solar_size_existing': 0.0, 'solar_size_new': 639.6613, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 29.54, 'fossil_size_existing': 0.0, 'fossil_size_new': 29.54, 'battery_cap_total': 231.29, 'battery_cap_existing': 0.0, 'battery_cap_new': 231.29, 'battery_pow_total': 120.47, 'battery_pow_existing': 0.0, 'battery_pow_new': 120.47}
-2024-08-02 00:59:29,850 MainProcess root load_phases on bus_name: phases ['3'] on bus 684.3
-2024-08-02 00:59:29,850 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 692.1.2.3
-2024-08-02 00:59:29,850 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-08-02 00:59:29,851 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-08-02 00:59:29,851 MainProcess root load_phases on bus_name: phases ['1', '2', '3'] on bus 675.1.2.3
-2024-08-02 00:59:29,851 MainProcess root load_phases on bus_name: phases ['3'] on bus 611.3
-2024-08-02 00:59:29,851 MainProcess root load_phases on bus_name: phases ['3'] on bus 652.3
-2024-08-02 00:59:29,851 MainProcess root load_phases on bus_name: phases ['1'] on bus 670.1
-2024-08-02 00:59:29,851 MainProcess root load_phases on bus_name: phases ['2'] on bus 670.2
-2024-08-02 00:59:29,851 MainProcess root load_phases on bus_name: phases ['3'] on bus 670.3
-2024-08-02 00:59:29,852 MainProcess root More than one load voltage is specified on microgrid mg2. Check Oneline diagram to verify that phases and voltages of ('684_command_center', '692_warehouse2', '675a_hospital', '675b_residential1', '675c_residential1', '611_runway', '652_residential', '670a_residential2', '670b_residential2', '670c_residential2') are correctly supported by gen_bus 670.
-
-2024-08-02 00:59:29,922 MainProcess root mg_phase_and_kv out_dict: {'gen_bus': '670', 'phases': ['1', '2', '3'], 'kv': 2.4017771198288433}
-2024-08-02 00:59:29,948 MainProcess root Pre-existing battery battery_684_existing will not be utilized to support loads in microgrid mg2.
-
-2024-08-02 00:59:30,017 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:59:30,017 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-08-02 00:59:30,017 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-08-02 00:59:30,017 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-08-02 00:59:30,017 MainProcess root Supporting critical loads across microgrids assumes the ability to remotely disconnect 3-phase loads.
-
-2024-08-02 00:59:30,018 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:59:30,018 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:59:30,018 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:59:30,018 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:59:30,018 MainProcess root Supporting critical loads across microgrids assumes an AMI metering system. If not currently installed, add budget for the creation of an AMI system.
-
-2024-08-02 00:59:30,052 MainProcess root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 3885.5623, 'solar_size_existing': 800.0, 'solar_size_new': 3085.5623, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 823.96, 'fossil_size_existing': 81.0, 'fossil_size_new': 742.96, 'battery_cap_total': 1175.84, 'battery_cap_existing': 100.0, 'battery_cap_new': 1075.84, 'battery_pow_total': 455.13, 'battery_pow_existing': 20.0, 'battery_pow_new': 435.13}
-2024-08-02 00:59:30,316 MainProcess root QSTS with circuit_plus_mgAll.dss AND CWD IS /home/austin/programming/repositories/microgridup/microgridup/data/projects/lehighauto_3mg
-2024-08-02 00:59:32,879 MainProcess root CONTROLLING ON {'mg0': mappingproxy({'loads': ('634a_data_center', '634b_radar', '634c_atc_tower'), 'switch': '632633', 'gen_bus': '633', 'gen_obs_existing': ('solar_634_existing', 'battery_634_existing'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})})}), 'mg1': mappingproxy({'loads': ('645_hangar', '646_office'), 'switch': '632645', 'gen_bus': '645', 'gen_obs_existing': (), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})})}), 'mg2': mappingproxy({'loads': ('684_command_center', '692_warehouse2', '675a_hospital', '675b_residential1', '675c_residential1', '611_runway', '652_residential', '670a_residential2', '670b_residential2', '670c_residential2'), 'switch': '632670', 'gen_bus': '670', 'gen_obs_existing': ('solar_675_existing', 'fossil_684_existing', 'battery_684_existing'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})})})}
-2024-08-02 00:59:32,900 MainProcess root reduced 646_office from 230kW to 0kW.
-2024-08-02 00:59:32,912 MainProcess root reduced 692_warehouse2 from 170kW to 0kW.
-2024-08-02 00:59:32,912 MainProcess root reduced 675b_residential1 from 68kW to 0kW.
-2024-08-02 00:59:32,913 MainProcess root reduced 675c_residential1 from 290kW to 0kW.
-2024-08-02 00:59:32,913 MainProcess root reduced 652_residential from 128kW to 0kW.
-2024-08-02 00:59:32,913 MainProcess root reduced 670a_residential2 from 17kW to 0kW.
-2024-08-02 00:59:32,913 MainProcess root reduced 670b_residential2 from 66kW to 0kW.
-2024-08-02 00:59:32,913 MainProcess root reduced 670c_residential2 from 117kW to 0kW.
-2024-08-02 00:59:34,973 MainProcess root Control microgrids count 3 and renewable count 0
+2024-08-30 18:42:11,112 Process-3  root microgrid_report_csv() gen_sizes into CSV report: {'solar_size_total': 1538.416, 'solar_size_existing': 0.0, 'solar_size_new': 1538.416, 'wind_size_total': 0, 'wind_size_existing': 0.0, 'wind_size_new': 0.0, 'fossil_size_total': 96.31, 'fossil_size_existing': 0.0, 'fossil_size_new': 96.31, 'battery_cap_total': 443.1, 'battery_cap_existing': 0.0, 'battery_cap_new': 443.1, 'battery_pow_total': 202.57, 'battery_pow_existing': 0.0, 'battery_pow_new': 202.57}
+2024-08-30 18:42:11,741 Process-3  root QSTS with circuit_plus_mgAll.dss AND CWD IS /home/austin/programming/repositories/microgridup/microgridup/data/projects/lehigh3mgs
+2024-08-30 18:42:18,072 Process-3  root CONTROLLING ON {'mg0': mappingproxy({'gen_bus': '634', 'gen_obs_existing': ('solar_634_existing', 'battery_634_existing'), 'loads': ('634a_data_center', '634b_radar', '634c_atc_tower'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})}), 'switch': '632633'}), 'mg1': mappingproxy({'gen_bus': '675', 'gen_obs_existing': (), 'loads': ('675a_hospital', '675b_residential1', '675c_residential1', '692_warehouse2'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})}), 'switch': '671692'}), 'mg2': mappingproxy({'gen_bus': '646', 'gen_obs_existing': (), 'loads': ('645_hangar', '646_office'), 'parameter_overrides': mappingproxy({'reopt_inputs': mappingproxy({})}), 'switch': '632645'})}
+2024-08-30 18:42:18,154 Process-3  root reduced 692_warehouse2 from 170kW to 0kW.
+2024-08-30 18:42:23,867 Process-3  root Control microgrids count 3 and renewable count 0

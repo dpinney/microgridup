@@ -165,6 +165,8 @@ def main(data, invalidate_cache=True, open_results=False):
 			error_message = str(e)
 			print(error_message)
 			logger.warning(error_message)
+			with open('output_control.html', 'w') as file:
+				file.write(f"<html><body><h1>Error</h1><p>{error_message}</p></body></html>")
 		# Resilience simulation with outages. Optional. Skipped if no OUTAGE_CSV
 		if immutable_data['OUTAGE_CSV']:
 			all_microgrid_loads = [x.get('loads',[]) for x in immutable_data['MICROGRIDS'].values()]
@@ -234,7 +236,7 @@ def main(data, invalidate_cache=True, open_results=False):
 	except Exception as e:
 		print(traceback.format_exc())
 		logger.warning(traceback.format_exc())
-		os.system(f'touch "{data["MODEL_DIR"]}/0crashed.txt"')
+		os.system(f'touch "{absolute_model_directory}/0crashed.txt"')
 		check_each_mg_for_reopt_error(immutable_data['MICROGRIDS'], logger)
 	finally:
 		os.chdir(curr_dir)
@@ -456,18 +458,15 @@ def colorby_mgs(omd_path, mg_group_dictionary, critical_loads):
 			}
 		}
 	}
-	mg_keys = mg_group_dictionary.keys()
-	color_step = float(1/(len(mg_keys) + 1))
 	output_csv = 'bus,mg_color,crit_color\n'
 	all_mg_elements = microgridup_control.get_all_mg_elements(None, mg_group_dictionary, omd_path)
 	all_colorable_elements = get_all_colorable_elements(None, omd_path)
 	seen = set()
-	for i, mg_key in enumerate(mg_group_dictionary):
-		my_color = (i+1) * color_step
+	for mg_key in mg_group_dictionary:
 		all_items = list(all_mg_elements[mg_key])
 		for item in all_items:
 			critical_binary = 1 if item in critical_loads else 0
-			output_csv += item + ',' + str(my_color) + ',' + str(critical_binary) + '\n'
+			output_csv += item + ',' + str(mg_key) + ',' + str(critical_binary) + '\n'
 			seen.add(item)
 	# Color all circuit elements that aren't in an mg/critical as 0.
 	for item in all_colorable_elements:
@@ -580,9 +579,9 @@ def _tests():
 			'energyCost': 0.12,
 			'wholesaleCost': 0.034,
 			'demandCost': 20.0,
-			'solarCanCurtail': 'true',
-			'solarCanExport': 'true',
-			'urdbLabelSwitch': 'off',
+			'solarCanCurtail': True,
+			'solarCanExport': True,
+			'urdbLabelSwitch': False,
 			'urdbLabel': '5b75cfe95457a3454faf0aea',
 			'year': 2017,
 			'analysisYears': 25,
@@ -590,10 +589,10 @@ def _tests():
 			'value_of_lost_load': 100.0,
 			'omCostEscalator': 0.025,
 			'discountRate': 0.083,
-			'solar': 'on',
-			'battery': 'on',
-			'fossil': 'on',
-			'wind': 'off',
+			'solar': True,
+			'battery': True,
+			'fossil': True,
+			'wind': False,
 			'solarCost': 1600.0,
 			'solarMax': 10000.0,
 			'solarMin': 0.0,
@@ -620,7 +619,7 @@ def _tests():
 			'dieselCO2Factor': 24.1,
 			'dieselOMCostKw': 35.0,
 			'dieselOMCostKwh': 0.02,
-			'dieselOnlyRunsDuringOutage': 'false',
+			'dieselOnlyRunsDuringOutage': False,
 			'dieselMacrsOptionYears': 0,
 			'windCost': 4989.0,
 			'windMax': 1000.0,
@@ -657,16 +656,16 @@ def _tests():
 	with open('testfiles/test_params.json') as file:
 		test_params = json.load(file)
 	# - It appears that, for these tests, all we need from test_params.json are the microgrid definitions. We can ignore everything else
-	MG_MINES = test_params['MG_MINES']
-	for model_name in MG_MINES:
+	MICROGRIDS = test_params['MICROGRIDS']
+	for model_name in MICROGRIDS:
 		data['MODEL_DIR'] = model_name
-		data['MICROGRIDS'] = MG_MINES[model_name][0]
+		data['MICROGRIDS'] = MICROGRIDS[model_name][0]
 		try:
 			model_name.index('wizard')
 			data['BASE_DSS'] = f'{MGU_DIR}/testfiles/wizard_base_3mg.dss'
 			data['FAULTED_LINES'] = ['reg1']
 		except ValueError as e:
-			data['BASE_DSS'] = f'{MGU_DIR}/testfiles/lehigh_base_3mg.dss'
+			data['BASE_DSS'] = f'{MGU_DIR}/testfiles/lehigh_base_phased.dss'
 			data['FAULTED_LINES'] = ['670671']
 		print(f'---------------------------------------------------------\nBeginning end-to-end backend test of {model_name}.\n---------------------------------------------------------')
         # - These tests don't run in GitHub, so it's okay to take longer and actually run REopt

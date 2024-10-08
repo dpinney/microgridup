@@ -128,7 +128,7 @@ class CircuitElement {
 
     static validateProperty(property, propertyVal, namespace) {
         //const onlyLetters = /^[A-Za-z\-_]+$/;
-        const onlyNumbers = /^\d*\.?\d+$/;
+        const onlyNumbers = /^(?:0(?:\.\d+)?|[1-9]\d*(?:\.\d+)?)$/;
         const lettersOrNumbers = /^[\w\-]+$/;
         const onlyIntegers = /^\d+$/;
         if (namespace === 'props') {
@@ -137,50 +137,51 @@ class CircuitElement {
                     throw TypeError(`The "${property}" property must be typeof "string".`);
                 }
                 if (!lettersOrNumbers.test(propertyVal)) {
-                    throw Error(`The value of the "${property}" property can only include the following: (1) alphanumeric characters, (2) "-", and (3) "_".`);
+                    // - CSVs heading load names may contain uppercase letters. I raise an error if two headings are the same in any case
+                    throw Error(`Value can only include (1) alphanumeric characters, (2) "-", and (3) "_". Please change the value.`);
                 }
                 if (property === 'namespace') {
                     if (!CircuitElement.namespaces.includes(propertyVal)) {
-                        throw Error('The "props.namespace" value must be one of the values in CircuitElement.namespaces.'); 
+                        throw Error('The "props.namespace" value must be one of the values in CircuitElement.namespaces. Please change the value.');
                     }
                 }
                 if (property === 'type') {
                     if (!CircuitElement.types.includes(propertyVal)) {
-                        throw Error('The "props.type" value must be one of the values in CircuitElement.types.');
+                        throw Error('The "props.type" value must be one of the values in CircuitElement.types. Please change the value');
                     }
                 }
                 if (property === 'name') {
                     if (propertyVal.includes('.')) {
-                        throw Error('The "props.name" property must not contain the "." character.');
+                        throw Error('The "props.name" property must not contain the "." character. Please change the value.');
                     }
                 }
             }
             if (property === 'parent') {
                 const ary = propertyVal.split('.');
                 if (ary.length !== 2) {
-                    throw Error('Invalid value for the "parent" property');
+                    throw Error('Invalid value for the "parent" property.');
                 }
                 const [namespace, name] = ary;
                 if (!lettersOrNumbers.test(namespace)) {
-                    throw Error('The namespace component of the "parent" property can only include the following: (1) alphanumeric characters, (2) "-", and (3) "_". ');
+                    throw Error(`The namespace component of the "parent" property can only include (1) alphanumeric characters, (2) "-", and (3) "_". Please change the value.`);
                 }
                 if (!lettersOrNumbers.test(name)) {
-                    throw Error('The name component of the "parent" property can only include the following: (1) alphanumeric characters, (2) "-", and (3) "_". ');
+                    throw Error(`The name component of the "parent" property can only include (1) alphanumeric characters, (2) "-", and (3) "_". Please change the value.`);
                 }
             }
             if (['kw', 'kwh', 'basekv'].includes(property)) {
                 if (!onlyNumbers.test(propertyVal)) {
-                    throw Error(`The value of the "${property}" property can only include positive numbers.`);
+                    throw Error(`"${property}" can only include positive numbers. Please change the value.`);
                 }
             }
             if (['singlePhaseLoadCount', 'threePhaseLoadCount'].includes(property)) {
                 if (!onlyIntegers.test(propertyVal)) {
-                    throw Error(`The value of the "${property}" property can only include positive integers.`);
+                    throw Error(`"${property}" can only include positive integers. Please change the value.`);
                 }
             }
             if (['loadProfile'].includes(property)) {
                 if (!(propertyVal instanceof Array)) {
-                    throw TypeError(`The value of the "${property}" property must be instance of Array`);
+                    throw TypeError(`"${property}" must be instance of Array.`);
                 }
             }
         } else if (namespace === 'meta') {
@@ -365,7 +366,7 @@ class OutageLocationInputView {
         label.textContent = 'Outage Location(s) ';
         const span = document.createElement('span');
         span.classList.add('classic');
-        span.textContent = 'Node number in distribution map where typical outage would take place.';
+        span.textContent = 'Node number in distribution map where typical outage would take place. Use commas to separate multiple locations.';
         label.append(span);
         modal.divElement.append(label);
         const input = document.createElement('input');
@@ -611,6 +612,11 @@ class CircuitModel {
         }
     }
 
+    /**
+     * @param {string} fullName - the identifying name of the element that is being renamed
+     * @param {string} newName - the new name for the element
+     * @returns {undefined}
+     */
     renameElement(fullName, newName) {
         if (typeof fullName !== 'string') {
             throw TypeError('The "fullName" argument must be typeof "string".');
@@ -618,9 +624,9 @@ class CircuitModel {
         if (typeof newName !== 'string') {
             throw TypeError('The "newName" argument must be typeof "string".');
         }
-        const namespace = fullName.split('.')[0];
+        const [namespace, oldName] = fullName.split('.');
         const newFullName = `${namespace}.${newName}`;
-        if (this.#nameToKey.hasOwnProperty(newFullName)) {
+        if (this.#nameToKey.hasOwnProperty(newFullName) && oldName !== newName) {
             throw Error(`The name "${newName}" is already taken by another object.`);
         }
         for (const e of this.getChildElements(fullName)) {
@@ -743,6 +749,9 @@ class CircuitUserControlsView {
             }
             this.#circuitElementParentNameSelect.replaceWith(select);
             this.#circuitElementParentNameSelect = select;
+            this.#circuitElementParentNameSelect.addEventListener('focus', () => {
+                this.modal.setBanner('', ['hidden']);
+            });
         }
         if (this.#circuitElementSelect.value === 'load') {
             const oldVal = this.#circuitElementNameElement.value;
@@ -754,6 +763,9 @@ class CircuitUserControlsView {
             }
             this.#circuitElementNameElement.replaceWith(select);
             this.#circuitElementNameElement = select;
+            this.#circuitElementNameElement.addEventListener('focus', () => {
+                this.modal.setBanner('', ['hidden']);
+            });
         }
     }
 
@@ -835,63 +847,89 @@ class CircuitUserControlsView {
         this.#circuitElementSelect.addEventListener('change', () => {
             this.#createUserControlsDynamicDiv();
         });
+        // - Error message should disappear when the user clicks on the select
+        this.#circuitElementSelect.addEventListener('focus', () => {
+            modal.setBanner('', ['hidden']);
+        });
     }
 
     #createUserControlsDynamicDiv() {
         const dynamicDiv = this.#userInputDiv.children[1];
         const circuitElement = this.#circuitElementSelect.value;
+        let circuitElementNameElement = null;
+        let circuitElementParentTypeSelect = null;
+        let circuitElementParentNameSelect = null;
         if (circuitElement === '<select element>') {
             dynamicDiv.replaceChildren();
         } else if (circuitElement === 'substation') {
             const span = document.createElement('span');
             span.textContent = 'named';
-            this.#circuitElementNameElement = document.createElement('input');
-            dynamicDiv.replaceChildren(span, this.#circuitElementNameElement);
+            circuitElementNameElement = document.createElement('input');
+            dynamicDiv.replaceChildren(span, circuitElementNameElement);
         } else if (circuitElement === 'feeder') {
             const span1 = document.createElement('span');
             span1.textContent = 'named';
-            this.#circuitElementNameElement = document.createElement('input');
+            circuitElementNameElement = document.createElement('input');
             const span2 = document.createElement('span');
             span2.textContent = 'to';
-            this.#circuitElementParentTypeSelect = document.createElement('select');
+            circuitElementParentTypeSelect = document.createElement('select');
             const option = document.createElement('option');
             option.label = 'substation';
             option.value = 'substation';
-            this.#circuitElementParentTypeSelect.add(option);
+            circuitElementParentTypeSelect.add(option);
             const span3 = document.createElement('span');
             span3.textContent = 'named';
-            this.#circuitElementParentNameSelect = this.#getNewCircuitElementParentNameSelect('substation');
-            dynamicDiv.replaceChildren(span1, this.#circuitElementNameElement, span2, this.#circuitElementParentTypeSelect, span3, this.#circuitElementParentNameSelect);
+            circuitElementParentNameSelect = this.#getNewCircuitElementParentNameSelect('substation');
+            dynamicDiv.replaceChildren(span1, circuitElementNameElement, span2, circuitElementParentTypeSelect, span3, circuitElementParentNameSelect);
         } else if (circuitElement === 'load') {
             const span1 = document.createElement('span');
             span1.textContent = 'named';
-            this.#circuitElementNameElement = this.#getNewLoadNameSelect();
+            circuitElementNameElement = this.#getNewLoadNameSelect();
             const span2 = document.createElement('span');
             span2.textContent = 'to';
-            this.#circuitElementParentTypeSelect = document.createElement('select');
+            circuitElementParentTypeSelect = document.createElement('select');
             const option = document.createElement('option');
             option.label = 'feeder';
             option.value = 'feeder';
-            this.#circuitElementParentTypeSelect.add(option);
+            circuitElementParentTypeSelect.add(option);
             const span3 = document.createElement('span');
             span3.textContent = 'named';
-            this.#circuitElementParentNameSelect = this.#getNewCircuitElementParentNameSelect('feeder');
-            dynamicDiv.replaceChildren(span1, this.#circuitElementNameElement, span2, this.#circuitElementParentTypeSelect, span3, this.#circuitElementParentNameSelect);
+            circuitElementParentNameSelect = this.#getNewCircuitElementParentNameSelect('feeder');
+            dynamicDiv.replaceChildren(span1, circuitElementNameElement, span2, circuitElementParentTypeSelect, span3, circuitElementParentNameSelect);
         } else {
             const span1 = document.createElement('span');
             span1.textContent = 'named'; 
-            this.#circuitElementNameElement = document.createElement('input');
+            circuitElementNameElement = document.createElement('input');
             const span2 = document.createElement('span');
             span2.textContent = 'to';
-            this.#circuitElementParentTypeSelect = document.createElement('select');
+            circuitElementParentTypeSelect = document.createElement('select');
             const option = document.createElement('option');
             option.label = 'feeder';
             option.value = 'feeder';
-            this.#circuitElementParentTypeSelect.add(option);
+            circuitElementParentTypeSelect.add(option);
             const span3 = document.createElement('span');
             span3.textContent = 'named';
-            this.#circuitElementParentNameSelect = this.#getNewCircuitElementParentNameSelect('feeder');
-            dynamicDiv.replaceChildren(span1, this.#circuitElementNameElement, span2, this.#circuitElementParentTypeSelect, span3, this.#circuitElementParentNameSelect); 
+            circuitElementParentNameSelect = this.#getNewCircuitElementParentNameSelect('feeder');
+            dynamicDiv.replaceChildren(span1, circuitElementNameElement, span2, circuitElementParentTypeSelect, span3, circuitElementParentNameSelect);
+        }
+        // - Error message should disappear when the user clicks on the select or input
+        if (circuitElementNameElement !== null) {
+            this.#circuitElementNameElement = circuitElementNameElement;
+            this.#circuitElementNameElement.addEventListener('focus', () => {
+                this.modal.setBanner('', ['hidden']);
+            });
+        }
+        if (circuitElementParentTypeSelect !== null) {
+            this.#circuitElementParentTypeSelect = circuitElementParentTypeSelect;
+            this.#circuitElementParentTypeSelect.addEventListener('focus', () => {
+                this.modal.setBanner('', ['hidden']);
+            });
+        }
+        if (circuitElementParentNameSelect !== null) {
+            this.#circuitElementParentNameSelect = circuitElementParentNameSelect;
+            this.#circuitElementParentNameSelect.addEventListener('focus', () => {
+                this.modal.setBanner('', ['hidden']);
+            });
         }
     }
 
@@ -1020,36 +1058,20 @@ class CircuitUserControlsView {
         const span = document.createElement('span');
         button.append(span);
         span.textContent = 'Submit circuit';
-        button.addEventListener('click', (e) => {
+        button.addEventListener('click', async (e) => {
             // - Don't let form be submitted
             e.preventDefault();
+            // - Check if there are any caution divs. Technically, only the circuit builder names and properties and model name need to be valid
+            if ([...document.getElementsByClassName('caution')].length > 0) {
+                alert('Please correct any erroneous inputs with a highlighted error message before submitting your circuit.');
+                return;
+            }
             const formData = new FormData();
             const modelNameInput = document.querySelector('input[name="MODEL_DIR"]');
-            let re = /^[\w-_]+$/;
-            if (re.test(modelNameInput.value.trim())) {
-                this.modal.setBanner('', ['hidden']);
-            } else {
-                this.modal.setBanner('The model name can only include the following: (1) alphanumeric characters, (2) "-", and (3) "_".', ['caution'])
-                return;
-            }
             formData.append('MODEL_DIR', modelNameInput.value.trim());
             const latitudeInput = document.querySelector('input[name="latitude"]');
-            re = /^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$/;
-            if (re.test(latitudeInput.value.trim())) {
-                this.modal.setBanner('', ['hidden']);
-            } else {
-                this.modal.setBanner('Please specify a valid latitude', ['caution'])
-                return;
-            }
             formData.append('latitude', latitudeInput.value.trim());
             const longitudeInput = document.querySelector('input[name="longitude"]');
-            re = /^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$/;
-            if (re.test(longitudeInput.value.trim())) {
-                this.modal.setBanner('', ['hidden']);
-            } else {
-                this.modal.setBanner('Please specify a valid longitude', ['caution'])
-                return;
-            }   
             formData.append('longitude', longitudeInput.value.trim());
             const ary = [];
             for (const e of this.#controller.model.getElements(e => true)) {
@@ -1062,48 +1084,87 @@ class CircuitUserControlsView {
             }
             formData.append('json', JSON.stringify(ary));
             // Recognize if we're on the edit flow. If we are not, backend should search data/projects for model_dir and return error if it already exists.
-            formData.append('on_edit_flow',window.on_edit_flow);
+            formData.append('onEditFlow',window.onEditFlow);
             const that = this;
-            $.ajax({
-                url: '/wizard_to_dss',
-                type: 'POST',
-                contentType: false,
-                data: formData,
-                processData : false,
-                success: function(data) {
-                    // - Global variable!
-                    window.circuitIsSpecified = true;
-                    const loads = data.loads;
-                    $('#critLoads').empty();
-                    $('#critLoads').append('<p>Please select all critical loads:</p>')
-                    $('#dropDowns').empty();
-                    $('#dropDowns').hide();
-                    jQuery('<form>', {
-                        id: 'criticalLoadsSelect',
-                        class: 'chunk'
-                    }).appendTo('#critLoads');
-                    for (let i=0; i<loads.length; i++) {
-                        $('#criticalLoadsSelect').append('<label><input type="checkbox">'+loads[i]+'</label>')
-                        $('#dropDowns').append('<label><select></select> '+loads[i]+'</label><br>')
-                    }
-                    if (loads.length === 0) {
-                        $('#criticalLoadsSelect').append('<p>No loads to select from.</p>')
-                        $('#dropDowns').append('<p>No loads to assign to microgrids.</p>')
-                    }
-                    // Global variable!
-                    window.filename = data.filename;
-                    // Make directory uneditable.
-                    $('input[name="MODEL_DIR"]').prop("readonly", true);
-                    // Enable partition selector.
-                    $('#previewPartitionsButton').prop('disabled', false);
-                    $('#partitionMethod').prop('disabled', false);
-                    that.modal.setBanner('', ['hidden']);
-                    document.getElementById('partitionMethod').dispatchEvent(new Event('change')); // Manually trigger dropdown select menu change to potentially refresh partition method descriptions (manual is different dependent on wizard vs upload).
-                },
-                error: function(data) {
-                    that.modal.setBanner(data.responseJSON.error, ['caution']);
+            try {
+                const response = await fetch('/wizard_to_dss', {
+                    method: 'POST',
+                    body: formData
+                });
+                const responseJson = await response.json();
+                if (!response.ok) {
+                    throw new Error(responseJson.message);
                 }
-            });
+                // Enable partition selector.
+				document.getElementById('previewPartitionsButton').disabled = false;
+				document.getElementById('partitionMethod').disabled = false;
+				window.circuitIsSpecified = true; // - Global variable!
+				const loads = responseJson.loads;
+                // Clear critLoads.
+				const critLoadsContainer = document.getElementById('critLoads');
+				critLoadsContainer.innerHTML = '';
+                // Instructions for critLoads.
+				const critLoadsParagraph = document.createElement('p');
+				critLoadsParagraph.textContent = 'Please select all critical loads:';
+				critLoadsContainer.appendChild(critLoadsParagraph);
+                // Clear previous content and add loads to manualpartitioningcontainer (shown if user chooses manual partitioning).
+				const manualPartitioningContainer = document.getElementById('manualPartitioningContainer');
+				manualPartitioningContainer.innerHTML = '';
+				manualPartitioningContainer.style.display = 'none';
+                // Form element for checkboxes.
+				const criticalLoadsSelect = document.createElement('form');
+				criticalLoadsSelect.id = 'criticalLoadsSelect';
+				criticalLoadsSelect.classList.add('chunk');
+				critLoadsContainer.appendChild(criticalLoadsSelect);
+                // Create a div to house load assignment dropdown menus.
+				const loadAssignmentContainer = document.createElement('div');
+				loadAssignmentContainer.id = 'loadAssignmentContainer';
+				manualPartitioningContainer.appendChild(loadAssignmentContainer);
+                // Create checkboxes and labels for each load.
+				for (let i = 0; i < loads.length; i++) {
+					const label = document.createElement('label');
+					label.style.display = 'inline-block';
+					label.style.paddingRight = '5px';
+					const checkbox = document.createElement('input');
+					checkbox.type = 'checkbox';
+					label.appendChild(checkbox);
+					label.appendChild(document.createTextNode(loads[i]));
+					criticalLoadsSelect.appendChild(label);
+					// Add a dropdown to loadAssignmentContainer.
+					const dropdownLabel = document.createElement('label');
+					dropdownLabel.style.display = 'inline-block';
+					dropdownLabel.style.paddingRight = '8px';
+					const dropdown = document.createElement('select');
+					dropdown.style.marginRight = '3px';
+					dropdown.dataset.loadId = loads[i];
+					dropdownLabel.appendChild(dropdown);
+					dropdownLabel.appendChild(document.createTextNode(loads[i]));
+					loadAssignmentContainer.appendChild(dropdownLabel);
+				}
+                // Handle the case where there are no loads.
+				if (loads.length === 0) {
+					const noLoadsMessage1 = document.createElement('p');
+					noLoadsMessage1.textContent = 'No loads to select from.';
+					criticalLoadsSelect.appendChild(noLoadsMessage1);
+
+					const noLoadsMessage2 = document.createElement('p');
+					noLoadsMessage2.textContent = 'No loads to assign to microgrids.';
+					manualPartitioningContainer.appendChild(noLoadsMessage2);
+				}
+                window.filename = responseJson.filename; // Set filename. // Global variable!
+                const modelDirInput = document.querySelector('input[name="MODEL_DIR"]');
+				if (modelDirInput) {
+					modelDirInput.readOnly = true; // Make the directory input uneditable.
+				}
+                that.modal.setBanner('', ['hidden']);
+                document.getElementById('partitionMethod').dispatchEvent(new Event('change')); // Manually trigger dropdown select menu change to potentially refresh partition method descriptions (manual partitioning description differs dependent on wizard vs upload).
+            } catch (error) {
+                that.modal.setBanner(data.responseJSON.error, ['caution']);
+                setTimeout(() => {
+                    that.modal.setBanner('', ['hidden']);
+                }, 5000)
+                alert(error);
+            }
         });
         modal.divElement.append(div);
     }
@@ -1220,7 +1281,8 @@ class CircuitTableView {
     }
 
     handleChangedProperty(element, property, oldPropertyVal, namespace) {
-        this.renderContent();
+        // - Don't re-render the table because then all of the error messages will go away
+        //this.renderContent();
     }
 
     // *********************
@@ -1228,6 +1290,9 @@ class CircuitTableView {
     // *********************
 
     #getElementRow(element) {
+        if (!(element instanceof CircuitElement)) {
+            throw TypeError('The "element" argument must be instanceof CircuitElement.');
+        }
         const button = document.createElement('button');
         button.classList.add('delete');
         button.append(getTrashCanSvg());
@@ -1237,6 +1302,7 @@ class CircuitTableView {
         const circuitElementSpan = document.createElement('span');
         const type = element.getProperty('type');
         circuitElementSpan.textContent = type;
+        const errorElement = document.createElement('div');
         const name = element.getProperty('name');
         let circuitElementNameElement;
         if (type === 'load') {
@@ -1249,15 +1315,19 @@ class CircuitTableView {
                 const newName = this.value.trim();
                 try {
                     that.#controller.setProperty(element.fullName, 'name', newName);
-                    that.modal.setBanner('', ['hidden']);
+                    errorElement.textContent = '';
+                    errorElement.classList.remove('caution');
+                    //that.modal.setBanner('', ['hidden']);
                 } catch (e) {
-                    that.modal.setBanner(e.message, ['caution']);
-                    this.value = that.#controller.model.getElement(element.fullName).getProperty('name');
+                    errorElement.textContent = e.message;
+                    errorElement.classList.add('caution');
+                    //this.value = that.#controller.model.getElement(element.fullName).getProperty('name');
+                    //that.modal.setBanner(e.message, ['caution']);
                 }
             });
             circuitElementNameElement.value = name;
         }
-        return [button, circuitElementSpan, circuitElementNameElement];
+        return [button, circuitElementSpan, circuitElementNameElement, errorElement];
     }
 
     #getElementPropertiesRows(element) {
@@ -1274,15 +1344,20 @@ class CircuitTableView {
                 //});
                 const propertySpan = document.createElement('span'); 
                 propertySpan.textContent = key;
+                const errorElement = document.createElement('div');
                 const valueInput = document.createElement('input');
                 valueInput.value = val;
                 valueInput.addEventListener('change', function() {
                     try {
                         that.#controller.setProperty(element.fullName, key, this.value);
-                        that.modal.setBanner('', ['hidden']);
+                        errorElement.textContent = '';
+                        errorElement.classList.remove('caution');
+                        //that.modal.setBanner('', ['hidden']);
                     } catch (e) {
-                        that.modal.setBanner(e.message, ['caution']);
-                        this.value = that.#controller.model.getElement(element.fullName).getProperty(key);
+                        errorElement.textContent = e.message;
+                        errorElement.classList.add('caution');
+                        //this.value = that.#controller.model.getElement(element.fullName).getProperty(key);
+                        //that.modal.setBanner(e.message, ['caution']);
                     }
 
                 });
@@ -1292,7 +1367,7 @@ class CircuitTableView {
                 if (element.getProperty('type') === 'load' && ['kw'].includes(key)) {
                     valueInput.disabled = true;
                 }
-                rows.push([null, propertySpan, valueInput]);
+                rows.push([null, propertySpan, valueInput, errorElement]);
             }
         }
         return rows;

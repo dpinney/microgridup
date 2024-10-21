@@ -1280,6 +1280,8 @@
 
 				// Special behavior if the user removes the circuit.
 				if (event.target.id === 'remove-circuit-button') {
+					// Remove staged filename.
+					window.filename = '';
 					document.getElementById('wizard').disabled = false;
 					// Clear critical loads select and reset partitioning.
 					document.getElementById('critLoads').innerHTML = '';

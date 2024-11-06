@@ -1,4 +1,4 @@
-import os, json, datetime, traceback, sys, logging, shutil, copy
+import os, json, datetime, traceback, re, sys, logging, shutil, copy
 from types import MappingProxyType
 import pandas as pd
 import numpy as np
@@ -57,6 +57,9 @@ def main(data, invalidate_cache=True, open_results=False):
 	assert len(data.keys()) == 12 or (len(data.keys()) == 13 and 'jsCircuitModel' in data)
 	assert isinstance(invalidate_cache, bool)
 	assert isinstance(open_results, bool)
+	# Quick check to ensure MODEL_DIR contains only lowercase alphanumeric and dashes. No spaces or underscores.
+	pattern = re.compile(r'^[a-z0-9-]+$')
+	assert bool(pattern.match(data['MODEL_DIR'])), f'MODEL_DIR may only contain lowercase alphanumeric characters and dashes. Received MODEL_DIR: {data["MODEL_DIR"]}'
 	# - Format the data
 	#   - TODO: move maxRuntimeSeconds out of REOPT_INPUTS
 	data['QSTS_STEPS'] = int(data['QSTS_STEPS'])

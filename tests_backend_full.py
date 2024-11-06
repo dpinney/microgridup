@@ -513,7 +513,7 @@ def test_auto3mg():
 			'reopt_inputs': {}
 		}
 	data = {
-		'MODEL_DIR': 'lehighauto_3mg',
+		'MODEL_DIR': 'lehighauto3mg',
 		'BASE_DSS': f'{microgridup.MGU_DIR}/testfiles/lehigh_base_phased.dss',
 		'LOAD_CSV': f'{microgridup.MGU_DIR}/testfiles/lehigh_load.csv',
 		'QSTS_STEPS': 480,

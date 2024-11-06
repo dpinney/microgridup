@@ -179,7 +179,6 @@ def main(in_csv, data, in_dss, out_html):
 		'Microgrid Meter Count',
 		'Customer Outage Minutes',
 		'Microgrid Customer Outage Minutes'])
-	table_df.to_csv('/Users/austinchang/programming/repositories/microgridup/microgridup/df_join.csv')
 	table_html = '<h1>Full Outage History and Microgrid Adjustments</h1>' + table_df.to_html()
 	# - Generate outage timelines
 	fig = go.Figure(

@@ -1603,6 +1603,8 @@
 	const reoptParametersModel = new REoptParametersModel();
 	const reoptParametersController = new REoptParametersController(reoptParametersModel);
 	const reoptParametersView = new REoptParametersView(reoptParametersController)
+	window.reoptParametersModel = reoptParametersModel;
+	window.reoptParametersView = reoptParametersView;
 	document.getElementById('reoptParametersMVC').replaceChildren(reoptParametersView.modal.divElement);
 
 	window.createReoptParametersMVC = function(MG_MINES) {
@@ -1612,16 +1614,13 @@
 			const btn = document.getElementById('remove-circuit-button');
 			if (btn !== null) {
 				btn.addEventListener('click', function() {
-					window.reoptParametersModel.reset();
-					window.reoptParametersView.renderContent();
+					reoptParametersModel.reset();
+					reoptParametersView.renderContent();
 				});
 			}
 		}
+		reoptParametersModel.reset()
 		for (const [mgName, mg] of Object.entries(MG_MINES)) {
-			// - If the user clicks "Preview partitions" multiple times, each time should reset any existing parameter overrides first
-			if (reoptParametersModel.hasReoptParametersInstance(mgName)) {
-				reoptParametersModel.removeReoptParametersInstance(mgName);
-			}
 			reoptParametersModel.addReoptParametersInstance(mgName);
 			// - If this is an edit run, it's possible that there are existing overrides that should populate the widget
 			if (Object.hasOwn(mg, 'parameter_overrides')) {
@@ -1640,8 +1639,6 @@
 		}
 		// - Need to re-render the view so that the microgrids show up in the select
 		reoptParametersView.renderContent();
-		window.reoptParametersModel = reoptParametersModel;
-		window.reoptParametersView = reoptParametersView;
 	}
 	// - Create the validation model
 	const in_data = JSON.parse('{{ in_data | tojson | safe }}');

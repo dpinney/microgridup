@@ -1,20 +1,227 @@
-from omf.solvers import opendss
-from omf.solvers.opendss import dssConvert
-import random
+import random, json, os, csv
 from random import randint
-from numpy.random import exponential
 from datetime import datetime as dt
 from datetime import timedelta as td
-from omf.models.outageCost import stats
-import csv
 import pandas as pd
+from numpy.random import exponential
 import plotly.graph_objects as go
-import os
+import microgridup
+from omf.solvers import opendss
+from omf.solvers.opendss import dssConvert
+from omf.models.outageCost import stats
 from omf.models.microgridControl import customerCost1, utilityOutageTable
 
-OUTAGE_CSV_COLS = ['ComponentAff', 'Start', 'Finish', 'Duration_min', 'Meters Affected']
-CRIT_OUT_LEN_MINUTES = 10*24*60 #TODO: use outage len
-#TODO: what if the fault is inside the microgrid!?
+
+def main(in_csv, data, in_dss, out_html):
+	'''
+	Output for resilience before/after microgrid deployment.
+
+	:param in_csv: the path of the outage CSV that was created via _many_random_outages()
+	:type csv_path: str
+	:param data: the data which contains the microgrid definitions
+	:type data: dict
+	:param in_dss: the path of the circuit file that contains the microgrids
+	:type in_dss: str
+	:param out_html: the path of the HTML file that will be created in this function
+	:type out_html: str
+	:rtype: None
+	'''
+	outages = pd.read_csv(in_csv)
+	# - Step 1: filter out outages that didn't affect any meters because those shouldn't affect the resilience statistics
+	outages = outages[~pd.isna(outages['Meters Affected'])]
+	# - Step 2: split up every meter within a single row of the "Meters Affected" column into its own row with only a single meter
+	outages['Meters Affected'] = outages['Meters Affected'].apply(lambda meters: meters.split())
+	atomic_outages = outages.explode('Meters Affected')
+	# - Step 3: identify meter location and criticality
+
+	def identify_microgrid(meter):
+		microgrid_name = None
+		for mg_name, mg in data['MICROGRIDS'].items():
+			if meter in mg['loads']:
+				microgrid_name = mg_name
+		return microgrid_name
+
+	atomic_outages['Microgrid'] = atomic_outages['Meters Affected'].apply(identify_microgrid)
+	atomic_outages['Criticality'] = atomic_outages['Meters Affected'].apply(lambda meter: meter in data['CRITICAL_LOADS'])
+	# - Step 4: split meters into 4 categories
+	noncritical_without_mg = atomic_outages[(atomic_outages['Criticality'] == False) & (pd.isna(atomic_outages['Microgrid']))]
+	noncritical_mg = atomic_outages[(atomic_outages['Criticality'] == False) & (~pd.isna(atomic_outages['Microgrid']))]
+	critical_without_mg = atomic_outages[(atomic_outages['Criticality'] == True) & (pd.isna(atomic_outages['Microgrid']))]
+	critical_mg = atomic_outages[(atomic_outages['Criticality'] == True) & (~pd.isna(atomic_outages['Microgrid']))]
+	# - Step 5: adjust the outage duration for each meter within a microgrid based on the outage location and the average outage survival duration of
+	#   that microgrid
+	mg_average_hours_survived = {}
+	for mg_name in data['MICROGRIDS'].keys():
+		with open(f'reopt_{mg_name}/allOutputData.json') as f:
+			mg_average_hours_survived[mg_name] = json.load(f)['avgOutage1']
+	tree = dssConvert.dssToTree(in_dss)
+
+	def adjust_outage_duration(series):
+		# - Don't mutate the passed object
+		series = series.copy()
+		sub_lines = opendss.get_subtree_lines(data['MICROGRIDS'][series['Microgrid']]['switch'], tree)
+		if series['ComponentAff'] in [line['object'].split('.')[1] for line in sub_lines]:
+			# - If the affected component was in the microgrid, then the microgrid would not have mitigated the outage, so don't do anything
+			pass
+		else:
+			# - If the affected component was not in the microgrid, then the microgrid would have mitigated the outage, so adjust the outage duration
+			duration_hours = (pd.Timestamp(series['Finish']) - pd.Timestamp(series['Start'])).total_seconds() / 3600
+			difference = duration_hours - mg_average_hours_survived[series['Microgrid']]
+			if difference > 0:
+				# - If the outage duration was longer than the average microgrid survival time, then shorten the outage
+				series['Start'] = str((pd.Timestamp(series['Finish']) - pd.Timedelta(difference, unit='hours')).round(freq='s'))
+				series['Duration_min'] = difference * 60
+			else:
+				# - If the outage duration was shorter than the average microgrid survival time, then remove the outage
+				series['ComponentAff'] = None
+		return series
+
+	noncritical_mg = noncritical_mg.apply(adjust_outage_duration, axis=1)
+	critical_mg = critical_mg.apply(adjust_outage_duration, axis=1)
+	# - Step 6 (last step): remove outages that would have been entirely mitigated by a microgrid
+	noncritical_mg = noncritical_mg[~pd.isna(noncritical_mg['ComponentAff'])]
+	critical_mg = critical_mg[~pd.isna(critical_mg['ComponentAff'])]
+	# - Generate resilience statistics for SAIDI and group loads by critical/noncritical and without microgrid/with microgrid
+	load_count = len([x for x in tree if x.get('object','').startswith('load.')])
+	df = pd.DataFrame({
+		'SAIFI': [
+			round(stats(noncritical_without_mg, 200, load_count)[0], 3),
+			round(stats(noncritical_mg, 200, load_count)[0], 3),
+			round(stats(critical_mg, 200, load_count)[0], 3),
+			round(stats(critical_without_mg, 200, load_count)[0], 3)]
+	}, index=['noncritical_without_mg', 'noncritical_mg', 'critical_mg', 'critical_without_mg'])
+	fig = go.Figure(data=[
+		go.Bar(name='Noncritical Outside Microgrid', x=df.columns.to_series(), y=df.loc['noncritical_without_mg'], hoverlabel_namelength=-1),
+		go.Bar(name='Noncritical Inside Microgrid', x=df.columns.to_series(), y=df.loc['noncritical_mg'], hoverlabel_namelength=-1),
+		go.Bar(name='Critical Inside Microgrid', x=df.columns.to_series(), y=df.loc['critical_mg'], hoverlabel_namelength=-1),
+		go.Bar(name='Critical Outside Microgrid', x=df.columns.to_series(), y=df.loc['critical_without_mg'], hoverlabel_namelength=-1)])
+	legend_spec = {'orientation':'h', 'xanchor':'left'}#, 'x':0, 'y':-0.2}
+	fig.update_layout(
+		title = 'SAIFI Statistics for Four Categories of Loads Across All Years',
+		legend = legend_spec,
+		font = dict(
+			family="sans-serif",
+			color="black"))
+	saidi_groupings_html = fig.to_html(default_height='300px')
+	# - Generate resilience statistics for SAIDI, SAIFI, CAIDI, ASAI, and MAIFI. Compare stats by year and by no microgrids vs. microgrids
+	no_microgrids_df = pd.read_csv(in_csv)
+	# - Interuption of less than '200' seconds considered momentary.
+	no_microgrids_stats = [
+		[round(x, 3) for x in stats(no_microgrids_df[(pd.to_datetime(no_microgrids_df['Start']) >= pd.Timestamp(str(year))) & (pd.to_datetime(no_microgrids_df['Start']) < pd.Timestamp(str(year + 1)))].reset_index(), 200, load_count)]
+		for year in range(2015, 2022)]
+	microgrids_df = pd.concat([noncritical_without_mg, noncritical_mg, critical_mg, critical_without_mg])
+	microgrids_stats = [
+		[round(x, 3) for x in stats(microgrids_df[(pd.to_datetime(microgrids_df['Start']) >= pd.Timestamp(str(year))) & (pd.to_datetime(microgrids_df['Start']) < pd.Timestamp(str(year + 1)))].reset_index(), '200', str(load_count))]
+		for year in range(2015, 2022)]
+	df = pd.DataFrame({
+		'SAIDI': [f(i) for i in range(7) for f in (lambda idx: no_microgrids_stats[idx][0], lambda idx: microgrids_stats[idx][0])],
+		'SAIFI': [f(i) for i in range(7) for f in (lambda idx: no_microgrids_stats[idx][1], lambda idx: microgrids_stats[idx][1])],
+		'CAIDI': [f(i) for i in range(7) for f in (lambda idx: no_microgrids_stats[idx][2], lambda idx: microgrids_stats[idx][2])],
+		'ASAI':  [f(i) for i in range(7) for f in (lambda idx: no_microgrids_stats[idx][3], lambda idx: microgrids_stats[idx][3])],
+		'MAIFI': [f(i) for i in range(7) for f in (lambda idx: no_microgrids_stats[idx][4], lambda idx: microgrids_stats[idx][4])]
+	}, index=['stats_raw_2015', 'stats_new_2015', 'stats_raw_2016', 'stats_new_2016', 'stats_raw_2017', 'stats_new_2017', 'stats_raw_2018', 'stats_new_2018', 'stats_raw_2019', 'stats_new_2019', 'stats_raw_2020', 'stats_new_2020', 'stats_raw_2021', 'stats_new_2021'])
+	fig = go.Figure(data=[
+		go.Bar(name='Without Microgrid (2015)', x=df.columns.to_series(), y=df.loc['stats_raw_2015'], marker_color='#fa9563', hoverlabel_namelength=-1),
+		go.Bar(name='Microgrid (2015)', x=df.columns.to_series(), y=df.loc['stats_new_2015'], marker_color='#48cb11', hoverlabel_namelength=-1),
+		go.Bar(name='Without Microgrid (2016)', x=df.columns.to_series(), y=df.loc['stats_raw_2016'], marker_color='#fa9563', hoverlabel_namelength=-1),
+		go.Bar(name='Microgrid (2016)', x=df.columns.to_series(), y=df.loc['stats_new_2016'], marker_color='#48cb11', hoverlabel_namelength=-1),
+		go.Bar(name='Without Microgrid (2017)', x=df.columns.to_series(), y=df.loc['stats_raw_2017'], marker_color='#fa9563', hoverlabel_namelength=-1),
+		go.Bar(name='Microgrid (2017)', x=df.columns.to_series(), y=df.loc['stats_new_2017'], marker_color='#48cb11', hoverlabel_namelength=-1),
+		go.Bar(name='Without Microgrid (2018)', x=df.columns.to_series(), y=df.loc['stats_raw_2018'], marker_color='#fa9563', hoverlabel_namelength=-1),
+		go.Bar(name='Microgrid (2018)', x=df.columns.to_series(), y=df.loc['stats_new_2018'], marker_color='#48cb11', hoverlabel_namelength=-1),
+		go.Bar(name='Without Microgrid (2019)', x=df.columns.to_series(), y=df.loc['stats_raw_2019'], marker_color='#fa9563', hoverlabel_namelength=-1),
+		go.Bar(name='Microgrid (2019)', x=df.columns.to_series(), y=df.loc['stats_new_2019'], marker_color='#48cb11', hoverlabel_namelength=-1),
+		go.Bar(name='Without Microgrid (2020)', x=df.columns.to_series(), y=df.loc['stats_raw_2020'], marker_color='#fa9563', hoverlabel_namelength=-1),
+		go.Bar(name='Microgrid (2020)', x=df.columns.to_series(), y=df.loc['stats_new_2020'], marker_color='#48cb11', hoverlabel_namelength=-1),
+		go.Bar(name='Without Microgrid (2021)', x=df.columns.to_series(), y=df.loc['stats_raw_2021'], marker_color='#fa9563', hoverlabel_namelength=-1),
+		go.Bar(name='Microgrid (2021)', x=df.columns.to_series(), y=df.loc['stats_new_2021'], marker_color='#48cb11', hoverlabel_namelength=-1)])
+	fig.update_layout(
+		title = 'Original and Adjusted Resilience Metrics by Year',
+		legend = legend_spec,
+		font = dict(
+			family="sans-serif",
+			color="black"))
+	years_grouping_html = fig.to_html(default_height='300px')
+	# - Generate outage table
+	# - First, generate microgrid-related columns
+	microgrid_meters = pd.concat([noncritical_mg, critical_mg]).drop(columns=['ComponentAff', 'Start', 'Finish', 'Microgrid', 'Criticality'])
+	microgrid_meters = (microgrid_meters.groupby([microgrid_meters.index])
+		.agg({'Duration_min': 'mean', 'Meters Affected': lambda x: ' '.join(x)})
+		.rename(columns={'Duration_min': 'Average Microgrid Duration_min', 'Meters Affected': 'Microgrid Meters Affected'}))
+	microgrid_meters['Microgrid Meter Count'] = microgrid_meters['Microgrid Meters Affected'].apply(lambda string: len(string.split()))
+	microgrid_meters['Microgrid Customer Outage Minutes'] = microgrid_meters['Microgrid Meter Count'] * microgrid_meters['Average Microgrid Duration_min']
+	# - Second, generate non-microgrid-related columns
+	no_microgrids_df['Date'] = no_microgrids_df['Start'].apply(lambda string: str(pd.to_datetime(string).to_period(freq='d')))
+	no_microgrids_df['Meter Count'] = no_microgrids_df['Meters Affected'].apply(lambda string: len(string.split()) if not pd.isna(string) else 0)
+	no_microgrids_df['Customer Outage Minutes'] = no_microgrids_df.apply(lambda series: len(series['Meters Affected'].split()) * series['Duration_min'] if not pd.isna(series['Meters Affected']) else 0, axis=1)
+	# - Third, join dataframes, fill in blanks row cells, and round
+	table_df = no_microgrids_df.join(microgrid_meters)
+	table_df['Meters Affected'] = table_df['Meters Affected'].fillna('None')
+	table_df['Average Microgrid Duration_min'] = table_df['Average Microgrid Duration_min'].fillna(0)
+	table_df['Microgrid Meters Affected'] = table_df['Microgrid Meters Affected'].fillna('None')
+	table_df['Microgrid Meter Count'] = table_df['Microgrid Meter Count'].fillna(0)
+	table_df['Microgrid Customer Outage Minutes'] = table_df['Microgrid Customer Outage Minutes'].fillna(0)
+	table_df['Duration_min'] = table_df['Duration_min'].round(2)
+	table_df['Average Microgrid Duration_min'] = table_df['Average Microgrid Duration_min'].round(2)
+	table_df['Customer Outage Minutes'] = table_df['Customer Outage Minutes'].round(2)
+	table_df['Microgrid Customer Outage Minutes'] = table_df['Microgrid Customer Outage Minutes'].round(2)
+    # - Fourth, reorder columns
+	table_df = table_df.reindex(columns=[
+		'ComponentAff',
+        'Start',
+		'Finish',
+		'Duration_min',
+		'Meters Affected',
+		'Average Microgrid Duration_min',
+		'Microgrid Meters Affected',
+		'Date',
+		'Meter Count',
+		'Microgrid Meter Count',
+		'Customer Outage Minutes',
+		'Microgrid Customer Outage Minutes'])
+	table_df.to_csv('/Users/austinchang/programming/repositories/microgridup/microgridup/df_join.csv')
+	table_html = '<h1>Full Outage History and Microgrid Adjustments</h1>' + table_df.to_html()
+	# - Generate outage timelines
+	fig = go.Figure(
+		data=[
+			go.Bar(
+				name = 'Customer Outage Minutes',
+				x=[str(x)[0:7] for x in table_df['Date']], # aggregate to the month level.
+				y=[float(x) for x in table_df['Customer Outage Minutes']]),
+			go.Bar(
+				name='Microgrid Customer Outage Minutes',
+				x=[str(x)[0:7] for x in table_df['Date']], # aggregate to the month level.
+				y=[float(x) for x in table_df['Microgrid Customer Outage Minutes']])])
+	fig.update_layout(
+		title = 'Outage Timeline, Original and Microgrid',
+		legend = legend_spec,
+		font = dict(
+			family="sans-serif",
+			color="black"))
+	outage_timeline_html = fig.to_html(default_height='600px')
+	style_string = '<head><style>* {font-family:sans-serif}; .dataframe {width:100%; border-collapse:collapse; overflow-x:scroll}</style></head>'
+	# TODO: fix table styling, transition to jinja2 template.
+	with open(out_html,'w') as outFile:
+		outFile.write(style_string + '\n' + saidi_groupings_html + '\n' + years_grouping_html + '\n' + outage_timeline_html + '\n' + table_html)
+
+
+def _customer_outage_cost(csv_path):
+	rows = [x.split(',') for x in open(csv_path).readlines()]
+	header = rows[0]
+	values = rows[1:]
+	# print(header, values)
+	for in_row in values:
+		payload = in_row[1:5]
+		print(in_row[0], payload)
+		out = customerCost1(*payload)
+		print(out)
+
+
+def _utility_outage_cost_TEST():
+	# utilityOutageTable(average_lost_kwh, profit_on_energy_sales, restoration_cost, hardware_cost, outageDuration, output_dir)
+	utilcost = utilityOutageTable([1000,1000,1000], 0.02, 5000, 9000, 5, None) #None = tempfile output.
+	print(utilcost)
+
 
 def __test_getting_affloads(affected_obj='692675', test_file='lehigh_base_phased.dss'):
 	''' Test getting loads affected by an outage on a TREE. '''
@@ -24,6 +231,7 @@ def __test_getting_affloads(affected_obj='692675', test_file='lehigh_base_phased
 	sub_loads = [x['object'][5:] for x in sub_obs if x.get('object','').startswith('load.')]
 	print('SUBLOAD_NAMES', len(sub_loads), sub_loads)
 
+
 def _write_csv(filename, fields, rows):
 	''' Helper function to write a CSV. '''
 	with open(filename, 'w') as csvfile:
@@ -31,9 +239,12 @@ def _write_csv(filename, fields, rows):
 		csvwriter.writerow(fields)
 		csvwriter.writerows(rows)
 
+
 def _random_outage(tree):
 	''' Generate single random outage on a tree, return affected loads. '''
 	all_line_names = [x.get('object')[5:] for x in tree if x.get('object','').startswith('line.')]
+	all_transformer_names = [x.get('object')[12:] for x in tree if x.get('object', '').startswith('transformer.')]
+	all_line_names.extend(all_transformer_names)
 	# for lehigh: all_line_names = ['670671','645646','692675','684611','684652','671692','632633','671684','632645','632670','650632','671680']
 	out_line = random.choice(all_line_names)
 	duration = exponential(scale=100)
@@ -45,129 +256,36 @@ def _random_outage(tree):
 	loads_affected = [x['object'][5:] for x in obs_affected if x.get('object','').startswith('load.')]
 	return [out_line, start_date, end_date, duration, ' '.join(loads_affected)]
 
+
 def _many_random_outages(count, out_filename, in_dss):
 	''' Create <count> outages for the Lehigh circuit. '''
 	tree = dssConvert.dssToTree(in_dss)
-	print(tree)
 	rows = []
 	for x in range(count):
 		rows.append(_random_outage(tree))
+	OUTAGE_CSV_COLS = ['ComponentAff', 'Start', 'Finish', 'Duration_min', 'Meters Affected']
 	_write_csv(out_filename, OUTAGE_CSV_COLS, rows)
 
-def gen_supported_csv(in_path, out_path, mg_supported_loads, tree):
-	''' Generate a modified outage list factoring out outages that would have been averted by microgrids. '''
-	out_df = pd.read_csv(in_path)
-	rows = out_df.values.tolist()
-	# print(raw_data)
-	for row in rows:
-		sub_obs = opendss.get_subtree_obs(row[0], tree)
-		sub_loads = [x['object'][5:] for x in sub_obs if x.get('object','').startswith('load.')]
-		not_supported = [x for x in sub_loads if x not in mg_supported_loads]
-		# print(f'orig {len(sub_loads)} not supp {len(not_supported)} specifically {not_supported}')
-		row[4] = ' '.join(not_supported)
-	# print(rows)
-	_write_csv(out_path, OUTAGE_CSV_COLS, rows)
-
-def main(in_csv, out_csv, mg_supported_loads, in_dss, out_html):
-	''' Output for resilience before/after microgrid deployment. '''
-	# Generate resilience statistics SAIDI/SAIFI/etc.
-	tree = dssConvert.dssToTree(in_dss)
-	load_count = len([x for x in tree if x.get('object','').startswith('load.')])
-	print('LOAD COUNT', load_count)
-	gen_supported_csv(in_csv, out_csv, mg_supported_loads, tree)
-	raw_df = pd.read_csv(in_csv)
-	new_df = pd.read_csv(out_csv)
-	out_stats_raw = stats(raw_df, '200', str(load_count)) #interuption of less than '200' seconds considered momentary.
-	out_stats_new = stats(new_df, '200', str(load_count))
-	stats_labels = ['SAIDI','SAIFI','CAIDI','ASAI','MAIFI']
-	legend_spec = {'orientation':'h', 'xanchor':'left'}#, 'x':0, 'y':-0.2}
-	stats_fig = go.Figure(
-		data=[
-			go.Bar(
-				name = 'Without Microgrid',
-				x=stats_labels,
-				y=[round(x,3) for x in out_stats_raw],
-			), go.Bar(
-				name='Microgrid',
-				x=stats_labels,
-				y=[round(x,3) for x in out_stats_new],
-			)
-		]
-	)
-	stats_fig.update_layout(
-		title = 'Original and Adjusted Resilience Metrics',
-		legend = legend_spec,
-		font = dict(
-			family="sans-serif",
-			color="black"
-		)
-	)
-	# Generate outage table
-	df_init = pd.read_csv(in_csv) 
-	df_with_mg = pd.read_csv(out_csv)
-	df_with_mg = df_with_mg.rename(columns={
-		'Duration_min':'Microgrid Duration_min',
-		'Meters Affected':'Microgrid Meters Affected'
-	}).drop(['ComponentAff', 'Start', 'Finish'], axis=1)
-	df_full = pd.concat([df_init, df_with_mg], axis=1)
-	df_full['Date'] = pd.to_datetime(df_full['Start']).dt.date
-	print(df_full.head())
-	df_full['Meter Count'] = [0 if str(x).lower() == "nan" else len(str(x).split()) for x in df_full['Meters Affected']]
-	df_full['Microgrid Meter Count'] = [0 if str(x).lower() == "nan" else len(str(x).split()) for x in df_full['Microgrid Meters Affected']]
-	df_full['Customer Outage Minutes'] = [x[0]*x[1] for x in zip(df_full['Meter Count'],df_full['Duration_min'])]
-	df_full['Microgrid Customer Outage Minutes'] = [x[0]*x[1] for x in zip(df_full['Microgrid Meter Count'],df_full['Microgrid Duration_min'])]
-	table_html = '<h1>Full Outage History and Microgrid Adjustments</h1>' + df_full.to_html()
-	# Generate 
-	fig = go.Figure(
-		data=[
-			go.Bar(
-				name = 'Customer Outage Minutes',
-				x=[str(x)[0:7] for x in df_full['Date']], # aggregate to the month level.
-				y=[float(x) for x in df_full['Customer Outage Minutes']],
-			), go.Bar(
-				name='Microgrid Customer Outage Minutes',
-				x=[str(x)[0:7] for x in df_full['Date']], # aggregate to the month level.
-				y=[float(x) for x in df_full['Microgrid Customer Outage Minutes']],
-			)
-		]
-	)
-	fig.update_layout(
-		title = 'Outage Timeline, Original and Microgrid',
-		legend = legend_spec,
-		font = dict(
-			family="sans-serif",
-			color="black"
-		)
-	)
-	chart_html = fig.to_html(default_height='600px')
-	stats_chart_html = stats_fig.to_html(default_height='300px')
-	style_string = '<head><style>* {font-family:sans-serif}; .dataframe {width:100%; border-collapse:collapse; overflow-x:scroll}</style></head>'
-	# TODO: fix table styling, transition to jinja2 template.
-	with open(out_html,'w') as outFile:
-		outFile.write(style_string + '\n' + stats_chart_html + '\n' + chart_html + '\n' + table_html)
-
-def customer_outage_cost(csv_path):
-	rows = [x.split(',') for x in open(csv_path).readlines()]
-	header = rows[0]
-	values = rows[1:]
-	# print(header, values)
-	for in_row in values:
-		payload = in_row[1:5]
-		print(in_row[0], payload)
-		out = customerCost1(*payload)
-		print(out)
-
-def utility_outage_cost_TEST():
-	# utilityOutageTable(average_lost_kwh, profit_on_energy_sales, restoration_cost, hardware_cost, outageDuration, output_dir)
-	utilcost = utilityOutageTable([1000,1000,1000], 0.02, 5000, 9000, 5, None) #None = tempfile output.
-	print(utilcost)
 
 def _tests():
-	_many_random_outages(100, './testfiles/lehigh_random_outages999.csv', './testfiles/lehigh_base_phased.dss')
-	utility_outage_cost_TEST()
-	# customer_outage_cost(f'{omf.omfDir}/static/testFiles/customerInfo.csv')
-	main('./testfiles/lehigh_random_outages.csv', './testfiles/lehigh_random_outages_ADJUSTED.csv', ['634a_data_center','634b_radar','634c_atc_tower','675a_hospital','675b_residential1','675c_residential1','692_warehouse2'], './testfiles/lehigh_base_phased.dss', 'zoutput.html')
-	os.system('open zoutput.html')
+	# - Test outage generation
+	#_many_random_outages(100, './testfiles/lehigh_random_outages999.csv', './testfiles/lehigh_base_phased.dss')
+	# - Test model run
+	test_model = 'lehigh1mg'
+	absolute_model_directory = f'{microgridup.PROJ_DIR}/{test_model}'
+	# HACK: work in directory because we're very picky about the current dir.
+	curr_dir = os.getcwd()
+	if curr_dir != absolute_model_directory:
+		os.chdir(absolute_model_directory)
+	with open('allInputData.json') as file:
+		data = json.load(file)
+	main('outages.csv', data, 'circuit.dss', 'zoutput.html')
+	assert os.path.isfile('zoutput.html')
+	#os.system('open zoutput.html')
+	os.chdir(curr_dir)
+	#_utility_outage_cost_TEST()
+	#_customer_outage_cost(f'{omf.omfDir}/static/testFiles/customerInfo.csv')
+
 
 if __name__ == '__main__':
 	_tests()

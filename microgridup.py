@@ -169,9 +169,7 @@ def main(data, invalidate_cache=True, open_results=False):
 				file.write(f"<html><body><h1>Error</h1><p>{error_message}</p></body></html>")
 		# Resilience simulation with outages. Optional. Skipped if no OUTAGE_CSV
 		if immutable_data['OUTAGE_CSV']:
-			all_microgrid_loads = [x.get('loads',[]) for x in immutable_data['MICROGRIDS'].values()]
-			all_loads = [item for sublist in all_microgrid_loads for item in sublist]
-			microgridup_resilience.main('outages.csv', 'outages_ADJUSTED.csv', all_loads, 'circuit_plus_mgAll.dss', 'output_resilience.html')
+			microgridup_resilience.main('outages.csv', immutable_data, 'circuit_plus_mgAll.dss', 'output_resilience.html')
 		# Build Final report
 		reports = [x for x in os.listdir('.') if x.startswith('ultimate_rep_')]
 		reports.sort()

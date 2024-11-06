@@ -1,101 +1,101 @@
 ComponentAff,Start,Finish,Duration_min,Meters Affected
-692675,2017-1-12 1:0:13,2017-1-12 1:10:18,10.095411422943815,675a_hospital 675b_residential1 675c_residential1
-684652,2018-5-1 8:12:7,2018-5-1 8:41:55,29.810565202388723,652_residential
-692675,2015-6-26 6:26:35,2015-6-26 7:09:29,42.90645944455714,675a_hospital 675b_residential1 675c_residential1
-692675,2015-4-28 2:27:42,2015-4-28 2:35:16,7.573381216678256,675a_hospital 675b_residential1 675c_residential1
-692675,2017-2-1 10:49:9,2017-2-1 12:45:28,116.32518644722944,675a_hospital 675b_residential1 675c_residential1
-650632,2017-4-11 16:12:38,2017-4-11 16:21:15,8.628581788394609,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-684611,2015-7-14 7:28:39,2015-7-14 8:14:44,46.084239083289944,611_runway
-684652,2016-4-20 1:26:40,2016-4-20 1:42:00,15.34690401121236,652_residential
-632645,2016-9-16 17:52:23,2016-9-16 18:10:33,18.177595053452535,645_hangar 646_office
-650632,2017-8-2 17:9:5,2017-8-2 20:29:00,199.93153530673192,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-632670,2019-6-27 16:25:46,2019-6-27 18:37:10,131.41156284921493,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-632633,2019-1-15 9:45:8,2019-1-15 10:16:26,31.304726178100932,634a_data_center 634b_radar 634c_atc_tower
-684611,2021-11-9 23:46:7,2021-11-9 23:52:39,6.53848053632005,611_runway
-684611,2016-10-25 11:58:57,2016-10-25 12:53:25,54.480233022784006,611_runway
-684611,2019-9-25 7:43:50,2019-9-25 7:49:10,5.336749262629119,611_runway
-632670,2020-3-16 11:9:56,2020-3-16 12:00:30,50.56795116010522,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-650632,2015-6-12 1:46:43,2015-6-12 3:44:56,118.22982873596975,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-692675,2016-10-17 15:2:21,2016-10-17 15:34:37,32.28095951663272,675a_hospital 675b_residential1 675c_residential1
-650632,2020-10-23 2:14:52,2020-10-23 3:20:00,65.14609149491791,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-632670,2016-1-7 6:7:43,2016-1-7 9:17:53,190.18301391425828,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-632670,2015-7-9 12:26:6,2015-7-9 14:38:37,132.5308779965632,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-692675,2021-2-5 17:31:28,2021-2-5 20:49:23,197.9258484669322,675a_hospital 675b_residential1 675c_residential1
-684611,2019-9-5 2:23:35,2019-9-5 6:01:41,218.10019728372282,611_runway
-650632,2021-2-10 22:48:50,2021-2-10 22:52:15,3.429174156180967,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-684652,2015-5-19 18:39:26,2015-5-19 19:09:50,30.41164811354131,652_residential
-650632,2021-6-25 7:26:25,2021-6-25 7:36:22,9.963426504348043,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-671692,2018-10-26 19:41:34,2018-10-26 20:26:51,45.29029337024764,692_warehouse2 675a_hospital 675b_residential1 675c_residential1
-650632,2018-4-7 17:32:43,2018-4-7 18:17:58,45.25232464333157,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-684652,2020-3-22 19:31:9,2020-3-22 22:52:47,201.64745456009948,652_residential
-645646,2017-3-26 3:25:35,2017-3-26 4:00:52,35.29611184562364,646_office
-684652,2017-9-26 8:41:59,2017-9-26 9:54:19,72.33621727400637,652_residential
-670671,2021-4-11 12:14:24,2021-4-11 19:48:52,454.4746169173867,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential
-632633,2017-10-9 15:13:25,2017-10-9 19:00:14,226.8286977111455,634a_data_center 634b_radar 634c_atc_tower
-650632,2018-7-14 13:20:1,2018-7-14 13:49:13,29.216522393992445,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-684652,2015-12-11 17:48:55,2015-12-11 18:34:42,45.790498121817535,652_residential
-632633,2018-6-19 19:19:35,2018-6-19 20:07:24,47.82595194826836,634a_data_center 634b_radar 634c_atc_tower
-670671,2020-5-5 23:20:1,2020-5-6 1:50:47,150.76876165614297,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential
-671692,2021-9-26 7:29:25,2021-9-26 8:32:23,62.979837488636306,692_warehouse2 675a_hospital 675b_residential1 675c_residential1
-670671,2015-11-22 1:36:45,2015-11-22 3:20:09,103.40621559411198,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential
-650632,2015-1-4 18:2:52,2015-1-4 23:10:18,307.4432122265854,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-650632,2015-1-12 4:31:37,2015-1-12 8:05:53,214.2737440971986,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-684611,2021-4-25 21:38:39,2021-4-26 1:59:49,261.1708325130532,611_runway
-670671,2019-10-4 11:0:25,2019-10-4 16:16:29,316.08025396874615,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential
-692675,2018-3-6 15:33:46,2018-3-6 16:03:27,29.69632053714021,675a_hospital 675b_residential1 675c_residential1
-632645,2015-8-24 14:51:14,2015-8-24 15:35:52,44.647002319403846,645_hangar 646_office
-632633,2017-2-10 4:42:26,2017-2-10 8:43:46,241.3397580192216,634a_data_center 634b_radar 634c_atc_tower
-692675,2016-2-9 6:41:13,2016-2-9 8:29:26,108.23192369121945,675a_hospital 675b_residential1 675c_residential1
-671680,2018-11-11 8:31:36,2018-11-11 9:19:15,47.66067674871,
-671684,2015-11-3 8:31:32,2015-11-3 10:21:05,109.55432855269962,684_command_center 611_runway 652_residential
-671692,2016-5-18 23:45:52,2016-5-19 3:19:19,213.45778521618115,692_warehouse2 675a_hospital 675b_residential1 675c_residential1
-670671,2020-9-21 16:37:59,2020-9-21 19:25:05,167.11335581647896,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential
-632670,2017-3-5 19:4:12,2017-3-5 20:58:31,114.32730736489016,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-632645,2020-8-23 2:23:22,2020-8-23 2:31:36,8.2445746496898,645_hangar 646_office
-692675,2015-3-22 19:9:27,2015-3-22 20:55:11,105.73979621016953,675a_hospital 675b_residential1 675c_residential1
-632645,2017-6-8 9:45:15,2017-6-8 11:56:00,130.7568274884509,645_hangar 646_office
-684652,2017-2-7 10:24:30,2017-2-7 10:58:12,33.71328630005856,652_residential
-671680,2017-11-23 10:21:49,2017-11-23 10:50:16,28.458845209323215,
-645646,2015-7-7 18:35:48,2015-7-7 18:38:54,3.1098931986403784,646_office
-671680,2018-6-16 0:7:19,2018-6-16 0:31:49,24.504133352521524,
-650632,2015-11-18 17:39:47,2015-11-18 17:41:34,1.796527953754797,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-632633,2020-6-26 12:44:26,2020-6-26 12:57:18,12.868836459433867,634a_data_center 634b_radar 634c_atc_tower
-671680,2021-10-26 20:48:15,2021-10-26 20:49:39,1.4036884584574183,
-671684,2019-5-19 18:43:22,2019-5-19 20:59:50,136.47903272241518,684_command_center 611_runway 652_residential
-684611,2020-2-21 21:42:49,2020-2-21 21:50:18,7.488042514182165,611_runway
-632633,2021-10-13 22:14:58,2021-10-13 23:09:30,54.53827537347687,634a_data_center 634b_radar 634c_atc_tower
-632670,2015-1-26 20:8:6,2015-1-26 20:25:53,17.795315053665078,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-671684,2015-4-14 5:52:42,2015-4-14 9:44:46,232.07565083854712,684_command_center 611_runway 652_residential
-632670,2016-2-14 22:35:4,2016-2-15 1:10:08,155.07707167205697,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-632633,2015-5-18 0:28:52,2015-5-18 1:10:54,42.03766304043125,634a_data_center 634b_radar 634c_atc_tower
-632633,2017-6-22 3:18:41,2017-6-22 4:18:40,59.98680922395826,634a_data_center 634b_radar 634c_atc_tower
-645646,2018-9-16 7:0:39,2018-9-16 8:09:29,68.83469265374727,646_office
-671680,2017-9-24 0:2:10,2017-9-24 0:40:01,37.85579911452314,
-684652,2016-4-22 14:19:30,2016-4-22 14:30:02,10.54130939200703,652_residential
-671680,2018-2-23 9:36:36,2018-2-23 10:21:18,44.700217076423215,
-670671,2016-9-25 8:35:27,2016-9-25 9:10:01,34.56847077170556,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential
-671680,2015-4-15 13:2:46,2015-4-15 16:35:05,212.33186353736454,
-684652,2018-3-11 3:59:20,2018-3-11 5:14:16,74.94318910316774,652_residential
-632670,2016-7-28 7:30:56,2016-7-28 9:22:36,111.68059784267162,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-671684,2021-10-25 12:31:42,2021-10-25 13:21:07,49.42064428467899,684_command_center 611_runway 652_residential
-684611,2020-2-23 13:8:34,2020-2-23 16:16:13,187.65543324861022,611_runway
-671692,2021-10-14 16:19:43,2021-10-14 20:16:48,237.09753410313104,692_warehouse2 675a_hospital 675b_residential1 675c_residential1
-670671,2020-3-26 5:13:59,2020-3-26 10:19:04,305.0963772717451,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential
-671680,2018-6-12 15:18:51,2018-6-12 19:10:59,232.1338691660438,
-671692,2017-3-7 16:8:15,2017-3-7 16:45:15,37.00987405992276,692_warehouse2 675a_hospital 675b_residential1 675c_residential1
-632633,2018-4-16 19:15:34,2018-4-16 19:16:02,0.4687747253233189,634a_data_center 634b_radar 634c_atc_tower
-670671,2018-4-17 20:9:8,2018-4-17 20:12:24,3.267012551253498,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential
-670671,2020-10-2 9:14:58,2020-10-2 10:00:45,45.7859089488491,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential
-670671,2015-9-1 1:51:31,2015-9-1 2:57:14,65.7267438560475,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential
-684611,2020-10-10 20:24:4,2020-10-10 20:29:02,4.982024459865942,611_runway
-632670,2017-12-19 22:15:2,2017-12-19 22:43:43,28.691584256247793,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-692675,2021-6-8 15:10:35,2021-6-8 20:55:40,345.0926177309979,675a_hospital 675b_residential1 675c_residential1
-670671,2016-8-3 16:22:18,2016-8-3 17:23:09,60.85372233426053,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential
-670671,2015-7-24 13:4:10,2015-7-24 13:18:12,14.040589429397443,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential
-632670,2015-7-17 6:17:35,2015-7-17 7:10:45,53.1726868464375,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
-692675,2019-6-19 12:48:40,2019-6-19 14:50:09,121.49017129106694,675a_hospital 675b_residential1 675c_residential1
-632645,2019-1-27 22:41:49,2019-1-28 0:37:34,115.75223776187376,645_hangar 646_office
-671692,2016-11-12 13:48:34,2016-11-12 14:26:10,37.6161722466453,692_warehouse2 675a_hospital 675b_residential1 675c_residential1
-684652,2017-4-4 20:48:12,2017-4-4 21:01:40,13.470123315677032,652_residential
-684611,2020-2-13 7:48:6,2020-2-13 8:09:03,20.95912926382152,611_runway
-670671,2021-9-24 12:27:57,2021-9-24 12:51:26,23.493827316695786,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential
+645646,2020-7-12 19:13:36,2020-7-12 20:16:27,62.861946045742854,646_office
+632670,2019-9-24 23:26:49,2019-9-25 4:06:37,279.81567491458577,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+632645,2017-10-7 2:54:57,2017-10-7 5:36:13,161.27289063357196,645_hangar 646_office
+684652,2017-1-7 7:39:36,2017-1-7 8:29:02,49.438756814923615,652_residential
+671692,2020-1-9 15:29:37,2020-1-9 16:46:12,76.58740766066278,692_warehouse2 675a_hospital 675b_residential1 675c_residential1
+650632,2016-1-20 19:57:1,2016-1-20 20:20:39,23.63863927133782,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+632633,2021-2-10 1:22:13,2021-2-10 4:25:07,182.90793281738266,634a_data_center 634b_radar 634c_atc_tower
+xfm1,2019-8-20 11:14:51,2019-8-20 15:48:57,274.1132991285825,634a_data_center 634b_radar 634c_atc_tower
+632670,2021-7-12 2:50:6,2021-7-12 3:35:24,45.30145988369895,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+671692,2018-11-3 13:50:14,2018-11-3 15:36:48,106.56769764564211,692_warehouse2 675a_hospital 675b_residential1 675c_residential1
+sub,2020-6-6 21:39:29,2020-6-7 0:17:21,157.87228649416986,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+671684,2020-7-27 9:16:7,2020-7-27 11:22:38,126.52020989980932,684_command_center 611_runway 652_residential
+sub,2020-9-4 7:0:5,2020-9-4 8:19:39,79.57439213008453,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+632645,2019-6-19 8:20:32,2019-6-19 8:46:19,25.79294157990534,645_hangar 646_office
+671692,2017-10-17 11:33:6,2017-10-17 19:56:34,503.4791196947307,692_warehouse2 675a_hospital 675b_residential1 675c_residential1
+reg3,2016-9-19 4:59:28,2016-9-19 8:33:09,213.69196024383817,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+sub,2017-3-25 15:55:29,2017-3-25 17:01:31,66.0468250644376,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+684652,2021-2-15 18:26:41,2021-2-15 19:55:33,88.87854337908793,652_residential
+671692,2018-7-26 7:37:9,2018-7-26 7:53:29,16.33428094800945,692_warehouse2 675a_hospital 675b_residential1 675c_residential1
+650632,2015-9-6 19:3:8,2015-9-6 22:51:59,228.86101447001988,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+reg1,2016-2-1 1:4:22,2016-2-1 1:16:39,12.292760179112392,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+684611,2017-2-8 15:51:1,2017-2-8 18:04:55,133.90481850408938,611_runway
+645646,2015-11-2 23:40:17,2015-11-3 5:28:02,347.75803300251636,646_office
+692675,2018-6-22 13:10:57,2018-6-22 13:14:25,3.4710778068536072,675a_hospital 675b_residential1 675c_residential1
+xfm1,2021-6-25 23:9:39,2021-6-25 23:39:24,29.759645486496282,634a_data_center 634b_radar 634c_atc_tower
+reg3,2015-5-20 16:0:23,2015-5-20 21:19:36,319.23021830013766,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+645646,2019-10-20 8:58:41,2019-10-20 9:54:14,55.55442871177119,646_office
+671692,2019-10-27 3:50:3,2019-10-27 5:38:26,108.39351565307098,692_warehouse2 675a_hospital 675b_residential1 675c_residential1
+xfm1,2016-4-11 13:12:17,2016-4-11 13:35:35,23.30321152682743,634a_data_center 634b_radar 634c_atc_tower
+sub,2017-6-20 5:13:27,2017-6-20 7:34:12,140.7614283416935,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+reg2,2017-5-3 12:29:11,2017-5-3 14:40:33,131.37093178848238,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+reg2,2015-2-18 22:29:45,2015-2-18 23:58:40,88.9311177298364,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+670671,2016-11-5 15:30:33,2016-11-5 19:55:38,265.0863947971395,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential
+692675,2015-5-21 9:33:43,2015-5-21 11:43:46,130.05197066390474,675a_hospital 675b_residential1 675c_residential1
+632645,2019-8-20 16:46:1,2019-8-20 17:30:38,44.62093862779146,645_hangar 646_office
+650632,2021-7-11 12:4:22,2021-7-11 12:53:08,48.772171134534965,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+684652,2015-5-20 18:4:15,2015-5-20 20:51:51,167.60945833416733,652_residential
+reg3,2020-11-1 11:16:3,2020-11-1 11:23:56,7.883464096015046,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+reg1,2020-4-26 14:18:56,2020-4-26 14:30:07,11.197589011367924,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+671692,2017-3-23 15:12:53,2017-3-23 15:22:47,9.914020854391284,692_warehouse2 675a_hospital 675b_residential1 675c_residential1
+671680,2019-2-7 18:4:35,2019-2-7 18:15:59,11.410325722410546,
+645646,2020-11-15 8:2:31,2020-11-15 10:26:05,143.57303071672453,646_office
+632633,2015-8-7 21:35:44,2015-8-8 1:23:03,227.33295031661265,634a_data_center 634b_radar 634c_atc_tower
+650632,2017-1-5 14:21:49,2017-1-5 15:09:54,48.09617209586652,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+632633,2017-6-3 20:55:1,2017-6-4 2:54:24,359.3844176405037,634a_data_center 634b_radar 634c_atc_tower
+632633,2015-1-22 8:56:3,2015-1-22 9:27:05,31.036698352600578,634a_data_center 634b_radar 634c_atc_tower
+650632,2017-2-27 14:10:48,2017-2-27 16:54:14,163.44364093414882,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+632645,2019-12-14 18:9:59,2019-12-14 19:00:01,50.04611407891324,645_hangar 646_office
+reg2,2021-7-27 23:20:13,2021-7-28 1:26:14,126.02742800336077,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+671692,2021-11-27 5:59:30,2021-11-27 9:02:08,182.63991169664237,692_warehouse2 675a_hospital 675b_residential1 675c_residential1
+632633,2021-2-25 3:51:56,2021-2-25 4:00:53,8.958178256830532,634a_data_center 634b_radar 634c_atc_tower
+632645,2018-7-11 3:31:33,2018-7-11 4:16:20,44.79395428774954,645_hangar 646_office
+645646,2016-8-25 5:1:31,2016-8-25 7:17:03,135.53950678415026,646_office
+671692,2021-7-7 10:12:18,2021-7-7 12:43:31,151.21752036612887,692_warehouse2 675a_hospital 675b_residential1 675c_residential1
+reg2,2015-4-16 22:40:20,2015-4-17 0:14:52,94.54680327370886,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+632633,2020-2-13 19:17:58,2020-2-13 19:29:42,11.734450436541069,634a_data_center 634b_radar 634c_atc_tower
+650632,2019-12-22 2:8:8,2019-12-22 5:56:13,228.09030900446152,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+671684,2017-11-25 0:1:40,2017-11-25 5:31:16,329.601966619238,684_command_center 611_runway 652_residential
+671692,2019-5-17 4:36:7,2019-5-17 4:52:50,16.722103866371455,692_warehouse2 675a_hospital 675b_residential1 675c_residential1
+reg3,2020-10-23 18:32:44,2020-10-23 19:50:20,77.60469980622432,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+645646,2017-8-12 1:5:12,2017-8-12 1:30:47,25.591222521761857,646_office
+632645,2020-2-17 2:27:34,2020-2-17 2:36:14,8.673713044587346,645_hangar 646_office
+reg2,2019-7-6 17:33:34,2019-7-6 19:39:33,125.99416552757758,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+671680,2016-5-21 20:38:15,2016-5-21 23:10:00,151.75252824135927,
+692675,2015-11-2 19:23:58,2015-11-2 19:52:08,28.176963486943524,675a_hospital 675b_residential1 675c_residential1
+632645,2019-7-5 12:1:8,2019-7-5 17:04:25,303.2895933768049,645_hangar 646_office
+reg3,2016-12-3 8:35:8,2016-12-3 9:01:01,25.88711641819469,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+671684,2019-10-17 14:24:14,2019-10-17 15:25:02,60.811684925201945,684_command_center 611_runway 652_residential
+632633,2017-5-28 19:9:30,2017-5-28 22:02:29,172.98682012434472,634a_data_center 634b_radar 634c_atc_tower
+632645,2015-7-11 10:22:58,2015-7-11 10:52:46,29.80865780521855,645_hangar 646_office
+671680,2020-3-6 5:47:25,2020-3-6 8:10:12,142.79366791921984,
+684611,2015-6-7 8:31:32,2015-6-7 8:44:45,13.220911052977561,611_runway
+684652,2021-3-3 1:4:40,2021-3-3 1:55:04,50.40964738206682,652_residential
+632645,2020-3-9 1:49:27,2020-3-9 2:06:20,16.885961785223063,645_hangar 646_office
+684611,2015-1-12 23:44:2,2015-1-13 2:23:20,159.31196676834,611_runway
+684611,2021-6-6 1:40:24,2021-6-6 1:45:32,5.136392363562479,611_runway
+632633,2020-5-23 7:54:29,2020-5-23 11:43:22,228.89629086406575,634a_data_center 634b_radar 634c_atc_tower
+reg2,2017-8-12 1:40:33,2017-8-12 3:55:34,135.0188942035752,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+692675,2015-12-11 15:3:22,2015-12-11 16:47:54,104.54145807572009,675a_hospital 675b_residential1 675c_residential1
+671680,2015-5-23 11:3:31,2015-5-23 12:03:23,59.871574261381866,
+645646,2016-9-7 20:49:20,2016-9-7 23:54:42,185.36932025773848,646_office
+632633,2019-12-7 13:42:34,2019-12-7 14:05:29,22.931034649798864,634a_data_center 634b_radar 634c_atc_tower
+632670,2017-10-27 4:52:39,2017-10-27 5:11:09,18.51135818411655,684_command_center 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+645646,2015-7-10 17:31:27,2015-7-10 17:35:40,4.231436501985426,646_office
+684611,2018-1-14 18:24:4,2018-1-14 18:51:58,27.908031439741393,611_runway
+reg2,2021-1-2 10:45:31,2021-1-2 11:10:22,24.858404063658764,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+reg3,2019-4-23 23:5:4,2019-4-23 23:57:19,52.26045755515534,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+reg2,2016-9-10 4:50:26,2016-9-10 5:01:15,10.821826048752692,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+650632,2019-3-8 16:17:59,2019-3-8 18:35:42,137.72156160637027,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+671684,2020-4-21 20:37:53,2020-4-21 20:55:19,17.438149810802486,684_command_center 611_runway 652_residential
+reg3,2016-8-17 6:25:28,2016-8-17 6:29:33,4.085343006048573,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+692675,2020-5-11 3:23:25,2020-5-11 5:06:37,103.20745482881983,675a_hospital 675b_residential1 675c_residential1
+692675,2015-1-19 20:30:42,2015-1-19 20:41:28,10.776320239746545,675a_hospital 675b_residential1 675c_residential1
+xfm1,2019-7-27 14:3:52,2019-7-27 15:53:58,110.10634326080844,634a_data_center 634b_radar 634c_atc_tower
+632633,2017-10-4 17:49:8,2017-10-4 19:28:26,99.30222873476905,634a_data_center 634b_radar 634c_atc_tower
+684652,2016-4-7 10:50:58,2016-4-7 11:51:01,60.062017199208974,652_residential
+632633,2021-8-26 16:4:26,2021-8-26 16:15:13,10.796253459049181,634a_data_center 634b_radar 634c_atc_tower
+reg3,2019-4-24 20:38:44,2019-4-24 21:11:49,33.08990357087147,684_command_center 634a_data_center 634b_radar 634c_atc_tower 645_hangar 646_office 692_warehouse2 675a_hospital 675b_residential1 675c_residential1 611_runway 652_residential 670a_residential2 670b_residential2 670c_residential2
+692675,2018-6-10 18:14:55,2018-6-10 19:17:00,62.09384050756359,675a_hospital 675b_residential1 675c_residential1
+684652,2016-2-19 9:8:7,2016-2-19 10:37:52,89.75050200160098,652_residential

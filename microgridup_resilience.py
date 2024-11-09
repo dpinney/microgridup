@@ -84,11 +84,11 @@ def main(in_csv, data, in_dss, out_html):
 	# - Generate resilience statistics for SAIDI and group loads by critical/noncritical and without microgrid/with microgrid
 	load_count = len([x for x in tree if x.get('object','').startswith('load.')])
 	df = pd.DataFrame({
-		'SAIFI': [
-			round(stats(noncritical_without_mg, 200, load_count)[0], 3),
-			round(stats(noncritical_mg, 200, load_count)[0], 3),
-			round(stats(critical_mg, 200, load_count)[0], 3),
-			round(stats(critical_without_mg, 200, load_count)[0], 3)]
+		'CAIDI': [
+			round(stats(noncritical_without_mg, 200, load_count)[2], 3),
+			round(stats(noncritical_mg, 200, load_count)[2], 3),
+			round(stats(critical_mg, 200, load_count)[2], 3),
+			round(stats(critical_without_mg, 200, load_count)[2], 3)]
 	}, index=['noncritical_without_mg', 'noncritical_mg', 'critical_mg', 'critical_without_mg'])
 	fig = go.Figure(data=[
 		go.Bar(name='Noncritical Outside Microgrid', x=df.columns.to_series(), y=df.loc['noncritical_without_mg'], hoverlabel_namelength=-1),
@@ -97,7 +97,7 @@ def main(in_csv, data, in_dss, out_html):
 		go.Bar(name='Critical Outside Microgrid', x=df.columns.to_series(), y=df.loc['critical_without_mg'], hoverlabel_namelength=-1)])
 	legend_spec = {'orientation':'h', 'xanchor':'left'}#, 'x':0, 'y':-0.2}
 	fig.update_layout(
-		title = 'SAIFI Statistics for Four Categories of Loads Across All Years',
+		title = 'CAIDI Statistics for Four Categories of Loads Across All Years',
 		legend = legend_spec,
 		font = dict(
 			family="sans-serif",

@@ -5,8 +5,64 @@ import numpy as np
 import networkx as nx
 from collections import defaultdict
 from plotly import graph_objects, offline, subplots
+from scipy.interpolate import RegularGridInterpolator
 from omf.solvers.opendss import dssConvert, _getByName, newQstsPlot
 import microgridup
+
+# Constants for interpolators.
+DIESEL_GENERATOR_SIZES = np.array([20, 30, 40, 60, 75, 100, 125, 135, 150, 175, 200, 230, 250, 300, 350, 400, 500, 600, 750, 1000, 1250, 1500, 1750, 2000, 2250]) # https://www.generatorsource.com/Diesel_Fuel_Consumption.aspx
+NATURAL_GAS_GENERATOR_SIZES = np.array([20, 30, 40, 60, 75, 100, 125, 135, 150, 175, 200, 230, 250, 300, 350, 400, 500, 600, 750, 1000]) # https://www.generatorsource.com/Natural_Gas_Fuel_Consumption.aspx
+LOAD_LEVELS = np.array([0.25, 0.5, 0.75, 1.0])  # Load as fraction of full load
+# Rows correspond to generator sizes, columns correspond to load levels (1/4, 1/2, 3/4, Full Load).
+DIESEL_CONSUMPTION_GAL_PER_HOUR = np.array([
+    [0.6, 0.9, 1.3, 1.6],
+    [1.3, 1.8, 2.4, 2.9],
+    [1.6, 2.3, 3.2, 4.0],
+    [1.8, 2.9, 3.8, 4.8],
+    [2.4, 3.4, 4.6, 6.1],
+    [2.6, 4.1, 5.8, 7.4],
+    [3.1, 5.0, 7.1, 9.1],
+    [3.3, 5.4, 7.6, 9.8],
+    [3.6, 5.9, 8.4, 10.9],
+    [4.1, 6.8, 9.7, 12.7],
+    [4.7, 7.7, 11.0, 14.4],
+    [5.3, 8.8, 12.5, 16.6],
+    [5.7, 9.5, 13.6, 18.0],
+    [6.8, 11.3, 16.1, 21.5],
+    [7.9, 13.1, 18.7, 25.1],
+    [8.9, 14.9, 21.3, 28.6],
+    [11.0, 18.5, 26.4, 35.7],
+    [13.2, 22.0, 31.5, 42.8],
+    [16.3, 27.4, 39.3, 53.4],
+    [21.6, 36.4, 52.1, 71.1],
+    [26.9, 45.3, 65.0, 88.8],
+    [32.2, 54.3, 77.8, 106.5],
+    [37.5, 63.2, 90.7, 124.2],
+    [42.8, 72.2, 103.5, 141.9],
+    [48.1, 81.1, 116.4, 159.6]
+])
+NATURAL_GAS_CONSUMPTION_MMBTU = np.array([
+    [157, 188, 247, 289],
+    [202, 260, 348, 416],
+    [246, 333, 449, 543],
+    [334, 479, 652, 798],
+    [400, 588, 803, 990],
+    [510, 771, 1056, 1308],
+    [621, 953, 1308, 1627],
+    [665, 1026, 1409, 1754],
+    [731, 1135, 1561, 1946],
+    [841, 1317, 1813, 2264],
+    [952, 1500, 2066, 2583],
+    [1084, 1718, 2369, 2965],
+    [1172, 1864, 2571, 3220],
+    [1393, 2229, 3076, 3857],
+    [1614, 2593, 3581, 4495],
+    [1834, 2958, 4086, 5132],
+    [2276, 3687, 5096, 6407],
+    [2717, 4416, 6107, 7681],
+    [3379, 5509, 7622, 9593],
+    [4482, 7332, 10147, 12780]
+]) * 0.001015
 
 def get_first_nodes_of_mgs(dssTree, microgrids):
 	nodes = {}
@@ -410,9 +466,9 @@ def make_chart(csvName, y_list, year, microgrids, chart_name, y_axis_name, outag
 	'''
 	rengen_proportional_loadshapes = form_rengen_proportional_loadshapes(rengen_mgs, rengen_kw_ratings, microgrids)
 	storage_proportional_loadshapes = form_storage_proportional_loadshapes(rengen_mgs, batt_kwh_ratings, microgrids) # Divide batteries into microgrids, find mg total kwh capacities for storage, and form element specific loadshapes.
-	fossil_kwh_output, diesel_dict, mmbtu_dict, fossil_traces, batt_cycles, glc_traces = extract_charting_data(csvName, microgrids, y_list, outage_start, outage_length, fossil_kw_ratings, vsource_ratings, year, rengen_mgs, storage_proportional_loadshapes, batt_kwh_ratings, rengen_proportional_loadshapes)
+	fossil_kwh_output, diesel_dict, natural_gas_dict, fossil_traces, batt_cycles, glc_traces = extract_charting_data(csvName, microgrids, y_list, outage_start, outage_length, fossil_kw_ratings, vsource_ratings, year, rengen_mgs, storage_proportional_loadshapes, batt_kwh_ratings, rengen_proportional_loadshapes)
 	if chart_name == 'Generator Output':
-		make_fossil_loading_chart(csvName, fossil_traces, fossil_kwh_output, diesel_dict, mmbtu_dict)
+		make_fossil_loading_chart(csvName, fossil_traces, fossil_kwh_output, diesel_dict, natural_gas_dict)
 		make_batt_cycle_chart(csvName, batt_cycles)
 	ansi_bands = True if chart_name == 'Load Voltage' else False
 	make_glc_plots(csvName, chart_name, y_axis_name, glc_traces, outage_start, outage_length, year, ansi_bands)
@@ -482,6 +538,38 @@ def form_storage_proportional_loadshapes(rengen_mgs, batt_kwh_ratings, microgrid
 		storage_proportional_loadshapes[mg_key] = mg_proportional_storage_shapes
 	return storage_proportional_loadshapes
 
+def get_diesel_interpolator():
+	'''Get interpolator once using lazy-initialized singleton pattern.'''
+	if not hasattr(get_diesel_interpolator, '_interpolator'):
+		get_diesel_interpolator._interpolator = RegularGridInterpolator((DIESEL_GENERATOR_SIZES, LOAD_LEVELS), DIESEL_CONSUMPTION_GAL_PER_HOUR, bounds_error=False, fill_value=None)
+	return get_diesel_interpolator._interpolator
+
+def estimate_diesel_consumption(generator_size, load_fraction):
+    '''
+    Estimate diesel fuel consumption for a given generator size and load fraction using interpolation/extrapolation.
+    :param generator_size: Size of the generator in kW.
+    :param load_fraction: Load as a decimal fraction (0.0 to 1.0).
+    :return: Estimated fuel consumption in gallons per hour.
+    '''
+    interpolator = get_diesel_interpolator()
+    return float(interpolator((generator_size, load_fraction)))
+
+def get_natural_gas_interpolator():
+	'''Get interpolator once using lazy-initialized singleton pattern.'''
+	if not hasattr(get_natural_gas_interpolator, '_interpolator'):
+		get_natural_gas_interpolator._interpolator = RegularGridInterpolator((NATURAL_GAS_GENERATOR_SIZES, LOAD_LEVELS), NATURAL_GAS_CONSUMPTION_MMBTU, bounds_error=False, fill_value=None)
+	return get_natural_gas_interpolator._interpolator
+
+def estimate_natural_gas_consumption(generator_size, load_fraction):
+    '''
+    Estimate natural gas fuel consumption for a given generator size and load fraction using interpolation/extrapolation.
+    :param generator_size: Size of the generator in kW.
+    :param load_fraction: Load as a decimal fraction (0.0 to 1.0).
+    :return: Estimated fuel consumption in mmbtu/hour.
+    '''
+    interpolator = get_natural_gas_interpolator()
+    return float(interpolator((generator_size, load_fraction)))
+
 def extract_charting_data(csvName, microgrids, y_list, outage_start, outage_length, fossil_kw_ratings, vsource_ratings, year, rengen_mgs, storage_proportional_loadshapes, batt_kwh_ratings, rengen_proportional_loadshapes):
 	'''
 	:param csvName: CSV name generated by newQstsPlot. Prefix is timezcontrol.
@@ -511,7 +599,7 @@ def extract_charting_data(csvName, microgrids, y_list, outage_start, outage_leng
 	:return: total fossil output in kWh, diesel consumption in gallons during the outage (keyed by legend group), diesel consumption in mmbtu during the outage (keyed by legend group), ploty Scatter objects representing fossil loading percent, number of battery cycles each battery experiences (keyed by battery name and phase), list of 3 traces (plotly Scatter objects) for gen/load/control
 	:rtype: int, dict, dict, list, dict, list
 	'''
-	diesel_dict, mmbtu_dict, fossil_traces, batt_cycles, unreasonable_voltages, glc_traces = {}, {}, [], {}, {}, []
+	diesel_dict, natural_gas_dict, fossil_traces, batt_cycles, unreasonable_voltages, glc_traces = {}, {}, [], {}, {}, []
 	fossil_kwh_output = 0
 	csv_outage_start, csv_outage_end = 24, 24 + outage_length # newQstsPlot() runs from 24 hours before to 24 hours after the outage.
 	gen_data = pd.read_csv(csvName)
@@ -540,27 +628,37 @@ def extract_charting_data(csvName, microgrids, y_list, outage_start, outage_leng
 			
 			# Clean up series. 
 			this_series[y_name] = pd.to_numeric(this_series[y_name], errors='coerce')
-			this_series[y_name] = this_series[y_name].fillna(0)
+			this_series[y_name] = this_series[y_name].replace([np.inf, -np.inf], np.nan).fillna(0) # Replace +/-infinity with nan and replace nan with 0
 
 			# Amass data for fuel consumption chart.
-			if ("lead_gen_" in ob_name or "fossil_" in ob_name) and not this_series[y_name].isnull().values.any():
+			if ("lead_gen_" in ob_name or "fossil_" in ob_name) and not this_series[y_name].isnull().values.any(): # TODO: get object type with less error prone method.
 				this_series[y_name] = this_series[y_name].astype(float)
 				additional = sum(abs(this_series[y_name].iloc[csv_outage_start:csv_outage_end])) if "fossil_" in ob_name else sum(this_series[y_name].iloc[csv_outage_start:csv_outage_end])
 				fossil_kwh_output += additional
-				fossil_kw_rating = fossil_kw_ratings[ob_name_no_phases.split("-")[1]] if "fossil_" in ob_name_no_phases else vsource_ratings[ob_name_no_phases.split("-")[1]]
+				ob_name_no_phases_no_type = ob_name_no_phases.split("-")[1]
+				fossil_kw_rating = fossil_kw_ratings[ob_name_no_phases_no_type] if "fossil_" in ob_name_no_phases else vsource_ratings[ob_name_no_phases_no_type] # TODO: get object type with less error prone method.
 				fossil_loading_average_decimal = additional / (float(fossil_kw_rating) * outage_length)
-				diesel_consumption_gal_per_hour = (0.065728897 * fossil_loading_average_decimal + 0.003682709) * float(fossil_kw_rating) + (-0.027979695 * fossil_loading_average_decimal + 0.568328949) # See this link for calculations: https://docs.google.com/document/d/11-W5XSjTWYlBpBKOZmwk6jfjbo8prSgLM88Q07SSo3s/edit?usp=sharing.
+				if fossil_loading_average_decimal > 1:
+					print(f'Fossil loading average exceeds 100% ({fossil_loading_average_decimal * 100}).')
+					fossil_loading_average_decimal = 1 # TODO: Fossil loading average should never exceed 100%. Rounding fossil loading averages to 1 is only a short term fix.
+				elif 0 < fossil_loading_average_decimal < 0.25: 
+					print(f'Fossil loading average is lower than 25% ({fossil_loading_average_decimal * 100}).')
+					fossil_loading_average_decimal = 0.25 # TODO: Fossil loading average should not be below 25%. https://www.cat.com/en_US/by-industry/electric-power/Articles/White-papers/the-impact-of-generator-set-underloading.html
+				# Calculate diesel_consumption_per_hour and natural_gas_consumption_mmbtu_per_hour using interpolation. 
+				generator_size = float(fossil_kw_rating)
+				load_fraction = fossil_loading_average_decimal
+				diesel_consumption_gal_per_hour = estimate_diesel_consumption(generator_size, load_fraction) if fossil_loading_average_decimal != 0 else 0
 				diesel_consumption_outage = diesel_consumption_gal_per_hour * outage_length
-				mmbtu_consumption_mmbtu_per_hour = (0.0112913202545883 * fossil_loading_average_decimal + 0.00171037274039439) * float(fossil_kw_rating) + (-0.0560953826993578* fossil_loading_average_decimal + 0.074238182761738)
-				mmbtu_consumption_outage = mmbtu_consumption_mmbtu_per_hour * outage_length
+				natural_gas_consumption_mmbtu_per_hour = estimate_natural_gas_consumption(generator_size, load_fraction) if fossil_loading_average_decimal != 0 else 0
+				natural_gas_consumption_outage = natural_gas_consumption_mmbtu_per_hour * outage_length
 				if legend_group in diesel_dict.keys():
 					diesel_dict[legend_group] += diesel_consumption_outage
 				else:
 					diesel_dict[legend_group] = diesel_consumption_outage
-				if legend_group in mmbtu_dict.keys():
-					mmbtu_dict[legend_group] += mmbtu_consumption_outage
+				if legend_group in natural_gas_dict.keys():
+					natural_gas_dict[legend_group] += natural_gas_consumption_outage
 				else:
-					mmbtu_dict[legend_group] = mmbtu_consumption_outage
+					natural_gas_dict[legend_group] = natural_gas_consumption_outage
 				# Make fossil loading percentages traces.
 				fossil_percent_loading = [(x / float(fossil_kw_rating)) * -100 for x in this_series[y_name]] if "fossil_" in ob_name else [(x / float(fossil_kw_rating)) * 100 for x in this_series[y_name]]
 				graph_start_time = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(hours=outage_start-24)
@@ -632,9 +730,9 @@ def extract_charting_data(csvName, microgrids, y_list, outage_start, outage_leng
 					hoverlabel = dict(namelength = -1)
 				)
 				glc_traces.append(trace)
-	return fossil_kwh_output, diesel_dict, mmbtu_dict, fossil_traces, batt_cycles, glc_traces
+	return fossil_kwh_output, diesel_dict, natural_gas_dict, fossil_traces, batt_cycles, glc_traces
 
-def make_fossil_loading_chart(csvName, fossil_traces, fossil_kwh_output, diesel_dict, mmbtu_dict):
+def make_fossil_loading_chart(csvName, fossil_traces, fossil_kwh_output, diesel_dict, natural_gas_dict):
 	'''
 	:param csvName: CSV name generated by newQstsPlot. Prefix is timezcontrol.
 	:type csvName: str
@@ -642,8 +740,8 @@ def make_fossil_loading_chart(csvName, fossil_traces, fossil_kwh_output, diesel_
 	:type fossil_traces: list
 	:param diesel_dict: stores diesel consumption in gallons during the outage, keyed by legend group
 	:type diesel_dict: dict
-	:param mmbtu_dict: stores diesel consumption in mmbtu during the outage, keyed by legend group
-	:type mmbtu_dict: dict
+	:param natural_gas_dict: stores diesel consumption in mmbtu during the outage, keyed by legend group
+	:type natural_gas_dict: dict
 	:return: don't return anything. Instead, plot figure to file.
 	:rtype: None 
 	'''
@@ -658,14 +756,14 @@ def make_fossil_loading_chart(csvName, fossil_traces, fossil_kwh_output, diesel_
 	# Calculate total fossil genset consumption and make fossil fuel consumption chart. 
 	fossil_kwh_output = "{:e}".format(fossil_kwh_output)
 	total_gal_diesel = "{:e}".format(sum(diesel_dict.values()))
-	total_mmbtu_gas = "{:e}".format(sum(mmbtu_dict.values()))
+	total_mmbtu_gas = "{:e}".format(sum(natural_gas_dict.values()))
 	# Make fossil fuel consumption chart. 
 	diesel_dict = dict(sorted(diesel_dict.items()))
-	mmbtu_dict = dict(sorted(mmbtu_dict.items()))
+	natural_gas_dict = dict(sorted(natural_gas_dict.items()))
 	# Construct plot.
 	fig = subplots.make_subplots(shared_xaxes=True, specs=[[{"secondary_y": True}]])
 	fig.add_trace(graph_objects.Bar(x = list(diesel_dict.keys()), y = list(diesel_dict.values()), name="Diesel"), secondary_y=False)
-	fig.add_trace(graph_objects.Bar(x = list(mmbtu_dict.keys()), y = list(mmbtu_dict.values()), name="Gas"), secondary_y=True)
+	fig.add_trace(graph_objects.Bar(x = list(natural_gas_dict.keys()), y = list(natural_gas_dict.values()), name="Gas"), secondary_y=True)
 	fig.update_layout(
 		title_text = f"Diesel and Natural Gas Equivalent Consumption During Outage By Microgrid<br><sup>Total Consumption in Gallons of Diesel = {total_gal_diesel} || Total Consumption in MMBTU Natural Gas = {total_mmbtu_gas}|| Total Output in kWh = {fossil_kwh_output}</sup>",
 		font = dict(family="sans-serif", color="black"),

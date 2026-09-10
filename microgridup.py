@@ -762,7 +762,7 @@ def get_immutable_dict(data):
 				for idx in range(len(mutable_obj)):
 					v = mutable_obj[idx]
 					if isinstance(v, dict) or isinstance(v, list):
-						stack.append((mutable_obj, k, v))
+						stack.append((mutable_obj, idx, v))
 			if mutable_obj == stack[len(stack) - 1][2]:
 				parent, k, v = stack.pop()
 				if parent is None:

@@ -83,7 +83,9 @@ def main(data, invalidate_cache=True, open_results=False):
 		'CREATION_DATE': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
 		'DESCRIPTION': data['DESCRIPTION'],
 		'singlePhaseRelayCost': data['singlePhaseRelayCost'],
-		'threePhaseRelayCost': data['threePhaseRelayCost']
+		'threePhaseRelayCost': data['threePhaseRelayCost'],
+		'LOAD_GROWTH_PERCENT': data['LOAD_GROWTH_PERCENT'],
+		'LOAD_GROWTH_SPECIFIC': data['LOAD_GROWTH_SPECIFIC']
 	}
 	if 'jsCircuitModel' in data:
 		inputs['jsCircuitModel'] = data['jsCircuitModel']

@@ -1,14 +1,15 @@
 {
     "MODEL_DIR": "3mgs",
     "QSTS_STEPS": 480,
+    "LOAD_GROWTH_PERCENT": 0,
+    "LOAD_GROWTH_SPECIFIC": {},
     "REOPT_INPUTS": {
         "energyCost": 0.12,
         "wholesaleCost": 0.034,
         "demandCost": 20.0,
         "solarCanCurtail": true,
         "solarCanExport": true,
-        "urdbLabelSwitch": false,
-        "urdbLabel": "5b75cfe95457a3454faf0aea",
+        "urdbResponse": "",
         "year": 2017,
         "analysisYears": 25,
         "outageDuration": 48,

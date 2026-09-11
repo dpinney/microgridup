@@ -196,8 +196,9 @@ def edit(project):
 		for s in json.loads(in_data['jsCircuitModel']):
 			jsCircuitModel.append(json.loads(s))
 		in_data['jsCircuitModel'] = jsCircuitModel
+	# - TODO: can we remove this if we update our committed "data/projects" directory? Probably not because existing user projects will break
 	# Inject defaults for any REOPT_INPUTS keys added after a project was created (backwards compatibility).
-	reopt_defaults = {'batterySocMinFraction': 0.2}
+	reopt_defaults = {'batterySocMinFraction': 0.2, 'urdbResponse': ''}
 	for key, default in reopt_defaults.items():
 		if key not in in_data.get('REOPT_INPUTS', {}):
 			in_data.setdefault('REOPT_INPUTS', {})[key] = default
@@ -706,19 +707,53 @@ def _get_uploaded_file_filepath(absolute_model_directory, filename, save_path, r
 
 def _get_reopt_inputs(data):
 	'''
+	- Move the key-value pairs from the data dict into a new dict and return the new dict. Also cast parameters to correct types for error checking. Also
+	  delete the key-value pairs from the data dict. The net effect is that all of the key-value pairs are moved out of the top level of data and are moved
+	  under the "REOPT_INPUTS" key in data
+
 	:param data: the dict of data
 	:type data: dict
-	:rtype: None
+	:rtype: dict
 	'''
 	assert isinstance(data, dict)
+
+	def _get_user_urdb_response(urdb_response_text):
+		'''
+		Return the unchanged str instead of a dict because the only place that needs a dict is in microgridDesign.py
+
+		:param urdb_response_text: the user's pasted JSON
+		:type urdb_response_text: str
+		:return: the user's pasted JSON or an empty string
+		:rtype: str
+		:raises ValueError: if the text is not a JSON object with the keys that REopt requires. The ValueError handler at the top of this file turns it into
+			the JSON 400 response that the submit alert shows
+		'''
+		# - An empty textarea means "no custom rate". It is the default (the blended energy and demand rates are used), so it must not be parsed as JSON
+		if urdb_response_text.strip() == '':
+			return ''
+		try:
+			urdb_response = json.loads(urdb_response_text)
+		except json.JSONDecodeError as e:
+			raise ValueError(f'The "Custom URDB Rate (JSON format)" is not valid JSON: {e}')
+		# - Only a JSON object can be a rate. Without this check, a pasted list or number would crash the key check below
+		if not isinstance(urdb_response, dict):
+			raise ValueError('The "Custom URDB Rate (JSON format)" must be a JSON object (the rate itself, not a list)')
+		# urdb.jl in REopt requires these three keys
+		required_keys = ('energyratestructure', 'energyweekdayschedule', 'energyweekendschedule')
+		missing_keys = ', '.join([k for k in required_keys if k not in urdb_response])
+		if missing_keys != '':
+			raise ValueError(f'The "Custom URDB Rate (JSON format)" lacks required key(s): {missing_keys}')
+		return urdb_response_text
+
 	reopt_inputs = {
 		'energyCost':                   float(data['energyCost']),
 		'wholesaleCost':                float(data['wholesaleCost']),
 		'demandCost':                   float(data['demandCost']),
 		'solarCanCurtail':              data['solarCanCurtail'] == 'true',
 		'solarCanExport':               data['solarCanExport'] == 'true',
-		'urdbLabelSwitch':              data['urdbLabelSwitch'] == 'true',
-		'urdbLabel':                    data['urdbLabel'],
+		# (removed) 'urdbLabelSwitch':              data['urdbLabelSwitch'] == 'true',
+		# (removed) 'urdbLabel':                    data['urdbLabel'],
+		'urdbResponse':                 _get_user_urdb_response(data['urdbResponse']),
 		'year':                         int(data['year']),
 		'analysisYears':                int(data['analysisYears']),
 		'outageDuration':               int(data['outageDuration']),

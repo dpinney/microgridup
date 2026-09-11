@@ -594,34 +594,37 @@ def run():
 	except Exception:
 		partition_params = {}
 	mg_name_map = partition_params.get('mg_name', {})  # Map ids -> names: {'mg0': 'name0', 'mg1': 'name1'}
-	# Build reverse map name -> id for convenience
-	name_to_id = {v: k for k, v in mg_name_map.items() if v}
-	# Keys coming from the microgrids returned by form_microgrids().
-	actual_mg_keys = set(data['MICROGRIDS'].keys())
-	# Convert actual_mg_keys to a set of mg ids (handling cases where the keys are either ids or names).
-	actual_mg_ids = set()
-	for key in actual_mg_keys:
-		if key in mg_name_map: # Key is an id
-			actual_mg_ids.add(key)
-		elif key in name_to_id: # Key is a name
-			actual_mg_ids.add(name_to_id[key])
-		else:
-			# Unknown key format; log for debugging but don't crash here
-			print(f'Unexpected MICROGRIDS key format: "{key}". Could not map to mg id using PARTITION_PARAMS.mg_name.')
-			# Do not add it to actual_mg_ids because it cannot be mapped to the intended id space
-	# Intended mg ids (from the user's partition parameters)
-	intended_mg_ids = set(mg_name_map.keys())
-	# Determine which intended ids are missing (present in intended but not in actual)
-	missing_intended_mgs = sorted(list(intended_mg_ids - actual_mg_ids))
-	if missing_intended_mgs:
-		# Map to nice names if available, otherwise fall back to id string
-		missing_names = [mg_name_map.get(mgid, mgid) for mgid in missing_intended_mgs]
-		msg = (
-			f'The following microgrids were defined but no loads were assigned: {missing_names}. '
-			'Either assign at least one load to each microgrid or remove them from the partitioner and try again.'
-		)
-		print(msg)
-		raise ValueError(msg)
+	# - Only run the check when the front end supplied microgrid names. A re-run from the edit page without choosing a partition method sends the
+	#   saved MICROGRIDS dict as PARTITION_PARAMS, which has no "mg_name" key, so every key would be reported as unexpected even though the run is fine
+	if mg_name_map:
+		# Build reverse map name -> id for convenience
+		name_to_id = {v: k for k, v in mg_name_map.items() if v}
+		# Keys coming from the microgrids returned by form_microgrids().
+		actual_mg_keys = set(data['MICROGRIDS'].keys())
+		# Convert actual_mg_keys to a set of mg ids (handling cases where the keys are either ids or names).
+		actual_mg_ids = set()
+		for key in actual_mg_keys:
+			if key in mg_name_map: # Key is an id
+				actual_mg_ids.add(key)
+			elif key in name_to_id: # Key is a name
+				actual_mg_ids.add(name_to_id[key])
+			else:
+				# Unknown key format; log for debugging but don't crash here
+				print(f'Unexpected MICROGRIDS key format: "{key}". Could not map to mg id using PARTITION_PARAMS.mg_name.')
+				# Do not add it to actual_mg_ids because it cannot be mapped to the intended id space
+		# Intended mg ids (from the user's partition parameters)
+		intended_mg_ids = set(mg_name_map.keys())
+		# Determine which intended ids are missing (present in intended but not in actual)
+		missing_intended_mgs = sorted(list(intended_mg_ids - actual_mg_ids))
+		if missing_intended_mgs:
+			# Map to nice names if available, otherwise fall back to id string
+			missing_names = [mg_name_map.get(mgid, mgid) for mgid in missing_intended_mgs]
+			msg = (
+				f'The following microgrids were defined but no loads were assigned: {missing_names}. '
+				'Either assign at least one load to each microgrid or remove them from the partitioner and try again.'
+			)
+			print(msg)
+			raise ValueError(msg)
 	
 	if len(list(data['MICROGRIDS'].keys())) == 0:
 		# - I'm assuming that if this is true, then the front-end allowed bad data to be sent, so we should inform the user

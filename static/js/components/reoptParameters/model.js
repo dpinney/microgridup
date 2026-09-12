@@ -1,4 +1,4 @@
-export { REoptParametersModel, REoptParameters, REoptParameter, REoptIntParameter, REoptFloatParameter, REoptStringParameter, REoptBooleanParameter };
+export { REoptParametersModel, REoptParameters, REoptParameter, REoptIntParameter, REoptFloatParameter, REoptStringParameter, REoptJsonObjectParameter, REoptBooleanParameter };
 import { Observable } from '../observable.js';
 
 /**
@@ -242,24 +242,31 @@ class REoptParameters extends Observable {
                                                 'Specify the demand cost in $/kW. Format 0.XX',
                                                 1.0e9,
                                                 0),
-                urdb_label:                 new REoptStringParameter(
-                                                'URDB Label',
-                                                'ElectricTariff:urdb_label',
-                                                'urdbLabel',
-                                                'Input the string found at the end of the URDB Rate URL. For example, <a href="https://openei.org/apps/IURDB/rate/view/5b75cfe95457a3454faf0aea">this rate data entry</a> would be "5b75cfe95457a3454faf0aea"',
-                                                /.+/),
-                mgu_urdb_label_enabled:     new REoptBooleanParameter(
-                                                'Use URDB Rate?',
-                                                'ElectricTariff:mgu_urdb_label_enabled',
-                                                'urdbLabelSwitch',
-                                                'Utilizing a rate from the Utility Rate Database overrides Cost of Energy and Cost of Demand rates above. See <a href="https://openei.org/services/doc/rest/util_rates/">OpenEI</a> for more information.'),
+                //urdb_label:                 new REoptStringParameter(
+                //                                'URDB Label',
+                //                                'ElectricTariff:urdb_label',
+                //                                'urdbLabel',
+                //                                'Input the string found at the end of the URDB Rate URL. For example, <a href="https://openei.org/apps/IURDB/rate/view/5b75cfe95457a3454faf0aea">this rate data entry</a> would be "5b75cfe95457a3454faf0aea"',
+                //                                /.+/),
+                //mgu_urdb_label_enabled:     new REoptBooleanParameter(
+                //                                'Use URDB Rate?',
+                //                                'ElectricTariff:mgu_urdb_label_enabled',
+                //                                'urdbLabelSwitch',
+                //                                'Utilizing a rate from the Utility Rate Database overrides Cost of Energy and Cost of Demand rates above. See <a href="https://openei.org/services/doc/rest/util_rates/">OpenEI</a> for more information.'),
                 wholesale_rate:             new REoptFloatParameter(
-                                                'Wholesale Cost ($/kWh)',
+                                                'Exported Power Cost ($/kWh)',
                                                 'ElectricTariff:wholesale_rate',
                                                 'wholesaleCost',
-                                                'Specify wholesale price for selling excess electricity back to the grid operator. Format 0.XX',
+                                                'Specify the price the grid operator pays for power exported by the microgrid, i.e. generation beyond the site load. It applies whether the tariff comes from Energy Cost and Demand Cost or from a Custom URDB Rate, and it is ignored when "DG Can Export" is No, which curtails the excess generation instead. A value of 0 leaves export allowed but unpaid, so the optimizer will not size generation for it. Format 0.XX',
                                                 1.0e9,
                                                 0),
+                urdb_response:              new REoptJsonObjectParameter(
+                                                'Custom URDB Rate (JSON format)',
+                                                'ElectricTariff:urdb_response',
+                                                'urdbResponse',
+                                                'Optional. Paste a utility rate in the <a href="https://openei.org/services/doc/rest/util_rates/?version=7"><u>URDB JSON format</u></a> to model a rate that is not in the URDB. When this field is set, it is sent to REopt as a urdb_response and takes precedence over Energy Cost and Demand Cost. The easiest way to generate a custom rate is to go to the <a href="https://reopt.nlr.gov/tool/custom_tariffs"><u>REopt tariff builder</u></a>, build the rate, and download the JSON file. The keys energyratestructure, energyweekdayschedule, and energyweekendschedule are required. Demand charges, tiers, and fixed charges are optional. Rate periods are zero-indexed.',
+                                                ['energyratestructure', 'energyweekdayschedule', 'energyweekendschedule'],
+                                                '{"energyratestructure": [[{"rate": 0.06}], [{"rate": 0.15}]], "energyweekdayschedule": [[0, 0, ...]], "energyweekendschedule": [[0, 0, ...]]}'),
             },
             Financial: {
                 analysis_years:             new REoptIntParameter(
@@ -787,6 +794,81 @@ class REoptStringParameter extends REoptParameter {
             throw Error(`"${value}" must match the format description.`);
         }
         super.value = value;
+    }
+}
+
+class REoptJsonObjectParameter extends REoptParameter {
+
+    #requiredKeys;
+    #placeholder;
+
+    /**
+     * @param {string} displayName
+     * @param {string} parameterName
+     * @param {string} alias
+     * @param {string} tooltip
+     * @param {Array} requiredKeys - keys the parsed object must have
+     * @param {string} [placeholder=''] - example text shown in the empty textarea
+     */
+    constructor(displayName, parameterName, alias, tooltip, requiredKeys, placeholder='') {
+        super(displayName, parameterName, alias, tooltip);
+        if (!Array.isArray(requiredKeys) || requiredKeys.some(key => typeof key !== 'string')) {
+            throw TypeError('The "requiredKeys" argument must be an array of strings.');
+        }
+        if (typeof placeholder !== 'string') {
+            throw TypeError('The "placeholder" argument must be typeof "string".');
+        }
+        this.#requiredKeys = [...requiredKeys];
+        this.#placeholder = placeholder;
+    }
+
+    /**
+     * @returns {Array}
+     */
+    get requiredKeys() {
+        return [...this.#requiredKeys];
+    }
+
+    /**
+     * @returns {string}
+     */
+    get placeholder() {
+        return this.#placeholder;
+    }
+
+    /**
+     * @returns {string}
+     */
+    get value() {
+        return super.value;
+    }
+
+    /**
+     * @param {string} value - JSON text, or an empty string for "not provided"
+     * @returns {undefined}
+     */
+    set value(value) {
+        if (typeof value !== 'string') {
+            throw TypeError('The "value" argument must be typeof "string".');
+        }
+        const text = value.trim();
+        if (text !== '') {
+            let object;
+            try {
+                object = JSON.parse(text);
+            } catch (e) {
+                throw Error(`"${this.displayName}" must be valid JSON (${e.message}).`);
+            }
+            if (typeof object !== 'object' || object === null || Array.isArray(object)) {
+                throw Error(`"${this.displayName}" must be a JSON object.`);
+            }
+            const missingKeys = this.#requiredKeys.filter(key => !Object.hasOwn(object, key));
+            if (missingKeys.length > 0) {
+                const hint = Object.hasOwn(object, 'items') ? ' If you pasted an OpenEI API response, paste only the rate object inside "items".' : '';
+                throw Error(`"${this.displayName}" is missing required keys: ${missingKeys.join(', ')}.${hint}`);
+            }
+        }
+        super.value = text;
     }
 }
 

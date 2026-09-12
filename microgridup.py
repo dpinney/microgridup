@@ -83,7 +83,9 @@ def main(data, invalidate_cache=True, open_results=False):
 		'CREATION_DATE': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
 		'DESCRIPTION': data['DESCRIPTION'],
 		'singlePhaseRelayCost': data['singlePhaseRelayCost'],
-		'threePhaseRelayCost': data['threePhaseRelayCost']
+		'threePhaseRelayCost': data['threePhaseRelayCost'],
+		'LOAD_GROWTH_PERCENT': data['LOAD_GROWTH_PERCENT'],
+		'LOAD_GROWTH_SPECIFIC': data['LOAD_GROWTH_SPECIFIC']
 	}
 	if 'jsCircuitModel' in data:
 		inputs['jsCircuitModel'] = data['jsCircuitModel']
@@ -762,7 +764,7 @@ def get_immutable_dict(data):
 				for idx in range(len(mutable_obj)):
 					v = mutable_obj[idx]
 					if isinstance(v, dict) or isinstance(v, list):
-						stack.append((mutable_obj, k, v))
+						stack.append((mutable_obj, idx, v))
 			if mutable_obj == stack[len(stack) - 1][2]:
 				parent, k, v = stack.pop()
 				if parent is None:
@@ -813,8 +815,7 @@ def _tests():
 			'demandCost': 20.0,
 			'solarCanCurtail': True,
 			'solarCanExport': True,
-			'urdbLabelSwitch': False,
-			'urdbLabel': '5b75cfe95457a3454faf0aea',
+			'urdbResponse': '',
 			'year': 2017,
 			'analysisYears': 25,
 			'outageDuration': 48,

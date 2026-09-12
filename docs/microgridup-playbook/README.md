@@ -1013,10 +1013,14 @@ characters.</td>
 <td>Energy charge per kWh.</td>
 </tr>
 <tr class="odd">
-<td><strong>Wholesale Cost ($/kWh)</strong></td>
+<td><strong>Exported Power Cost ($/kWh)</strong></td>
 <td>0.034</td>
-<td>To turn off energy export/net-metering set wholesale Cost to 0 and
-excess PV gen will be curtailed.</td>
+<td>The price the grid operator pays for power exported by the
+microgrid, i.e. generation beyond the site load. It applies whether the
+tariff comes from Energy Cost and Demand Cost or from a Custom URDB Rate,
+and it is ignored when DG Can Export is No, which curtails the excess
+generation instead. A value of 0 leaves export allowed but unpaid, so the
+optimizer will not size generation for it.</td>
 </tr>
 <tr class="even">
 <td><strong>Demand Cost ($/kW)</strong></td>
@@ -1036,7 +1040,7 @@ curtailed.</td>
 grid.</td>
 </tr>
 <tr class="odd">
-<td><strong>Use URDB Rate?</strong></td>
+<td><strong>Use URDB Rate? (removed)</strong></td>
 <td>No</td>
 <td>The electricity rate can be selected from a list of rates available
 in the location entered. The rates are downloaded from the <a
@@ -1052,7 +1056,7 @@ href="https://reopt.nrel.gov/tool/reopt-user-manual.pdf#page=5"><u>The
 REopt Web Tool User Manual.</u></a></td>
 </tr>
 <tr class="even">
-<td><strong>URDB Label</strong></td>
+<td><strong>URDB Label (removed)</strong></td>
 <td>5b75cfe95457a3454faf0aea</td>
 <td>If you want to use a URDB rate that isn’t available in the dropdown
 list for your selected location, you can enter a URDB label that
@@ -1061,6 +1065,21 @@ the URDB rate on the Open EI website. For example, the label for the
 rate found at the URL <a
 href="https://openei.org/apps/IURDB/rate/view/5e6134175457a3cf56019407"><u>https://openei.org/apps/IURDB/rate/view/5e6134175457a3cf56019407</u></a>would
 be entered as just the label 5e6134175457a3cf56019407.</td>
+</tr>
+<tr class="odd">
+<td><strong>Custom URDB Rate (JSON format)</strong></td>
+<td>(none)</td>
+<td>Optional. Paste a utility rate in the <a
+href="https://openei.org/services/doc/rest/util_rates/?version=7"><u>URDB
+JSON format</u></a> to model a rate that is not in the URDB. When this
+field is set, it is sent to REopt as a urdb_response and takes precedence
+over Energy Cost and Demand Cost. The easiest way to generate a custom rate
+is to go to the <a href="https://reopt.nlr.gov/tool/custom_tariffs">REopt tariff builder</a>,
+build the rate, and download the JSON file. The keys energyratestructure,
+energyweekdayschedule, and energyweekendschedule are required. Demand charges,
+tiers, and fixed charges are optional. Rate periods are zero-indexed. See the <a
+href="https://natlabrockies.github.io/REopt.jl/dev/reopt/inputs/#ElectricTariff"><u>REopt.jl
+ElectricTariff inputs</u></a> for the full list of recognized keys.</td>
 </tr>
 <tr class="odd">
 <td><strong>Load Data (.csv)</strong></td>

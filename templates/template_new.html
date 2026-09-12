@@ -26,6 +26,8 @@
 		}
 		.chunk, .desc {
 			display: inline-block;
+			/* Make adjacent inputs of expandable text areas stay at the top */
+			vertical-align: top;
 			background-color: lightgray;
 			padding: 6px;
 			border-radius: 4px;
@@ -34,6 +36,10 @@
 		/* Only style inputs in chunks, not inputs in tables */
 		.chunk > input:last-child, .chunk > select:last-child {
 			margin-left: .5rem;
+		}
+		/* Make labels of expandable text areas stay at the top */
+		.chunk > textarea {
+			vertical-align: top;
 		}
 		.multiSelectDropdown {
 			position: relative;
@@ -303,15 +309,21 @@
                 </div>
                 <div>
                     <i class="fa fa-plus-square"></i>
-                    <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
+                    <a href="javascript:void(0)" class="toggle show">Advanced inputs</a>
                     <div style="display:none">
                         <div id="energyCost"></div>
-                        <div id="wholesaleCost"></div>
                         <div id="demandCost"></div>
+                        <div id="wholesaleCost"></div>
                         <div id="solarCanCurtail"></div>
                         <div id="solarCanExport"></div>
-                        <div id="urdbLabelSwitch"></div>
-                        <div id="urdbLabel"></div>
+                        <div class="chunk">
+                            <label class="tooltip" for="urdbResponseSwitch">Use Custom URDB JSON?<span class="classic">Yes replaces Energy Cost and Demand Cost with a rate pasted in URDB JSON format. Switching back to No clears the pasted rate. Exported Power Cost applies either way.</span></label>
+                            <select id="urdbResponseSwitch">
+                                <option value="false" selected>No</option>
+                                <option value="true">Yes</option>
+                            </select>
+                        </div>
+                        <div id="urdbResponse"></div>
                     </div>
                 </div>
                 <h5>Load Profile</h5>
@@ -328,18 +340,11 @@
                 <div id="analysisYears"></div>
                 <div>
                     <i class="fa fa-plus-square"></i>
-                    <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
+                    <a href="javascript:void(0)" class="toggle show">Advanced inputs</a>
                     <div style="display:none">
                         <div id="year"></div>
-                        <div class="chunk">
-                            <!-- <label for="LOAD_GROWTH_PERCENT">Global Load Growth (%)</label> -->
-							<label class="tooltip" for="LOAD_GROWTH_PERCENT">Global Load Growth (%)<span class="classic">Input a whole number percentage to increase all loads by. increased_load = original_load * (1 + load_growth_percentage / 100).</span></label>
-                            <input type="number" name="LOAD_GROWTH_PERCENT" value="0" step="1" min="0" max="500">
-                        </div>
-                        <div class="chunk">
-                            <label class="tooltip" for="LOAD_GROWTH_SPECIFIC">Specific Load Growth (JSON format)<span class="classic">Input a JSON object with meter names and whole number percentages to increase specific loads. Example: {"meter1": 10, "meter2": 5} increases meter1 by 10% and meter2 by 5%.</span></label>
-                            <textarea name="LOAD_GROWTH_SPECIFIC" placeholder='{"meter1": 10, "meter2": 5}' rows="1"  cols="30"></textarea>
-                        </div>
+                        <div id="LOAD_GROWTH_PERCENT"></div>
+                        <div id="LOAD_GROWTH_SPECIFIC"></div>
                         <div class="chunk">
                             <label class="tooltip" for="ADDITIONAL_LOADSHAPE">Additional Loadshape (.csv)<span class="classic">Upload a CSV file with a single column of values to add to a specific meter's load profile. Must have the same number of rows as your load data (typically 8760 for one year of hourly data).</span></label>
                             <input type="file" name="ADDITIONAL_LOADSHAPE" accept=".csv">
@@ -371,7 +376,7 @@
                 </div>
                 <div>
                     <i class="fa fa-plus-square"></i>
-                    <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
+                    <a href="javascript:void(0)" class="toggle show">Advanced inputs</a>
                     <div style="display:none;">
                         <div id='maxRuntimeSeconds'></div>
                     </div>
@@ -382,7 +387,7 @@
                 <div id="threePhaseRelayCost"></div>
                 <div>
                     <i class="fa fa-plus-square"></i>
-                    <a href="javascript:void(0)" class="toggle show">Optional inputs</a>
+                    <a href="javascript:void(0)" class="toggle show">Advanced inputs</a>
                     <div style="display:none">
                         <div id="omCostEscalator"></div>
                         <div id='discountRate'></div>
@@ -673,6 +678,58 @@
 		} else {
 			slideUp(element, duration);
 		}
+	}
+
+	// - Inline styles the horizontal slides set while animating an inline-block element
+	const horizontalSlideProperties = ['boxSizing', 'whiteSpace', 'clipPath', 'width', 'paddingLeft', 'paddingRight', 'marginLeft', 'marginRight', 'transition'];
+
+	/** Horizontal counterpart of slideUp: the element's right edge moves left until the element is gone. Meant for inline-block elements. */
+	function slideLeft(element, duration = 500) {
+		clearTimeout(element.horizontalSlideTimeout);
+		element.style.boxSizing = 'border-box';
+		element.style.whiteSpace = 'nowrap';
+		// - clip-path clips the overflowing content without changing the element's baseline, unlike overflow: hidden, so the row doesn't jump
+		element.style.clipPath = 'inset(0)';
+		element.style.width = element.offsetWidth + 'px';
+		element.offsetWidth; // Force reflow
+		element.style.transition = `width ${duration}ms ease-in-out, padding ${duration}ms ease-in-out, margin ${duration}ms ease-in-out`;
+		element.style.width = 0;
+		element.style.paddingLeft = 0;
+		element.style.paddingRight = 0;
+		element.style.marginLeft = 0;
+		element.style.marginRight = 0;
+		element.horizontalSlideTimeout = setTimeout(() => {
+			element.style.display = 'none';
+			horizontalSlideProperties.forEach(property => element.style[property] = '');
+		}, duration);
+	}
+
+	/** Horizontal counterpart of slideDown: the element grows from its left edge to its natural width. Meant for inline-block elements. */
+	function slideRight(element, duration = 500) {
+		clearTimeout(element.horizontalSlideTimeout);
+		// - Clear the inline styles of a slideLeft that is still running so that the natural width, not the mid-animation width, is measured below
+		horizontalSlideProperties.forEach(property => element.style[property] = '');
+		element.style.display = 'inline-block';
+		element.style.boxSizing = 'border-box';
+		element.style.whiteSpace = 'nowrap';
+		element.style.clipPath = 'inset(0)';
+		const style = window.getComputedStyle(element);
+		const [width, paddingLeft, paddingRight, marginLeft, marginRight] = [element.offsetWidth + 'px', style.paddingLeft, style.paddingRight, style.marginLeft, style.marginRight];
+		element.style.width = 0;
+		element.style.paddingLeft = 0;
+		element.style.paddingRight = 0;
+		element.style.marginLeft = 0;
+		element.style.marginRight = 0;
+		element.offsetWidth; // Force reflow
+		element.style.transition = `width ${duration}ms ease-in-out, padding ${duration}ms ease-in-out, margin ${duration}ms ease-in-out`;
+		element.style.width = width;
+		element.style.paddingLeft = paddingLeft;
+		element.style.paddingRight = paddingRight;
+		element.style.marginLeft = marginLeft;
+		element.style.marginRight = marginRight;
+		element.horizontalSlideTimeout = setTimeout(() => {
+			horizontalSlideProperties.forEach(property => element.style[property] = '');
+		}, duration);
 	}
 
 	/** Create a button that checks every checkbox in the given critical loads form when clicked. */
@@ -1331,7 +1388,7 @@
 				}
 			});
 		} else if ((document.getElementById('circuitPostCreation')) && (selectedPartitioningMethod == '')) {
-			PARTITION_PARAMS = JSON.parse('{{ in_data.MICROGRIDS | tojson | safe }}');
+			PARTITION_PARAMS = {{ in_data.MICROGRIDS | tojson }};
 		}
 		form1.append('PARTITION_PARAMS',JSON.stringify(PARTITION_PARAMS));
 		// Do not proceed if user specifies multiple microgrids in manual/loadgrouping partitioning but doesn't assign loads to each microgrid. 
@@ -1374,7 +1431,7 @@
 		form1.append('mgParameterOverrides', JSON.stringify(mgParameterOverrides));
 
 		// - Append data to get single phase load count and three phase load count per load
-		const existingJsCircuitModel = JSON.parse('{{ in_data.get("jsCircuitModel", "") | tojson | safe }}');
+		const existingJsCircuitModel = {{ in_data.get("jsCircuitModel", "") | tojson }};
 		if (window.circuitModel.getElements().length > 0) {
 			for (const element of window.circuitModel.getElements(element => element.getProperty('type') === 'load')) {
 				element.setProperty('loadProfile', undefined);
@@ -1579,7 +1636,7 @@
 			const MODEL_DIR = document.getElementsByName('MODEL_DIR')[0].value;
 			window.onEditFlow = true;
 			// Get allDataInputs.json params from Jinja as variables in the script.
-			const inData = JSON.parse('{{ in_data | tojson | safe }}');
+			const inData = {{ in_data | tojson }};
 			const CRITICAL_LOADS = inData['CRITICAL_LOADS'];
 			const MICROGRIDS = inData['MICROGRIDS'];
 			// Stash saved wizard elements so the post-circuitModel-init block (below) can load them.
@@ -1732,7 +1789,7 @@
 					this.classList.add('hide');
 				} else {
 					// Replace the text
-					this.textContent = 'Optional inputs';
+					this.textContent = 'Advanced inputs';
 					// Replace the icon
 					const icon = this.previousElementSibling;
 					if (icon && icon.tagName.toLowerCase() === 'i') {
@@ -1761,7 +1818,7 @@
 	</script>
 	<script type='module'>
 	import { CircuitElement, CircuitModel, CircuitController, CircuitTableView, CircuitUserControlsView, CsvLoadParser, OutageLocationInputView } from '/static/js/components/circuitBuilder/circuitBuilder.js';
-	import { REoptParametersModel, REoptParameters, REoptIntParameter, REoptFloatParameter, REoptStringParameter } from '/static/js/components/reoptParameters/model.js';
+	import { REoptParametersModel, REoptParameters, REoptIntParameter, REoptFloatParameter, REoptStringParameter, REoptJsonObjectParameter } from '/static/js/components/reoptParameters/model.js';
 	import { REoptParametersController } from '/static/js/components/reoptParameters/controller.js';
 	import { REoptParametersView, REoptInputView } from '/static/js/components/reoptParameters/view.js';
 
@@ -1832,7 +1889,7 @@
 		reoptParametersView.renderContent();
 	}
 	// - Create the validation model
-	const in_data = JSON.parse('{{ in_data | tojson | safe }}');
+	const in_data = {{ in_data | tojson }};
 	const reoptValidationModel = new REoptParametersModel();
 	reoptValidationModel.addReoptParametersInstance('validationMg');
 	const validationMg = reoptValidationModel.getReoptParametersInstance('validationMg')
@@ -1894,8 +1951,26 @@
 			'MODEL_DIR',
 			'A project name must be unique and can only include (1) lowercase letters (a-z), (2) digits (0-9), and (3) hyphens ("-"). Underscores and spaces are not allowed.',
 			/^[a-z0-9\-]+$/));
+	validationMg.addReoptParameter(
+		'MicrogridUp:LOAD_GROWTH_PERCENT',
+		new REoptFloatParameter(
+			'Global Load Growth (%)',
+			'MicrogridUp:LOAD_GROWTH_PERCENT',
+			'LOAD_GROWTH_PERCENT',
+			'Input a whole number percentage to increase all loads by. increased_load = original_load * (1 + load_growth_percentage / 100).',
+			500,
+			0));
+	validationMg.addReoptParameter(
+		'MicrogridUp:LOAD_GROWTH_SPECIFIC',
+		new REoptJsonObjectParameter(
+			'Specific Load Growth (JSON format)',
+			'MicrogridUp:LOAD_GROWTH_SPECIFIC',
+			'LOAD_GROWTH_SPECIFIC',
+			'Input a JSON object with meter names and whole number percentages to increase specific loads. Example: {"meter1": 10, "meter2": 5} increases meter1 by 10% and meter2 by 5%.',
+			[],
+			'{"meter1": 10, "meter2": 5}'));
 	const reoptValidationController = new REoptParametersController(reoptValidationModel);
-	// - Get the actual parameter values from allInputData.json and use them to set the values of the dynamically inputs
+	// - Get the actual parameter values from allInputData.json and use them to set the values of the dynamic inputs
 	const parameters = Object.entries(in_data.REOPT_INPUTS);
 	parameters.push(
 		['singlePhaseRelayCost', in_data.singlePhaseRelayCost],
@@ -1903,7 +1978,10 @@
 		['QSTS_STEPS', in_data.QSTS_STEPS],
 		['latitude', 39.7817],
 		['longitude', -89.6501],
-        ['MODEL_DIR', in_data.MODEL_DIR])
+        ['MODEL_DIR', in_data.MODEL_DIR],
+		// - Projects saved before load growth was persisted in allInputData.json lack these two keys, so I need default values
+		['LOAD_GROWTH_PERCENT', in_data.LOAD_GROWTH_PERCENT ?? 0],
+		['LOAD_GROWTH_SPECIFIC', Object.keys(in_data.LOAD_GROWTH_SPECIFIC ?? {}).length === 0 ? '' : JSON.stringify(in_data.LOAD_GROWTH_SPECIFIC)])
 	for (const [key, value] of parameters) {
 		const reoptParameter = reoptValidationModel.getReoptParametersInstance('validationMg').reoptParameters.filter(parameter => parameter.alias === key)[0];
 		reoptParameter.value = value;
@@ -1911,6 +1989,42 @@
 		const replacementDiv = document.getElementById(reoptParameter.alias);
 		replacementDiv.replaceWith(reoptInputView.modal.divElement);
 	}
+	// - Add logic for the Custom URDB Rate switch
+	const urdbResponseSwitch = document.getElementById('urdbResponseSwitch');
+	const urdbResponseTextArea = document.getElementById('urdbResponse');
+	const urdbResponseChunk = urdbResponseTextArea.closest('.chunk');
+	const blendedRateChunks = ['energyCost', 'demandCost'].map(alias => document.getElementById(alias).closest('.chunk'));
+	// - Make the Yes/No input match the text area during edit workflows
+	urdbResponseSwitch.value = urdbResponseTextArea.value.trim() === '' ? 'false' : 'true';
+	// - Use the "animate" argument to not show an animation on page load
+	function applyUrdbResponseSwitch(animate) {
+		const useCustomJson = urdbResponseSwitch.value === 'true';
+		const shownChunks = useCustomJson ? [urdbResponseChunk] : blendedRateChunks;
+		const hiddenChunks = useCustomJson ? blendedRateChunks : [urdbResponseChunk];
+		for (const chunk of hiddenChunks) {
+			if (animate) {
+				slideLeft(chunk);
+			} else {
+				chunk.style.display = 'none';
+			}
+		}
+		for (const chunk of shownChunks) {
+			if (animate) {
+				slideRight(chunk);
+			} else {
+				chunk.style.display = '';
+			}
+		}
+	}
+	applyUrdbResponseSwitch(false);
+	urdbResponseSwitch.addEventListener('change', () => {
+		// - Clear the text area if the user does not use the Custom URDB Rate
+		if (urdbResponseSwitch.value === 'false') {
+			urdbResponseTextArea.value = '';
+			urdbResponseTextArea.dispatchEvent(new Event('change'));
+		}
+		applyUrdbResponseSwitch(true);
+	});
 	{% if iframe_mode %}
 	window.disableInputs = function() {
 		[...document.getElementsByTagName('input')].forEach(input => {

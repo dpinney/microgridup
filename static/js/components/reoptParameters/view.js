@@ -1,5 +1,5 @@
 export { REoptParametersView, REoptInputView };
-import { REoptIntParameter, REoptFloatParameter, REoptBooleanParameter } from './model.js';
+import { REoptIntParameter, REoptFloatParameter, REoptBooleanParameter, REoptJsonObjectParameter } from './model.js';
 import { REoptParametersController } from './controller.js';
 import { Modal, getTrashCanSvg, getCirclePlusSvg } from '../modal.js';
 
@@ -49,6 +49,10 @@ class REoptInputView {
         this.#input.id = reoptParameter.alias;
         this.#input.name = reoptParameter.alias;
         input.required = true;
+        // - JSON text parameters may be left empty
+        if (reoptParameter instanceof REoptJsonObjectParameter) {
+            input.required = false;
+        }
         modal.divElement.append(input);
         if (input.type === 'checkbox' && !input.checked) {
             // - Must append a hidden input for unchecked checkboxes
@@ -203,7 +207,7 @@ class REoptParametersTable {
                 parentElement.remove();
             } else {
                 const inputOrSelect = parentElement.children[2].children[0].children[0];
-                if (inputOrSelect instanceof HTMLInputElement) {
+                if (inputOrSelect instanceof HTMLInputElement || inputOrSelect instanceof HTMLTextAreaElement) {
                     // - During a refresh, don't remove erroneous values from any inputs
                     //inputOrSelect.value = reoptParameter.value;
                 } else {
@@ -446,7 +450,13 @@ function getInput(id, errorElement=null) {
         });
         return select;
     } else {
-        const input = document.createElement('input');
+        // - JSON text parameters get a textarea
+        const input = document.createElement(reoptParameter instanceof REoptJsonObjectParameter ? 'textarea' : 'input');
+        if (input instanceof HTMLTextAreaElement) {
+            input.rows = 1;
+            input.cols = 30;
+            input.placeholder = reoptParameter.placeholder;
+        }
         input.value = oldValue;
         input.addEventListener('change', function() {
             try {

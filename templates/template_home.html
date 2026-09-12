@@ -464,8 +464,7 @@
                 }
             });
 
-            const projects_json = '{{ projects | tojson }}';
-            const projects = JSON.parse(projects_json);
+            const projects = {{ projects | tojson }};
             checkStatus(projects);
             setInterval(() => checkStatus(projects), 8000); // Check status each 8 seconds.
         }
